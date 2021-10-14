@@ -118,20 +118,16 @@ my $save_details = sub {
         (event_datetime, honey_ipv4, sip_from, sip_method, sip_uri, sip_via, sip_contact, sip_user_agent, sip_to) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
       }
-    ) or die "Cannot prepare: " . $dbh->errstr();
+    );
     say q{Prepared INSERT} if $debug;
 
-    $sth->bind_param(
+    $sth->execute(
         $event_dt,                    q{ipv4_to_come},
         $from,                        $call->method(),
         $call->uri(),                 $call->get_header('via'),
         $call->get_header('contact'), $call->get_header('user-agent'),
         $call->get_header('to')
-
-    ) or die "Cannot bind_param: " . $dbh->errstr();
-    say q{Bound params} if $debug;
-
-    $sth->execute() or die "Cannot execute: " . $dbh->errstr();
+    );
     say q{INSERTed data} if $debug;
 
     return 1;
@@ -144,7 +140,6 @@ $ua->create_chain(
 if ( $verbose or $debug ) {
     say 'Listening...';
 }
-
 $ua->loop;
 
 sub sig_handler {    # 1st argument is signal name
