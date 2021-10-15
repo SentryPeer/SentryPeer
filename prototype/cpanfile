@@ -1,7 +1,8 @@
+requires 'Config::Tiny', '2.27';
 requires 'DBI', '1.634';
 requires 'DBD::SQLite', '1.70';
 requires 'DateTime', '1.54';
-requires 'Data::Dumper', '0';
 requires 'Mojolicious', '9.21';
 requires 'Net::BGP', 0;
 requires 'Net::SIP', '0.832';
+requires 'Time::HiRes', '1.9764';

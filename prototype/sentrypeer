@@ -11,7 +11,7 @@
 # REQUIREMENTS:  ---
 #         BUGS:  ---
 #        NOTES:  ---
-#       AUTHOR:  Gavin Henry (GH), <ghenry@sentrypeer.com>
+#       AUTHOR:  Gavin Henry (GH), <ghenry@sentrypeer.org>
 #      COMPANY:  .
 #      VERSION:  1.0
 #      CREATED:  19/08/21 19:32:20 BST
@@ -19,7 +19,7 @@
 #
 #
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
-# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.com>
+# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org
 #===============================================================================
 
 use strict;
@@ -28,22 +28,28 @@ use utf8;
 use feature ':5.16';
 
 use DBI;
-use DateTime;
 use Net::SIP;
 use Getopt::Long;
+use Config::Tiny;
+use Time::HiRes qw/ gettimeofday /;
+use Mojolicious::Lite -signatures;
 
 GetOptions(
     q{debug}   => \my $debug,
     q{verbose} => \my $verbose
 );
 
-my $dbfile = qq{$0.db};
+my $dbfile      = qq{$0.db};
+my $config_file = qq{$0.conf};
 
-# Cleanup
+my $config = Config::Tiny->read( $config_file, 'utf8' )
+  or die "Can't open $config_file\n";
+
+# TODO: Cleanup
 $SIG{'INT'}  = \&sig_handler;
 $SIG{'QUIT'} = \&sig_handler;
 
-# Clean slate - maybe call devmode so we don't clean up valuable honey data
+# TODO: Clean slate - maybe call devmode so we don't clean up valuable honey data
 if ($debug) {
     unlink $dbfile          if -e $dbfile;
     say qq{Deleted $dbfile} if $debug;
@@ -63,8 +69,8 @@ my $dbh = DBI->connect(
 # Schema - open for change at any stage during prototype phase
 my $schema = <<'SCHEMA';
 CREATE TABLE IF NOT EXISTS honey (
-   event_datetime TEXT,
-   honey_ipv4 TEXT,
+   event_timestamp TEXT,
+   source_ip TEXT,
    sip_from TEXT,
    sip_method TEXT,
    sip_uri TEXT,
@@ -79,11 +85,16 @@ $dbh->do($schema);
 say qq{$dbfile created and SCHEMA populated} if $debug;
 
 # TODO: Find our IP out automatically
-my $ua = Net::SIP::Simple->new( leg => q{192.168.100.90:5060} );
+my $ip_address = $config->{main}->{ip_address};
+my $ua         = Net::SIP::Simple->new( leg => qq{$ip_address:5060} );
 
 # TODO: Refactor
 my $save_details = sub {
     my ( $from, $call ) = @_;
+
+    # TODO: Maybe convert to DT with a TZ
+    my $event_timestamp = gettimeofday();
+    say qq{Event datetime is: $event_timestamp} if $debug;
 
     if ($debug) {
         say '======= From:';
@@ -108,21 +119,17 @@ my $save_details = sub {
         say $call->get_header('to');
     }
 
-    # TODO: Honour TZ properly
-    my $event_dt = DateTime->now()->iso8601() . q{Z};
-    say qq{Event datetime is: $event_dt} if $debug;
-
     my $sth = $dbh->prepare(
         q{
         INSERT INTO honey 
-        (event_datetime, honey_ipv4, sip_from, sip_method, sip_uri, sip_via, sip_contact, sip_user_agent, sip_to) 
+        (event_timestamp, source_ip, sip_from, sip_method, sip_uri, sip_via, sip_contact, sip_user_agent, sip_to) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
       }
     );
     say q{Prepared INSERT} if $debug;
 
     $sth->execute(
-        $event_dt,                    q{ipv4_to_come},
+        $event_timestamp,             q{ipv4_to_come},
         $from,                        $call->method(),
         $call->uri(),                 $call->get_header('via'),
         $call->get_header('contact'), $call->get_header('user-agent'),
@@ -137,15 +144,69 @@ my $save_details = sub {
 $ua->create_chain(
     [ $ua->create_registrar, $ua->listen( filter => $save_details ) ] );
 
-if ( $verbose or $debug ) {
-    say 'Listening...';
+# TODO: Check DBD::SQLite does re fork()
+# local $SIG{CHLD} = "IGNORE";
+my $pid = fork();
+die "Failed to fork: $!" unless defined $pid;
+
+# TODO: This is running in a child process - best way or move to another program. Will be easier in non-prototype
+# as limitation here is the event loops of Mojo and Net::SIP. We should do our own and put these in them?
+# Mojolicious
+if ( $pid == 0 ) {
+    say "Hi from the Mojo child process." if $debug;
+
+    # https://metacpan.org/pod/DBD::SQLite#DBD::SQLite-and-fork()
+    my $dbh = DBI->connect(
+        qq{dbi:SQLite:dbname=$dbfile},
+        q{}, q{},
+        {
+            AutoCommit     => 1,
+            RaiseError     => 1,
+            sqlite_unicode => 1,
+        }
+    );
+
+    get '/' => sub ($c) {
+
+        my $honey_data = $dbh->selectall_arrayref(q{SELECT * FROM honey});
+        $c->render( template => 'sentrypeer', honey_data => $honey_data );
+    };
+
+    app->start( 'daemon', '-l', 'http://*:8090' );
 }
-$ua->loop;
+
+if ( $pid != 0 ) {
+    if ( $verbose or $debug ) {
+        say 'Listening...';
+    }
+    $ua->loop;
+}
 
 sub sig_handler {    # 1st argument is signal name
     my ($sig) = @_;
     say "Caught a SIG$sig. Closing $dbfile" if $debug;
     $dbh->disconnect;
+    say "Waiting for child process to exit: $pid" if $debug;
+    waitpid $pid, 0;
     exit(0);
 }
 
+# TODO: Move to standalone file in ./templates when needed
+#
+__DATA__
+
+@@ sentrypeer.html.ep
+% use Data::Dumper;
+<!DOCTYPE html>
+<html>
+  <head><title>SentryPeer</title></head>
+  <body>Hi There! Here is your data:
+    <ul>
+      % for my $sip (@{$honey_data}) {
+        <li>
+          %= Dumper $sip
+        </li>
+      % }    
+    </ul>
+  </body>
+</html>
