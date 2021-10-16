@@ -66,6 +66,8 @@ my $dbh = DBI->connect(
     }
 );
 
+# TODO: Add E.164 number dialled
+# TODO: Add IP addresss (maxmind geoip) ountry origination and AS Number
 # Schema - open for change at any stage during prototype phase
 my $schema = <<'SCHEMA';
 CREATE TABLE IF NOT EXISTS honey (
@@ -94,6 +96,9 @@ my $save_details = sub {
     # TODO: Maybe convert to DT with a TZ
     my $event_timestamp = gettimeofday();
     say qq{Event datetime is: $event_timestamp} if $debug;
+
+    # TODO: Actually number dialled save in E.164
+    # TODO: Save request IP, but see - https://github.com/noxxi/p5-net-sip/issues/50
 
     if ($debug) {
         say '======= From:';
@@ -164,7 +169,13 @@ if ( $pid == 0 ) {
     get '/' => sub ($c) {
 
         my $honey_data = $dbh->selectall_arrayref(q{SELECT * FROM honey});
-        $c->render( template => 'sentrypeer', honey_data => $honey_data );
+
+        # https://docs.mojolicious.org/Mojolicious/Guides/Rendering#Content-negotiation
+        $c->respond_to(
+            json => { json     => { honey_data => $honey_data } },
+            html => { template => 'sentrypeer', honey_data => $honey_data },
+            any  => { text     => '',           status     => 204 }
+        );
     };
 
     app->start( 'daemon', '-l', 'http://*:8090' );
@@ -186,12 +197,11 @@ sub sig_handler {    # 1st argument is signal name
     exit(0);
 }
 
-# TODO: Move to standalone file in ./templates when needed
+# TODO: Move to standalone files in ./templates when needed
 #
 __DATA__
 
 @@ sentrypeer.html.ep
-% use Data::Dumper;
 <!DOCTYPE html>
 <!-- 
    _____            _              _____               
