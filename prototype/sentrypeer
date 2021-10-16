@@ -69,14 +69,17 @@ my $dbh = DBI->connect(
 # TODO: Use this for WebSocket pushes and BGP announcements
 # https://www.sqlite.org/c3ref/update_hook.html
 # https://metacpan.org/pod/DBD::SQLite#$dbh-%3Esqlite_update_hook(-$code_ref-)
-my $print_sqlite_event_ref = sub {
-    my ( $action_code, $database, $table, $rowid ) = @_;
-    say "Action code: $action_code";
-    say "Database: $database";
-    say "Table: $table";
-    say "Row ID: $rowid";
-};
-$dbh->sqlite_update_hook($print_sqlite_event_ref);
+if ($debug) {
+    my $print_sqlite_event_ref = sub {
+        my ( $action_code, $database, $table, $rowid ) = @_;
+        say "=== Event from SQLite has run a callback:";
+        say "Action code: $action_code";
+        say "Database: $database";
+        say "Table: $table";
+        say "Row ID: $rowid";
+    };
+    $dbh->sqlite_update_hook($print_sqlite_event_ref);
+}
 
 # TODO: Add E.164 number dialled
 # TODO: Add IP addresss (maxmind geoip) ountry origination and AS Number
