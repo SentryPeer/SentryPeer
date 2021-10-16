@@ -66,6 +66,18 @@ my $dbh = DBI->connect(
     }
 );
 
+# TODO: Use this for WebSocket pushes and BGP announcements
+# https://www.sqlite.org/c3ref/update_hook.html
+# https://metacpan.org/pod/DBD::SQLite#$dbh-%3Esqlite_update_hook(-$code_ref-)
+my $print_sqlite_event_ref = sub {
+    my ( $action_code, $database, $table, $rowid ) = @_;
+    say "Action code: $action_code";
+    say "Database: $database";
+    say "Table: $table";
+    say "Row ID: $rowid";
+};
+$dbh->sqlite_update_hook($print_sqlite_event_ref);
+
 # TODO: Add E.164 number dialled
 # TODO: Add IP addresss (maxmind geoip) ountry origination and AS Number
 # Schema - open for change at any stage during prototype phase
@@ -97,8 +109,8 @@ my $save_details = sub {
     my $event_timestamp = gettimeofday();
     say qq{Event datetime is: $event_timestamp} if $debug;
 
-    # TODO: Actually number dialled save in E.164
-    # TODO: Save request IP, but see - https://github.com/noxxi/p5-net-sip/issues/50
+# TODO: Actually number dialled save in E.164
+# TODO: Save request IP, but see - https://github.com/noxxi/p5-net-sip/issues/50
 
     if ($debug) {
         say '======= From:';
@@ -170,7 +182,7 @@ if ( $pid == 0 ) {
 
         my $honey_data = $dbh->selectall_arrayref(q{SELECT * FROM honey});
 
-        # https://docs.mojolicious.org/Mojolicious/Guides/Rendering#Content-negotiation
+ # https://docs.mojolicious.org/Mojolicious/Guides/Rendering#Content-negotiation
         $c->respond_to(
             json => { json     => { honey_data => $honey_data } },
             html => { template => 'sentrypeer', honey_data => $honey_data },
