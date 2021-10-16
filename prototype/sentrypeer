@@ -86,6 +86,7 @@ if ($debug) {
 # Schema - open for change at any stage during prototype phase
 my $schema = <<'SCHEMA';
 CREATE TABLE IF NOT EXISTS honey (
+   honey_id INTEGER PRIMARY KEY,
    event_timestamp TEXT,
    source_ip TEXT,
    sip_from TEXT,
