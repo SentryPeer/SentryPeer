@@ -1,0 +1,29 @@
+name: build_and_test
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.34
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install cpamn
+        run: cpanm -n App::cpanminus
+      - name: Install dependencies
+        run: |
+          cd prototype
+          cpanm -n --installdeps .
+          cpanm -n Test::Pod Test::Pod::Coverage
+      - name: Run tests
+        run: |
+          prove -lv t
+        env:
+          TEST_POD: 1
