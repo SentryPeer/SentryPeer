@@ -117,7 +117,7 @@ my $save_details = sub {
     # Methods we don't want to save
     return 1
       if grep { $_ eq $sip_packet->method() }
-      qw/ SUBSCRIBE PUBLISH PRESENCE ACK BYE/;
+      qw/ SUBSCRIBE PUBLISH PRESENCE /;
 
     # TODO: Maybe convert to DT with a TZ
     my $event_timestamp = gettimeofday();
