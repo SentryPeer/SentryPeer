@@ -281,7 +281,7 @@ __DATA__
         </tr>
       </thead>
       <tbody>
-      % my $i = 7;
+      % my $i = 8;
       % for my $sip (@{$honey_data}) {
         <tr>
           % for my $detail (0 .. $i) {
