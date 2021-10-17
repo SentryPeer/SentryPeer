@@ -29,7 +29,7 @@ use feature ':5.16';
 
 use DBI;
 use Net::SIP;
-use Net::SIP::Util qw(  sip_uri2sockinfo );
+use Net::SIP::Util qw/ sip_uri2sockinfo /;
 
 #use Net::SIP::Debug '2';
 use Getopt::Long;
