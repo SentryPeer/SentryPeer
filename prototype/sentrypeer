@@ -29,6 +29,7 @@ use feature ':5.16';
 
 use DBI;
 use Net::SIP;
+use Net::SIP::Debug '2';
 use Getopt::Long;
 use Config::Tiny;
 use Time::HiRes qw/ gettimeofday /;
@@ -89,7 +90,6 @@ CREATE TABLE IF NOT EXISTS honey (
    honey_id INTEGER PRIMARY KEY,
    event_timestamp TEXT,
    source_ip TEXT,
-   sip_from TEXT,
    sip_method TEXT,
    sip_uri TEXT,
    sip_via TEXT,
@@ -102,8 +102,10 @@ $dbh->do($schema);
 say qq{$dbfile created and SCHEMA populated} if $debug;
 
 # TODO: Find our IP out automatically
-my $ip_address = $config->{main}->{ip_address};
-my $ua         = Net::SIP::Simple->new( leg => qq{$ip_address:5060} );
+my $sip_listen_ip_address = $config->{main}->{sip_listen_ip_address};
+my $sip_listen_port       = $config->{main}->{sip_listen_port};
+my $ua =
+  Net::SIP::Simple->new( leg => qq{$sip_listen_ip_address:$sip_listen_port} );
 
 # TODO: Refactor
 my $save_details = sub {
@@ -117,7 +119,7 @@ my $save_details = sub {
 # TODO: Save request IP, but see - https://github.com/noxxi/p5-net-sip/issues/50
 
     if ($debug) {
-        say '======= From:';
+        say '======= Source IP/From:';
         say $from;
 
         say '======= Method:';
@@ -139,17 +141,17 @@ my $save_details = sub {
     my $sth = $dbh->prepare(
         q{
         INSERT INTO honey 
-        (event_timestamp, source_ip, sip_from, sip_method, sip_uri, sip_via, sip_contact, sip_user_agent) 
+        (event_timestamp, source_ip, sip_method, sip_uri, sip_via, sip_contact, sip_user_agent) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?);
       }
     );
     say q{Prepared INSERT} if $debug;
 
     $sth->execute(
-        $event_timestamp,             q{ipv4_to_come},
-        $from,                        $call->method(),
-        $call->uri(),                 $call->get_header('via'),
-        $call->get_header('contact'), $call->get_header('user-agent')
+        $event_timestamp,         $from,
+        $call->method(),          $call->uri(),
+        $call->get_header('via'), $call->get_header('contact'),
+        $call->get_header('user-agent')
     );
     say q{INSERTed data} if $debug;
 
@@ -157,8 +159,11 @@ my $save_details = sub {
 };
 
 # https://github.com/noxxi/p5-net-sip/issues/49#issuecomment-902025333
+# Creates a https://metacpan.org/dist/Net-SIP/view/lib/Net/SIP/ReceiveChain.pod
 $ua->create_chain(
-    [ $ua->create_registrar, $ua->listen( filter => $save_details ) ] );
+
+    [ $ua->create_registrar, $ua->listen( filter => $save_details ) ]
+);
 
 # TODO: Check DBD::SQLite does re fork()
 # local $SIG{CHLD} = "IGNORE";
