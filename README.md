@@ -40,7 +40,7 @@ The sharing part...you only get other users' data if you share yours. That's the
 
 TBD :-)
 
-Final language choice will probably be [C](https://en.wikipedia.org/wiki/C_(programming_language)), but looking at [Rust](https://www.rust-lang.org/), [Go](https://golang.org/) and [Elixir](https://elixir-lang.org/). Probably C with Perl for tests. I started this because
+Final language choice will probably be [C](https://en.wikipedia.org/wiki/C_(programming_language)), but looking at [Rust](https://www.rust-lang.org/), [Go](https://golang.org/) and [Elixir](https://elixir-lang.org/). Probably C with [Perl](https://www.perl.org/) for tests. I started this because
 I wanted to do C network programming as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
 [Asterisk](https://www.asterisk.org/) etc. But then there's a LOT of Go and I'm doing a podcast on Rust in Nov 2021. Just done one on Dart. See my podcast
 show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
