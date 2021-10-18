@@ -1,7 +1,3 @@
-# SentryPeer
-
-A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
-
 ## Introduction
 
 This is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and number they tried to call. Those details are then used to block them at the service providers network and the next time a user/customer tries to call a collected number, it's blocked.
