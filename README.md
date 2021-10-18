@@ -15,7 +15,7 @@ The sharing part...you only get other users' data if you share yours. That's the
 
 ## Goals
 
-- [ ] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
+- [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [ ] FAST
 - [ ] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
