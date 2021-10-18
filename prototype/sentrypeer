@@ -125,7 +125,7 @@ my $save_details = sub {
     say qq{Event datetime is: $event_timestamp} if $debug;
 
     my ( $proto, $host, $port, $family ) =
-      sip_uri2sockinfo( $sip_packet->uri() );
+      sip_uri2sockinfo( $sip_packet->get_header('contact') );
 
 # A bit from https://stackoverflow.com/a/55337094/1072411
 # TODO: Do we want to save anything other than digits here for analysis reasons?
@@ -182,7 +182,6 @@ my $save_details = sub {
 
 # https://github.com/noxxi/p5-net-sip/issues/49#issuecomment-902025333
 # Creates a https://metacpan.org/dist/Net-SIP/view/lib/Net/SIP/ReceiveChain.pod
-use Data::Dumper;
 $ua->create_chain(
     [ $ua->create_registrar, $ua->listen ],
     (
