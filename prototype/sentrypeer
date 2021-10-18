@@ -84,8 +84,7 @@ if ($debug) {
     $dbh->sqlite_update_hook($print_sqlite_event_ref);
 }
 
-# TODO: Add E.164 number dialled
-# TODO: Add IP addresss (maxmind geoip) ountry origination and AS Number
+# TODO: Add IP address (maxmind geoip) country origination and AS Number
 # Schema - open for change at any stage during prototype phase
 my $schema = <<'SCHEMA';
 CREATE TABLE IF NOT EXISTS honey (
@@ -213,6 +212,7 @@ if ( $pid == 0 ) {
 
     get '/' => sub ($c) {
 
+        # TODO: Add bind_columns for json payload on API
         my $honey_data = $dbh->selectall_arrayref(q{SELECT * FROM honey});
 
  # https://docs.mojolicious.org/Mojolicious/Guides/Rendering#Content-negotiation
