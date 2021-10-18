@@ -17,7 +17,7 @@ The sharing part...you only get other users' data if you share yours. That's the
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [ ] FAST
-- [ ] User _owns their_ data
+- [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] User can **pay to get all data collected** via [SentyPeer commercial website](https://sentrypeer.com) (one day, maybe..)
