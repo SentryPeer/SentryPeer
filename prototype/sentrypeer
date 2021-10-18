@@ -115,9 +115,10 @@ my $save_details = sub {
     my $sip_packet = shift;
 
     # Methods we don't want to save
+    # TODO: Are ACK and BYE used to sniff out responses like in the TCP world?
     return 1
       if grep { $_ eq $sip_packet->method() }
-      qw/ SUBSCRIBE PUBLISH PRESENCE /;
+      qw/ SUBSCRIBE PUBLISH PRESENCE ACK BYE /;
 
     # TODO: Maybe convert to DT with a TZ
     my $event_timestamp = gettimeofday();
@@ -126,7 +127,9 @@ my $save_details = sub {
     my ( $proto, $host, $port, $family ) =
       sip_uri2sockinfo( $sip_packet->uri() );
 
-    my ($called_number) = $sip_packet->uri() =~ m/^sip:(\d+)\@/g;
+# A bit from https://stackoverflow.com/a/55337094/1072411
+# TODO: Do we want to save anything other than digits here for analysis reasons?
+    my ($called_number) = $sip_packet->uri() =~ m/^sips?:\+?(\d+)\@/g;
     $called_number //= q{not_found};
 
     if ($debug) {
