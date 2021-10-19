@@ -1,0 +1,95 @@
+doctype html
+html(lang='en')
+
+    head
+
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+        meta(name='description', content='')
+        meta(name='author', content='')
+
+        title SentryPeer
+
+        // Favicon
+        link(rel='icon', type='image/x-icon', href='assets/favicon.ico')
+
+        // Core theme CSS (includes Bootstrap)
+        link(href='css/styles.css', rel='stylesheet')
+
+    body
+
+        // Page content
+        .container
+            .text-center.my-5
+                h1.mb-0 SIP Honeypot Data
+
+            ul.nav.nav-pills.nav-fill.mb-5
+                li.nav-item
+                    a.nav-link.active(href='#') Source IPs
+                li.nav-item
+                    a.nav-link(href='#') User Agent Used
+                li.nav-item
+                    a.nav-link(href='#') Method Used
+                li.nav-item
+                    a.nav-link(href='#') Country Analysis
+                li.nav-item
+                    a.nav-link(href='#') Number Analysis
+
+            .row
+                .col-auto
+                    .card.mb-5
+                        .card-header
+                            | Time Frame
+                        .card-body
+                            nav.nav.nav-pills.flex-column
+                                a.nav-link.active(aria-current='page', href='#') 1 Hour
+                                a.nav-link(href='#') 24 Hours
+                                a.nav-link(href='#') 7 Days
+                                a.nav-link(href='#') 30 Days
+                .col
+                    .card.mb-5
+                        .card-header
+                            | Data collected between 17:00 and 18:00 UTC
+                        .card-body
+                            table.table
+                                thead
+                                    tr
+                                        th(scope='col') IP Address
+                                        th.text-end(scope='col') Count
+                                tbody
+                                    tr
+                                        td 20.63.64.190
+                                        td.text-end 1576481
+                                    tr
+                                        td 141.94.139.30
+                                        td.text-end 125
+                                    tr
+                                        td 193.46.255.243	
+                                        td.text-end 125
+                                    tr
+                                        td 23.148.145.28
+                                        td.text-end 125
+                                    tr
+                                        td 40.86.206.158
+                                        td.text-end 125
+                                    tr
+                                        td 51.104.46.51
+                                        td.text-end 125
+                                    tr
+                                        td 104.149.156.10
+                                        td.text-end 125
+                                    tr
+                                        td 92.118.63.42
+                                        td.text-end 125
+                                    tr
+                                        td 104.149.141.122
+                                        td.text-end 125
+                                    tr
+                                        td 23.148.145.212
+                                        td.text-end 125
+
+        // Bootstrap core JS
+        script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js')
+
+        // Core theme JS
+        script(src='js/scripts.js')
