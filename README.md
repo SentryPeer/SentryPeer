@@ -57,6 +57,10 @@ This work is dual-licensed under GPL 2.0 and GPL 3.0.
 
 `SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only`
 
+### Contributing
+
+See [CONTRIBUTING](./CONTRIBUTING.md)
+
 ### Project Website
 
 https://sentrypeer.org
@@ -64,4 +68,12 @@ https://sentrypeer.org
 ### Commercial Services (one day, maybe)
  
 https://sentrypeer.com
+
+### Questions, Bug reports, Feature Requests
+
+New issues can be raised at:
+
+https://github.com/ghenry/SentryPeer/issues
+
+It's okay to raise an issue to ask a question.
 
