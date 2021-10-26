@@ -1,15 +1,73 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
+# https://raw.githubusercontent.com/github/gitignore/master/C.gitignore
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
 *.dll
 *.so
+*.so.*
 *.dylib
 
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Executables
+*.exe
 *.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+sentrypeer
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Autoconf and Automake outputs
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.h
+config.h.in
+config.h.in~
+config.log
+config.status
+config.guess
+config.sub
+ltmain.sh
+libtool
+configure
+depcomp
+install-sh
+missing
+src/.deps/
+src/.dirstamp
+stamp-h1
+test-driver
+m4
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
