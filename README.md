@@ -75,7 +75,7 @@ https://sentrypeer.com
 
 ### Trademark
 
-**SENTRYPEER** is a pending registered trademark of Gavin Henry
+[**SENTRYPEER** is a pending registered trademark](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003700947) of Gavin Henry
 
 ### Questions, Bug reports, Feature Requests
 
