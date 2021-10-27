@@ -20,7 +20,7 @@ sentrypeer_SOURCES=src/sentrypeer.c src/sentrypeer.h
 # what flags you want to pass to the C compiler & linker
 #
 # -g and -O2 already added by default
-AM_CFLAGS=-Wall -std=c18
+AM_CFLAGS=-Wall -Werror -std=c18
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 

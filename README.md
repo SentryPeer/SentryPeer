@@ -2,6 +2,11 @@
 
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
+<a href="https://scan.coverity.com/projects/sentrypeer-sentrypeer">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/23969/badge.svg"/>
+</a>
+
 ## Introduction
 
 This is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and number they tried to call. Those details are then used to block them at the service providers network and the next time a user/customer tries to call a collected number, it's blocked.
@@ -10,7 +15,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 
 Of course, if you don't want to run any of this and just buy access to the data that users have opted in to share, then that's a choice too. One day, maybe.
 
-The sharing part...you only get other users' data if you share yours. That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
+The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
 
 ## Goals
@@ -19,7 +24,7 @@ The sharing part...you only get other users' data if you share yours. That's the
 - [ ] FAST
 - [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
-- [ ] User gets other users' data **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
+- [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] User can **pay to get all data collected** via [SentryPeer commercial website](https://sentrypeer.com) (one day, maybe.)
 - [ ] Data is max 7(?) days old as useless otherwise
 - [ ] **Local** data copy for **fast access** - feature / cli flag

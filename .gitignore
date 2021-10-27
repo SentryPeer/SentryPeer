@@ -75,3 +75,6 @@ m4
 
 # sqlite3 db
 sentrypeer.db
+
+# dist
+sentrypeer-*.tar.gz
