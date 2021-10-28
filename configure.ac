@@ -6,9 +6,9 @@
 
 AC_PREREQ([2.69])
 AC_INIT([sentrypeer], [0.0.1], [ghenry@sentrypeer.org],,[https://github.com/SentryPeer/SentryPeer])
+AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
-AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
@@ -39,11 +39,18 @@ AC_CHECK_HEADER_STDBOOL
 # Checks for library functions.
 AC_FUNC_MALLOC
 
-# Our versions follow https://semver.org
-SENTRYPEER_VERSION=001
-AC_SUBST(SENTRYPEER_VERSION)
-SENTRYPEER_VERSION_STRING="0.0.1"
-AC_SUBST(SENTRYPEER_VERSION_STRING)
+AC_SUBST(VERSION)
+
+AC_CHECK_PROG(GIT, git, 1)
+
+if [[ ! -z "${GIT}" ]]; then
+	REVISION=`git rev-parse --short HEAD`
+else
+	REVISION="not found."
+fi
+
+AC_DEFINE_UNQUOTED(REVISION, "$REVISION", [Git revision])
+AC_SUBST(REVISION)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
