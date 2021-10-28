@@ -4,8 +4,11 @@
 #ifndef SENTRYPEER_H
 #define SENTRYPEER_H
 
-#define SENTRYPEER_NAME "SentryPeer"
-#define SENTRYPEER_VERSION "0.0.1"
+// From autotools
+#include <config.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #endif // SENTRYPEER_H
 
