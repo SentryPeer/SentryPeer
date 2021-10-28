@@ -15,9 +15,11 @@ jobs:
         run: |
           set -x
           sudo apt-get update
-          sudo apt-get -y install \
-            git \
-            build-essential
+          sudo apt-get -y upgrade
+# These are already installed in the base image
+#          sudo apt-get -y install \
+#            git \
+#            build-essential
       - name: Build and Clean
         run: |
           set -x
