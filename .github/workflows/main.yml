@@ -9,21 +9,21 @@ on:
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
-    container:
-      image: perl:5.34
     steps:
       - uses: actions/checkout@v2
-      - name: perl -V
-        run: perl -V
-      - name: Install cpamn
-        run: cpanm -n App::cpanminus
-      - name: Install dependencies
+      - name: Fetch Dependencies
         run: |
-          cd prototype
-          cpanm -n --installdeps .
-          cpanm -n Test::Pod Test::Pod::Coverage
-      - name: Run tests
+          set -x
+          sudo apt-get update
+          sudo apt-get -y install \
+            git \
+            build-essential
+      - name: Build and Clean
         run: |
-          prove -lv t
-        env:
-          TEST_POD: 1
+          set -x
+          ./bootstrap.sh
+          ./configure
+          make
+          make check
+          make distcheck
+          make clean
