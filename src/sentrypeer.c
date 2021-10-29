@@ -3,10 +3,14 @@
 
 #include "sentrypeer.h"
 
-int main(void) {
+int main(int argc, char **argv)
+{
+	if (argc <= 1) {
+		print_usage();
+		exit(EXIT_SUCCESS);
+	}
 
-  fprintf(stdout, "Hello from '%s'\nversion: %s\nrevision: %s \n", PACKAGE_NAME,
-          PACKAGE_VERSION, REVISION);
+	process_cli(argc, argv);
 
-  return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }

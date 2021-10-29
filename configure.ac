@@ -31,17 +31,18 @@ AC_PROG_LIBTOOL
 #])
 
 # Checks for header files.
-#AC_CHECK_HEADERS([stdlib.h string.h curl/curl.h jansson.h openssl/sha.h])
+AC_CHECK_HEADERS([unistd.h stdio.h stdlib.h stdbool.h errno.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
 
 # Checks for library functions.
 AC_FUNC_MALLOC
 
 AC_SUBST(VERSION)
 
-AC_CHECK_PROG(GIT, git, 1)
+AC_CHECK_PROG(GIT, git, 1.7.0, [
+ AC_MSG_ERROR([unable to find the git program. git installed?])
+])
 
 if [[ ! -z "${GIT}" ]]; then
 	REVISION=`git rev-parse --short HEAD`

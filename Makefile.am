@@ -14,13 +14,17 @@
 ######
 
 bin_PROGRAMS=sentrypeer
-sentrypeer_SOURCES=src/sentrypeer.c src/sentrypeer.h
+sentrypeer_SOURCES= \
+    src/sentrypeer.c \
+    src/sentrypeer.h \
+    src/conf.c \
+    src/conf.h
 
 # From http://mij.oltrelinux.com/devel/autoconf-automake/
 # what flags you want to pass to the C compiler & linker
 #
 # -g and -O2 already added by default
-AM_CFLAGS=-Wall -Werror -std=c18
+AM_CFLAGS=-Wall -Wextra -Werror -std=c18 -pedantic
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
