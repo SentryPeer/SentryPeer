@@ -10,6 +10,7 @@ jobs:
   scan-latest:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Fetch Dependencies
         run: |
           set -x
