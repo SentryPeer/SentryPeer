@@ -5,12 +5,18 @@
 
 int main(int argc, char **argv)
 {
-	if (argc <= 1) {
-		print_usage();
-		exit(EXIT_SUCCESS);
+	int rc;
+	struct sentrypeer_config config;
+
+	rc = process_cli(&config, argc, argv);
+	if (rc != EXIT_SUCCESS) {
+		exit(rc);
 	}
 
-	process_cli(argc, argv);
+	if (config.debug_mode || config.verbose_mode) {
+		fprintf(stderr, "Starting %s\n", PACKAGE_NAME);
+	}
 
+	fprintf(stderr, "%s is about to do something?\n", PACKAGE_NAME);
 	return EXIT_SUCCESS;
 }

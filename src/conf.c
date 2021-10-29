@@ -25,29 +25,28 @@ void print_version(void)
 		PACKAGE_VERSION, REVISION);
 }
 
-void process_cli(int argc, char **argv)
+int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 {
 	int cli_option;
-	//int verbose_mode = 0;
-	//int debug_mode = 0;
 
 	while ((cli_option = getopt(argc, argv, "hVvd")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
-			exit(EXIT_SUCCESS);
+			return(EXIT_SUCCESS);
 		case 'V':
 			print_version();
-			exit(EXIT_SUCCESS);
+			return(EXIT_SUCCESS);
 		case 'v':
-			//verbose_mode = 1;
+			config->verbose_mode = true;
 			break;
 		case 'd':
-			//debug_mode = 1;
+			config->debug_mode = true;
 			break;
 		default:
 			print_usage();
-			exit(EXIT_FAILURE);
+			return(EXIT_FAILURE);
 		}
 	}
+	return(EXIT_SUCCESS);
 }

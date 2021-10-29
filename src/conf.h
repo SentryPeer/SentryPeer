@@ -5,9 +5,19 @@
 #define SENTRYPEER_CONFIG_H
 
 #include <getopt.h>
+#include <stdbool.h>
 
-void print_usage(void);
-void print_version(void);
-void process_cli(int argc, char **argv);
+struct sentrypeer_config {
+	bool verbose_mode;
+	bool debug_mode;
+	bool daemon_mode;
+	bool foreground_mode;
+	bool sip_mode;
+	bool bgp_mode;
+	bool api_mode;
+	bool web_gui_mode;
+};
+
+int process_cli(struct sentrypeer_config *config, int argc, char **argv);
 
 #endif // SENTRYPEER_CONFIG_H
