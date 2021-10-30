@@ -26,7 +26,6 @@ jobs:
             sudo apt-get -y upgrade
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
-            for i in $(brew list); do brew upgrade $i; done
             brew install automake
           fi
       - name: Build and Clean
