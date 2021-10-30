@@ -18,17 +18,17 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v2
-      - name: Fetch Dependencies
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-          set -x
-          sudo apt-get update
-          sudo apt-get -y upgrade
+#      - name: Fetch Dependencies
+#        run: |
+#          if [ "$RUNNER_OS" == "Linux" ]; then
+#          set -x
+#          sudo apt-get update
+#          sudo apt-get -y upgrade
 # These are already installed in the base image
 #          sudo apt-get -y install \
 #            git \
 #            build-essential
-          fi
+#          fi
       - name: Build and Clean
         run: |
           set -x
