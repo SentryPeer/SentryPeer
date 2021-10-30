@@ -36,7 +36,7 @@ int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 			return(EXIT_SUCCESS);
 		case 'V':
 			print_version();
-			return(EXIT_SUCCESS);
+			exit(EXIT_SUCCESS);
 		case 'v':
 			config->verbose_mode = true;
 			break;
