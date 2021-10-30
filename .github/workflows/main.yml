@@ -36,4 +36,5 @@ jobs:
           make
           make check
           make distcheck
+          ./sentrypeer -V
           make clean
