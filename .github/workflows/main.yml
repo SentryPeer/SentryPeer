@@ -18,17 +18,17 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v2
-#      - name: Fetch Dependencies
-#        run: |
-#          if [ "$RUNNER_OS" == "Linux" ]; then
-#          set -x
-#          sudo apt-get update
-#          sudo apt-get -y upgrade
-# These are already installed in the base image
-#          sudo apt-get -y install \
-#            git \
-#            build-essential
-#          fi
+      - name: Fetch Dependencies
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            set -x
+            sudo apt-get update
+            sudo apt-get -y upgrade
+          fi
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            for i in $(brew list); do brew upgrade $i; done
+            brew install automake
+          fi
       - name: Build and Clean
         run: |
           set -x
