@@ -28,6 +28,8 @@ void print_version(void)
 int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 {
 	int cli_option;
+	config->verbose_mode = false;
+	config->debug_mode = false;
 
 	while ((cli_option = getopt(argc, argv, "hVvd")) != -1) {
 		switch (cli_option) {

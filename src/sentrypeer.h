@@ -4,8 +4,8 @@
 #ifndef SENTRYPEER_H
 #define SENTRYPEER_H
 
-// From autotools
-#include <config.h>
+// Produced by autoconf and cmake (manually by me)
+#include "config.h"
 
 #include <unistd.h>
 #include <stdio.h>
