@@ -71,6 +71,7 @@ m4
 
 # CMake 
 build
+!cmake/config.h.in 
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

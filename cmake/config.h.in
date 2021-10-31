@@ -1,0 +1,6 @@
+// See https://github.com/bast/cmake-example/blob/master/cmake/config.h.in
+
+// Only used for CMake
+#define PACKAGE_NAME "@PACKAGE_NAME@"
+#define PACKAGE_VERSION "@PACKAGE_VERSION@"
+#define REVISION "@REVISION@"
