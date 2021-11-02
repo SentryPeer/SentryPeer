@@ -5,18 +5,20 @@
 
 int main(int argc, char **argv)
 {
-	int rc;
 	struct sentrypeer_config config;
 
-	rc = process_cli(&config, argc, argv);
-	if (rc != EXIT_SUCCESS) {
-		exit(rc);
+	if (process_cli(&config, argc, argv) != EXIT_SUCCESS) {
+		exit(EXIT_FAILURE);
 	}
 
 	if (config.debug_mode || config.verbose_mode) {
-		fprintf(stderr, "Starting %s\n", PACKAGE_NAME);
+		fprintf(stderr, "Starting %s...\n", PACKAGE_NAME);
 	}
 
-	fprintf(stderr, "%s is about to do something?\n", PACKAGE_NAME);
+	if (sip_daemon_init(&config) == EXIT_FAILURE) {
+		fprintf(stderr, "Failed to start SIP server..");
+		exit(EXIT_FAILURE);
+	}
+
 	return EXIT_SUCCESS;
 }

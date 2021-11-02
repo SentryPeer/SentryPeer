@@ -56,7 +56,9 @@ config.h.in~
 config.log
 config.status
 config.guess
+config.guess~
 config.sub
+config.sub~
 ltmain.sh
 libtool
 configure

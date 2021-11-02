@@ -18,7 +18,29 @@ sentrypeer_SOURCES= \
     src/sentrypeer.c \
     src/sentrypeer.h \
     src/conf.c \
-    src/conf.h
+    src/conf.h \
+    src/sip_daemon.c \
+    src/sip_daemon.h
+
+EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
+           COPYRIGHT COPYING LICENSE.GPL-2.0.only \
+           LICENSE.GPL-3.0.only CMakeLists.txt \
+           cmake/git_revision.cmake cmake/config.h.in
+
+#########
+# Clean
+
+MAINTAINERCLEANFILES=configure aclocal.m4 compile \
+                     install-sh missing Makefile.in depcomp \
+                     stamp-h1 Makefile.in config.guess \
+                     config.sub include/Makefile.in \
+                     ltmain.sh depcomp libtool config.h.in \
+                     config.h.in~ test-driver
+
+maintainer-clean-local: 
+	-rm -rf $(top_srcdir)/build
+	-rm -rf $(top_srcdir)/m4
+	-rm -rf $(top_srcdir)/autom4te.cache
 
 # From http://mij.oltrelinux.com/devel/autoconf-automake/
 # what flags you want to pass to the C compiler & linker

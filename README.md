@@ -1,12 +1,10 @@
-# SentryPeer
+## SentryPeer
+
+<img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
-<a href="https://scan.coverity.com/projects/sentrypeer-sentrypeer">
-  <img alt="Coverity Scan Build Status"
-       src="https://scan.coverity.com/projects/23969/badge.svg"/>
-</a>
-
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![build_and_test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 
 ## Introduction
@@ -19,6 +17,13 @@ Of course, if you don't want to run any of this and just buy access to the data 
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
+## Screenshots
+
+Here's a mock up of the web UI which is subject to change.
+
+[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
+
+Screenshots of agents and APIs to come...
 
 ## Goals
 
@@ -89,5 +94,5 @@ It's okay to raise an issue to ask a question.
 
 ### Special Thanks
 
-Special thanks to [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme). Very kind of you!
+Special thanks to [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
 

@@ -2,7 +2,7 @@
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
 
 #ifndef SENTRYPEER_H
-#define SENTRYPEER_H
+#define SENTRYPEER_H 1
 
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
@@ -13,7 +13,10 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
+#include <signal.h>
 
 #include "conf.h"
+#include "sip_daemon.h"
 
 #endif // SENTRYPEER_H

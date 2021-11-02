@@ -2,7 +2,7 @@
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
 
 #ifndef SENTRYPEER_CONFIG_H
-#define SENTRYPEER_CONFIG_H
+#define SENTRYPEER_CONFIG_H 1
 
 #include <getopt.h>
 #include <stdbool.h>
