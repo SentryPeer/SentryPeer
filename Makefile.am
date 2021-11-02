@@ -23,8 +23,8 @@ sentrypeer_SOURCES= \
     src/sip_daemon.h
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
-           COPYRIGHT COPYING LICENSE.GPL-2.0.only \
-           LICENSE.GPL-3.0.only CMakeLists.txt \
+           COPYRIGHT COPYING LICENSE.GPL-2.0-only \
+           LICENSE.GPL-3.0-only CMakeLists.txt \
            cmake/git_revision.cmake cmake/config.h.in
 
 #########
