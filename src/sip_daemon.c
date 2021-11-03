@@ -46,6 +46,8 @@ int sip_daemon_init(struct sentrypeer_config *config)
 	int gai = getaddrinfo(0, "5060", &gai_hints, &bind_address);
 	if (gai != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
+		// TODO: wrap these
+		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
 
@@ -58,6 +60,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		       bind_address->ai_protocol);
 	if (!ISVALIDSOCKET(socket_listen)) {
 		perror("socket() failed.");
+		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
 
@@ -82,6 +85,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		 bind_address->ai_addrlen)) {
 		fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
 		perror("bind() failed.");
+		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
 	freeaddrinfo(bind_address); // Not needed anymore
@@ -140,7 +144,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					sizeof(client_send_port_buffer),
 					NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
 				perror("getnameinfo() failed.");
-				exit(EXIT_FAILURE);
+				return (EXIT_FAILURE);
 			}
 
 			if (config->debug_mode || config->verbose_mode) {
