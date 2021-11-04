@@ -76,6 +76,8 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		fprintf(stderr, "setsockopt() failed. (%d)\n",
 			GETSOCKETERRNO());
 		perror("setsockopt() failed.");
+		CLOSESOCKET(socket_listen);
+		return (EXIT_FAILURE);
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -85,6 +87,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		 bind_address->ai_addrlen)) {
 		fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
 		perror("bind() failed.");
+		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
