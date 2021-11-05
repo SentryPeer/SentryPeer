@@ -24,9 +24,11 @@ jobs:
             set -x
             sudo apt-get update
             sudo apt-get -y upgrade
+            sudo apt-get install libosip2-11
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             brew install automake
+            brew install libosip2
           fi
       - name: Build and Clean
         run: |
