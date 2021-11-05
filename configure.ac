@@ -21,7 +21,7 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([osipparser2], [osip_message_init])
 
 AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
-  AC_MSG_ERROR([osip_message_init() is not available. libosip2-devel is required.])
+  AC_MSG_ERROR([osip_message_init() is not available. libosip2-dev / libosip2-devel is required.])
 ])
 
 #AC_SEARCH_LIBS(SHA1, crypto, [], [
