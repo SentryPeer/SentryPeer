@@ -28,7 +28,7 @@ jobs:
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             brew install automake
-            brew install libosip2
+            brew install libosip
           fi
       - name: Build and Clean
         run: |

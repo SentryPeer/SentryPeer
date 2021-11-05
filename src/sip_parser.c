@@ -15,6 +15,15 @@ int sip_message_parser(char *incoming_sip_message, size_t packet_size)
 		return EXIT_FAILURE;
 	}
 
+// https://stackoverflow.com/a/36957123/1072411
+//
+// This is needed and not documented in the osip2 library. Argh!!!!
+	if ((parser_init()) < 0) {
+		fprintf(stderr, "Cannot initialise osip parser.\n");
+		osip_message_free(parsed_sip_message);
+		return EXIT_FAILURE;
+	}
+
 	if ((osip_message_parse(parsed_sip_message, incoming_sip_message,
 				packet_size)) < 0) {
 		fprintf(stderr, "Cannot parse incoming SIP message.\n");

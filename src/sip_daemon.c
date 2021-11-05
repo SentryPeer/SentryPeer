@@ -153,15 +153,20 @@ int sip_daemon_init(struct sentrypeer_config *config)
 				return EXIT_FAILURE;
 			}
 
-			fprintf(stderr, "read_packet_buf size is: %lu: ",
-				sizeof(read_packet_buf));
-			fprintf(stderr, "read_packet_buf length is: %lu: ",
-				strlen(read_packet_buf));
-			fprintf(stderr,
-				"bytes_received size is: %d: ", bytes_received);
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"read_packet_buf size is: %lu: \n",
+					sizeof(read_packet_buf));
+				fprintf(stderr,
+					"read_packet_buf length is: %lu: \n",
+					strlen(read_packet_buf));
+				fprintf(stderr,
+					"bytes_received size is: %d: \n",
+					bytes_received);
+			}
 
 			if ((sip_message_parser(read_packet_buf,
-						strlen(read_packet_buf))) < 0) {
+						bytes_received)) < 0) {
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
 				return EXIT_FAILURE;
