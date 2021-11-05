@@ -18,5 +18,6 @@
 
 #include "conf.h"
 #include "sip_daemon.h"
+#include "sip_parser.h"
 
 #endif // SENTRYPEER_H

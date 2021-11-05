@@ -18,6 +18,12 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 
 # Check for libraries.
+AC_CHECK_LIB([osipparser2], [osip_message_init])
+
+AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
+  AC_MSG_ERROR([osip_message_init() is not available. libosip2-devel is required.])
+])
+
 #AC_SEARCH_LIBS(SHA1, crypto, [], [
 #  AC_MSG_ERROR([unable to find the SHA1() function. openssl libs installed?])
 #])
@@ -31,12 +37,15 @@ AC_PROG_LIBTOOL
 #])
 
 # Checks for header files.
-AC_CHECK_HEADERS([unistd.h stdio.h stdlib.h stdbool.h errno.h string.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdio.h stdlib.h stdbool.h errno.h string.h sys/socket.h sys/types.h syslog.h unistd.h assert.h signal.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_PID_T
 
 # Checks for library functions.
+AC_FUNC_FORK
 AC_FUNC_MALLOC
+AC_CHECK_FUNCS([inet_ntoa memset strerror])
 
 AC_SUBST(VERSION)
 

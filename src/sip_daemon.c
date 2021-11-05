@@ -60,6 +60,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		       bind_address->ai_protocol);
 	if (!ISVALIDSOCKET(socket_listen)) {
 		perror("socket() failed.");
+		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
@@ -77,6 +78,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			GETSOCKETERRNO());
 		perror("setsockopt() failed.");
 		CLOSESOCKET(socket_listen);
+		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}
 
@@ -86,7 +88,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 	if (bind(socket_listen, bind_address->ai_addr,
 		 bind_address->ai_addrlen)) {
 		fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
-		perror("bind() failed.");
+		perror("bind() failed");
 		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
@@ -117,10 +119,10 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			struct sockaddr_storage client_address;
 			socklen_t client_len = sizeof(client_address);
 
-			char read[1024];
+			char read_packet_buf[1024];
 			int bytes_received =
-				recvfrom(socket_listen, read, 1024, 0,
-					 (struct sockaddr *)&client_address,
+				recvfrom(socket_listen, read_packet_buf, 1024,
+					 0, (struct sockaddr *)&client_address,
 					 &client_len);
 			if (bytes_received < 1) {
 				if (config->debug_mode ||
@@ -135,7 +137,8 @@ int sip_daemon_init(struct sentrypeer_config *config)
 
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr, "Received (%d bytes): %.*s\n",
-					bytes_received, bytes_received, read);
+					bytes_received, bytes_received,
+					read_packet_buf);
 			}
 
 			char client_ip_address_buffer[100];
@@ -147,7 +150,21 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					sizeof(client_send_port_buffer),
 					NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
 				perror("getnameinfo() failed.");
-				return (EXIT_FAILURE);
+				return EXIT_FAILURE;
+			}
+
+			fprintf(stderr, "read_packet_buf size is: %lu: ",
+				sizeof(read_packet_buf));
+			fprintf(stderr, "read_packet_buf length is: %lu: ",
+				strlen(read_packet_buf));
+			fprintf(stderr,
+				"bytes_received size is: %d: ", bytes_received);
+
+			if ((sip_message_parser(read_packet_buf,
+						strlen(read_packet_buf))) < 0) {
+				fprintf(stderr,
+					"Parsing this SIP packet failed.\n");
+				return EXIT_FAILURE;
 			}
 
 			if (config->debug_mode || config->verbose_mode) {

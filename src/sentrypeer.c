@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	}
 
 	if (sip_daemon_init(&config) == EXIT_FAILURE) {
-		fprintf(stderr, "Failed to start SIP server..");
+		fprintf(stderr, "Failed to start SIP server..\n");
 		exit(EXIT_FAILURE);
 	}
 

@@ -20,7 +20,9 @@ sentrypeer_SOURCES= \
     src/conf.c \
     src/conf.h \
     src/sip_daemon.c \
-    src/sip_daemon.h
+    src/sip_daemon.h \
+    src/sip_parser.c \
+    src/sip_parser.h
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
@@ -46,7 +48,15 @@ maintainer-clean-local:
 # what flags you want to pass to the C compiler & linker
 #
 # -g and -O2 already added by default
-AM_CFLAGS=-Wall -Wextra -Werror -std=c18 -pedantic
+# AM_CFLAGS=-Wall -Wextra -Werror -std=c18 -pedantic
+# https://github.com/mcinglis/c-style
+AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
+          -Wformat=2 -Wno-unused-parameter -Wshadow \
+          -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
+          -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
+          -std=c18
+
+
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
