@@ -4,20 +4,16 @@
 #ifndef SENTRYPEER_H
 #define SENTRYPEER_H 1
 
-// Produced by autoconf and cmake (manually by me)
-#include "config.h"
-
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <errno.h>
-#include <string.h>
-#include <assert.h>
-#include <signal.h>
-
-#include "conf.h"
-#include "sip_daemon.h"
-#include "sip_parser.h"
+struct bad_actor {
+	char event_timestamp[26];
+	char source_ip[100];
+	char called_number[100];
+	char method[10];
+	char uri[150];
+	char via[250];
+	char contact[250];
+	char user_agent[250];
+	char country[200];
+};
 
 #endif // SENTRYPEER_H

@@ -1,11 +1,16 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only */
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "sip_parser.h"
-#include "sentrypeer.h"
 
 // http://www.antisip.com/doc/osip2/group__howto__parser.html
-int sip_message_parser(char *incoming_sip_message, size_t packet_size)
+
+int sip_message_parser(char *incoming_sip_message, size_t packet_size,
+		       struct bad_actor *bad_actor)
 {
 	osip_message_t *parsed_sip_message = NULL;
 
@@ -15,9 +20,9 @@ int sip_message_parser(char *incoming_sip_message, size_t packet_size)
 		return EXIT_FAILURE;
 	}
 
-// https://stackoverflow.com/a/36957123/1072411
-//
-// This is needed and not documented in the osip2 library. Argh!!!!
+	// https://stackoverflow.com/a/36957123/1072411
+	//
+	// This is needed and not documented in the osip2 library. Argh!!!!
 	if ((parser_init()) < 0) {
 		fprintf(stderr, "Cannot initialise osip parser.\n");
 		osip_message_free(parsed_sip_message);
@@ -30,5 +35,6 @@ int sip_message_parser(char *incoming_sip_message, size_t packet_size)
 		osip_message_free(parsed_sip_message);
 		return EXIT_FAILURE;
 	}
+
 	return EXIT_SUCCESS;
 }

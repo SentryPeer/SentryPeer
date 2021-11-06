@@ -4,8 +4,19 @@
 // Bring in getaddrinfo and others as -std=c18 bins them off
 #define _GNU_SOURCE
 
+#include <sys/socket.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+
+#include "conf.h"
 #include "sip_daemon.h"
-#include "sentrypeer.h"
+#include "sip_parser.h"
 
 /*
  * Hands-On Network Programming with C, page 117
@@ -135,8 +146,19 @@ int sip_daemon_init(struct sentrypeer_config *config)
 				return (EXIT_FAILURE);
 			}
 
+			// TODO: Move this to a function in a utils.c file?
+			char time_str[26];
+			struct timeval timestamp_tv;
+			gettimeofday(&timestamp_tv, 0);
+			struct tm *time_info = localtime(&timestamp_tv.tv_sec);
+			strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", time_info);
+
+			// Format timestamp like ngrep does
+			// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
 			if (config->debug_mode || config->verbose_mode) {
-				fprintf(stderr, "Received (%d bytes): %.*s\n",
+				fprintf(stderr,
+					"%s.%06ld\nReceived (%d bytes): %.*s\n",
+					time_str, timestamp_tv.tv_usec,
 					bytes_received, bytes_received,
 					read_packet_buf);
 			}
@@ -161,12 +183,13 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					"read_packet_buf length is: %lu: \n",
 					strlen(read_packet_buf));
 				fprintf(stderr,
-					"bytes_received size is: %d: \n",
+					"bytes_received size is: %d: \n\n",
 					bytes_received);
 			}
 
-			if ((sip_message_parser(read_packet_buf,
-						bytes_received)) < 0) {
+			struct bad_actor bad_actor;
+			if ((sip_message_parser(read_packet_buf, bytes_received,
+						&bad_actor)) < 0) {
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
 				return EXIT_FAILURE;
