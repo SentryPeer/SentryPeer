@@ -19,7 +19,8 @@ jobs:
             git \
             build-essential \
             curl \
-            wget
+            wget \
+            libosip2-dev
 
       - name: Download Coverity Build Tool
         run: |
