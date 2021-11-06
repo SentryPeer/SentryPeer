@@ -11,11 +11,15 @@ on:
   pull_request:
 jobs:
   build_and_test:
+    name: Autotools build on ${{matrix.os}} using ${{matrix.cc}} ${{matrix.posix}}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest]
+        cc: [gcc, clang]
+    env:
+      CC: ${{ matrix.cc }}
     steps:
       - uses: actions/checkout@v2
       - name: Fetch Dependencies
@@ -40,3 +44,17 @@ jobs:
           make distcheck
           ./sentrypeer -V
           make clean
+
+# TODO: cmake
+# https://github.com/maxmind/libmaxminddb/blob/main/.github/workflows/test.yml
+#  cmake_build_and_test:
+#    strategy:
+#      matrix:
+#        os: [ubuntu-latest, macos-latest]
+#    name: CMake build on ${{matrix.os}}
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#      - uses: actions/checkout@v2
+#      - run: cmake -DBUILD_TESTING=ON .
+#      - run: cmake --build .
+#      - run: ctest -V .
