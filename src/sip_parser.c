@@ -10,7 +10,7 @@
 // http://www.antisip.com/doc/osip2/group__howto__parser.html
 
 int sip_message_parser(char *incoming_sip_message, size_t packet_size,
-		       struct bad_actor *bad_actor)
+		       bad_actor *bad_actor_event)
 {
 	osip_message_t *parsed_sip_message = NULL;
 

@@ -148,10 +148,11 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			// TODO: Move this to a function in a utils.c file?
 			char time_str[26];
 			struct timespec timestamp_ts;
-			if (clock_gettime(CLOCK_REALTIME, &timestamp_ts) == -1) {
-                                perror("clock_gettime() failed.");
-                                return EXIT_FAILURE;
-                        }
+			if (clock_gettime(CLOCK_REALTIME, &timestamp_ts) ==
+			    -1) {
+				perror("clock_gettime() failed.");
+				return EXIT_FAILURE;
+			}
 
 			struct tm *time_info = localtime(&timestamp_ts.tv_sec);
 			strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", time_info);
@@ -190,9 +191,9 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					bytes_received);
 			}
 
-			struct bad_actor bad_actor;
+			bad_actor bad_actor_event;
 			if ((sip_message_parser(read_packet_buf, bytes_received,
-						&bad_actor)) < 0) {
+						&bad_actor_event)) < 0) {
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
 				return EXIT_FAILURE;
