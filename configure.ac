@@ -45,7 +45,7 @@ AC_TYPE_PID_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([inet_ntoa memset strerror])
+AC_CHECK_FUNCS([clock_gettime memset])
 
 AC_SUBST(VERSION)
 

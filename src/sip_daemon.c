@@ -148,9 +148,13 @@ int sip_daemon_init(struct sentrypeer_config *config)
 
 			// TODO: Move this to a function in a utils.c file?
 			char time_str[26];
-			struct timeval timestamp_tv;
-			gettimeofday(&timestamp_tv, 0);
-			struct tm *time_info = localtime(&timestamp_tv.tv_sec);
+			struct timespec timestamp_ts;
+			if (clock_gettime(CLOCK_REALTIME, &timestamp_ts) == -1) {
+                                perror("clock_gettime() failed.");
+                                return EXIT_FAILURE;
+                        }
+
+			struct tm *time_info = localtime(&timestamp_ts.tv_sec);
 			strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", time_info);
 
 			// Format timestamp like ngrep does
@@ -158,7 +162,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"%s.%06ld\nReceived (%d bytes): %.*s\n",
-					time_str, timestamp_tv.tv_usec,
+					time_str, timestamp_ts.tv_nsec,
 					bytes_received, bytes_received,
 					read_packet_buf);
 			}
