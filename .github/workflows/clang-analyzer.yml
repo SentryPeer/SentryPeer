@@ -1,6 +1,6 @@
 # Found this at https://github.com/maxmind/libmaxminddb/blob/main/.github/workflows/clang-analyzer.yml
 # See what it finds...
-name: Run Clang Static Analysis
+name: Clang Static Analysis
 on:
   push:
     branches: [ main ]
