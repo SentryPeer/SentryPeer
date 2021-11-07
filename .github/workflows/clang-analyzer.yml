@@ -1,0 +1,27 @@
+# Found this at https://github.com/maxmind/libmaxminddb/blob/main/.github/workflows/clang-analyzer.yml
+# See what it finds...
+name: Run Clang Static Analysis
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 9 * * *' # Daily at 10:00 UTC
+jobs:
+  clang-analyzer:
+    name: Clang static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install libosip2-dev
+      - run: |
+          set -x
+          ./bootstrap.sh
+      - run: scan-build ./configure
+        env:
+          CFLAGS: |
+          -Wall -Werror -Wextra -Wpedantic -pedantic
+          -Wformat=2 -Wno-unused-parameter -Wshadow
+          -Wwrite-strings -Wstrict-prototypes -Wold-style-definition
+          -Wredundant-decls -Wnested-externs -Wmissing-include-dirs
+          -std=c18
+      - run: cd src; scan-build --status-bugs make; cd ..
