@@ -71,7 +71,6 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		       bind_address->ai_protocol);
 	if (!ISVALIDSOCKET(socket_listen)) {
 		perror("socket() failed.");
-		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
 		return (EXIT_FAILURE);
 	}

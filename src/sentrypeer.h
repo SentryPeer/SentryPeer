@@ -4,6 +4,13 @@
 #ifndef SENTRYPEER_H
 #define SENTRYPEER_H 1
 
+// Modern C - Manning. Chapter 6, Section 6.4:
+// Takeaway 6.29
+// (Forward-declare a struct within a typedef using the same identifier
+// as the tag name.
+//
+
+typedef struct bad_actor bad_actor;
 struct bad_actor {
 	char event_timestamp[26];
 	char source_ip[100];
