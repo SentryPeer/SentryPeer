@@ -22,7 +22,9 @@ sentrypeer_SOURCES= \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
-    src/sip_parser.h
+    src/sip_parser.h \
+    src/utils.c \
+    src/utils.h
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
@@ -50,11 +52,14 @@ maintainer-clean-local:
 # -g and -O2 already added by default
 # AM_CFLAGS=-Wall -Wextra -Werror -std=c18 -pedantic
 # https://github.com/mcinglis/c-style
+#
+# Also see Effective C, page 205 in the PDF
 AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18
+          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl,-pie -fpic -shared \
+          -g3 -O2
 
 
 AM_LDFLAGS=

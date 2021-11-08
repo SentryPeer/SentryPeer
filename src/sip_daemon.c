@@ -6,8 +6,6 @@
 
 #include <sys/socket.h>
 #include <netdb.h>
-#include <sys/time.h>
-#include <time.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +15,7 @@
 #include "conf.h"
 #include "sip_daemon.h"
 #include "sip_parser.h"
+#include "utils.h"
 
 /*
  * Hands-On Network Programming with C, page 117
@@ -145,24 +144,12 @@ int sip_daemon_init(struct sentrypeer_config *config)
 				return (EXIT_FAILURE);
 			}
 
-			// TODO: Move this to a function in a utils.c file?
-			char time_str[26];
-			struct timespec timestamp_ts;
-			if (clock_gettime(CLOCK_REALTIME, &timestamp_ts) ==
-			    -1) {
-				perror("clock_gettime() failed.");
-				return EXIT_FAILURE;
-			}
-
-			struct tm *time_info = localtime(&timestamp_ts.tv_sec);
-			strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", time_info);
-
 			// Format timestamp like ngrep does
 			// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
 			if (config->debug_mode || config->verbose_mode) {
+				print_event_timestamp();
 				fprintf(stderr,
-					"%s.%06ld\nReceived (%d bytes): %.*s\n",
-					time_str, timestamp_ts.tv_nsec,
+					"Received (%d bytes): %.*s\n",
 					bytes_received, bytes_received,
 					read_packet_buf);
 			}
