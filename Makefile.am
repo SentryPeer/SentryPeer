@@ -49,18 +49,15 @@ maintainer-clean-local:
 # From http://mij.oltrelinux.com/devel/autoconf-automake/
 # what flags you want to pass to the C compiler & linker
 #
-# -g and -O2 already added by default
-# AM_CFLAGS=-Wall -Wextra -Werror -std=c18 -pedantic
 # https://github.com/mcinglis/c-style
 #
 # Also see Effective C, page 205 in the PDF
-AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
+AM_CFLAGS = -Wall -Werror -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl,-pie -fpic -shared \
           -g3 -O2
-
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
