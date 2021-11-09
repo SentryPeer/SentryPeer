@@ -46,7 +46,6 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - name: Install deps
     - run: sudo apt-get install libosip2-dev
     - run: |
         set -x
