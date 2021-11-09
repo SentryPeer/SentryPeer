@@ -18,7 +18,8 @@ void print_event_timestamp(void)
 
 	assert(timestamp_ts.tv_nsec < 1000000000);
 
-	struct tm *time_info = localtime(&timestamp_ts.tv_sec);
-	strftime(timestamp_buf, TIMESTAMP_LEN, "%Y-%m-%d %H:%M:%S", time_info);
+	struct tm time_info;
+	localtime_r(&timestamp_ts.tv_sec, &time_info);
+	strftime(timestamp_buf, TIMESTAMP_LEN, "%Y-%m-%d %H:%M:%S", &time_info);
 	fprintf(stderr, "%s.%06ld\n", timestamp_buf, timestamp_ts.tv_nsec);
 }

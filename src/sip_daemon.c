@@ -17,6 +17,8 @@
 #include "sip_parser.h"
 #include "utils.h"
 
+#define PACKET_BUFFER_SIZE 1024
+
 /*
  * Hands-On Network Programming with C, page 117
  * UDP Server (move to libevent and/or 0MQ Routers/zproto/zproject/Zyre:
@@ -58,7 +60,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
 		// TODO: wrap these
 		freeaddrinfo(bind_address);
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -71,7 +73,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 	if (!ISVALIDSOCKET(socket_listen)) {
 		perror("socket() failed.");
 		freeaddrinfo(bind_address);
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	/* The failure of the bind() call can be prevented by setting
@@ -88,7 +90,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		perror("setsockopt() failed.");
 		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -100,7 +102,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 		perror("bind() failed");
 		CLOSESOCKET(socket_listen);
 		freeaddrinfo(bind_address);
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	freeaddrinfo(bind_address); // Not needed anymore
 
@@ -128,10 +130,11 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			struct sockaddr_storage client_address;
 			socklen_t client_len = sizeof(client_address);
 
-			char read_packet_buf[1024];
+			char read_packet_buf[PACKET_BUFFER_SIZE];
 			int bytes_received =
-				recvfrom(socket_listen, read_packet_buf, 1024,
-					 0, (struct sockaddr *)&client_address,
+				recvfrom(socket_listen, read_packet_buf,
+					 PACKET_BUFFER_SIZE, 0,
+					 (struct sockaddr *)&client_address,
 					 &client_len);
 			if (bytes_received < 1) {
 				if (config->debug_mode ||
@@ -141,15 +144,14 @@ int sip_daemon_init(struct sentrypeer_config *config)
 						GETSOCKETERRNO());
 					perror("recvfrom() failed.");
 				}
-				return (EXIT_FAILURE);
+				return EXIT_FAILURE;
 			}
 
 			// Format timestamp like ngrep does
 			// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
 			if (config->debug_mode || config->verbose_mode) {
 				print_event_timestamp();
-				fprintf(stderr,
-					"Received (%d bytes): %.*s\n",
+				fprintf(stderr, "Received (%d bytes): %.*s\n",
 					bytes_received, bytes_received,
 					read_packet_buf);
 			}
@@ -172,7 +174,8 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					sizeof(read_packet_buf));
 				fprintf(stderr,
 					"read_packet_buf length is: %lu: \n",
-					strlen(read_packet_buf));
+					strnlen(read_packet_buf,
+						PACKET_BUFFER_SIZE));
 				fprintf(stderr,
 					"bytes_received size is: %d: \n\n",
 					bytes_received);
@@ -200,5 +203,5 @@ int sip_daemon_init(struct sentrypeer_config *config)
 	//	if (config->debug_mode || config->verbose_mode) {
 	//		fprintf(stderr, "Finished.\n");
 	//	}
-	//	return (EXIT_SUCCESS);
+	//	return EXIT_SUCCESS;
 }
