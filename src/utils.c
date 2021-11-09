@@ -7,7 +7,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <assert.h>
-#include <errno.h>
 
 void print_event_timestamp(void)
 {
@@ -15,7 +14,6 @@ void print_event_timestamp(void)
 	char timestamp_buf[TIMESTAMP_LEN];
 	if (clock_gettime(CLOCK_REALTIME, &timestamp_ts) == -1) {
 		perror("clock_gettime() failed.");
-		assert_perror(errno);
 	}
 
 	assert(timestamp_ts.tv_nsec < 1000000000);
