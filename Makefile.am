@@ -51,13 +51,12 @@ maintainer-clean-local:
 #
 # https://github.com/mcinglis/c-style
 #
-# Also see Effective C, page 205 in the PDF
-AM_CFLAGS = -Wall -Werror -Wpedantic -pedantic \
+# Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
+AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl,-pie -fpic -shared \
-          -g3 -O2
+          -std=c18 -D_FORTIFY_SOURCE=2 -fpic -shared -g3 -O2
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
