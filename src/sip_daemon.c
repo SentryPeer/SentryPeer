@@ -11,13 +11,14 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include "conf.h"
 #include "sip_daemon.h"
 #include "sip_parser.h"
-#include "utils.h"
 
 #define PACKET_BUFFER_SIZE 1024
+#define SIP_PORT "5060"
 
 /*
  * Hands-On Network Programming with C, page 117
@@ -55,7 +56,7 @@ int sip_daemon_init(struct sentrypeer_config *config)
 	gai_hints.ai_flags = AI_PASSIVE;
 
 	struct addrinfo *bind_address;
-	int gai = getaddrinfo(0, "5060", &gai_hints, &bind_address);
+	int gai = getaddrinfo(0, SIP_PORT, &gai_hints, &bind_address);
 	if (gai != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
 		// TODO: wrap these
@@ -150,10 +151,12 @@ int sip_daemon_init(struct sentrypeer_config *config)
 			// Format timestamp like ngrep does
 			// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
 			if (config->debug_mode || config->verbose_mode) {
-				print_event_timestamp();
-				fprintf(stderr, "Received (%d bytes): %.*s\n",
-					bytes_received, bytes_received,
-					read_packet_buf);
+				time_t timestamp;
+				time(&timestamp);
+				fprintf(stderr,
+					"epochtime: %ld\nReceived (%d bytes): %.*s\n",
+					timestamp, bytes_received,
+					bytes_received, read_packet_buf);
 			}
 
 			char client_ip_address_buffer[100];
@@ -181,9 +184,14 @@ int sip_daemon_init(struct sentrypeer_config *config)
 					bytes_received);
 			}
 
-			bad_actor bad_actor_event;
+			// TODO: update once with have TCP and TLS
+			char transport_type[] = "UDP";
+			bad_actor *bad_actor_event =
+				bad_actor_new(0, client_ip_address_buffer, 0, 0,
+					      transport_type, 0);
+
 			if ((sip_message_parser(read_packet_buf, bytes_received,
-						&bad_actor_event)) < 0) {
+						bad_actor_event, config)) < 0) {
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
 				return EXIT_FAILURE;

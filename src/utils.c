@@ -7,8 +7,10 @@
 #include <time.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include <assert.h>
 
-void print_event_timestamp(void)
+char *event_timestamp(char *event_timestamp)
 {
 	struct timespec timestamp_ts;
 	char timestamp_buf[TIMESTAMP_LEN];
@@ -21,5 +23,12 @@ void print_event_timestamp(void)
 	struct tm time_info;
 	localtime_r(&timestamp_ts.tv_sec, &time_info);
 	strftime(timestamp_buf, TIMESTAMP_LEN, "%Y-%m-%d %H:%M:%S", &time_info);
-	fprintf(stderr, "%s.%06ld\n", timestamp_buf, timestamp_ts.tv_nsec);
+
+	if (snprintf(event_timestamp, TIMESTAMP_LEN + 10, "%s.%06ld",
+		     timestamp_buf, timestamp_ts.tv_nsec) < 0) {
+		perror("snprintf() failed.");
+	}
+	assert(event_timestamp);
+
+	return event_timestamp;
 }

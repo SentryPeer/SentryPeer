@@ -2,10 +2,10 @@
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
 
 #ifndef SENTRYPEER_UTILS_H
-#define SENTRYPEER_UTILS_H
+#define SENTRYPEER_UTILS_H 1
 
 #define TIMESTAMP_LEN 30
 
-void print_event_timestamp(void);
+char *event_timestamp(char *event_timestamp);
 
 #endif //SENTRYPEER_UTILS_H

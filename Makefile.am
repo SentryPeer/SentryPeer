@@ -24,7 +24,15 @@ sentrypeer_SOURCES= \
     src/sip_parser.c \
     src/sip_parser.h \
     src/utils.c \
-    src/utils.h
+    src/utils.h \
+    src/bad_actor.c \
+    src/bad_actor.h
+
+unit_test_sources = \
+	src/sip_parser.c \
+	src/bad_actor.c \
+	src/utils.c \
+	tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
@@ -56,10 +64,14 @@ AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpic -g3 -O2
+          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl, -pie -g3 -O2
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
-# Testing - https://www.gnu.org/software/automake/manual/html_node/Scripts_002dbased-Testsuites.html#Scripts_002dbased-Testsuites
-# TESTS=test1.sh
+# Get these flags in for testing as per p219 of Effective C PDF
+# -fno-omit-frame-pointer -fsanitize=address
+TESTS=tests/unit_tests/runner
+check_PROGRAMS = tests/unit_tests/runner
+tests_unit_tests_runner_SOURCES = $(unit_test_sources)
+tests_unit_tests_runner_LDADD = -lcmocka

@@ -88,3 +88,13 @@ sentrypeer-*.tar.gz
 # build folder used by # Unity Test Framework - http://www.throwtheswitch.org/unity
 build
 !test/Makefile
+
+# tests 
+tests/udp_client
+test-suite.log
+tests/unit_tests/.deps/
+tests/unit_tests/.dirstamp
+tests/unit_tests/runner
+tests/unit_tests/runner.log
+tests/unit_tests/runner.trs
+

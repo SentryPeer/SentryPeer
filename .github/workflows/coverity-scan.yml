@@ -20,7 +20,8 @@ jobs:
             build-essential \
             curl \
             wget \
-            libosip2-dev
+            libosip2-dev \
+            libcmocka-dev
 
       - name: Download Coverity Build Tool
         run: |
