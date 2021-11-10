@@ -64,7 +64,7 @@ AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl, -pie -g3 -O2
+          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -Wl,-pie -g3 -O2
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
