@@ -5,7 +5,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer], [0.0.1], [ghenry@sentrypeer.org],,[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[0.0.1],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
@@ -15,7 +15,7 @@ AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_SILENT_RULES([yes])
 AC_PROG_CC
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Check for libraries.
 AC_CHECK_LIB([osipparser2], [osip_message_init])
