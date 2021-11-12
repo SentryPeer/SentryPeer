@@ -23,6 +23,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/git_revision.cmake)
 set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
+target_link_libraries(sentrypeer -losipparser2)
+
 # configure header file
 configure_file(
         ${CMAKE_SOURCE_DIR}/cmake/config.h.in
