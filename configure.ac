@@ -15,7 +15,6 @@ AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_SILENT_RULES([yes])
 AC_PROG_CC
-LT_INIT
 
 # Check for libraries.
 AC_CHECK_LIB([osipparser2], [osip_message_init])
@@ -61,6 +60,52 @@ fi
 
 AC_DEFINE_UNQUOTED(REVISION, "$REVISION", [Git revision])
 AC_SUBST(REVISION)
+
+# Ideas taken from https://github.com/staskobzar/libamip/blob/master/configure.ac
+#
+# Doxygen
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN";
+   then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
+
+# CMOCKA unit tests check lib
+PKG_CHECK_EXISTS(cmocka >= 1.1.5,
+		[AC_CHECK_HEADERS([stdarg.h stddef.h setjmp.h],
+			[], dnl We are only interested in action-if-not-found
+			[AC_MSG_WARN([Header files stdarg.h stddef.h setjmp.h are required by cmocka])
+			 cmocka_required_headers="no"
+			]
+		)
+		AS_IF([test x"$cmocka_required_headers" != x"no"],
+			  [PKG_CHECK_MODULES([CMOCKA], [cmocka], [have_cmocka="yes"])]
+		)],
+		dnl PKG_CHECK_EXISTS ACTION-IF-NOT-FOUND
+		[AC_MSG_WARN([No libcmocka-1.1.5 or newer library found, cmocka tests will not be built])]
+	)
+AM_CONDITIONAL([HAVE_CMOCKA], [test x$have_cmocka = xyes])
+
+# Test coverage generate. Flag: --with-coverage
+AC_ARG_WITH([coverage],
+			AS_HELP_STRING([--with-coverage], [Generate test covearge report with lcov.]),
+			[with_cov=true], []
+			)
+
+AM_CONDITIONAL([WITH_COVERAGE], [test x$with_cov = xtrue])
+
+if test x$with_cov = xtrue; then
+  AC_PATH_PROG(LCOV, lcov)
+  AC_PATH_PROG(GCOV, gcov)
+  AC_PATH_PROG(GENHTML, genhtml)
+  COVERAGE_CFLAGS="--coverage"
+  COVERAGE_OPTFLAGS="-O0"
+  AC_SUBST([GCOV])
+  AC_SUBST([LCOV])
+  AC_SUBST([GENHTML])
+  AC_SUBST([COVERAGE_CFLAGS])
+  AC_SUBST([COVERAGE_OPTFLAGS])
+fi
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

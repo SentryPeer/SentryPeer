@@ -85,9 +85,8 @@ sentrypeer.db
 # dist
 sentrypeer-*.tar.gz
 
-# build folder used by # Unity Test Framework - http://www.throwtheswitch.org/unity
-build
-!test/Makefile
+# Doxygen
+docs
 
 # tests 
 tests/udp_client

@@ -69,7 +69,7 @@ void bad_actor_destroy(bad_actor **self_ptr)
 		bad_actor *self = *self_ptr;
 
 		// As per osip_message_to_str();
-		osip_free(self->sip_message);
+		osip_free(self->sip_message)
 
 		free(self);
 		*self_ptr = 0;

@@ -7,8 +7,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <assert.h>
-#include <string.h>
-#include <assert.h>
 
 char *event_timestamp(char *event_timestamp)
 {
