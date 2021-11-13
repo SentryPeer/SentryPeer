@@ -24,6 +24,7 @@ set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
 target_link_libraries(sentrypeer -losipparser2)
+target_link_libraries(sentrypeer -lsqlite3)
 
 # configure header file
 configure_file(

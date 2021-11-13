@@ -26,12 +26,19 @@ sentrypeer_SOURCES= \
     src/utils.c \
     src/utils.h \
     src/bad_actor.c \
-    src/bad_actor.h
+    src/bad_actor.h \
+    src/database.c \
+    src/database.h
 
 unit_test_sources = \
 	src/sip_parser.c \
+	src/sip_parser.h \
 	src/bad_actor.c \
+	src/bad_actor.h \
 	src/utils.c \
+	src/utils.h \
+	src/database.c \
+	src/database.h \
 	tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

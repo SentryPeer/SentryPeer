@@ -23,6 +23,10 @@ AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
   AC_MSG_ERROR([osip_message_init() is not available. libosip2-dev / libosip2-devel is required.])
 ])
 
+AC_SEARCH_LIBS(sqlite3_open, sqlite3, [], [
+  AC_MSG_ERROR([sqlite3_open() is not available. libsqlite3-dev / sqlite-devel is required.])
+])
+
 #AC_SEARCH_LIBS(SHA1, crypto, [], [
 #  AC_MSG_ERROR([unable to find the SHA1() function. openssl libs installed?])
 #])
