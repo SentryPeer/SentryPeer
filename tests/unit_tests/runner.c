@@ -10,6 +10,10 @@
 #include <cmocka.h>
 
 #include <sqlite3.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TEST_DB_FILE "tests/sentrypeer.db"
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -20,11 +24,9 @@ static void null_test_success(void **state)
 static void open_add_close_sqlite_db(void **state)
 {
 	sqlite3 *db;
-	int open_rc = sqlite3_open("sentrypeer.db", &db);
-	assert_int_equal(open_rc, SQLITE_OK);
-
-	int close_rc = sqlite3_close(db);
-	assert_int_equal(close_rc, SQLITE_OK);
+	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
+	assert_int_equal(sqlite3_close(db), SQLITE_OK);
+	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
 }
 
 int main(void)
