@@ -47,7 +47,7 @@ function _processFile(filePath, watchEvent) {
 
     if (filePath.match(/\.scss$/)) {
         if (watchEvent === 'change') {
-            return _handleSCSS(filePath, watchEvent);
+            return _handleSCSS();
         }
         return;
     }
