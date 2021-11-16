@@ -39,6 +39,8 @@ unit_test_sources = \
 	src/utils.h \
 	src/database.c \
 	src/database.h \
+	tests/unit_tests/test_database.c \
+	tests/unit_tests/test_database.h \
 	tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
@@ -67,11 +69,14 @@ maintainer-clean-local:
 # https://github.com/mcinglis/c-style
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
+# and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2
+          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
+          -fstack-protector-strong -grecord-gcc-switches \
+          -Werror=format-security -Werror=implicit-function-declaration 
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
