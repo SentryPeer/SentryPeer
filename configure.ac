@@ -50,8 +50,6 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([clock_gettime memset])
 
-AC_SUBST(VERSION)
-
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
@@ -113,3 +111,40 @@ fi
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
+
+AC_CANONICAL_HOST
+
+# https://github.com/zeromq/zyre/blob/master/configure.ac#L691
+BUILD_USER=${USER}
+BUILD_ARCH=${host}
+BUILD_HOST=${ac_hostname}
+BUILD_DATE=$(date +'%F %H:%M')
+
+AC_DEFINE_UNQUOTED([BUILD_USER],     "${BUILD_USER}",     [The fine user who built the package])
+AC_DEFINE_UNQUOTED([BUILD_ARCH],     "${BUILD_ARCH}",     [Architecture of the build host])
+AC_DEFINE_UNQUOTED([BUILD_HOST],     "${BUILD_HOST}",     [Build host name])
+AC_DEFINE_UNQUOTED([BUILD_DATE],     "${BUILD_DATE}",     [Build date])
+
+AC_SUBST(BUILD_USER)
+AC_SUBST(BUILD_ARCH)
+AC_SUBST(BUILD_HOST)
+AC_SUBST(BUILD_DATE)
+
+PROJECT_NAME="sentrypeer"
+AC_MSG_NOTICE([
+Configured build options for $PROJECT_NAME:
+  Configure date:     $BUILD_DATE
+  Build arch:         $BUILD_ARCH
+  Build user:         $BUILD_USER
+  Bulid host:         $BUILD_HOST 
+  Install prefix:     ${prefix}
+  Compiler:         
+   C compiler         ${CC}
+   CFLAGS:            ${CFLAGS}
+   LIBS:              ${LIBS}
+
+  Configure complete! Now proceed with:
+  - 'make'            compile $PROJECT_NAME
+  - 'make check'      run the $PROJECT_NAME selftests
+  - 'make install'    install the '$PROJECT_NAME' project to $prefix
+])
