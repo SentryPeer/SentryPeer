@@ -9,8 +9,8 @@
 #include "bad_actor.h"
 #include "conf.h"
 
-int sip_message_parser(char *incoming_sip_msg, size_t packet_size,
+int sip_message_parser(const char *incoming_sip_msg, size_t packet_size,
 		       bad_actor *bad_actor_event,
-		       struct sentrypeer_config *config);
+		       struct sentrypeer_config const *config);
 
 #endif //SENTRYPEER_SIP_PARSER_H

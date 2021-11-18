@@ -24,7 +24,7 @@ The sharing part...you only get other users' data if you [share yours](https://e
 
 ## Screenshots
 
-Here's a mock up of the web UI which is subject to change.
+Here's a mockup of the web UI which is subject to change.
 
 [![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
 

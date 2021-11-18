@@ -10,9 +10,9 @@
 
 // http://www.antisip.com/doc/osip2/group__howto__parser.html
 
-int sip_message_parser(char *incoming_sip_message, size_t packet_size,
+int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 		       bad_actor *bad_actor_event,
-		       struct sentrypeer_config *config)
+		       struct sentrypeer_config const *config)
 
 {
 	osip_message_t *parsed_sip_message = 0;
@@ -46,7 +46,7 @@ int sip_message_parser(char *incoming_sip_message, size_t packet_size,
 				&bad_actor_event->sip_message,
 				&sip_message_length) != 0) {
 		fprintf(stderr, "Cannot convert SIP message to string.\n");
-		osip_free(bad_actor_event->sip_message);
+		osip_free(bad_actor_event->sip_message)
 		osip_message_free(parsed_sip_message);
 		return EXIT_FAILURE;
 	}
@@ -66,7 +66,7 @@ int sip_message_parser(char *incoming_sip_message, size_t packet_size,
 	// SIP User Agent
 	char ua_not_found[] = "N/A";
 	osip_header_t *user_agent_header = 0;
-	osip_message_get_user_agent(parsed_sip_message, 1, &user_agent_header);
+	osip_message_get_user_agent(parsed_sip_message, 0, &user_agent_header);
 	if (user_agent_header != NULL) {
 		bad_actor_event->user_agent = user_agent_header->hvalue;
 	} else {

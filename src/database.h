@@ -10,6 +10,6 @@ int db_connect(char *db_name);
 int db_create(char *db_name);
 int db_execute(char *sql_query);
 int db_disconnect(char *db_name);
-void error_log_callback(void *arg, int err_code, const char *msg);
+void error_log_callback(const void *unused_for_now, int err_code, const char *msg);
 
 #endif //SENTRYPEER_DATABASE_H
