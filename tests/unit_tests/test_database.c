@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_DB_FILE "tests/sentrypeer.db"
+#define TEST_DB_FILE "./sentrypeer.db"
 
 void open_add_close_sqlite_db(void **state)
 {
