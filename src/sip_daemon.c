@@ -43,7 +43,7 @@
  * TODO: Implement proper logging
  */
 
-int sip_daemon_init(struct sentrypeer_config *config)
+int sip_daemon_init(struct sentrypeer_config const *config)
 {
 	// TODO: Do a macro for these later
 	if (config->debug_mode || config->verbose_mode) {

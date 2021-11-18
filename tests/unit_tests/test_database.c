@@ -9,7 +9,6 @@
 
 #include "test_database.h"
 #include "../../src/database.h"
-#include "../../src/bad_actor.h"
 
 #include <sqlite3.h>
 #include <stdio.h>
@@ -42,6 +41,7 @@ void open_add_close_sqlite_db(void **state)
 
 	sqlite3 *db;
 	sqlite3_stmt *insert_bad_actor_stmt;
+	// http://man.hubwiz.com/docset/SQLite.docset/Contents/Resources/Documents/sqlite/errlog.html
 	sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL);
 
 	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);

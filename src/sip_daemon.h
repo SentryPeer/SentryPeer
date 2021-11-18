@@ -14,6 +14,6 @@
 #define SOCKET int
 #define GETSOCKETERRNO() (errno)
 
-int sip_daemon_init(struct sentrypeer_config *config);
+int sip_daemon_init(struct sentrypeer_config const *config);
 
 #endif //SENTRYPEER_SIP_DAEMON_H

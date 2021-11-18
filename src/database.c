@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-void error_log_callback(const void *unused_for_now, int err_code, const char *msg)
+void error_log_callback(int err_code, const char *msg)
 {
 	fprintf(stderr, "Database error (%d): %s\n", err_code, msg);
 }
