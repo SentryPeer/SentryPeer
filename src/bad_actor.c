@@ -68,8 +68,31 @@ void bad_actor_destroy(bad_actor **self_ptr)
 	if (*self_ptr) {
 		bad_actor *self = *self_ptr;
 
+		if (self->event_timestamp != 0) {
+			free(self->event_timestamp);
+			self->event_timestamp = 0;
+		}
+
+		if (self->called_number != 0) {
+			free(self->called_number);
+			self->called_number = 0;
+		}
+
+		if (self->user_agent != 0) {
+			free(self->user_agent);
+			self->user_agent = 0;
+		}
+
+		if (self->method != 0) {
+			free(self->method);
+			self->method = 0;
+		}
+
 		// As per osip_message_to_str();
-		osip_free(self->sip_message)
+		if (self->sip_message != 0) {
+			osip_free(self->sip_message)
+			self->sip_message = 0;
+		}
 
 		free(self);
 		*self_ptr = 0;

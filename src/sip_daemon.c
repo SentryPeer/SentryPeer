@@ -16,6 +16,7 @@
 #include "conf.h"
 #include "sip_daemon.h"
 #include "sip_parser.h"
+#include "database.h"
 
 #define PACKET_BUFFER_SIZE 1024
 #define SIP_PORT "5060"
@@ -194,14 +195,16 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 						bad_actor_event, config)) < 0) {
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
+				bad_actor_destroy(&bad_actor_event);
 				return EXIT_FAILURE;
 			}
 
-			if (config->debug_mode || config->verbose_mode) {
+			if (db_insert_bad_actor(bad_actor_event, config) !=
+			    EXIT_SUCCESS) {
 				fprintf(stderr,
-					"Client IP address: %s, Client send port: %s\n",
-					client_ip_address_buffer,
-					client_send_port_buffer);
+					"Saving bad actor to db failed\n");
+				bad_actor_destroy(&bad_actor_event);
+				return EXIT_FAILURE;
 			}
 		}
 	}

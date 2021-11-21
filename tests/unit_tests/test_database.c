@@ -8,6 +8,7 @@
 #include <cmocka.h>
 
 #include "test_database.h"
+#include "test_bad_actor.h"
 #include "../../src/database.h"
 
 #include <sqlite3.h>
@@ -16,8 +17,10 @@
 
 #define TEST_DB_FILE "./sentrypeer.db"
 
-void open_add_close_sqlite_db(void **state)
+void test_open_add_close_sqlite_db(void **state)
 {
+	(void)state; /* unused */
+
 	const char *schema_check = "PRAGMA user_version;";
 	const char *create_table_sql =
 		"CREATE TABLE IF NOT EXISTS honey "
@@ -124,4 +127,9 @@ void open_add_close_sqlite_db(void **state)
 
 	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
 	fprintf(stderr, "Removed database successfully.\n");
+}
+
+void test_db_insert_bad_actor(void **state)
+{
+
 }

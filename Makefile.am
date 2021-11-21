@@ -39,6 +39,8 @@ unit_test_sources = \
 	src/utils.h \
 	src/database.c \
 	src/database.h \
+	tests/unit_tests/test_bad_actor.c \
+	tests/unit_tests/test_bad_actor.h \
 	tests/unit_tests/test_database.c \
 	tests/unit_tests/test_database.h \
 	tests/unit_tests/runner.c
@@ -70,6 +72,7 @@ maintainer-clean-local:
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
+# libasan for later -fsanitize=address -fno-omit-frame-pointer \
 AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \

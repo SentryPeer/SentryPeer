@@ -1,9 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only */
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "sip_parser.h"
 #include "conf.h"
@@ -42,35 +44,50 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 
 	// Full SIP Message
 	size_t sip_message_length;
+	bad_actor_event->sip_message = 0; // Clear the previous SIP message
 	if (osip_message_to_str(parsed_sip_message,
 				&bad_actor_event->sip_message,
 				&sip_message_length) != 0) {
 		fprintf(stderr, "Cannot convert SIP message to string.\n");
-		osip_free(bad_actor_event->sip_message)
 		osip_message_free(parsed_sip_message);
 		return EXIT_FAILURE;
 	}
 
 	// SIP Method
-	bad_actor_event->method = parsed_sip_message->sip_method;
+	bad_actor_event->method = 0; // Clear the previous SIP method
+	bad_actor_event->method =
+		strndup(parsed_sip_message->sip_method,
+			strlen(parsed_sip_message->sip_method));
+	assert(bad_actor_event->method);
 
 	// Phone Number called
-	char number_not_found[] = "N/A";
+	bad_actor_event->called_number = 0; // Clear the previous called number
+	char number_not_found[] = BAD_ACTOR_NOT_FOUND;
 	if (parsed_sip_message->to->url->username != NULL) {
 		bad_actor_event->called_number =
-			parsed_sip_message->to->url->username;
+			strndup(parsed_sip_message->to->url->username,
+				strlen(parsed_sip_message->to->url->username));
+		assert(bad_actor_event->called_number);
 	} else {
-		bad_actor_event->called_number = number_not_found;
+		bad_actor_event->called_number =
+			strndup(number_not_found, strlen(number_not_found));
+		assert(bad_actor_event->called_number);
 	}
 
 	// SIP User Agent
-	char ua_not_found[] = "N/A";
+	bad_actor_event->user_agent = 0; // Clear the previous SIP user agent
+	char ua_not_found[] = BAD_ACTOR_NOT_FOUND;
 	osip_header_t *user_agent_header = 0;
 	osip_message_get_user_agent(parsed_sip_message, 0, &user_agent_header);
 	if (user_agent_header != NULL) {
-		bad_actor_event->user_agent = user_agent_header->hvalue;
+		bad_actor_event->user_agent =
+			strndup(user_agent_header->hvalue,
+				strlen(user_agent_header->hvalue));
+		assert(bad_actor_event->user_agent);
 	} else {
-		bad_actor_event->user_agent = ua_not_found;
+		bad_actor_event->user_agent =
+			strndup(ua_not_found, strlen(ua_not_found));
+		assert(bad_actor_event->user_agent);
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -90,7 +107,6 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 			bad_actor_event->transport_type,
 			bad_actor_event->user_agent);
 	}
-	bad_actor_destroy(&bad_actor_event);
 	osip_message_free(parsed_sip_message);
 
 	return EXIT_SUCCESS;

@@ -12,6 +12,8 @@
 // as the tag name.
 //
 
+#define BAD_ACTOR_NOT_FOUND "NOT_FOUND"
+
 typedef struct bad_actor bad_actor;
 struct bad_actor {
 	char *event_timestamp;
@@ -24,7 +26,8 @@ struct bad_actor {
 };
 
 //  Constructor
-bad_actor *bad_actor_new(	char *sip_message, char *source_ip, char *called_number, char *method,
+bad_actor *bad_actor_new(char *sip_message, char *source_ip,
+			 char *called_number, char *method,
 			 char *transport_type, char *user_agent);
 
 //  Destructor
