@@ -8,6 +8,9 @@ A distributed list of bad IP addresses and phone numbers collected via a SIP Hon
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
 [![Clang Static Analysis](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml)
+[![Language grade: C](https://img.shields.io/lgtm/grade/cpp/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/context:cpp)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/alerts/)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
 ## Introduction
 
@@ -21,9 +24,9 @@ The sharing part...you only get other users' data if you [share yours](https://e
 
 ## Screenshots
 
-Here's a mock up of the web UI which is subject to change.
+Here's a mockup of the web UI which is subject to change.
 
-[![SentryPeer Web GUI mock up](https://github.com/SentryPeer/SentryPeer/blob/main/screenshots/SentryPeer-Web-GUI-screenshot.png)](https://github.com/SentryPeer/SentryPeer/blob/main/screenshots/SentryPeer-Web-GUI-screenshot.png)
+[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
 
 Screenshots of agents and APIs to come...
 
