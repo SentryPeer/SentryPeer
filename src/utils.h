@@ -15,4 +15,13 @@
 
 char *event_timestamp(char *event_timestamp);
 
+/**
+ * Duplicate a string (must be freed by caller).
+ *
+ * @param string The string to duplicate.
+ * @return A new string with the same contents as the original
+ */
+
+char *util_duplicate_string(const char *string);
+
 #endif //SENTRYPEER_UTILS_H

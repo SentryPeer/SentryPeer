@@ -56,38 +56,30 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 	// SIP Method
 	bad_actor_event->method = 0; // Clear the previous SIP method
 	bad_actor_event->method =
-		strndup(parsed_sip_message->sip_method,
-			strlen(parsed_sip_message->sip_method));
-	assert(bad_actor_event->method);
+		util_duplicate_string(parsed_sip_message->sip_method);
 
 	// Phone Number called
 	bad_actor_event->called_number = 0; // Clear the previous called number
-	char number_not_found[] = BAD_ACTOR_NOT_FOUND;
 	if (parsed_sip_message->to->url->username != NULL) {
-		bad_actor_event->called_number =
-			strndup(parsed_sip_message->to->url->username,
-				strlen(parsed_sip_message->to->url->username));
-		assert(bad_actor_event->called_number);
+		bad_actor_event->called_number = util_duplicate_string(
+			parsed_sip_message->to->url->username);
 	} else {
+		char number_not_found[] = BAD_ACTOR_NOT_FOUND;
 		bad_actor_event->called_number =
-			strndup(number_not_found, strlen(number_not_found));
-		assert(bad_actor_event->called_number);
+			util_duplicate_string(number_not_found);
 	}
 
 	// SIP User Agent
 	bad_actor_event->user_agent = 0; // Clear the previous SIP user agent
-	char ua_not_found[] = BAD_ACTOR_NOT_FOUND;
 	osip_header_t *user_agent_header = 0;
 	osip_message_get_user_agent(parsed_sip_message, 0, &user_agent_header);
 	if (user_agent_header != NULL) {
 		bad_actor_event->user_agent =
-			strndup(user_agent_header->hvalue,
-				strlen(user_agent_header->hvalue));
-		assert(bad_actor_event->user_agent);
+			util_duplicate_string(user_agent_header->hvalue);
 	} else {
+		static char ua_not_found[] = BAD_ACTOR_NOT_FOUND;
 		bad_actor_event->user_agent =
-			strndup(ua_not_found, strlen(ua_not_found));
-		assert(bad_actor_event->user_agent);
+			util_duplicate_string(ua_not_found);
 	}
 
 	if (config->debug_mode || config->verbose_mode) {

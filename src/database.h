@@ -9,14 +9,12 @@
 #include "bad_actor.h"
 #include "conf.h"
 
-int db_connect(char *db_name);
-int db_create(char *db_name);
-int db_execute(char *sql_query);
-int db_disconnect(char *db_name);
+#define DB_FILE "sentrypeer.db"
 
 int db_insert_bad_actor(bad_actor *bad_actor_event,
-		      struct sentrypeer_config const *config);
+			struct sentrypeer_config const *config);
 
-void error_log_callback(int err_code, const char *msg);
+int db_set_error_log_callback(void);
+void db_error_log_callback(int err_code, const char *msg);
 
 #endif //SENTRYPEER_DATABASE_H

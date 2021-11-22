@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 char *event_timestamp(char *event_timestamp)
@@ -29,4 +30,15 @@ char *event_timestamp(char *event_timestamp)
 	assert(event_timestamp);
 
 	return event_timestamp;
+}
+
+char *util_duplicate_string(const char *string)
+{
+	char *duplicate = NULL;
+	assert(string);
+
+	duplicate = strndup(string, strlen(string));
+
+	assert(duplicate);
+	return duplicate;
 }

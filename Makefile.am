@@ -43,6 +43,8 @@ unit_test_sources = \
 	tests/unit_tests/test_bad_actor.h \
 	tests/unit_tests/test_database.c \
 	tests/unit_tests/test_database.h \
+	tests/unit_tests/test_utils.c \
+	tests/unit_tests/test_utils.h \
 	tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

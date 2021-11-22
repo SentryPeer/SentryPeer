@@ -13,6 +13,7 @@ add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/utils.c
         ${CMAKE_SOURCE_DIR}/src/bad_actor.c
+        ${CMAKE_SOURCE_DIR}/src/database.c
         )
 
 # See https://github.com/bast/cmake-example/blob/master/CMakeLists.txt
