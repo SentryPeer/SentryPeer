@@ -64,7 +64,91 @@ I started this because I wanted to do [C network programming](https://github.com
 
 ### Installation
  
-See [prototype](./prototype) folder for now.
+You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
+
+If you are going to build from this repository, you will need to have the following installed:
+
+`libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
+`libsqlite3-dev` (Debian/Ubuntu) or `libsqlite3-devel` (Fedora/CentOS)
+`libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
+
+Debian/Ubuntu:
+
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev
+
+CentOS/Fedora:
+
+    sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel
+
+then (make check is highly recommended):
+
+
+    ./bootstrap.sh
+    ./configure
+    make
+    make check
+    make install
+
+
+Once built, you can run like so to start in debug mode (this won't work as a daemon yet):
+
+    ./sentrypeer -d
+    Starting sentrypeer...
+    Configuring local address...
+    Creating socket...
+    Binding socket to local address...
+    Setting database error log callback...
+    Listening for incoming connections...
+
+when you get a probe request, you can see something like the following in the terminal:
+
+```bash
+Received (411 bytes): OPTIONS sip:100@XXX.XXX.XXX.XXX SIP/2.0
+Via: SIP/2.0/UDP 91.223.3.152:5173;branch=z9hG4bK-515761064;rport
+Content-Length: 0
+From: "sipvicious"<sip:100@1.1.1.1>;tag=6434396633623535313363340131363131333837383137
+Accept: application/sdp
+User-Agent: friendly-scanner
+To: "sipvicious"<sip:100@1.1.1.1>
+Contact: sip:100@91.223.3.152:5173
+CSeq: 1 OPTIONS
+Call-ID: 679894155883566215079442
+Max-Forwards: 70
+
+
+read_packet_buf size is: 1024: 
+read_packet_buf length is: 468: 
+bytes_received size is: 411: 
+
+Bad Actor is:
+Event Timestamp: 2021-11-23 20:13:36.427515810
+SIP Message: OPTIONS sip:100@XXX.XXX.XXX.XXX SIP/2.0
+Via: SIP/2.0/UDP 91.223.3.152:5173;branch=z9hG4bK-515761064;rport
+From: "sipvicious" <sip:100@1.1.1.1>;tag=6434396633623535313363340131363131333837383137
+To: "sipvicious" <sip:100@1.1.1.1>
+Call-ID: 679894155883566215079442
+CSeq: 1 OPTIONS
+Contact: <sip:100@91.223.3.152:5173>
+Accept: application/sdp
+User-agent: friendly-scanner
+Max-forwards: 70
+Content-Length: 0
+
+
+Source IP: 193.107.216.27
+Called Number: 100
+SIP Method: OPTIONS
+Transport Type: UDP
+User Agent: friendly-scanner
+```
+
+You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlitebrowser](https://sqlitebrowser.org/) or sqlite3 command line tool.
+
+Here's a screenshot of the database opened using [sqlitebrowser](https://sqlitebrowser.org/) (it's big, so I'll just link to the image):
+
+[sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
+
+The REST API and web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
 ### License
  

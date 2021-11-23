@@ -113,6 +113,7 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 	}
 	if (db_set_error_log_callback() != EXIT_SUCCESS) {
 		fprintf(stderr, "Couldn't set database error log callback\n");
+		CLOSESOCKET(socket_listen);
 		return EXIT_FAILURE;
 	}
 
