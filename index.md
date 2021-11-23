@@ -4,6 +4,7 @@
 
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
@@ -82,13 +83,11 @@ CentOS/Fedora:
 
 then (make check is highly recommended):
 
-
     ./bootstrap.sh
     ./configure
     make
     make check
     make install
-
 
 Once built, you can run like so to start in debug mode (this won't work as a daemon yet):
 
