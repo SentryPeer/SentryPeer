@@ -33,22 +33,22 @@ Screenshots of agents and APIs to come...
 ## Goals
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
-- [ ] FAST
+- [x] FAST
 - [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
 - [ ] User can **pay to get all data collected** via [SentryPeer commercial website](https://sentrypeer.com) (one day, maybe.)
 - [ ] Data is max 7(?) days old as useless otherwise
-- [ ] **Local** data copy for **fast access** - feature / cli flag
+- [x] **Local** data copy for **fast access** - feature / cli flag
 - [ ] **Local** API for **fast access** - feature / cli flag
 - [ ] **Local** Web GUI for **fast access** - feature / cli flag
 - [ ] Peer to Peer data replication - feature / cli flag
-- [ ] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
+- [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
 - [ ] Analytics - opt in
 - [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with and maybe [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) or our own with nftables
-- [ ] Small binary size for IoT usage
-- [ ] Cross-platform
+- [x] Small binary size for IoT usage
+- [x] Cross-platform
 - [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
 - [ ] Container on Docker Hub for latest build - Reference https://github.com/natm/iocontrollergw/blob/master/.github/workflows/cd.yaml and https://github.com/natm/iocontrollergw/blob/master/.github/workflows/ci.yaml (plus Nat's Dockerfile :-) )
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
@@ -68,9 +68,9 @@ You have two options for installation. CMake or autotools. Autotools is recommen
 
 If you are going to build from this repository, you will need to have the following installed:
 
-`libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
-`libsqlite3-dev` (Debian/Ubuntu) or `libsqlite3-devel` (Fedora/CentOS)
-`libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
+* `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
+* `libsqlite3-dev` (Debian/Ubuntu) or `libsqlite3-devel` (Fedora/CentOS)
+* `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
 
 Debian/Ubuntu:
 
