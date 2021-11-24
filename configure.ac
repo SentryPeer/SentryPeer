@@ -5,7 +5,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer],[0.0.1],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[0.0.2],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
 AC_CONFIG_SRCDIR([src/sentrypeer.h])

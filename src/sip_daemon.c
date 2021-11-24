@@ -83,6 +83,10 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 	 *
 	 * Eliminates "ERROR on binding: Address already in use" error.
 	 * See Hands-On Network Programming with C, page 374 of PDF.
+	 *
+	 * We also need the destination IP address, so we need to set
+	 * IP_PKTINFO or IP_ORIGDSTADDR on Linux and IP_RECVDSTADDR on BSD.
+	 *
 	 */
 	int yes = 1;
 	if (setsockopt(socket_listen, SOL_SOCKET, SO_REUSEADDR, (void *)&yes,

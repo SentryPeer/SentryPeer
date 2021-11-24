@@ -20,8 +20,8 @@ void test_open_add_close_sqlite_db(void **state)
 {
 	(void)state; /* unused */
 
-	const char *schema_check = "PRAGMA user_version;";
-	const char *create_table_sql =
+	const char schema_check[] = "PRAGMA user_version;";
+	const char create_table_sql[] =
 		"CREATE TABLE IF NOT EXISTS honey "
 		"("
 		"   honey_id INTEGER PRIMARY KEY,"
@@ -35,7 +35,7 @@ void test_open_add_close_sqlite_db(void **state)
 		"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 		");";
 
-	const char *insert_bad_actor = "INSERT INTO honey (event_timestamp,"
+	const char insert_bad_actor[] = "INSERT INTO honey (event_timestamp,"
 				       "   source_ip, called_number,"
 				       "   transport_type, method,"
 				       "   user_agent, sip_message) "

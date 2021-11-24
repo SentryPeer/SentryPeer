@@ -4,7 +4,7 @@
 #ifndef SENTRYPEER_UTILS_H
 #define SENTRYPEER_UTILS_H 1
 
-#define TIMESTAMP_LEN 30
+#define TIMESTAMP_LEN 40
 
 /**
  * Get the current time suitable for event logging.

@@ -40,7 +40,7 @@ int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 		switch (cli_option) {
 		case 'h':
 			print_usage();
-			return EXIT_SUCCESS;
+			exit(EXIT_SUCCESS);
 		case 'V':
 			print_version();
 			exit(EXIT_SUCCESS);

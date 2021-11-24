@@ -23,7 +23,7 @@ char *event_timestamp(char *event_timestamp)
 	localtime_r(&timestamp_ts.tv_sec, &time_info);
 	strftime(timestamp_buf, TIMESTAMP_LEN, "%Y-%m-%d %H:%M:%S", &time_info);
 
-	if (snprintf(event_timestamp, TIMESTAMP_LEN + 10, "%s.%06ld",
+	if (snprintf(event_timestamp, TIMESTAMP_LEN, "%s.%06ld",
 		     timestamp_buf, timestamp_ts.tv_nsec) < 0) {
 		perror("snprintf() failed.");
 	}

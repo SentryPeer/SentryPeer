@@ -1,0 +1,53 @@
+.TH SentryPeer 1 "November 2021" "SentryPeer"
+.SH NAME
+sentrypeer \- A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot
+
+.SH SYNOPSIS
+.B sentrypeer
+[\-vVhd]
+.SH DESCRIPTION
+.B SentryPeer
+is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
+from and number they tried to call. Those details are then used to block them at the service providers network and the
+next time a user/customer tries to call a collected number, it's blocked.
+
+Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all
+about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider
+related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it.
+If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community
+members via p2p methods.
+.SH OPTIONS
+.TP
+.BI "\-V
+shows the version of SentryPeer
+.TP
+.BI "\-v
+Runs SentryPeer in verbose mode
+.TP
+.BI "-h
+Shows the help screen
+.TP
+.BI "-d
+Runs SentryPeer in debug mode (preferred method at the moment)
+.SH USING SENTRYPEER
+For now, the only way to use SentryPeer is to run it standalone via the console in these early stages. Peer to Peer
+is the next step.
+.SH BUGS
+Issues and can be raised on the SentryPeer GitHub page:
+
+<https://github.com/ghenry/SentryPeer/issues>
+
+It's okay to raise an issue to ask a question.
+.br
+.SH SEE ALSO
+<https://sentrypeer.org>
+.SH LICENSE
+Copyright (C) 2021 Gavin Henry <ghenry@sentrypeer.org>
+.br
+License GPLv2 or GPLv3: GNU GPL version 2 or version 3 <https://www.gnu.org/licenses/gpl.html>
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH AUTHORS/CREDITS
+.B SentryPeer
+was written by Gavin Henry
+.B <ghenry@sentrypeer.org>

@@ -6,8 +6,8 @@
 #include "database.h"
 #include <stdlib.h>
 
-const char *schema_check = "PRAGMA user_version;";
-const char *create_table_sql =
+const char schema_check[] = "PRAGMA user_version;";
+const char create_table_sql[] =
 	"CREATE TABLE IF NOT EXISTS honey "
 	"("
 	"   honey_id INTEGER PRIMARY KEY,"
@@ -21,7 +21,7 @@ const char *create_table_sql =
 	"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 	");";
 
-const char *insert_bad_actor = "INSERT INTO honey (event_timestamp,"
+const char insert_bad_actor[] = "INSERT INTO honey (event_timestamp,"
 			       "   source_ip, called_number,"
 			       "   transport_type, method,"
 			       "   user_agent, sip_message) "
@@ -54,6 +54,7 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
+	// TODO: Check if schema is needs to be updated
 	if (sqlite3_exec(db, schema_check, NULL, NULL, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to check schema\n");
 		sqlite3_close(db);
