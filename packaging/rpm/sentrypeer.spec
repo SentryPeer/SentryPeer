@@ -8,7 +8,7 @@ Summary:	This is a SIP honeypot for VoIP
 
 License:	GPLv2 or GPLv3
 URL:		https://sentrypeer.org
-Source0:	%{name}-%{version}.tar.gz
+Source0:	https://github.com/SentryPeer/SentryPeer/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:	gcc
 BuildRequires:	make
