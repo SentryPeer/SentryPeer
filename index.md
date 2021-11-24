@@ -40,6 +40,9 @@ Screenshots of agents and APIs to come...
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
 - [ ] User can **pay to get all data collected** via [SentryPeer commercial website](https://sentrypeer.com) (one day, maybe.)
+- [x] UDP transport
+- [ ] TCP transport
+- [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] **Local** data copy for **fast access** - feature / cli flag
 - [ ] **Local** API for **fast access** - feature / cli flag
@@ -70,7 +73,7 @@ You have two options for installation. CMake or autotools. Autotools is recommen
 If you are going to build from this repository, you will need to have the following installed:
 
 * `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
-* `libsqlite3-dev` (Debian/Ubuntu) or `libsqlite3-devel` (Fedora/CentOS)
+* `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora/CentOS)
 * `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
 
 Debian/Ubuntu:
