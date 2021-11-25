@@ -4,7 +4,7 @@
 Name:		sentrypeer
 Version:	0.0.2
 Release:	1%{?dist}
-Summary:	This is a SIP honeypot for VoIP
+Summary:	SIP peer to peer honeypot for VoIP
 
 License:	GPLv2 or GPLv3
 URL:		https://sentrypeer.org
@@ -28,7 +28,6 @@ phone numbers collected via a SIP Honeypot.
 %make_build
 
 %install
-rm -rf $RPM_BUILD_ROOT
 %make_install
 
 %check
@@ -38,8 +37,8 @@ make check
 %license LICENSE.GPL-2.0-only LICENSE.GPL-3.0-only COPYING
 %doc AUTHORS CHANGELOG.md README.md COPYRIGHT
 %{_bindir}/%{name}
-%{_mandir}/man1/%{name}.1.gz
+%{_mandir}/man1/%{name}.1*
 
 %changelog
-* Wed Nov 24 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.2-1
+* Wed Nov 25 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.2-1
 - First version

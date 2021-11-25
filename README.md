@@ -5,6 +5,7 @@
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
@@ -13,7 +14,7 @@ A distributed list of bad IP addresses and phone numbers collected via a SIP Hon
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/alerts/)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
-## Introduction
+### Introduction
 
 This is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and number they tried to call. Those details are then used to block them at the service providers network and the next time a user/customer tries to call a collected number, it's blocked.
 
@@ -23,7 +24,7 @@ Of course, if you don't want to run any of this and just buy access to the data 
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
-## Screenshots
+### Screenshots
 
 Here's a mockup of the web UI which is subject to change.
 
@@ -31,7 +32,7 @@ Here's a mockup of the web UI which is subject to change.
 
 Screenshots of agents and APIs to come...
 
-## Goals
+### Goals
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
@@ -58,7 +59,7 @@ Screenshots of agents and APIs to come...
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
 
-## Design
+### Design
 
 TBD :-)
 
@@ -70,19 +71,27 @@ I started this because I wanted to do [C network programming](https://github.com
  
 You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
 
+If you are a Fedora user, you can install this via [Fedora copr](https://copr.fedorainfracloud.org/coprs/):
+
+[https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/)
+
 If you are going to build from this repository, you will need to have the following installed:
 
-* `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
-* `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora/CentOS)
-* `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
+* `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
+* `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
+* `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
     sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev
 
-CentOS/Fedora:
+Fedora:
 
     sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel
+
+macOS:
+
+    brew install libosip cmocka
 
 then (make check is highly recommended):
 
