@@ -77,17 +77,18 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 
 If you are going to build from this repository, you will need to have the following installed:
 
-* `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
-* `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
-* `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
+  * `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
+  * `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
+  * `libuuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
+  * `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev libuuid-dev
 
 Fedora:
 
-    sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel
+    sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel
 
 macOS:
 
@@ -100,6 +101,13 @@ then (make check is highly recommended):
     make
     make check
     make install
+
+Homebrew (macOS or Linux):
+
+We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
+
+    brew tap sentrypeer/sentrypeer
+    brew install sentrypeer
 
 Once built, you can run like so to start in debug mode (this won't work as a daemon yet):
 

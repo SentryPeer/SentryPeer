@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <uuid/uuid.h>
 
 char *event_timestamp(char *event_timestamp)
 {
@@ -23,8 +24,8 @@ char *event_timestamp(char *event_timestamp)
 	localtime_r(&timestamp_ts.tv_sec, &time_info);
 	strftime(timestamp_buf, TIMESTAMP_LEN, "%Y-%m-%d %H:%M:%S", &time_info);
 
-	if (snprintf(event_timestamp, TIMESTAMP_LEN, "%s.%06ld",
-		     timestamp_buf, timestamp_ts.tv_nsec) < 0) {
+	if (snprintf(event_timestamp, TIMESTAMP_LEN, "%s.%06ld", timestamp_buf,
+		     timestamp_ts.tv_nsec) < 0) {
 		perror("snprintf() failed.");
 	}
 	assert(event_timestamp);
@@ -41,4 +42,16 @@ char *util_duplicate_string(const char *string)
 
 	assert(duplicate);
 	return duplicate;
+}
+
+char *util_uuid_generate_string(char *uuid_string)
+{
+	assert(uuid_string);
+
+	uuid_t binary_uuid;
+	uuid_generate(binary_uuid);
+	assert(binary_uuid);
+
+	uuid_unparse_lower(binary_uuid, uuid_string);
+	return uuid_string;
 }

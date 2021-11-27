@@ -24,4 +24,13 @@ char *event_timestamp(char *event_timestamp);
 
 char *util_duplicate_string(const char *string);
 
+/**
+ * Generate a uuid.
+ *
+ * @param uuid_string The string to fill.
+ * @return A uuid in string format.
+ */
+
+char *util_uuid_generate_string(char *uuid_string);
+
 #endif //SENTRYPEER_UTILS_H

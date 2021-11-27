@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_DB_FILE "./sentrypeer.db"
+#define TEST_DB_FILE "./tests/unit_tests/sentrypeer.db"
 
 void test_open_add_close_sqlite_db(void **state)
 {
@@ -26,20 +26,24 @@ void test_open_add_close_sqlite_db(void **state)
 		"("
 		"   honey_id INTEGER PRIMARY KEY,"
 		"   event_timestamp TEXT,"
+		"   event_uuid TEXT,"
+		"   collected_method TEXT,"
 		"   source_ip TEXT,"
 		"   called_number TEXT,"
 		"   transport_type TEXT,"
 		"   method TEXT,"
 		"   user_agent TEXT,"
 		"   sip_message TEXT,"
+		"   created_by_node_id TEXT,"
 		"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 		");";
 
-	const char insert_bad_actor[] = "INSERT INTO honey (event_timestamp,"
-				       "   source_ip, called_number,"
-				       "   transport_type, method,"
-				       "   user_agent, sip_message) "
-				       "VALUES (?, ?, ?, ?, ?, ?, ?)";
+	const char insert_bad_actor[] =
+		"INSERT INTO honey (event_timestamp,"
+		"   event_uuid, collected_method, source_ip,"
+		"   called_number, transport_type, method,"
+		"   user_agent, sip_message, created_by_node_id) "
+		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 	sqlite3 *db;
 	sqlite3_stmt *insert_bad_actor_stmt;
@@ -73,26 +77,34 @@ void test_open_add_close_sqlite_db(void **state)
 					   "2020-11-18 20:13:17.349557105", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 2,
+	assert_int_equal(
+		sqlite3_bind_text(insert_bad_actor_stmt, 2,
+				  "f1f83c62-4fd9-11ec-a6bb-d05099894ba6", -1,
+				  SQLITE_STATIC),
+		SQLITE_OK);
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 3, "passive",
+					   -1, SQLITE_STATIC),
+			 SQLITE_OK);
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 4,
 					   "104.149.141.214", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 3, "100", -1,
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 5, "100", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 4, "UDP", -1,
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 6, "UDP", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 5, "INVITE",
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 7, "INVITE",
 					   -1, SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 6,
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 8,
 					   "friendly-scanner", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
 	assert_int_equal(
 		sqlite3_bind_text(
-			insert_bad_actor_stmt, 7,
+			insert_bad_actor_stmt, 9,
 			"OPTIONS sip:100@XXX.XXX.XXX.XXX SIP/2.0\n"
 			"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\n"
 			"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\n"
@@ -105,6 +117,11 @@ void test_open_add_close_sqlite_db(void **state)
 			"Max-forwards: 70\n"
 			"Content-Length: 0",
 			-1, SQLITE_STATIC),
+		SQLITE_OK);
+	assert_int_equal(
+		sqlite3_bind_text(insert_bad_actor_stmt, 10,
+				  "1f45cc1c-4fd4-11ec-89f0-d05099894ba6", -1,
+				  SQLITE_STATIC),
 		SQLITE_OK);
 
 	fprintf(stderr,
@@ -128,6 +145,7 @@ void test_open_add_close_sqlite_db(void **state)
 	fprintf(stderr, "Removed database successfully.\n");
 }
 
+// TODO: Fill out this
 void test_db_insert_bad_actor(void **state)
 {
 }

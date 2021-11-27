@@ -46,7 +46,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - run: sudo apt-get install libosip2-dev libcmocka-dev
+    - run: sudo apt-get install libosip2-dev libcmocka-dev libuuid-dev
     - run: |
         set -x
         ./bootstrap.sh
