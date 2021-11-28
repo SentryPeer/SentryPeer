@@ -166,4 +166,9 @@ void test_db_insert_bad_actor(void **state)
 
 	assert_int_equal(db_insert_bad_actor(bad_actor_event, &config),
 			 EXIT_SUCCESS);
+
+	// TODO: DB_FILE needs to be set via ENV or cli. In database.h for now
+	// We'll be doing https://12factor.net/ anyway
+	assert_int_equal(remove(DB_FILE), EXIT_SUCCESS);
+	fprintf(stderr, "Removed database successfully.\n");
 }
