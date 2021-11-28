@@ -9,12 +9,13 @@
 
 #include "test_database.h"
 #include "../../src/database.h"
+#include "../../src/utils.h"
 
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_DB_FILE "./tests/unit_tests/sentrypeer.db"
+#define TEST_DB_FILE "test_sentrypeer.db"
 
 void test_open_add_close_sqlite_db(void **state)
 {
@@ -118,6 +119,7 @@ void test_open_add_close_sqlite_db(void **state)
 			"Content-Length: 0",
 			-1, SQLITE_STATIC),
 		SQLITE_OK);
+
 	assert_int_equal(
 		sqlite3_bind_text(insert_bad_actor_stmt, 10,
 				  "1f45cc1c-4fd4-11ec-89f0-d05099894ba6", -1,
@@ -125,7 +127,7 @@ void test_open_add_close_sqlite_db(void **state)
 		SQLITE_OK);
 
 	fprintf(stderr,
-		"Bound bad actor values fpr insert at line number %d in file %s\n",
+		"Bound bad actor values for insert at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
 	assert_int_equal(sqlite3_step(insert_bad_actor_stmt), SQLITE_DONE);
@@ -148,4 +150,20 @@ void test_open_add_close_sqlite_db(void **state)
 // TODO: Fill out this
 void test_db_insert_bad_actor(void **state)
 {
+	(void)state; /* unused */
+
+	bad_actor *bad_actor_event =
+		bad_actor_new(0, "127.0.0.1", 0, 0, "UDP", 0, "passive", "");
+	fprintf(stderr,
+		"New bad actor event created at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+	assert_non_null(bad_actor_event);
+
+	struct sentrypeer_config config;
+	config.debug_mode = true;
+	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
+	assert_int_equal(db_insert_bad_actor(bad_actor_event, &config),
+			 EXIT_SUCCESS);
 }

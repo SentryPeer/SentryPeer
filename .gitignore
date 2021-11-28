@@ -96,4 +96,5 @@ tests/unit_tests/.dirstamp
 tests/unit_tests/runner
 tests/unit_tests/runner.log
 tests/unit_tests/runner.trs
+test_sentrypeer.db
 

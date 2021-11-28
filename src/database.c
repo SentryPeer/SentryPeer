@@ -12,20 +12,24 @@ const char create_table_sql[] =
 	"("
 	"   honey_id INTEGER PRIMARY KEY,"
 	"   event_timestamp TEXT,"
+	"   event_uuid TEXT,"
+	"   collected_method TEXT,"
 	"   source_ip TEXT,"
 	"   called_number TEXT,"
 	"   transport_type TEXT,"
 	"   method TEXT,"
 	"   user_agent TEXT,"
 	"   sip_message TEXT,"
+	"   created_by_node_id TEXT,"
 	"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 	");";
 
-const char insert_bad_actor[] = "INSERT INTO honey (event_timestamp,"
-			       "   source_ip, called_number,"
-			       "   transport_type, method,"
-			       "   user_agent, sip_message) "
-			       "VALUES (?, ?, ?, ?, ?, ?, ?)";
+const char insert_bad_actor[] =
+	"INSERT INTO honey (event_timestamp,"
+	"   event_uuid, collected_method, source_ip,"
+	"   called_number, transport_type, method,"
+	"   user_agent, sip_message, created_by_node_id) "
+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 void db_error_log_callback(int err_code, const char *msg)
 {
@@ -83,6 +87,22 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 	}
 
 	if (sqlite3_bind_text(insert_bad_actor_stmt, 2,
+			      bad_actor_event->event_uuid, -1,
+			      SQLITE_STATIC) != SQLITE_OK) {
+		fprintf(stderr, "Failed to bind event_uuid\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 3,
+			      bad_actor_event->collected_method, -1,
+			      SQLITE_STATIC) != SQLITE_OK) {
+		fprintf(stderr, "Failed to bind collected_method\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 4,
 			      bad_actor_event->source_ip, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind source_ip\n");
@@ -90,7 +110,7 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_bind_text(insert_bad_actor_stmt, 3,
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 5,
 			      bad_actor_event->called_number, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind called_number\n");
@@ -98,7 +118,7 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_bind_text(insert_bad_actor_stmt, 4,
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 6,
 			      bad_actor_event->transport_type, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind transport_type\n");
@@ -106,14 +126,14 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_bind_text(insert_bad_actor_stmt, 5, bad_actor_event->method,
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 7, bad_actor_event->method,
 			      -1, SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind method\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_bind_text(insert_bad_actor_stmt, 6,
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 8,
 			      bad_actor_event->user_agent, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind user_agent\n");
@@ -121,10 +141,18 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_bind_text(insert_bad_actor_stmt, 7,
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 9,
 			      bad_actor_event->sip_message, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind sip_message\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_bind_text(insert_bad_actor_stmt, 10,
+			      bad_actor_event->created_by_node_id, -1,
+			      SQLITE_STATIC) != SQLITE_OK) {
+		fprintf(stderr, "Failed to bind created_by_node_id\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}

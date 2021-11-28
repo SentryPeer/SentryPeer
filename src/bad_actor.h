@@ -17,6 +17,9 @@
 typedef struct bad_actor bad_actor;
 struct bad_actor {
 	char *event_timestamp;
+	char *event_uuid;
+	char *collected_method;
+	char *created_by_node_id;
 	char *sip_message;
 	char *source_ip;
 	char *called_number;
@@ -28,7 +31,8 @@ struct bad_actor {
 //  Constructor
 bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 			 char *called_number, char *method,
-			 char *transport_type, char *user_agent);
+			 char *transport_type, char *user_agent,
+			 char *collected_method, char *created_by_node_id);
 
 //  Destructor
 void bad_actor_destroy(bad_actor **self_ptr);
