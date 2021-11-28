@@ -5,6 +5,7 @@
 #define SENTRYPEER_UTILS_H 1
 
 #define TIMESTAMP_LEN 40
+#define UTILS_UUID_STRING_LEN 37
 
 /**
  * Get the current time suitable for event logging.

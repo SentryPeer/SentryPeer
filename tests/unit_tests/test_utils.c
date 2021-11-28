@@ -9,7 +9,6 @@
 
 #include "test_utils.h"
 #include "../../src/utils.h"
-#include <uuid/uuid.h>
 
 void test_utils(void **state)
 {
@@ -24,7 +23,7 @@ void test_utils(void **state)
 	assert_string_equal(string_to_copy, string_copied);
 
 	// uuid utils
-	char uuid_string[UUID_STR_LEN];
+	char uuid_string[UTILS_UUID_STRING_LEN];
 	util_uuid_generate_string(uuid_string);
 	assert_non_null(uuid_string);
 	assert_string_not_equal(uuid_string, "");
