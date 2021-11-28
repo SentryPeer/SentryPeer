@@ -141,6 +141,7 @@ bytes_received size is: 411:
 
 Bad Actor is:
 Event Timestamp: 2021-11-23 20:13:36.427515810
+Event UUID: fac3fa20-8c2c-445b-8661-50a70fa9e873
 SIP Message: OPTIONS sip:100@XXX.XXX.XXX.XXX SIP/2.0
 Via: SIP/2.0/UDP 91.223.3.152:5173;branch=z9hG4bK-515761064;rport
 From: "sipvicious" <sip:100@1.1.1.1>;tag=6434396633623535313363340131363131333837383137
@@ -159,6 +160,8 @@ Called Number: 100
 SIP Method: OPTIONS
 Transport Type: UDP
 User Agent: friendly-scanner
+Collected Method: passive
+Created by Node Id: fac3fa20-8c2c-445b-8661-50a70fa9e873
 ```
 
 You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlitebrowser](https://sqlitebrowser.org/) or sqlite3 command line tool.
