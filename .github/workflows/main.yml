@@ -28,7 +28,7 @@ jobs:
             set -x
             sudo apt-get update
             sudo apt-get -y upgrade
-            sudo apt-get install libosip2-dev libcmocka-dev libuuid-dev
+            sudo apt-get install libosip2-dev libcmocka-dev uuid-dev
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             brew install automake

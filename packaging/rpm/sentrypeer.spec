@@ -2,7 +2,7 @@
 # Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org>
 
 Name:		sentrypeer
-Version:	0.0.2
+Version:	0.0.3
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -15,6 +15,7 @@ BuildRequires:	make
 BuildRequires:	libcmocka-devel
 BuildRequires:	libosip2-devel
 BuildRequires:	sqlite-devel
+BuildRequires:	libuuid-devel
 
 %description	
 SentryPeer is a distributed peer to peer list of bad IP addresses and
@@ -40,5 +41,8 @@ make check
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Nov 28 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.3-1
+- Added `event_uuid`, `collected_method` and `created_by_node_id` columns to `honey` table
+- Added `libuuid` library requirement
 * Wed Nov 25 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.2-1
 - First version

@@ -79,12 +79,12 @@ If you are going to build from this repository, you will need to have the follow
 
   * `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   * `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
-  * `libuuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
+  * `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
   * `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev libuuid-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev
 
 Fedora:
 

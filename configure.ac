@@ -5,7 +5,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer],[0.0.2],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[0.0.3],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
@@ -28,7 +28,7 @@ AC_SEARCH_LIBS(sqlite3_open, sqlite3, [], [
 ])
 
 AC_SEARCH_LIBS(uuid_generate, uuid, [], [
-  AC_MSG_ERROR([uuid_generate() is not available. libuuid-dev / libuuid-devel is required.])
+  AC_MSG_ERROR([uuid_generate() is not available. uuid-dev / libuuid-devel is required.])
 ])
 
 #AC_SEARCH_LIBS(SHA1, crypto, [], [

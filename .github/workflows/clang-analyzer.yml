@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt-get install libosip2-dev clang-tools libcmocka-dev libuuid-dev
+      - run: sudo apt-get install libosip2-dev clang-tools libcmocka-dev uuid-dev
       - run: |
           set -x
           ./bootstrap.sh

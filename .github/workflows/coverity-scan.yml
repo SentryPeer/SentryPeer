@@ -22,7 +22,7 @@ jobs:
             wget \
             libosip2-dev \
             libcmocka-dev \
-            libuuid-dev
+            uuid-dev
 
       - name: Download Coverity Build Tool
         run: |
