@@ -77,10 +77,10 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 
 If you are going to build from this repository, you will need to have the following installed:
 
-  * `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
-  * `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
-  * `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
-  * `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
+  - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
+  - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
+  - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
+  - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 

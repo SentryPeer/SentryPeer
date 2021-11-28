@@ -34,7 +34,6 @@ jobs:
             brew install automake
             brew install libosip
             brew install cmocka
-            brew install uuid
           fi
       - name: Build and Clean
         run: |
