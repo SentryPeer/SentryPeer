@@ -38,7 +38,7 @@ jobs:
           if [ "$RUNNER_OS" == "macOS" ]; then
             brew install automake
             brew install libosip
-            brew install libjansson
+            brew install jansson
             brew install libmicrohttpd
             brew install cmocka
           fi

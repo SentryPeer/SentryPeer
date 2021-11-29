@@ -26,16 +26,6 @@ static enum MHD_Result ahc_echo(void *cls, struct MHD_Connection *connection,
 	struct MHD_Response *response;
 	int ret;
 
-	if (0 != strcmp(method, "GET"))
-		return MHD_NO; /* unexpected method */
-	if (&dummy != *ptr) {
-		/* The first time only the headers are valid,
-         do not respond in the first round... */
-		*ptr = &dummy;
-		return MHD_YES;
-	}
-	if (0 != *upload_data_size)
-		return MHD_NO; /* upload data in a GET!? */
 	*ptr = NULL; /* clear context pointer */
 	response = MHD_create_response_from_buffer(strlen(page), (void *)page,
 						   MHD_RESPMEM_PERSISTENT);
