@@ -22,7 +22,9 @@ jobs:
             wget \
             libosip2-dev \
             libcmocka-dev \
-            uuid-dev
+            uuid-dev \
+            libmicrohttpd-dev \
+            libjansson-dev
 
       - name: Download Coverity Build Tool
         run: |

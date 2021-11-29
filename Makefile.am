@@ -45,6 +45,8 @@ unit_test_sources = \
 	tests/unit_tests/test_database.h \
 	tests/unit_tests/test_utils.c \
 	tests/unit_tests/test_utils.h \
+    tests/unit_tests/test_web_api.c \
+    tests/unit_tests/test_web_api.h \
 	tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

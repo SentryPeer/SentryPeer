@@ -27,6 +27,8 @@ set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 target_link_libraries(sentrypeer -losipparser2)
 target_link_libraries(sentrypeer -lsqlite3)
 target_link_libraries(sentrypeer -luuid)
+target_link_libraries(sentrypeer -lmicrohttpd)
+target_link_libraries(sentrypeer -ljansson)
 
 # configure header file
 configure_file(

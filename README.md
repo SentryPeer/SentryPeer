@@ -80,6 +80,8 @@ If you are going to build from this repository, you will need to have the follow
   - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
+  - `libmicrohttpd-dev` (Debian/Ubuntu) or `libmicrohttpd-devel` (Fedora)
+  - `libjansson-dev` (Debian/Ubuntu) or `jansson-devel` (Fedora)
   - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
@@ -88,11 +90,11 @@ Debian/Ubuntu:
 
 Fedora:
 
-    sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel
+    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel
 
 macOS:
 
-    brew install libosip cmocka
+    brew install libosip cmocka libmicrohttpd jansson
 
 then (make check is highly recommended):
 

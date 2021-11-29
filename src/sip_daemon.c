@@ -144,37 +144,6 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 			socklen_t client_len = sizeof(client_address);
 
 			char read_packet_buf[PACKET_BUFFER_SIZE];
-//			int bytes_received = recvmsg(socket_listen,
-//						     (struct msghdr *)&read_packet_buf,
-//						     PACKET_BUFFER_SIZE);
-//
-//			if (bytes_received < 0) {
-//				fprintf(stderr, "recvmsg() failed. (%d)\n",
-//					GETSOCKETERRNO());
-//				perror("recvmsg() failed.");
-//				return EXIT_FAILURE;
-//			}
-//
-//			if (bytes_received == 0) {
-//				fprintf(stderr, "recvmsg() returned 0.\n");
-//				return EXIT_FAILURE;
-//			}
-//
-//			if (bytes_received > PACKET_BUFFER_SIZE) {
-//				fprintf(stderr, "recvmsg() returned %d.\n",
-//					bytes_received);
-//				return EXIT_FAILURE;
-//			}
-//
-//			if (config->debug_mode || config->verbose_mode) {
-//				fprintf(stderr, "Received %d bytes.\n",
-//					bytes_received);
-//			}
-//
-//
-//
-
-
 			int bytes_received =
 				recvfrom(socket_listen, read_packet_buf,
 					 PACKET_BUFFER_SIZE, 0,
