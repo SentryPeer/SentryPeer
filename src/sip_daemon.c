@@ -41,12 +41,11 @@
 /*
  * sip_daemon_init
  *
- * TODO: Implement proper logging
+ * TODO: Implement proper logging? What do we need to log?
  */
 
 int sip_daemon_init(struct sentrypeer_config const *config)
 {
-	// TODO: Do a macro for these later
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Configuring local address...\n");
 	}
@@ -60,7 +59,6 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 	int gai = getaddrinfo(0, SIP_PORT, &gai_hints, &bind_address);
 	if (gai != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
-		// TODO: wrap these
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
@@ -130,7 +128,7 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 		fprintf(stderr, "Listening for incoming connections...\n");
 	}
 
-	// TODO: Switch to libevent/0MQ/epoll etc. later
+	// TODO: Switch to libevent/0MQ/epoll etc. later if needed
 	while (1) {
 		fd_set reads;
 		reads = master;
@@ -146,6 +144,37 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 			socklen_t client_len = sizeof(client_address);
 
 			char read_packet_buf[PACKET_BUFFER_SIZE];
+//			int bytes_received = recvmsg(socket_listen,
+//						     (struct msghdr *)&read_packet_buf,
+//						     PACKET_BUFFER_SIZE);
+//
+//			if (bytes_received < 0) {
+//				fprintf(stderr, "recvmsg() failed. (%d)\n",
+//					GETSOCKETERRNO());
+//				perror("recvmsg() failed.");
+//				return EXIT_FAILURE;
+//			}
+//
+//			if (bytes_received == 0) {
+//				fprintf(stderr, "recvmsg() returned 0.\n");
+//				return EXIT_FAILURE;
+//			}
+//
+//			if (bytes_received > PACKET_BUFFER_SIZE) {
+//				fprintf(stderr, "recvmsg() returned %d.\n",
+//					bytes_received);
+//				return EXIT_FAILURE;
+//			}
+//
+//			if (config->debug_mode || config->verbose_mode) {
+//				fprintf(stderr, "Received %d bytes.\n",
+//					bytes_received);
+//			}
+//
+//
+//
+
+
 			int bytes_received =
 				recvfrom(socket_listen, read_packet_buf,
 					 PACKET_BUFFER_SIZE, 0,
@@ -218,13 +247,8 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 				bad_actor_destroy(&bad_actor_event);
 				return EXIT_FAILURE;
 			}
+			bad_actor_destroy(&bad_actor_event);
 		}
 	}
-	// TODO: Implement proper cleanup
 	CLOSESOCKET(socket_listen);
-	//
-	//	if (config->debug_mode || config->verbose_mode) {
-	//		fprintf(stderr, "Finished.\n");
-	//	}
-	//	return EXIT_SUCCESS;
 }

@@ -83,6 +83,8 @@ void bad_actor_destroy(bad_actor **self_ptr)
 	if (*self_ptr) {
 		bad_actor *self = *self_ptr;
 
+		// Modern C by Manning, Takeaway 6.19
+		// "6.19 Initialization or assignment with 0 makes a pointer null."
 		if (self->event_timestamp != 0) {
 			free(self->event_timestamp);
 			self->event_timestamp = 0;
@@ -110,7 +112,8 @@ void bad_actor_destroy(bad_actor **self_ptr)
 
 		// As per osip_message_to_str();
 		if (self->sip_message != 0) {
-			osip_free(self->sip_message) self->sip_message = 0;
+			osip_free(self->sip_message)
+			self->sip_message = 0;
 		}
 
 		free(self);
