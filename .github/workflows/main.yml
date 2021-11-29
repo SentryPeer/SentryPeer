@@ -36,6 +36,7 @@ jobs:
             libjansson-dev
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
+            set -x
             brew install automake
             brew install libosip
             brew install jansson
