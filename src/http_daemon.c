@@ -4,11 +4,12 @@
 #include "conf.h"
 #include "http_daemon.h"
 
-#include <microhttpd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#include <microhttpd.h>
 
 #define PAGE                                                                   \
 	"<html><head><title>SentryPeer API</title>"                            \
