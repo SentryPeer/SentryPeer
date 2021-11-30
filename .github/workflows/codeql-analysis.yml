@@ -49,7 +49,7 @@ jobs:
     - run: |
         sudo apt-get install libosip2-dev libcmocka-dev uuid-dev \
         libmicrohttpd-dev \
-        libjansson-dev
+        libjansson-dev libcurl-dev
     - run: |
         set -x
         ./bootstrap.sh

@@ -24,7 +24,8 @@ jobs:
             libcmocka-dev \
             uuid-dev \
             libmicrohttpd-dev \
-            libjansson-dev
+            libjansson-dev \
+            libcurl-dev
 
       - name: Download Coverity Build Tool
         run: |

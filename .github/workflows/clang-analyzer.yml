@@ -22,7 +22,8 @@ jobs:
           libcmocka-dev \
           uuid-dev \
           libmicrohttpd-dev \
-          libjansson-dev
+          libjansson-dev \
+          libcurl-dev
       - run: |
           set -x
           ./bootstrap.sh

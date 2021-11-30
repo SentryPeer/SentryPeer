@@ -11,13 +11,14 @@
 
 void print_usage(void)
 {
-	fprintf(stderr, "Usage: %s [-h] [-V] [-v] [-d]\n", PACKAGE_NAME);
+	fprintf(stderr, "Usage: %s [-h] [-V] [-s] [-v] [-d]\n", PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
-	fprintf(stderr, "  -h,      Print this help.\n");
-	fprintf(stderr, "  -V,      Print version.\n");
-	fprintf(stderr, "  -v,      Enable all logging.\n");
-	fprintf(stderr, "  -d,      Enable debug mode.\n");
+	fprintf(stderr, "  -h,      Print this help\n");
+	fprintf(stderr, "  -V,      Print version\n");
+	fprintf(stderr, "  -s,      Enable syslog logging\n");
+	fprintf(stderr, "  -v,      Enable verbose logging\n");
+	fprintf(stderr, "  -d,      Enable debug mode\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr,
 		"Report bugs to https://github.com/SentryPeer/SentryPeer/issues\n");
@@ -33,10 +34,11 @@ void print_version(void)
 int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 {
 	int cli_option;
+	config->syslog_mode = false;
 	config->verbose_mode = false;
 	config->debug_mode = false;
 
-	while ((cli_option = getopt(argc, argv, "hVvd")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVsvd")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -44,6 +46,9 @@ int process_cli(struct sentrypeer_config *config, int argc, char **argv)
 		case 'V':
 			print_version();
 			exit(EXIT_SUCCESS);
+		case 's':
+			config->syslog_mode = true;
+			break;
 		case 'v':
 			config->verbose_mode = true;
 			break;

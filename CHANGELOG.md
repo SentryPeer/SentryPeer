@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended `bad_actor` data structure to provide above
 - Added `libuuid` library requirement for `created_by_node_id` and `event_uuid` column of `honey` table
 - Memory leak fix with bad_actor not being destroyed
-- Added libmicrohttpd and jansson to provide a RESTful API for honeypot data
+- Added libmicrohttpd, curl and jansson to provide a RESTful API for honeypot data
 - Added build requirement for libmicrohttpd and jansson
+- Added syslog support for use with [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

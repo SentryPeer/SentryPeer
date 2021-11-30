@@ -46,12 +46,13 @@ Screenshots of agents and APIs to come...
 - [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] **Local** data copy for **fast access** - feature / cli flag
-- [ ] **Local** API for **fast access** - feature / cli flag
+- [x] **Local** API for **fast access** - feature / cli flag
 - [ ] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
 - [ ] Analytics - opt in
-- [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with and maybe [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) or our own with nftables
+- [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with or our own firewall with nftables
 - [x] Small binary size for IoT usage
 - [x] Cross-platform
 - [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
@@ -82,19 +83,20 @@ If you are going to build from this repository, you will need to have the follow
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
   - `libmicrohttpd-dev` (Debian/Ubuntu) or `libmicrohttpd-devel` (Fedora)
   - `libjansson-dev` (Debian/Ubuntu) or `jansson-devel` (Fedora)
+  - `libcurl-dev` (Debian/Ubuntu) or `libcurl-devel` (Fedora)
   - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev
 
 Fedora:
 
-    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel
+    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel
 
 macOS:
 
-    brew install libosip cmocka libmicrohttpd jansson
+    brew install libosip cmocka libmicrohttpd jansson libcurl
 
 then (make check is highly recommended):
 
@@ -111,10 +113,13 @@ We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew
     brew tap sentrypeer/sentrypeer
     brew install sentrypeer
 
-Once built, you can run like so to start in debug mode (this won't work as a daemon yet):
+### Running SentryPeer
 
-    ./sentrypeer -d
+Once built, you can run like so to start in debug mode and syslog logging (this won't work as a daemon yet):
+
+    ./sentrypeer -ds
     Starting sentrypeer...
+    Starting http daemon...
     Configuring local address...
     Creating socket...
     Binding socket to local address...
@@ -174,6 +179,14 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 The REST API and web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
+### Syslog and Fail2ban
+
+With `sentrypeer -s`, you parse syslog and use Fail2Ban to block the IP address of the bad actor.
+
+```syslog
+Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.36, Method: OPTIONS, Agent: sipsak 0.9.7
+```
+
 ### License
  
 Great reading - [How to choose a license for your own work](https://www.gnu.org/licenses/license-recommendations.en.html)
@@ -208,5 +221,8 @@ It's okay to raise an issue to ask a question.
 
 ### Special Thanks
 
-Special thanks to [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
+Special thanks to:
+
+  - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
+  - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
 

@@ -9,6 +9,7 @@ set(CMAKE_C_STANDARD 11)
 add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
+        ${CMAKE_SOURCE_DIR}/src/http_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/utils.c
@@ -29,6 +30,7 @@ target_link_libraries(sentrypeer -lsqlite3)
 target_link_libraries(sentrypeer -luuid)
 target_link_libraries(sentrypeer -lmicrohttpd)
 target_link_libraries(sentrypeer -ljansson)
+target_link_libraries(sentrypeer -lcurl)
 
 # configure header file
 configure_file(

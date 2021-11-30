@@ -37,17 +37,16 @@ AC_SEARCH_LIBS(json_object, jansson, [], [
   AC_MSG_ERROR([json_object() is not available. libjansson-dev / jansson-devel is required.])
 ])
 
+AC_SEARCH_LIBS(curl_easy_init, curl, [], [
+  AC_MSG_ERROR([curl_easy_init() is not available. libcurl-dev / libcurl-devel is required.])
+])
+
 #AC_SEARCH_LIBS(SHA1, crypto, [], [
 #  AC_MSG_ERROR([unable to find the SHA1() function. openssl libs installed?])
 #])
 
-#AC_SEARCH_LIBS(curl_easy_init, curl, [], [
-#  AC_MSG_ERROR([unable to find the curl_easy_init() function. curl libs installed?])
-#])
-
-
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdio.h stdlib.h stdbool.h errno.h string.h sys/socket.h sys/types.h syslog.h unistd.h assert.h signal.h])
+AC_CHECK_HEADERS([syslog.h arpa/inet.h netdb.h netinet/in.h stdio.h stdlib.h stdbool.h errno.h string.h sys/socket.h sys/types.h syslog.h unistd.h assert.h signal.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T

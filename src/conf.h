@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 struct sentrypeer_config {
+	bool syslog_mode;
 	bool verbose_mode;
 	bool debug_mode;
 	bool daemon_mode;

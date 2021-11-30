@@ -9,7 +9,6 @@
 
 #include "test_database.h"
 #include "../../src/database.h"
-#include "../../src/utils.h"
 
 #include <sqlite3.h>
 #include <stdio.h>

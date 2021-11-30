@@ -4,7 +4,7 @@ sentrypeer \- A distributed list of bad IP addresses and phone numbers collected
 
 .SH SYNOPSIS
 .B sentrypeer
-[\-vVhd]
+[\-hVsvd]
 .SH DESCRIPTION
 .B SentryPeer
 is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
@@ -18,14 +18,17 @@ If you've collected it, you should have the choice to keep it and/or opt in to s
 members via p2p methods.
 .SH OPTIONS
 .TP
+.BI "-h
+Shows the help screen
+.TP
 .BI "\-V
 shows the version of SentryPeer
 .TP
+.BI "\-s
+Runs SentryPeer with syslog logging. Allows Fail2ban to use SentryPeer to block IP addresses
+.TP
 .BI "\-v
 Runs SentryPeer in verbose mode
-.TP
-.BI "-h
-Shows the help screen
 .TP
 .BI "-d
 Runs SentryPeer in debug mode (preferred method at the moment)

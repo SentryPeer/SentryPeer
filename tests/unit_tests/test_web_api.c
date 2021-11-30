@@ -8,40 +8,29 @@
 #include <cmocka.h>
 
 #include "test_web_api.h"
-
-#include <microhttpd.h>
-#include <string.h>
-
-#define PAGE                                                                   \
-	"<html><head><title>SentryPeer API</title>"                        \
-	"</head><body>API demo</body></html>"
-
-static enum MHD_Result ahc_echo(void *cls, struct MHD_Connection *connection,
-				const char *url, const char *method,
-				const char *version, const char *upload_data,
-				size_t *upload_data_size, void **ptr)
-{
-	static int dummy;
-	const char *page = cls;
-	struct MHD_Response *response;
-	int ret;
-
-	*ptr = NULL; /* clear context pointer */
-	response = MHD_create_response_from_buffer(strlen(page), (void *)page,
-						   MHD_RESPMEM_PERSISTENT);
-	ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-	MHD_destroy_response(response);
-	return ret;
-}
+#include "../../src/http_daemon.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <curl/curl.h>
 
 void test_web_api_libmicrohttpd_get(void **state)
 {
 	(void)state; /* unused */
 
-	struct MHD_Daemon *d;
-	d = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, 8082, NULL, NULL,
-			     &ahc_echo, PAGE, MHD_OPTION_END);
+	struct sentrypeer_config config;
+	config.debug_mode = true;
+	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
-	assert_non_null(d);
-	MHD_stop_daemon(d);
+	assert_int_equal(http_daemon_init(&config), EXIT_SUCCESS);
+	fprintf(stderr, "http_daemon started at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
+	CURL *curl = curl_easy_init();
+	assert_non_null(curl);
+	if (curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:8082");
+		assert_int_equal(curl_easy_perform(curl), CURLE_OK);
+		curl_easy_cleanup(curl);
+	}
 }
