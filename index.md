@@ -5,6 +5,7 @@
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
@@ -13,7 +14,7 @@ A distributed list of bad IP addresses and phone numbers collected via a SIP Hon
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/alerts/)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
-## Introduction
+### Introduction
 
 This is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and number they tried to call. Those details are then used to block them at the service providers network and the next time a user/customer tries to call a collected number, it's blocked.
 
@@ -23,7 +24,7 @@ Of course, if you don't want to run any of this and just buy access to the data 
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
-## Screenshots
+### Screenshots
 
 Here's a mockup of the web UI which is subject to change.
 
@@ -31,7 +32,7 @@ Here's a mockup of the web UI which is subject to change.
 
 Screenshots of agents and APIs to come...
 
-## Goals
+### Goals
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
@@ -45,12 +46,13 @@ Screenshots of agents and APIs to come...
 - [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] **Local** data copy for **fast access** - feature / cli flag
-- [ ] **Local** API for **fast access** - feature / cli flag
+- [x] **Local** API for **fast access** - feature / cli flag
 - [ ] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
 - [ ] Analytics - opt in
-- [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with and maybe [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) or our own with nftables
+- [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with or our own firewall with nftables
 - [x] Small binary size for IoT usage
 - [x] Cross-platform
 - [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
@@ -58,7 +60,7 @@ Screenshots of agents and APIs to come...
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
 
-## Design
+### Design
 
 TBD :-)
 
@@ -70,19 +72,31 @@ I started this because I wanted to do [C network programming](https://github.com
  
 You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
 
+If you are a Fedora user, you can install this via [Fedora copr](https://copr.fedorainfracloud.org/coprs/):
+
+[https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/)
+
 If you are going to build from this repository, you will need to have the following installed:
 
-* `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora/CentOS)
-* `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora/CentOS)
-* `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora/CentOS) - for unit tests
+  - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
+  - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
+  - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
+  - `libmicrohttpd-dev` (Debian/Ubuntu) or `libmicrohttpd-devel` (Fedora)
+  - `libjansson-dev` (Debian/Ubuntu) or `jansson-devel` (Fedora)
+  - `libcurl-dev` (Debian/Ubuntu) or `libcurl-devel` (Fedora)
+  - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev
 
-CentOS/Fedora:
+Fedora:
 
-    sudo yum install libosip2-devel libsqlite3-devel libcmocka-devel
+    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel
+
+macOS:
+
+    brew install libosip cmocka libmicrohttpd jansson libcurl
 
 then (make check is highly recommended):
 
@@ -92,10 +106,20 @@ then (make check is highly recommended):
     make check
     make install
 
-Once built, you can run like so to start in debug mode (this won't work as a daemon yet):
+Homebrew (macOS or Linux):
 
-    ./sentrypeer -d
+We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
+
+    brew tap sentrypeer/sentrypeer
+    brew install sentrypeer
+
+### Running SentryPeer
+
+Once built, you can run like so to start in debug mode and syslog logging (this won't work as a daemon yet):
+
+    ./sentrypeer -ds
     Starting sentrypeer...
+    Starting http daemon...
     Configuring local address...
     Creating socket...
     Binding socket to local address...
@@ -124,6 +148,7 @@ bytes_received size is: 411:
 
 Bad Actor is:
 Event Timestamp: 2021-11-23 20:13:36.427515810
+Event UUID: fac3fa20-8c2c-445b-8661-50a70fa9e873
 SIP Message: OPTIONS sip:100@XXX.XXX.XXX.XXX SIP/2.0
 Via: SIP/2.0/UDP 91.223.3.152:5173;branch=z9hG4bK-515761064;rport
 From: "sipvicious" <sip:100@1.1.1.1>;tag=6434396633623535313363340131363131333837383137
@@ -142,6 +167,8 @@ Called Number: 100
 SIP Method: OPTIONS
 Transport Type: UDP
 User Agent: friendly-scanner
+Collected Method: passive
+Created by Node Id: fac3fa20-8c2c-445b-8661-50a70fa9e873
 ```
 
 You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlitebrowser](https://sqlitebrowser.org/) or sqlite3 command line tool.
@@ -151,6 +178,14 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 [sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
 
 The REST API and web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+
+### Syslog and Fail2ban
+
+With `sentrypeer -s`, you parse syslog and use Fail2Ban to block the IP address of the bad actor.
+
+```syslog
+Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.36, Method: OPTIONS, Agent: sipsak 0.9.7
+```
 
 ### License
  
@@ -186,5 +221,8 @@ It's okay to raise an issue to ask a question.
 
 ### Special Thanks
 
-Special thanks to [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
+Special thanks to:
+
+  - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
+  - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
 
