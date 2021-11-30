@@ -23,7 +23,8 @@ static enum MHD_Result ahc_echo(void *cls, struct MHD_Connection *connection,
 	static int dummy;
 	const char *page = cls;
 	struct MHD_Response *response;
-	int ret;
+	// https://lists.gnu.org/archive/html/libmicrohttpd/2020-06/msg00013.html
+	enum MHD_Result ret;
 
 	if (0 != strcmp(method, "GET"))
 		return MHD_NO; /* unexpected method */
