@@ -83,7 +83,7 @@ build
 sentrypeer.db
 
 # dist
-sentrypeer-*.tar.gz
+sentrypeer-*
 
 # Doxygen
 docs

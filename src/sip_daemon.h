@@ -13,6 +13,7 @@
 #define CLOSESOCKET(s) close(s)
 #define SOCKET int
 #define GETSOCKETERRNO() (errno)
+#define SIP_DAEMON_PORT "5060"
 
 int sip_daemon_init(struct sentrypeer_config const *config);
 

@@ -1,0 +1,5 @@
+# sysconfig file for SentryPeer
+
+# what extra options to give sentrypeer binary?
+#  See sentrypeer -h for options
+#OPTIONS=''

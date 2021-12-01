@@ -18,27 +18,27 @@ AC_PROG_CC
 
 # Check for libraries.
 AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
-  AC_MSG_ERROR([osip_message_init() is not available. libosip2-dev / libosip2-devel is required.])
+  AC_MSG_ERROR([osip_message_init() is not available. libosip2-dev / libosip2-devel or equivalent is required.])
 ])
 
 AC_SEARCH_LIBS(sqlite3_open, sqlite3, [], [
-  AC_MSG_ERROR([sqlite3_open() is not available. libsqlite3-dev / sqlite-devel is required.])
+  AC_MSG_ERROR([sqlite3_open() is not available. libsqlite3-dev / sqlite-devel or equivalent is required.])
 ])
 
 AC_SEARCH_LIBS(uuid_generate, uuid, [], [
-  AC_MSG_ERROR([uuid_generate() is not available. uuid-dev / libuuid-devel is required.])
+  AC_MSG_ERROR([uuid_generate() is not available. uuid-dev / libuuid-devel or equivalent is required.])
 ])
 
 AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
-  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel is required.])
+  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
 ])
 
 AC_SEARCH_LIBS(json_object, jansson, [], [
-  AC_MSG_ERROR([json_object() is not available. libjansson-dev / jansson-devel is required.])
+  AC_MSG_ERROR([json_object() is not available. libjansson-dev / jansson-devel or equivalent is required.])
 ])
 
 AC_SEARCH_LIBS(curl_easy_init, curl, [], [
-  AC_MSG_ERROR([curl_easy_init() is not available. libcurl-dev / libcurl-devel is required.])
+  AC_MSG_ERROR([curl_easy_init() is not available. libcurl-dev / libcurl-devel or equivalent is required.])
 ])
 
 #AC_SEARCH_LIBS(SHA1, crypto, [], [

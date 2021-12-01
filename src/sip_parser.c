@@ -105,13 +105,6 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 			bad_actor_event->collected_method,
 			bad_actor_event->created_by_node_id);
 	}
-
-	if (config->syslog_mode) {
-		syslog(LOG_NOTICE, "Source IP: %s, Method: %s, Agent: %s\n",
-		       bad_actor_event->source_ip, bad_actor_event->method,
-		       bad_actor_event->user_agent);
-	}
-
 	osip_message_free(parsed_sip_message);
 
 	return EXIT_SUCCESS;

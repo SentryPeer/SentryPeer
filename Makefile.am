@@ -21,6 +21,7 @@ sentrypeer_SOURCES= \
     src/conf.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/compat/mhd_compat.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \

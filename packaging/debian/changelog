@@ -1,0 +1,15 @@
+sentrypeer (0.0.3-1) UNRELEASED; urgency=medium
+
+  * Added `event_uuid`, `collected_method` (passive or responsive) and `created_by_node_id` (aa uuid) columns to `honey` table
+  * Extended `bad_actor` data structure to provide above
+  * Added `libuuid` library requirement for `created_by_node_id` and `event_uuid` column of `honey` table
+  * Memory leak fix with bad_actor not being destroyed
+  * Added libmicrohttpd, curl and jansson to provide a RESTful API for honeypot data
+  * Added build requirement for libmicrohttpd and jansson
+  * Added syslog support for use with [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
+  * Logging to syslog is enabled via `-s` flag. Default is off
+  * Log `Source IP` to sqlite db and syslog (if enabled) to track probes that aren't SIP compliant
+  * systemd service file for SentryPeer
+  * Debian packaging placeholder
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 01 Dec 2021 14:58:53 +0000

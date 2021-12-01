@@ -25,26 +25,30 @@ int main(int argc, char **argv)
 	}
 
 	if (config.debug_mode || config.verbose_mode) {
-		fprintf(stderr, "Starting %s...\n", PACKAGE_NAME);
+		char starting_fmt[] = "Starting %s...\n";
+		fprintf(stderr, starting_fmt, PACKAGE_NAME);
 		if (config.syslog_mode) {
-			syslog(LOG_ERR, "Starting %s...\n", PACKAGE_NAME);
+			syslog(LOG_ERR, starting_fmt, PACKAGE_NAME);
 		}
 	}
 
 	// Threaded, so start the HTTP daemon first
+	char failed[] = "Failed to start %s server on port %d\n";
 	if (http_daemon_init(&config) == EXIT_FAILURE) {
-		fprintf(stderr, "Failed to start HTTP server...\n");
+		fprintf(stderr, failed, "HTTP", HTTP_DAEMON_PORT);
+		perror("http_daemon_init");
 		if (config.syslog_mode) {
-			syslog(LOG_ERR, "Failed to start HTTP server..\n");
+			syslog(LOG_ERR, failed, "HTTP");
 		}
 		exit(EXIT_FAILURE);
 	}
 
 	// Blocking, so start the SIP daemon last
 	if (sip_daemon_init(&config) == EXIT_FAILURE) {
-		fprintf(stderr, "Failed to start SIP server...\n");
+		fprintf(stderr, failed, "SIP", SIP_DAEMON_PORT);
+		perror("sip_daemon_init");
 		if (config.syslog_mode) {
-			syslog(LOG_ERR, "Failed to start SIP server...\n");
+			syslog(LOG_ERR, failed, "SIP");
 		}
 		exit(EXIT_FAILURE);
 	}

@@ -1,0 +1,17 @@
+Source: sentrypeer
+Section: unknown
+Priority: optional
+Maintainer: Gavin Henry <ghenry@sentrypeer.org>
+Build-Depends: debhelper-compat (= 13), autotools-dev
+Standards-Version: 4.6.0
+Homepage: https://sentrypeer.org
+Vcs-Browser: https://github.com/SentryPeer/SentryPeer
+Vcs-Git: https://github.com/SentryPeer/SentryPeer.git
+Rules-Requires-Root: no
+
+Package: sentrypeer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SentryPeer - SIP peer to peer honeypot for VoIP
+A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
+

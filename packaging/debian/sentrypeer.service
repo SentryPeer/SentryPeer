@@ -1,0 +1,17 @@
+[Unit]
+Description=SentryPeer - SIP peer to peer honeypot for VoIP
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/default/sentrypeer
+ExecStart=/usr/bin/sentrypeer $DAEMON_OPTS
+KillMode=mixed
+User=sentrypeer
+Group=sentrypeer
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

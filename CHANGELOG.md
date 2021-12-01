@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added libmicrohttpd, curl and jansson to provide a RESTful API for honeypot data
 - Added build requirement for libmicrohttpd and jansson
 - Added syslog support for use with [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
+- Logging to syslog is enabled via `-s` flag. Default is off
+- Log `Source IP` to sqlite db and syslog (if enabled) to track probes that aren't SIP compliant
+- systemd service file for SentryPeer for Debian/Ubuntu and Fedora
+- Debian packaging placeholder - uncompleted
+- Handle starting up when Web API port is already in use
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

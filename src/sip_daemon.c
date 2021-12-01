@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
+#include <syslog.h>
 
 #include "conf.h"
 #include "sip_daemon.h"
@@ -19,7 +20,6 @@
 #include "database.h"
 
 #define PACKET_BUFFER_SIZE 1024
-#define SIP_PORT "5060"
 
 /*
  * Hands-On Network Programming with C, page 117
@@ -56,7 +56,7 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 	gai_hints.ai_flags = AI_PASSIVE;
 
 	struct addrinfo *bind_address;
-	int gai = getaddrinfo(0, SIP_PORT, &gai_hints, &bind_address);
+	int gai = getaddrinfo(0, SIP_DAEMON_PORT, &gai_hints, &bind_address);
 	if (gai != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
 		freeaddrinfo(bind_address);
@@ -202,19 +202,27 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 					      "UDP", 0, "passive", 0);
 
 			if ((sip_message_parser(read_packet_buf, bytes_received,
-						bad_actor_event, config)) < 0) {
-				fprintf(stderr,
-					"Parsing this SIP packet failed.\n");
-				bad_actor_destroy(&bad_actor_event);
-				return EXIT_FAILURE;
+						bad_actor_event, config)) !=
+			    EXIT_SUCCESS) {
+				if (config->debug_mode ||
+				    config->verbose_mode) {
+					fprintf(stderr,
+						"Parsing this SIP packet failed.\n");
+				}
+			}
+
+			if (config->syslog_mode) {
+				syslog(LOG_NOTICE,
+				       "Source IP: %s, Method: %s, Agent: %s\n",
+				       bad_actor_event->source_ip,
+				       bad_actor_event->method,
+				       bad_actor_event->user_agent);
 			}
 
 			if (db_insert_bad_actor(bad_actor_event, config) !=
 			    EXIT_SUCCESS) {
 				fprintf(stderr,
 					"Saving bad actor to db failed\n");
-				bad_actor_destroy(&bad_actor_event);
-				return EXIT_FAILURE;
 			}
 			bad_actor_destroy(&bad_actor_event);
 		}
