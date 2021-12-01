@@ -26,6 +26,7 @@ jobs:
             libmicrohttpd-dev \
             libjansson-dev \
             libcurl-dev
+            brew install libmicrohttpd
 
       - name: Download Coverity Build Tool
         run: |

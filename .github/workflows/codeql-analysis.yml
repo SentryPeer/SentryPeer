@@ -51,6 +51,7 @@ jobs:
         libmicrohttpd-dev \
         libjansson-dev \
         libcurl4-openssl-dev
+        brew install libmicrohttpd
     - run: |
         set -x
         ./bootstrap.sh

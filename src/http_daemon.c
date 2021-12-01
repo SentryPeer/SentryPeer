@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 
 // https://lists.gnu.org/archive/html/libmicrohttpd/2021-12/msg00001.html
-#include "src/compat/mhd_compat.h"
+#include <microhttpd.h>
 
 #define JSON "{\"title\":\"SentryPeer API\", \"body\":\"SentryPeer API Demo\"}"
 
