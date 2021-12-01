@@ -94,7 +94,7 @@ AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
 sentrypeer_CFLAGS = ${CFLAGS} ${libmicrohttpd_CFLAGS}
-sentrypeer_LDFLAGS = $LDFLAGS} ${libmicrohttpd_LDFLAGS}
+sentrypeer_LDFLAGS = ${LDFLAGS} ${libmicrohttpd_LDFLAGS}
 sentrypeer_LDADD = ${LIBS} ${libmicrohttpd_LIBS}
 
 if HAVE_CMOCKA
