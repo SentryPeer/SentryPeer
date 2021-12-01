@@ -35,23 +35,23 @@ sentrypeer_SOURCES= \
 unit_test_sources = \
     src/http_daemon.c \
     src/http_daemon.h \
-	src/sip_parser.c \
-	src/sip_parser.h \
-	src/bad_actor.c \
-	src/bad_actor.h \
-	src/utils.c \
-	src/utils.h \
-	src/database.c \
-	src/database.h \
-	tests/unit_tests/test_bad_actor.c \
-	tests/unit_tests/test_bad_actor.h \
-	tests/unit_tests/test_database.c \
-	tests/unit_tests/test_database.h \
-	tests/unit_tests/test_utils.c \
-	tests/unit_tests/test_utils.h \
+    src/sip_parser.c \
+    src/sip_parser.h \
+    src/bad_actor.c \
+    src/bad_actor.h \
+    src/utils.c \
+    src/utils.h \
+    src/database.c \
+    src/database.h \
+    tests/unit_tests/test_bad_actor.c \
+    tests/unit_tests/test_bad_actor.h \
+    tests/unit_tests/test_database.c \
+    tests/unit_tests/test_database.h \
+    tests/unit_tests/test_utils.c \
+    tests/unit_tests/test_utils.h \
     tests/unit_tests/test_web_api.c \
     tests/unit_tests/test_web_api.h \
-	tests/unit_tests/runner.c
+    tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
@@ -93,13 +93,19 @@ AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
+sentrypeer_CFLAGS = ${libmicrohttpd_CFLAGS}
+sentrypeer_LDFLAGS = ${libmicrohttpd_LDFLAGS}
+sentrypeer_LDADD = ${LIBS} ${libmicrohttpd_LIBS}
+
 if HAVE_CMOCKA
 # Get these flags in for testing as per p219 of Effective C PDF
 # -fno-omit-frame-pointer -fsanitize=address
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
-tests_unit_tests_runner_LDADD = -lcmocka
+tests_unit_tests_runner_LDADD = -lcmocka ${libmicrohttpd_LIBS}
+tests_unit_tests_runner_CFLAGS = ${libmicrohttpd_CFLAGS}
+tests_unit_tests_runner_LDFLAGS = ${libmicrohttpd_LDFLAGS}
 endif
 
 if HAVE_DOXYGEN
