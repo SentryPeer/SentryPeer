@@ -29,13 +29,9 @@ AC_SEARCH_LIBS(uuid_generate, uuid, [], [
   AC_MSG_ERROR([uuid_generate() is not available. uuid-dev / libuuid-devel or equivalent is required.])
 ])
 
-# Switching to this as libmicrohttpd is installed via homebrew on GitHub actions. I might switch all AC_SEARCH_LIBS to this
-# method
-PKG_CHECK_MODULES([libmicrohttpd], [libmicrohttpd >= 0.9.73])
-
-#AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
-#  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
-#])
+AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
+  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
+])
 
 AC_SEARCH_LIBS(json_object, jansson, [], [
   AC_MSG_ERROR([json_object() is not available. libjansson-dev / jansson-devel or equivalent is required.])

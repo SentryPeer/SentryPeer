@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org>
 ######
 ##
 ## Example from Page 81 of:
@@ -8,7 +10,7 @@
 ##
 ## Published by O’Reilly Media, Inc.
 ##
-## Updated: 2021-10-26
+## Updated: 2021-12-01
 ## Author: Gavin Henry <ghenry@sentrypeer.org (GH)
 ##
 ######
@@ -93,19 +95,13 @@ AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
-sentrypeer_CFLAGS = ${CFLAGS} ${libmicrohttpd_CFLAGS}
-sentrypeer_LDFLAGS = ${LDFLAGS} ${libmicrohttpd_LDFLAGS}
-sentrypeer_LDADD = ${LIBS} ${libmicrohttpd_LIBS}
-
 if HAVE_CMOCKA
 # Get these flags in for testing as per p219 of Effective C PDF
 # -fno-omit-frame-pointer -fsanitize=address
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
-tests_unit_tests_runner_LDADD = -lcmocka ${libmicrohttpd_LIBS}
-tests_unit_tests_runner_CFLAGS = ${libmicrohttpd_CFLAGS}
-tests_unit_tests_runner_LDFLAGS = ${libmicrohttpd_LDFLAGS}
+tests_unit_tests_runner_LDADD = -lcmocka
 endif
 
 if HAVE_DOXYGEN

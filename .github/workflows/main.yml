@@ -33,8 +33,8 @@ jobs:
             libcmocka-dev \
             uuid-dev \
             libjansson-dev \
-            libcurl4-openssl-dev
-            brew install libmicrohttpd
+            libcurl4-openssl-dev \
+            libmicrohttpd-dev
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             set -x

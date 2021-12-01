@@ -25,8 +25,7 @@ jobs:
             uuid-dev \
             libmicrohttpd-dev \
             libjansson-dev \
-            libcurl-dev
-            brew install libmicrohttpd
+            libcurl4-openssl-dev
 
       - name: Download Coverity Build Tool
         run: |

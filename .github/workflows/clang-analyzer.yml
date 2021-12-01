@@ -23,8 +23,8 @@ jobs:
           uuid-dev \
           libmicrohttpd-dev \
           libjansson-dev \
-          libcurl4-openssl-dev
-          brew install libmicrohttpd
+          libcurl4-openssl-dev \
+          libmicrohttpd-dev
       - run: |
           set -x
           ./bootstrap.sh
