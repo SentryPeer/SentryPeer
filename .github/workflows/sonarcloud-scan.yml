@@ -48,7 +48,7 @@ jobs:
       - name: Run build-wrapper
         run: |
           sudo apt-get install libosip2-dev libcmocka-dev uuid-dev \
-          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev \
+          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev
           brew install libmicrohttpd
           ./bootstrap.sh
           ./configure

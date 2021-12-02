@@ -95,8 +95,7 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
           -fstack-protector-strong -grecord-gcc-switches \
-          -Werror=format-security -Werror=implicit-function-declaration \
-          -Wstringop-overflow
+          -Werror=format-security -Werror=implicit-function-declaration
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
