@@ -51,9 +51,9 @@ jobs:
           ./bootstrap.sh
           ./configure
           make
+          ./sentrypeer -V
           make check || (cat ./test-suite.log; false)
           make distcheck
-          ./sentrypeer -V
           make clean
 
 # TODO: cmake
