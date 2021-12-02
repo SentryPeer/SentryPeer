@@ -112,8 +112,7 @@ void bad_actor_destroy(bad_actor **self_ptr)
 
 		// As per osip_message_to_str();
 		if (self->sip_message != 0) {
-			osip_free(self->sip_message)
-			self->sip_message = 0;
+			osip_free(self->sip_message) self->sip_message = 0;
 		}
 
 		free(self);

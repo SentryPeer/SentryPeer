@@ -6,15 +6,22 @@
 
 AC_PREREQ([2.69])
 AC_INIT([sentrypeer],[0.0.3],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
+AC_CONFIG_SRCDIR([src/sentrypeer.h])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
-AC_CONFIG_SRCDIR([src/sentrypeer.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
-AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_SILENT_RULES([yes])
+AC_PROG_CXX
+AC_PROG_AWK
 AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Check for libraries.
 AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
@@ -29,10 +36,6 @@ AC_SEARCH_LIBS(uuid_generate, uuid, [], [
   AC_MSG_ERROR([uuid_generate() is not available. uuid-dev / libuuid-devel or equivalent is required.])
 ])
 
-AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
-  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
-])
-
 AC_SEARCH_LIBS(json_object, jansson, [], [
   AC_MSG_ERROR([json_object() is not available. libjansson-dev / jansson-devel or equivalent is required.])
 ])
@@ -41,20 +44,23 @@ AC_SEARCH_LIBS(curl_easy_init, curl, [], [
   AC_MSG_ERROR([curl_easy_init() is not available. libcurl-dev / libcurl-devel or equivalent is required.])
 ])
 
-#AC_SEARCH_LIBS(SHA1, crypto, [], [
-#  AC_MSG_ERROR([unable to find the SHA1() function. openssl libs installed?])
-#])
+# Switching to this as libmicrohttpd is installed via homebrew on GitHub actions. I might switch all AC_SEARCH_LIBS to this
+# method
+PKG_CHECK_MODULES([MHD], [libmicrohttpd >= 0.9.73])
+AC_SUBST([MHD_CFLAGS])
+AC_SUBST([MHD_LDFLAGS])
+AC_SUBST([MHD_LIBS])
 
 # Checks for header files.
-AC_CHECK_HEADERS([syslog.h arpa/inet.h netdb.h netinet/in.h stdio.h stdlib.h stdbool.h errno.h string.h sys/socket.h sys/types.h syslog.h unistd.h assert.h signal.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_PID_T
+AC_CHECK_HEADER_STDBOOL
+AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime memset])
+AC_CHECK_FUNCS([clock_gettime inet_ntoa localtime_r memset select socket strndup strnlen])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])

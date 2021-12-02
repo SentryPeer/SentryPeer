@@ -151,8 +151,12 @@ void test_db_insert_bad_actor(void **state)
 {
 	(void)state; /* unused */
 
+	char test_source_ip[] = "127.0.0.1";
+	char test_transport_type[] = "UDP";
+	char test_collected_method[] = "passive";
 	bad_actor *bad_actor_event =
-		bad_actor_new(0, "127.0.0.1", 0, 0, "UDP", 0, "passive", "");
+		bad_actor_new(0, test_source_ip, 0, 0, test_transport_type, 0,
+			      test_collected_method, 0);
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);

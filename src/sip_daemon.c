@@ -197,9 +197,12 @@ int sip_daemon_init(struct sentrypeer_config const *config)
 			}
 
 			// TODO: update once with have TCP and TLS
+			char transport_type[] = "UDP";
+			char collected_method[] = "passive";
 			bad_actor *bad_actor_event =
 				bad_actor_new(0, client_ip_address_buffer, 0, 0,
-					      "UDP", 0, "passive", 0);
+					      transport_type, 0,
+					      collected_method, 0);
 
 			if ((sip_message_parser(read_packet_buf, bytes_received,
 						bad_actor_event, config)) !=

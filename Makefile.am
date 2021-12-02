@@ -10,7 +10,7 @@
 ##
 ## Published by O’Reilly Media, Inc.
 ##
-## Updated: 2021-12-01
+## Updated: 2021-12-02
 ## Author: Gavin Henry <ghenry@sentrypeer.org (GH)
 ##
 ######
@@ -33,6 +33,12 @@ sentrypeer_SOURCES= \
     src/bad_actor.h \
     src/database.c \
     src/database.h
+
+# So libmicrohttpd can be found (MHD) as Ubuntu LTS has an old version on GitHub Action and we
+# install via Homebrew there
+sentrypeer_CFLAGS = $(AM_CFLAGS) $(MHD_CFLAGS)
+sentrypeer_LDFLAGS = $(AM_LDFLAGS) $(MHD_LDFLAGS) $(MHD_LIBS)
+sentrypeer_LDADD = $(MHD_LDFLAGS) $(MHD_LIBS)
 
 unit_test_sources = \
     src/http_daemon.c \
@@ -82,8 +88,8 @@ maintainer-clean-local:
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
-# libasan for later -fsanitize=address -fno-omit-frame-pointer \
-AM_CFLAGS = -Wall -Werror -Wextra -Wpedantic -pedantic \
+# libasan for later -fsanitize=address -fno-omit-frame-pointer
+AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
@@ -101,7 +107,9 @@ if HAVE_CMOCKA
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
-tests_unit_tests_runner_LDADD = -lcmocka
+tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS) $(MHD_CFLAGS)
+tests_unit_tests_runner_LDFLAGS = $(AM_LDFLAGS) $(MHD_LDFLAGS) $(MHD_LIBS)
+tests_unit_tests_runner_LDADD = -lcmocka $(MHD_LDFLAGS) $(MHD_LIBS)
 endif
 
 if HAVE_DOXYGEN

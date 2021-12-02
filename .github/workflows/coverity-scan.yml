@@ -22,10 +22,10 @@ jobs:
             wget \
             libosip2-dev \
             libcmocka-dev \
-            uuid-dev \
-            libmicrohttpd-dev \
+            uuid-dev \            
             libjansson-dev \
             libcurl4-openssl-dev
+            brew install libmicrohttpd
 
       - name: Download Coverity Build Tool
         run: |

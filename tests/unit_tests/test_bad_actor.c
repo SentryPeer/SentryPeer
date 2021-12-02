@@ -71,9 +71,11 @@ void test_bad_actor(void **state)
 
 	char test_source_ip[] = "104.149.141.214";
 	char test_transport_type[] = "UDP";
+	char test_collected_method[] = "passive";
 
-	bad_actor *bad_actor_event = bad_actor_new(
-		0, test_source_ip, 0, 0, test_transport_type, 0, "passive", 0);
+	bad_actor *bad_actor_event =
+		bad_actor_new(0, test_source_ip, 0, 0, test_transport_type, 0,
+			      test_collected_method, 0);
 	assert_non_null(bad_actor_event);
 	assert_string_equal(bad_actor_event->source_ip, test_source_ip);
 	assert_string_equal(bad_actor_event->transport_type,
