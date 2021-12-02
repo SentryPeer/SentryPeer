@@ -51,7 +51,7 @@ jobs:
           ./bootstrap.sh
           ./configure
           make
-          make check
+          make check || (cat ./test-suite.log; false)
           make distcheck
           ./sentrypeer -V
           make clean
