@@ -73,7 +73,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 
 	if (json_requested)
 		MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
-					"application/json");
+					content_type_json);
 
 	const struct sockaddr *addr =
 		MHD_get_connection_info(connection,
