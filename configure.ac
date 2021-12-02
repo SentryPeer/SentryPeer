@@ -44,6 +44,10 @@ AC_SEARCH_LIBS(curl_easy_init, curl, [], [
   AC_MSG_ERROR([curl_easy_init() is not available. libcurl-dev / libcurl-devel or equivalent is required.])
 ])
 
+AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
+  AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
+])
+
 # Switching to this as libmicrohttpd is installed via homebrew on GitHub actions. I might switch all AC_SEARCH_LIBS to this
 # method
 PKG_CHECK_MODULES([MHD], [libmicrohttpd >= 0.9.73])
