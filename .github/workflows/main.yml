@@ -51,6 +51,10 @@ jobs:
           ./bootstrap.sh
           ./configure
           make
+          brew doctor
+          brew config
+          ldconfig
+          ldd ./sentrypeer
           ./sentrypeer -V
           make check || (cat ./test-suite.log; false)
           make distcheck

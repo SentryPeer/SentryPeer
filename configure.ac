@@ -148,7 +148,7 @@ Configured build options for $PROJECT_NAME:
   Configure date:     $BUILD_DATE
   Build arch:         $BUILD_ARCH
   Build user:         $BUILD_USER
-  Bulid host:         $BUILD_HOST 
+  Build host:         $BUILD_HOST
   Install prefix:     ${prefix}
   Compiler:         
    C compiler         ${CC}
@@ -157,6 +157,6 @@ Configured build options for $PROJECT_NAME:
 
   Configure complete! Now proceed with:
   - 'make'            compile $PROJECT_NAME
-  - 'make check'      run the $PROJECT_NAME selftests
+  - 'make check'      run the $PROJECT_NAME self tests
   - 'make install'    install the '$PROJECT_NAME' project to $prefix
 ])
