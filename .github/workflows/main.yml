@@ -51,7 +51,6 @@ jobs:
           ./bootstrap.sh
           ./configure
           make
-          brew doctor
           brew config
           ldconfig
           ldd ./sentrypeer
