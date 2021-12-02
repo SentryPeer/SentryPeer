@@ -52,7 +52,7 @@ jobs:
           ./configure
           make
           brew config
-          ldconfig
+          sudo ldconfig
           ldd ./sentrypeer
           ./sentrypeer -V
           make check || (cat ./test-suite.log; false)
