@@ -36,7 +36,6 @@ jobs:
             libcurl4-openssl-dev
             brew cleanup
             brew install libmicrohttpd cmocka
-            pkg-config --libs libmicrohttpd
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             set -x

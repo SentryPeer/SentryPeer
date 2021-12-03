@@ -13,7 +13,7 @@ AC_LANG(C)
 AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
-AM_SILENT_RULES([yes])
+#AM_SILENT_RULES([yes])
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
