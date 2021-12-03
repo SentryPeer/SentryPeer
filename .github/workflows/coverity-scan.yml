@@ -22,7 +22,7 @@ jobs:
             wget \
             libosip2-dev \
             libcmocka-dev \
-            uuid-dev \            
+            uuid-dev \
             libjansson-dev \
             libcurl4-openssl-dev
             brew install libmicrohttpd
