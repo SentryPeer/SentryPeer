@@ -34,12 +34,6 @@ sentrypeer_SOURCES= \
     src/database.c \
     src/database.h
 
-# So libmicrohttpd can be found (MHD) as Ubuntu LTS has an old version on GitHub Action and we
-# install via Homebrew there
-sentrypeer_CFLAGS = $(CFLAGS) $(AM_CFLAGS) $(MHD_CFLAGS)
-sentrypeer_LDFLAGS = $(LDFLAGS) $(AM_LDFLAGS) $(MHD_LDFLAGS) $(MHD_LIBS)
-sentrypeer_LDADD = $(LDFLAGS) $(AM_LDFLAGS) $(MHD_LIBS)
-
 unit_test_sources = \
     src/http_daemon.c \
     src/http_daemon.h \
@@ -106,9 +100,7 @@ if HAVE_CMOCKA
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
-tests_unit_tests_runner_CFLAGS = $(MHD_CFLAGS)
-tests_unit_tests_runner_LDFLAGS = $(MHD_LIBS)
-tests_unit_tests_runner_LDADD = -lcmocka $(LDFLAGS) $(AM_FLAGS) $(MHD_LIBS)
+tests_unit_tests_runner_LDADD = -lcmocka
 endif
 
 if HAVE_DOXYGEN
