@@ -25,7 +25,9 @@ jobs:
             uuid-dev \
             libjansson-dev \
             libcurl4-openssl-dev
-            brew install libmicrohttpd
+            sudo add-apt-repository ppa:savoury1/utilities
+            sudo apt-get update
+            sudo apt-get install libmicrohttpd-dev
 
       - name: Download Coverity Build Tool
         run: |
