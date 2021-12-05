@@ -158,7 +158,7 @@ if test x$with_asan = xtrue; then
   AX_CHECK_COMPILE_FLAG(
     [-fno-omit-frame-pointer],
     [LIBASAN_CFLAGS="$LIBASAN_CFLAGS -fno-omit-frame-pointer"],
-    AC_MSG_ERROR(Cannot enable -fno-omit-frame-pointer))
+    AC_MSG_ERROR([Cannot enable -fno-omit-frame-pointer]))
 
   AC_SUBST([LIBASAN_FLAGS])
 fi

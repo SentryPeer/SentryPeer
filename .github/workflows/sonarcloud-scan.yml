@@ -47,7 +47,7 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Run build-wrapper
         run: |
-          sudo apt-get install libosip2-dev libcmocka-dev uuid-dev \
+          sudo apt-get install autoconf-archive libosip2-dev libcmocka-dev uuid-dev \
           libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev
           sudo add-apt-repository ppa:savoury1/utilities
           sudo apt-get update
