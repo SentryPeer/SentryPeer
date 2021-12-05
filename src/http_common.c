@@ -11,13 +11,10 @@
                              |___/
 */
 
-#ifndef SENTRYPEER_HTTP_DAEMON_H
-#define SENTRYPEER_HTTP_DAEMON_H 1
+#include "http_common.h"
+#include <stdlib.h>
 
-#include "conf.h"
-
-#define HTTP_DAEMON_PORT 8082
-
-int http_daemon_init(struct sentrypeer_config const *config);
-
-#endif //SENTRYPEER_HTTP_DAEMON_H
+int http_common_init(void)
+{
+	return EXIT_SUCCESS;
+}

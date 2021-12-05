@@ -1,5 +1,15 @@
-/* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only */
+/* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/*
+   _____            _              _____
+  / ____|          | |            |  __ \
+ | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
+  \___ \ / _ \ '_ \| __| '__| | | |  ___/ _ \/ _ \ '__|
+  ____) |  __/ | | | |_| |  | |_| | |  |  __/  __/ |
+ |_____/ \___|_| |_|\__|_|   \__, |_|   \___|\___|_|
+                              __/ |
+                             |___/
+*/
 
 #include "conf.h"
 #include "http_daemon.h"
@@ -70,25 +80,40 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 	response = MHD_create_response_from_buffer(strlen(reply_to_get),
 						   (void *)reply_to_get,
 						   MHD_RESPMEM_PERSISTENT);
+	if (response != NULL) {
+		if (json_requested)
+			if (MHD_add_response_header(
+				    response, MHD_HTTP_HEADER_CONTENT_TYPE,
+				    content_type_json) != MHD_YES) {
+				fprintf(stderr, "Failed to add header\n");
+				return MHD_NO;
+			}
 
-	if (json_requested)
-		MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
-					content_type_json);
+		const struct sockaddr *addr =
+			MHD_get_connection_info(
+				connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS)
+				->client_addr;
 
-	const struct sockaddr *addr =
-		MHD_get_connection_info(connection,
-					MHD_CONNECTION_INFO_CLIENT_ADDRESS)
-			->client_addr;
+		if (addr != NULL) {
+			char client_ip_str[INET6_ADDRSTRLEN];
+			inet_ntop(
+				addr->sa_family,
+				addr->sa_family == AF_INET ?
+					(void *)&(((struct sockaddr_in *)addr)
+							  ->sin_addr) :
+					      (void *)&(((struct sockaddr_in6 *)addr)
+							  ->sin6_addr),
+				client_ip_str, sizeof(client_ip_str));
 
-	// IPv4 for now. Handle IPv6 later using https://www.mail-archive.com/libmicrohttpd@gnu.org/msg02421.html
-	const char *client_ip =
-		inet_ntoa(((struct sockaddr_in *)addr)->sin_addr);
-
-	fprintf(stderr, "GET %s from %s\n", url, client_ip);
-
-	ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-	MHD_destroy_response(response);
-	return ret;
+			fprintf(stderr, "GET %s from Client IP: %s\n", url,
+				client_ip_str);
+		}
+		ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
+		MHD_destroy_response(response);
+		return ret;
+	} else {
+		return MHD_NO;
+	}
 }
 
 int http_daemon_init(struct sentrypeer_config const *config)

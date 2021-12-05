@@ -1,5 +1,15 @@
-# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
-# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org>
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
+# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+#
+#   _____            _              _____
+#  / ____|          | |            |  __ \
+# | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
+#  \___ \ / _ \ '_ \| __| '__| | | |  ___/ _ \/ _ \ '__|
+#  ____) |  __/ | | | |_| |  | |_| | |  |  __/  __/ |
+# |_____/ \___|_| |_|\__|_|   \__, |_|   \___|\___|_|
+#                              __/ |
+#                             |___/
+#
 ######
 ##
 ## Example from Page 81 of:
@@ -23,6 +33,12 @@ sentrypeer_SOURCES= \
     src/conf.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/http_common.c \
+    src/http_common.h \
+    src/http_api.c \
+    src/http_api.h \
+    src/http_ui.c \
+    src/http_ui.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
@@ -51,8 +67,8 @@ unit_test_sources = \
     tests/unit_tests/test_database.h \
     tests/unit_tests/test_utils.c \
     tests/unit_tests/test_utils.h \
-    tests/unit_tests/test_web_api.c \
-    tests/unit_tests/test_web_api.h \
+    tests/unit_tests/test_http_api.c \
+    tests/unit_tests/test_http_api.h \
     tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

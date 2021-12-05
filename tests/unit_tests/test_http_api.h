@@ -11,13 +11,9 @@
                              |___/
 */
 
-#ifndef SENTRYPEER_HTTP_DAEMON_H
-#define SENTRYPEER_HTTP_DAEMON_H 1
+#ifndef SENTRYPEER_TEST_HTTP_API_H
+#define SENTRYPEER_TEST_HTTP_API_H 1
 
-#include "conf.h"
+void test_http_api_get(void **state);
 
-#define HTTP_DAEMON_PORT 8082
-
-int http_daemon_init(struct sentrypeer_config const *config);
-
-#endif //SENTRYPEER_HTTP_DAEMON_H
+#endif //SENTRYPEER_TEST_HTTP_API_H

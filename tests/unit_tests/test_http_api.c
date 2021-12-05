@@ -1,5 +1,15 @@
-/* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only */
+/* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/*
+   _____            _              _____
+  / ____|          | |            |  __ \
+ | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
+  \___ \ / _ \ '_ \| __| '__| | | |  ___/ _ \/ _ \ '__|
+  ____) |  __/ | | | |_| |  | |_| | |  |  __/  __/ |
+ |_____/ \___|_| |_|\__|_|   \__, |_|   \___|\___|_|
+                              __/ |
+                             |___/
+*/
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -7,13 +17,13 @@
 #include <stdint.h>
 #include <cmocka.h>
 
-#include "test_web_api.h"
+#include "test_http_api.h"
 #include "../../src/http_daemon.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <curl/curl.h>
 
-void test_web_api_libmicrohttpd_get(void **state)
+void test_http_api_get(void **state)
 {
 	(void)state; /* unused */
 
