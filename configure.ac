@@ -90,6 +90,13 @@ if test -z "$DOXYGEN";
 fi
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 
+# Doxygen
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN";
+   then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
+
 # CMOCKA unit tests check lib
 PKG_CHECK_EXISTS(cmocka >= 1.1.5,
 		[AC_CHECK_HEADERS([stdarg.h stddef.h setjmp.h],
@@ -108,7 +115,7 @@ AM_CONDITIONAL([HAVE_CMOCKA], [test x$have_cmocka = xyes])
 
 # Test coverage generate. Flag: --with-coverage
 AC_ARG_WITH([coverage],
-			AS_HELP_STRING([--with-coverage], [Generate test covearge report with lcov.]),
+			AS_HELP_STRING([--with-coverage], [Generate test coverage report with lcov.]),
 			[with_cov=true], []
 			)
 
@@ -125,6 +132,35 @@ if test x$with_cov = xtrue; then
   AC_SUBST([GENHTML])
   AC_SUBST([COVERAGE_CFLAGS])
   AC_SUBST([COVERAGE_OPTFLAGS])
+fi
+
+# Add these flags in for testing as per p219 of Effective C PDF
+# Enable AddressSanitizer. Flag: --with-asan
+AC_ARG_WITH([asan],
+			AS_HELP_STRING([--with-asan], [Compile tests with AddressSanitizer (aka ASan)]),
+			[with_asan=true], []
+			)
+
+AM_CONDITIONAL([WITH_ASAN], [test x$with_asan = xtrue])
+if test x$with_asan = xtrue; then
+  LIBASAN_FLAGS="-fno-omit-frame-pointer -fsanitize=address"
+
+  AX_CHECK_COMPILE_FLAG(
+    [[-fsanitize=address]],
+    [[LIBASAN_CFLAGS=-fsanitize=address]],
+    [AC_MSG_ERROR([compiler did not accept requested flags])])
+
+  AX_CHECK_LINK_FLAG(
+    [[-fsanitize=address]],
+    [[LIBASAN_CFLAGS=-fsanitize=address]],
+    [AC_MSG_ERROR([linker did not accept requested flags, you are missing libasan])])
+
+  AX_CHECK_COMPILE_FLAG(
+    [-fno-omit-frame-pointer],
+    [LIBASAN_CFLAGS="LIBASAN_CFLAGS -fno-omit-frame-pointer"],
+    [AC_MSG_ERROR(Cannot enable -fno-omit-frame-pointer)])
+
+  AC_SUBST([LIBASAN_FLAGS])
 fi
 
 AC_CONFIG_FILES([Makefile])
@@ -158,7 +194,7 @@ Configured build options for $PROJECT_NAME:
   Install prefix:     ${prefix}
   Compiler:         
    C compiler         ${CC}
-   CFLAGS:            ${CFLAGS}
+   CFLAGS:            ${CFLAGS} ${LIBASAN_FLAGS}
    LIBS:              ${LIBS}
 
   Configure complete! Now proceed with:

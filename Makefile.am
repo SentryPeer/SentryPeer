@@ -111,11 +111,10 @@ AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
 if HAVE_CMOCKA
-# Get these flags in for testing as per p219 of Effective C PDF
-# -fno-omit-frame-pointer -fsanitize=address
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
+tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS) $(LIBASAN_FLAGS)
 tests_unit_tests_runner_LDADD = -lcmocka
 endif
 

@@ -85,7 +85,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 		if (json_requested &&
 		    (MHD_add_response_header(response,
 					     MHD_HTTP_HEADER_CONTENT_TYPE,
-					     content_type_json) != MHD_YES)) {
+					     content_type_json) == MHD_NO)) {
 			fprintf(stderr, "Failed to add header\n");
 			return MHD_NO;
 		}
