@@ -16,12 +16,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
 
 #include <microhttpd.h>
 #include <jansson.h>
-#include <stdbool.h>
 
 static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 			       const char *url, const char *method,
@@ -42,11 +43,11 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 				connection, MHD_HEADER_KIND,
 				MHD_HTTP_HEADER_CONTENT_TYPE));
 
-		if (strncmp(MHD_lookup_connection_value(
-				    connection, MHD_HEADER_KIND,
-				    MHD_HTTP_HEADER_CONTENT_TYPE),
-			    content_type_json,
-			    strlen(content_type_json)) == 0) {
+		if (strncasecmp(MHD_lookup_connection_value(
+					connection, MHD_HEADER_KIND,
+					MHD_HTTP_HEADER_CONTENT_TYPE),
+				content_type_json,
+				strlen(content_type_json)) == 0) {
 			json_t *api_reply_to_get_json = json_pack(
 				"{s:s, s:s}", "status", "OK", "message",
 				"Hello from the SentryPeer RESTful API!");
@@ -81,13 +82,13 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 						   (void *)reply_to_get,
 						   MHD_RESPMEM_PERSISTENT);
 	if (response != NULL) {
-		if (json_requested)
-			if (MHD_add_response_header(
-				    response, MHD_HTTP_HEADER_CONTENT_TYPE,
-				    content_type_json) != MHD_YES) {
-				fprintf(stderr, "Failed to add header\n");
-				return MHD_NO;
-			}
+		if (json_requested &&
+		    (MHD_add_response_header(response,
+					     MHD_HTTP_HEADER_CONTENT_TYPE,
+					     content_type_json) != MHD_YES)) {
+			fprintf(stderr, "Failed to add header\n");
+			return MHD_NO;
+		}
 
 		const struct sockaddr *addr =
 			MHD_get_connection_info(
