@@ -25,8 +25,10 @@
 #include <stdlib.h>
 
 #define TEST_DB_FILE "test_sentrypeer.db"
+#define BAD_ACTOR_EVENT_UUID "f1f83c62-4fd9-11ec-a6bb-d05099894ba66"
+#define BAD_ACTOR_SOURCE_IP "104.149.141.214"
 
-void test_open_add_close_sqlite_db(void **state)
+void test_open_insert_close_sqlite_db(void **state)
 {
 	(void)state; /* unused */
 
@@ -87,16 +89,15 @@ void test_open_add_close_sqlite_db(void **state)
 					   "2020-11-18 20:13:17.349557105", -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
-	assert_int_equal(
-		sqlite3_bind_text(insert_bad_actor_stmt, 2,
-				  "f1f83c62-4fd9-11ec-a6bb-d05099894ba6", -1,
-				  SQLITE_STATIC),
-		SQLITE_OK);
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 2,
+					   BAD_ACTOR_EVENT_UUID, -1,
+					   SQLITE_STATIC),
+			 SQLITE_OK);
 	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 3, "passive",
 					   -1, SQLITE_STATIC),
 			 SQLITE_OK);
 	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 4,
-					   "104.149.141.214", -1,
+					   BAD_ACTOR_SOURCE_IP, -1,
 					   SQLITE_STATIC),
 			 SQLITE_OK);
 	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 5, "100", -1,
@@ -152,11 +153,44 @@ void test_open_add_close_sqlite_db(void **state)
 	assert_int_equal(sqlite3_close(db), SQLITE_OK);
 	fprintf(stderr, "Closed database successfully.\n");
 
+	// TEST_DB_FILE removed in next test. Move to setup and teardown cmocka
+}
+
+void test_open_select_close_sqlite_db(void **state)
+{
+	(void)state; /* unused */
+
+	sqlite3 *db;
+	sqlite3_stmt *select_bad_actor_stmt;
+
+	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
+	fprintf(stderr,
+		"Opened database successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
+	char select_bad_actor_by_uuid[] =
+		"SELECT source_ip FROM honey WHERE event_uuid = ?";
+	assert_int_equal(sqlite3_prepare_v2(db, select_bad_actor_by_uuid, -1,
+					    &select_bad_actor_stmt, 0),
+			 SQLITE_OK);
+
+	assert_int_equal(sqlite3_bind_text(select_bad_actor_stmt, 1,
+					   BAD_ACTOR_EVENT_UUID, -1,
+					   SQLITE_STATIC),
+			 SQLITE_OK);
+
+	assert_int_equal(sqlite3_step(select_bad_actor_stmt), SQLITE_ROW);
+	assert_string_equal(sqlite3_column_text(select_bad_actor_stmt, 0),
+			    BAD_ACTOR_SOURCE_IP);
+
+	assert_int_equal(sqlite3_finalize(select_bad_actor_stmt), SQLITE_OK);
+	assert_int_equal(sqlite3_close(db), SQLITE_OK);
+	fprintf(stderr, "Closed database successfully.\n");
+
 	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
 	fprintf(stderr, "Removed database successfully.\n");
 }
 
-// TODO: Fill out this
 void test_db_insert_bad_actor(void **state)
 {
 	(void)state; /* unused */
@@ -188,4 +222,10 @@ void test_db_insert_bad_actor(void **state)
 	fprintf(stderr, "Freed bad_actor_event.\n");
 	bad_actor_destroy(&bad_actor_event);
 	assert_null(bad_actor_event);
+}
+
+// TODO: Complete
+void test_db_select_bad_actor(void **state)
+{
+	(void)state;
 }

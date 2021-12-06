@@ -14,7 +14,9 @@
 #ifndef SENTRYPEER_TEST_DATABASE_H
 #define SENTRYPEER_TEST_DATABASE_H 1
 
-void test_open_add_close_sqlite_db(void **state);
+void test_open_insert_close_sqlite_db(void **state);
+void test_open_select_close_sqlite_db(void **state);
 void test_db_insert_bad_actor(void **state);
+void test_db_select_bad_actor(void **state);
 
 #endif //SENTRYPEER_TEST_DATABASE_H

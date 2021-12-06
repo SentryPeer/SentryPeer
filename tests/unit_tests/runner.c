@@ -36,8 +36,10 @@ int main(void)
 		cmocka_unit_test(null_test_success),
 		cmocka_unit_test(test_utils),
 		cmocka_unit_test(test_bad_actor),
-		cmocka_unit_test(test_open_add_close_sqlite_db),
+		cmocka_unit_test(test_open_insert_close_sqlite_db),
+		cmocka_unit_test(test_open_select_close_sqlite_db),
 		cmocka_unit_test(test_db_insert_bad_actor),
+		cmocka_unit_test(test_db_select_bad_actor),
 		cmocka_unit_test(test_http_api_get),
 	};
 
