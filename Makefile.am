@@ -98,14 +98,14 @@ maintainer-clean-local:
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
-# libasan for later -fsanitize=address -fno-omit-frame-pointer
 AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
           -fstack-protector-strong -grecord-gcc-switches \
-          -Werror=format-security -Werror=implicit-function-declaration
+          -Werror=format-security -Werror=implicit-function-declaration \
+           $(LIBASAN_FLAGS)
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
@@ -114,7 +114,7 @@ if HAVE_CMOCKA
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
-tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS) $(LIBASAN_FLAGS)
+tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
 tests_unit_tests_runner_LDADD = -lcmocka
 endif
 

@@ -184,4 +184,8 @@ void test_db_insert_bad_actor(void **state)
 	// We'll be doing https://12factor.net/ anyway
 	assert_int_equal(remove(DB_FILE), EXIT_SUCCESS);
 	fprintf(stderr, "Removed database successfully.\n");
+
+	fprintf(stderr, "Freed bad_actor_event.\n");
+	bad_actor_destroy(&bad_actor_event);
+	assert_null(bad_actor_event);
 }

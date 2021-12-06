@@ -19,6 +19,8 @@
 
 #include "test_utils.h"
 #include "../../src/utils.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 void test_utils(void **state)
 {
@@ -31,11 +33,21 @@ void test_utils(void **state)
 	char *string_copied = util_duplicate_string(string_to_copy);
 	assert_non_null(string_copied);
 	assert_string_equal(string_to_copy, string_copied);
+	free(string_copied);
+	fprintf(stderr,
+		"Freed string_copied successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
+	// Modern C by Manning, Takeaway 6.19
+	// "6.19 Initialization or assignment with 0 makes a pointer null."
+	string_copied = 0;
+	assert_null(string_copied);
 
 	// uuid utils
 	char uuid_string[UTILS_UUID_STRING_LEN];
 	util_uuid_generate_string(uuid_string);
 	assert_non_null(uuid_string);
 	assert_string_not_equal(uuid_string, "");
-	assert_string_not_equal(uuid_string, "00000000-0000-0000-0000-000000000000");
+	assert_string_not_equal(uuid_string,
+				"00000000-0000-0000-0000-000000000000");
 }

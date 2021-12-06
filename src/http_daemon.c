@@ -23,6 +23,7 @@
 
 #include <microhttpd.h>
 #include <jansson.h>
+#include <config.h>
 
 static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 			       const char *url, const char *method,
@@ -48,14 +49,15 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 					MHD_HTTP_HEADER_CONTENT_TYPE),
 				content_type_json,
 				strlen(content_type_json)) == 0) {
-			json_t *api_reply_to_get_json = json_pack(
-				"{s:s, s:s}", "status", "OK", "message",
-				"Hello from the SentryPeer RESTful API!");
+			json_t *api_reply_to_get_json =
+				json_pack("{s:s, s:s, s:s}", "status", "OK",
+					  "message", "Hello from SentryPeer!",
+					  "version", PACKAGE_VERSION);
 			reply_to_get = json_dumps(api_reply_to_get_json,
 						  JSON_INDENT(2));
 			json_requested = true;
 			// Free the json object
-			//json_decref(api_reply_to_get_json);
+			json_decref(api_reply_to_get_json);
 		} else {
 			reply_to_get = html_text;
 		}
@@ -87,6 +89,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 					     MHD_HTTP_HEADER_CONTENT_TYPE,
 					     content_type_json) == MHD_NO)) {
 			fprintf(stderr, "Failed to add header\n");
+			MHD_destroy_response(response);
 			return MHD_NO;
 		}
 

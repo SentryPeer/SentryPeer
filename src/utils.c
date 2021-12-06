@@ -51,6 +51,7 @@ char *util_duplicate_string(const char *string)
 	duplicate = strndup(string, strlen(string));
 
 	assert(duplicate);
+	// Must be freed by caller.
 	return duplicate;
 }
 

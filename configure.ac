@@ -153,7 +153,7 @@ if test x$with_asan = xtrue; then
   AX_CHECK_LINK_FLAG(
     [[-fsanitize=address]],
     [[LIBASAN_CFLAGS=-fsanitize=address]],
-    AC_MSG_ERROR([linker did not accept requested flags, you are missing libasan]))
+    [AC_MSG_ERROR([linker did not accept requested flags, you are missing libasan])])
 
   AX_CHECK_COMPILE_FLAG(
     [-fno-omit-frame-pointer],
