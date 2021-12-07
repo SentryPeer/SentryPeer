@@ -28,9 +28,16 @@
 #define BAD_ACTOR_EVENT_UUID "f1f83c62-4fd9-11ec-a6bb-d05099894ba66"
 #define BAD_ACTOR_SOURCE_IP "104.149.141.214"
 
-void test_open_insert_close_sqlite_db(void **state)
+// https://api.cmocka.org/group__cmocka__exec.html#ga7c62fd0acf2235ce98268c28ee262a57
+int test_setup_sqlite_db(void **state)
 {
 	(void)state; /* unused */
+
+	sqlite3 *db;
+	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
+	fprintf(stderr,
+		"Opened database successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
 	const char schema_check[] = "PRAGMA user_version;";
 	const char create_table_sql[] =
@@ -57,15 +64,7 @@ void test_open_insert_close_sqlite_db(void **state)
 		"   user_agent, sip_message, created_by_node_id) "
 		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-	sqlite3 *db;
 	sqlite3_stmt *insert_bad_actor_stmt;
-	// http://man.hubwiz.com/docset/SQLite.docset/Contents/Resources/Documents/sqlite/errlog.html
-	sqlite3_config(SQLITE_CONFIG_LOG, db_error_log_callback, NULL);
-
-	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
-	fprintf(stderr,
-		"Opened database successfully at line number %d in file %s\n",
-		__LINE__ - 1, __FILE__);
 
 	assert_int_equal(sqlite3_exec(db, schema_check, NULL, NULL, NULL),
 			 SQLITE_OK);
@@ -150,10 +149,22 @@ void test_open_insert_close_sqlite_db(void **state)
 		"Finalized insert bad actor statement at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	assert_int_equal(sqlite3_close(db), SQLITE_OK);
-	fprintf(stderr, "Closed database successfully.\n");
+	sqlite3_close(db);
+	fprintf(stderr,
+		"Closed database successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
-	// TEST_DB_FILE removed in next test. Move to setup and teardown cmocka
+	return EXIT_SUCCESS;
+}
+
+int test_teardown_sqlite_db(void **state)
+{
+	(void)state; /* unused */
+
+	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
+	fprintf(stderr, "Removed database successfully.\n");
+
+	return EXIT_SUCCESS;
 }
 
 void test_open_select_close_sqlite_db(void **state)
@@ -171,7 +182,7 @@ void test_open_select_close_sqlite_db(void **state)
 	char select_bad_actor_by_uuid[] =
 		"SELECT source_ip FROM honey WHERE event_uuid = ?";
 	assert_int_equal(sqlite3_prepare_v2(db, select_bad_actor_by_uuid, -1,
-					    &select_bad_actor_stmt, 0),
+					    &select_bad_actor_stmt, NULL),
 			 SQLITE_OK);
 
 	assert_int_equal(sqlite3_bind_text(select_bad_actor_stmt, 1,
@@ -184,11 +195,14 @@ void test_open_select_close_sqlite_db(void **state)
 			    BAD_ACTOR_SOURCE_IP);
 
 	assert_int_equal(sqlite3_finalize(select_bad_actor_stmt), SQLITE_OK);
-	assert_int_equal(sqlite3_close(db), SQLITE_OK);
-	fprintf(stderr, "Closed database successfully.\n");
+	fprintf(stderr,
+		"Finalized select bad actor statement at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
-	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
-	fprintf(stderr, "Removed database successfully.\n");
+	sqlite3_close(db);
+	fprintf(stderr,
+		"Closed database successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 }
 
 void test_db_insert_bad_actor(void **state)
@@ -225,7 +239,13 @@ void test_db_insert_bad_actor(void **state)
 }
 
 // TODO: Complete
-void test_db_select_bad_actor(void **state)
+void test_db_select_bad_actor_by_ip(void **state)
+{
+	(void)state;
+}
+
+// TODO: Complete
+void test_db_select_bad_actors(void **state)
 {
 	(void)state;
 }

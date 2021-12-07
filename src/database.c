@@ -189,3 +189,39 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 
 	return EXIT_SUCCESS;
 }
+
+int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
+			      struct sentrypeer_config const *config)
+{
+	return EXIT_SUCCESS;
+}
+
+int db_select_bad_actors(struct sentrypeer_config const *config)
+{
+	// TODO: Time to move these opens etc. to a function
+	sqlite3 *db;
+	sqlite3_stmt *select_bad_actor_stmt;
+	char select_bad_actor_by_uuid[] = "SELECT * FROM honey";
+
+	if (sqlite3_open(DB_FILE, &db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to open database\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_prepare_v2(db, select_bad_actor_by_uuid, -1,
+			       &select_bad_actor_stmt, NULL) != SQLITE_OK) {
+	}
+
+	if (sqlite3_step(select_bad_actor_stmt) != SQLITE_ROW) {
+	}
+
+	sqlite3_column_text(select_bad_actor_stmt, 0);
+
+	if (sqlite3_finalize(select_bad_actor_stmt) != SQLITE_OK) {
+	}
+
+	if (sqlite3_close(db) != SQLITE_OK) {
+	}
+	return EXIT_SUCCESS;
+}

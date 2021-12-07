@@ -24,6 +24,11 @@
 int db_insert_bad_actor(bad_actor *bad_actor_event,
 			struct sentrypeer_config const *config);
 
+int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
+			      struct sentrypeer_config const *config);
+
+int db_select_bad_actors(struct sentrypeer_config const *config);
+
 int db_set_error_log_callback(void);
 void db_error_log_callback(int err_code, const char *msg);
 
