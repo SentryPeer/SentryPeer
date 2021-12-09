@@ -25,6 +25,6 @@
 #define GETSOCKETERRNO() (errno)
 #define SIP_DAEMON_PORT "5060"
 
-int sip_daemon_init(struct sentrypeer_config const *config);
+int sip_daemon_init(sentrypeer_config const *config);
 
 #endif //SENTRYPEER_SIP_DAEMON_H

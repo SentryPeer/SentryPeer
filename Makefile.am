@@ -57,16 +57,20 @@ unit_test_sources = \
     src/sip_parser.h \
     src/bad_actor.c \
     src/bad_actor.h \
+    src/conf.c \
+    src/conf.h \
     src/utils.c \
     src/utils.h \
     src/database.c \
     src/database.h \
+    tests/unit_tests/test_conf.c \
+    tests/unit_tests/test_conf.h \
+    tests/unit_tests/test_utils.c \
+    tests/unit_tests/test_utils.h \
     tests/unit_tests/test_bad_actor.c \
     tests/unit_tests/test_bad_actor.h \
     tests/unit_tests/test_database.c \
     tests/unit_tests/test_database.h \
-    tests/unit_tests/test_utils.c \
-    tests/unit_tests/test_utils.h \
     tests/unit_tests/test_http_api.c \
     tests/unit_tests/test_http_api.h \
     tests/unit_tests/runner.c
@@ -105,7 +109,7 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
           -fstack-protector-strong -grecord-gcc-switches \
           -Werror=format-security -Werror=implicit-function-declaration \
-           $(LIBASAN_FLAGS)
+          -Wmisleading-indentation $(LIBASAN_FLAGS)
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4

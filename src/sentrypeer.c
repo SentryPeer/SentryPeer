@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <assert.h>
 
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
@@ -24,29 +25,30 @@
 
 int main(int argc, char **argv)
 {
-	struct sentrypeer_config config;
+	sentrypeer_config *config = sentrypeer_config_new();
+	assert(config);
 
-	if (process_cli(&config, argc, argv) != EXIT_SUCCESS) {
+	if (process_cli(config, argc, argv) != EXIT_SUCCESS) {
 		exit(EXIT_FAILURE);
 	}
 
-	if (config.syslog_mode) {
+	if (config->syslog_mode) {
 		openlog(PACKAGE_NAME, LOG_PID, LOG_USER);
 	}
 
-	if (config.debug_mode || config.verbose_mode) {
+	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Starting %s...\n", PACKAGE_NAME);
-		if (config.syslog_mode) {
+		if (config->syslog_mode) {
 			syslog(LOG_ERR, "Starting %s...\n", PACKAGE_NAME);
 		}
 	}
 
 	// Threaded, so start the HTTP daemon first
-	if (http_daemon_init(&config) == EXIT_FAILURE) {
+	if (http_daemon_init(config) == EXIT_FAILURE) {
 		fprintf(stderr, "Failed to start %s server on port %d\n",
 			"HTTP", HTTP_DAEMON_PORT);
 		perror("http_daemon_init");
-		if (config.syslog_mode) {
+		if (config->syslog_mode) {
 			syslog(LOG_ERR,
 			       "Failed to start %s server on port %d\n", "HTTP",
 			       HTTP_DAEMON_PORT);
@@ -55,11 +57,11 @@ int main(int argc, char **argv)
 	}
 
 	// Blocking, so start the SIP daemon last
-	if (sip_daemon_init(&config) == EXIT_FAILURE) {
+	if (sip_daemon_init(config) == EXIT_FAILURE) {
 		fprintf(stderr, "Failed to start %s server on port %s\n", "SIP",
 			SIP_DAEMON_PORT);
 		perror("sip_daemon_init");
-		if (config.syslog_mode) {
+		if (config->syslog_mode) {
 			syslog(LOG_ERR,
 			       "Failed to start %s server on port %d\n", "SIP",
 			       HTTP_DAEMON_PORT);

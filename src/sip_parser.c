@@ -24,7 +24,7 @@
 
 int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 		       bad_actor *bad_actor_event,
-		       struct sentrypeer_config const *config)
+		       sentrypeer_config const *config)
 
 {
 	osip_message_t *parsed_sip_message = 0;

@@ -47,7 +47,7 @@ Screenshots of agents and APIs to come...
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] **Local** data copy for **fast access** - feature / cli flag
 - [x] **Local** API for **fast access** - feature / cli flag
-- [ ] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] **Local** Web GUI for **fast access** - feature / cli flag
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag

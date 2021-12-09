@@ -19,15 +19,19 @@
 #include "bad_actor.h"
 #include "conf.h"
 
-#define DB_FILE "sentrypeer.db"
+#define DEFAULT_DB_FILE_NAME "sentrypeer.db"
 
-int db_insert_bad_actor(bad_actor *bad_actor_event,
-			struct sentrypeer_config const *config);
+int db_insert_bad_actor(bad_actor const *bad_actor_event,
+			sentrypeer_config const *config);
 
-int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
-			      struct sentrypeer_config const *config);
+int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
+			      sentrypeer_config const *config);
 
-int db_select_bad_actors(struct sentrypeer_config const *config);
+int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
+				sentrypeer_config const *config);
+
+int db_select_bad_actors(bad_actor *bad_actors,
+			 sentrypeer_config const *config);
 
 int db_set_error_log_callback(void);
 void db_error_log_callback(int err_code, const char *msg);

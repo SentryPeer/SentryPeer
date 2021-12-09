@@ -25,6 +25,36 @@
 #include <jansson.h>
 #include <config.h>
 
+#define NOT_FOUND_ERROR                                                        \
+	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
+
+/**
+ * Handler used to generate a 404 reply.
+ *
+ * @param cls a 'const char *' with the HTML webpage to return
+ * @param mime mime type to use
+ * @param session session handle
+ * @param connection connection to use
+ */
+static int not_found_page(const void *cls, const char *mime,
+			  struct MHD_Connection *connection)
+{
+	int ret;
+	struct MHD_Response *response;
+
+	/* unsupported HTTP method */
+	response = MHD_create_response_from_buffer(strlen(NOT_FOUND_ERROR),
+						   (void *)NOT_FOUND_ERROR,
+						   MHD_RESPMEM_PERSISTENT);
+	if (NULL == response)
+		return MHD_NO;
+	ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+	MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
+				mime);
+	MHD_destroy_response(response);
+	return ret;
+}
+
 static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 			       const char *url, const char *method,
 			       const char *version, const char *upload_data,
@@ -33,7 +63,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 	static int dummy;
 	const char *reply_to_get = 0;
 	const char *html_text =
-		"<html><body>Hello from SentryPeer!</body></html>";
+		"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
 	char content_type_json[] = "application/json";
 	bool json_requested = false;
 
@@ -71,6 +101,12 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 
 	if (strcmp(method, MHD_HTTP_METHOD_GET) != 0)
 		return MHD_NO; /* unexpected method */
+
+	// TODO: Do some routes here
+	if (0 != strncasecmp(url, "/health-check", 13)) {
+		return not_found_page(cls, "text/html", connection);
+	}
+
 	if (&dummy != *ptr) {
 		/* The first time only the headers are valid,
          do not respond in the first round... */
@@ -120,7 +156,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 	}
 }
 
-int http_daemon_init(struct sentrypeer_config const *config)
+int http_daemon_init(sentrypeer_config const *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Starting http daemon...\n");

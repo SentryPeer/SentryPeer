@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <cmocka.h>
 
+#include "test_conf.h"
 #include "test_utils.h"
 #include "test_bad_actor.h"
 #include "test_database.h"
@@ -34,15 +35,21 @@ int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(null_test_success),
+		cmocka_unit_test(test_conf),
 		cmocka_unit_test(test_utils),
 		cmocka_unit_test(test_bad_actor),
 		cmocka_unit_test_setup_teardown(
 			test_open_select_close_sqlite_db, test_setup_sqlite_db,
 			test_teardown_sqlite_db),
-		cmocka_unit_test(test_db_insert_bad_actor),
+		cmocka_unit_test_setup_teardown(test_db_insert_bad_actor,
+						test_setup_sqlite_db,
+						test_teardown_sqlite_db),
 		cmocka_unit_test(test_db_select_bad_actor_by_ip),
-		cmocka_unit_test(test_db_select_bad_actors),
+		cmocka_unit_test_setup_teardown(test_db_select_bad_actors,
+						test_setup_sqlite_db,
+						test_teardown_sqlite_db),
 		cmocka_unit_test(test_http_api_get),
+
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

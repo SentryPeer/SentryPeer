@@ -54,7 +54,7 @@
  * TODO: Implement proper logging? What do we need to log?
  */
 
-int sip_daemon_init(struct sentrypeer_config const *config)
+int sip_daemon_init(sentrypeer_config const *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Configuring local address...\n");

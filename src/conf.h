@@ -17,6 +17,9 @@
 #include <getopt.h>
 #include <stdbool.h>
 
+#define PATH_MAX 4096
+
+typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {
 	bool syslog_mode;
 	bool verbose_mode;
@@ -27,8 +30,19 @@ struct sentrypeer_config {
 	bool bgp_mode;
 	bool api_mode;
 	bool web_gui_mode;
+	char *db_file;
 };
 
-int process_cli(struct sentrypeer_config *config, int argc, char **argv);
+//  Constructor
+sentrypeer_config *sentrypeer_config_new(void);
+
+//  Destructor
+void sentrypeer_config_destroy(sentrypeer_config **self_ptr);
+
+int process_cli(sentrypeer_config *config, int argc, char **argv);
+
+int process_env_vars(sentrypeer_config *config);
+
+int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location);
 
 #endif // SENTRYPEER_CONFIG_H

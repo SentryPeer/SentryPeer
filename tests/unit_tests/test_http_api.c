@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <curl/curl.h>
-#include <string.h>
 #include <jansson.h>
 #include <config.h>
 
@@ -47,12 +46,12 @@ void test_http_api_get(void **state)
 {
 	(void)state; /* unused */
 
-	struct sentrypeer_config config;
-	config.debug_mode = true;
+	sentrypeer_config *config = sentrypeer_config_new();
+	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	assert_int_equal(http_daemon_init(&config), EXIT_SUCCESS);
+	assert_int_equal(http_daemon_init(config), EXIT_SUCCESS);
 	fprintf(stderr, "http_daemon started at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
@@ -60,8 +59,9 @@ void test_http_api_get(void **state)
 	CURL *easyhandle = curl_easy_init();
 	assert_non_null(easyhandle);
 	if (easyhandle) {
+		// This is 200 OK
 		curl_easy_setopt(easyhandle, CURLOPT_URL,
-				 "http://127.0.0.1:8082");
+				 "http://127.0.0.1:8082/health-check");
 		struct curl_slist *headers = NULL;
 		headers = curl_slist_append(headers,
 					    "Content-Type: application/json");
@@ -70,8 +70,29 @@ void test_http_api_get(void **state)
 				 curl_to_jansson_to_version);
 		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
 
+		long http_response_code = 0;
+		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+				  &http_response_code);
+		fprintf(stderr,
+			"Response code for 200 test at line number %d in file %s is: %ld\n",
+			__LINE__ - 1, __FILE__, http_response_code);
+		assert_int_equal(http_response_code, 200);
+
+		// This is 404 Not Found
+		curl_easy_setopt(easyhandle, CURLOPT_URL,
+				 "http://127.0.0.1:8082/blah");
+		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
+		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
+		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+				  &http_response_code);
+		fprintf(stderr,
+			"Response code for 404 test at line number %d in file %s is: %ld\n",
+			__LINE__ - 1, __FILE__, http_response_code);
+		assert_int_equal(http_response_code, 404);
+
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(easyhandle);
 		curl_global_cleanup();
+		sentrypeer_config_destroy(&config);
 	}
 }

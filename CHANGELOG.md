@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ran `autoscan` and `autoupdate` from autoconf to update configure.ac
 - API and Web UI are now available at `http://<host>:8082/`. With a Content-Type of `application/json` SentryPeer responds with JSON as a RESTful API, otherwise it responds with HTML, i.e. the Web UI
 - Developer option --with-asan added to configure.ac for ASAN (AddressSanitizer) support during `make check`
+- Added environment variable support for all command line options
+- The [sqlite](https://www.sqlite.org) `sentrypeer.db` database (call it what you like) location is now configurable via the `-f` flag and `SENTRYPEER_DB_FILE` environment variable. Default is the current working directory `./sentrypeer.db` 
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

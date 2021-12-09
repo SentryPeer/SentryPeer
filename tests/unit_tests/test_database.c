@@ -23,6 +23,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TEST_DB_FILE "test_sentrypeer.db"
 #define BAD_ACTOR_EVENT_UUID "f1f83c62-4fd9-11ec-a6bb-d05099894ba66"
@@ -31,10 +32,16 @@
 // https://api.cmocka.org/group__cmocka__exec.html#ga7c62fd0acf2235ce98268c28ee262a57
 int test_setup_sqlite_db(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = sentrypeer_config_new();
+	assert_non_null(config);
+	strncpy(config->db_file, TEST_DB_FILE, PATH_MAX);
+	assert_non_null(config->db_file);
+
+	*state = config;
+	assert_non_null(state);
 
 	sqlite3 *db;
-	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
+	assert_int_equal(sqlite3_open(config->db_file, &db), SQLITE_OK);
 	fprintf(stderr,
 		"Opened database successfully at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
@@ -149,32 +156,38 @@ int test_setup_sqlite_db(void **state)
 		"Finalized insert bad actor statement at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	sqlite3_close(db);
-	fprintf(stderr,
-		"Closed database successfully at line number %d in file %s\n",
-		__LINE__ - 1, __FILE__);
+	// TODO: If we do this, we get free() crashes. Investigate. Only on "make check"
+	// 	Running tests/unit_test/runner doesn't.
+	// 	See: https://sqlite.org/forum/forumpost/e5dcc68d32
+	//	sqlite3_close(db);
+	//	fprintf(stderr,
+	//		"Closed database successfully at line number %d in file %s\n",
+	//		__LINE__ - 1, __FILE__);
 
 	return EXIT_SUCCESS;
 }
 
 int test_teardown_sqlite_db(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
 
-	assert_int_equal(remove(TEST_DB_FILE), EXIT_SUCCESS);
+	assert_int_equal(remove(config->db_file), EXIT_SUCCESS);
 	fprintf(stderr, "Removed database successfully.\n");
 
+	sentrypeer_config_destroy(&config);
 	return EXIT_SUCCESS;
 }
 
 void test_open_select_close_sqlite_db(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
 
 	sqlite3 *db;
 	sqlite3_stmt *select_bad_actor_stmt;
 
-	assert_int_equal(sqlite3_open(TEST_DB_FILE, &db), SQLITE_OK);
+	assert_int_equal(sqlite3_open(config->db_file, &db), SQLITE_OK);
 	fprintf(stderr,
 		"Opened database successfully at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
@@ -207,7 +220,8 @@ void test_open_select_close_sqlite_db(void **state)
 
 void test_db_insert_bad_actor(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
 
 	char test_source_ip[] = "127.0.0.1";
 	char test_transport_type[] = "UDP";
@@ -220,32 +234,29 @@ void test_db_insert_bad_actor(void **state)
 		__LINE__ - 1, __FILE__);
 	assert_non_null(bad_actor_event);
 
-	struct sentrypeer_config config;
-	config.debug_mode = true;
+	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	assert_int_equal(db_insert_bad_actor(bad_actor_event, &config),
+	assert_int_equal(db_insert_bad_actor(bad_actor_event, config),
 			 EXIT_SUCCESS);
-
-	// TODO: DB_FILE needs to be set via ENV or cli. In database.h for now
-	// We'll be doing https://12factor.net/ anyway
-	assert_int_equal(remove(DB_FILE), EXIT_SUCCESS);
-	fprintf(stderr, "Removed database successfully.\n");
-
-	fprintf(stderr, "Freed bad_actor_event.\n");
 	bad_actor_destroy(&bad_actor_event);
+	fprintf(stderr, "Freed bad_actor_event.\n");
 	assert_null(bad_actor_event);
 }
 
 // TODO: Complete
 void test_db_select_bad_actor_by_ip(void **state)
 {
-	(void)state;
+	(void)state; /* unused */
 }
 
-// TODO: Complete
 void test_db_select_bad_actors(void **state)
 {
-	(void)state;
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
+
+	bad_actor *bad_actors = calloc(1, sizeof(bad_actor));
+	assert_int_equal(db_select_bad_actors(bad_actors, config),
+			 EXIT_SUCCESS);
 }

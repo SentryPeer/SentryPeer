@@ -1,4 +1,4 @@
-.TH SentryPeer 1 "November 2021" "SentryPeer"
+.TH SentryPeer 1 "December 2021" "SentryPeer"
 .SH NAME
 sentrypeer \- A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot
 
@@ -24,14 +24,17 @@ Shows the help screen
 .BI "\-V
 shows the version of SentryPeer
 .TP
+.BI "\-f
+Set 'sentrypeer.db' location or set SENTRYPEER_DB_FILE environment variable
+.TP
 .BI "\-s
-Runs SentryPeer with syslog logging. Allows Fail2ban to use SentryPeer to block IP addresses
+Runs SentryPeer with syslog logging or set SENTRYPEER_SYSLOG=1 environment variable. Allows Fail2ban to use SentryPeer to block IP addresses
 .TP
 .BI "\-v
-Runs SentryPeer in verbose mode
+Runs SentryPeer in verbose mode or set SENTRYPEER_VERBOSE=1 environment variable
 .TP
 .BI "-d
-Runs SentryPeer in debug mode (preferred method at the moment)
+Runs SentryPeer in debug mode (preferred method at the moment) or set SENTRYPEER_DEBUG=1 environment variable
 .SH USING SENTRYPEER
 For now, the only way to use SentryPeer is to run it standalone via the console in these early stages. Peer to Peer
 is the next step.

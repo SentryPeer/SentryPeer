@@ -15,6 +15,8 @@
 
 #include "database.h"
 #include <stdlib.h>
+#include <assert.h>
+#include <stdint.h>
 
 const char schema_check[] = "PRAGMA user_version;";
 const char create_table_sql[] =
@@ -56,13 +58,20 @@ int db_set_error_log_callback(void)
 	return EXIT_SUCCESS;
 }
 
-int db_insert_bad_actor(bad_actor *bad_actor_event,
-			struct sentrypeer_config const *config)
+int db_insert_bad_actor(bad_actor const *bad_actor_event,
+			sentrypeer_config const *config)
 {
 	sqlite3 *db;
 	sqlite3_stmt *insert_bad_actor_stmt;
 
-	if (sqlite3_open(DB_FILE, &db) != SQLITE_OK) {
+	assert(config->db_file);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "SentryPeer db file location is: %s\n",
+			config->db_file);
+	}
+
+	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
 		fprintf(stderr, "Failed to open database\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
@@ -190,38 +199,67 @@ int db_insert_bad_actor(bad_actor *bad_actor_event,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
-			      struct sentrypeer_config const *config)
+int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
+			      sentrypeer_config const *config)
 {
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actors(struct sentrypeer_config const *config)
+int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
+				sentrypeer_config const *config)
 {
-	// TODO: Time to move these opens etc. to a function
-	sqlite3 *db;
-	sqlite3_stmt *select_bad_actor_stmt;
-	char select_bad_actor_by_uuid[] = "SELECT * FROM honey";
+	return EXIT_SUCCESS;
+}
 
-	if (sqlite3_open(DB_FILE, &db) != SQLITE_OK) {
-		fprintf(stderr, "Failed to open database\n");
+int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
+{
+	sqlite3 *db;
+	sqlite3_stmt *select_bad_actors_stmt;
+	char select_bad_actors[] = "SELECT * FROM honey";
+
+	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to open database: %s\n",
+			sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_prepare_v2(db, select_bad_actor_by_uuid, -1,
-			       &select_bad_actor_stmt, NULL) != SQLITE_OK) {
+	if (sqlite3_prepare_v2(db, select_bad_actors, -1,
+			       &select_bad_actors_stmt, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_step(select_bad_actor_stmt) != SQLITE_ROW) {
+	int num_cols = sqlite3_column_count(select_bad_actors_stmt);
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Num of SentryPeer bad_actors is: %i\n",
+			num_cols);
 	}
 
-	sqlite3_column_text(select_bad_actor_stmt, 0);
+	bad_actors = realloc(bad_actors, num_cols * sizeof(bad_actor));
+	assert(bad_actors);
 
-	if (sqlite3_finalize(select_bad_actor_stmt) != SQLITE_OK) {
+	while (sqlite3_step(select_bad_actors_stmt) == SQLITE_ROW) {
+		int64_t row_id = sqlite3_column_int64(select_bad_actors_stmt, 0);
+
+		bad_actors[row_id].source_ip = util_duplicate_string((
+			const char *)sqlite3_column_text(select_bad_actors_stmt,
+							 4)); // source_ip
+	}
+	assert(bad_actors);
+
+	if (sqlite3_finalize(select_bad_actors_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
 	}
 
 	if (sqlite3_close(db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to close database\n");
+		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
 }
