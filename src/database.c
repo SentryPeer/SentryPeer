@@ -11,12 +11,14 @@
                              |___/
 */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 
 #include "database.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 const char schema_check[] = "PRAGMA user_version;";
 const char create_table_sql[] =
@@ -214,9 +216,6 @@ int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
 int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 {
 	sqlite3 *db;
-	sqlite3_stmt *select_bad_actors_stmt;
-	char select_bad_actors[] = "SELECT * FROM honey";
-
 	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
 		fprintf(stderr, "Failed to open database: %s\n",
 			sqlite3_errmsg(db));
@@ -224,6 +223,38 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
+	sqlite3_stmt *get_row_count_stmt;
+	char get_row_count[] = "SELECT count(*) from honey;";
+	if (sqlite3_prepare_v2(db, get_row_count, -1, &get_row_count_stmt,
+			       NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+	if (sqlite3_step(get_row_count_stmt) != SQLITE_ROW) {
+		fprintf(stderr, "Error stepping statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	int64_t row_count = sqlite3_column_int64(get_row_count_stmt, 0);
+	assert(row_count);
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Row count in honey table is: %ld\n",
+			row_count);
+	}
+
+	if (sqlite3_finalize(get_row_count_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	sqlite3_stmt *select_bad_actors_stmt;
+	char select_bad_actors[] = "SELECT * FROM honey;";
 	if (sqlite3_prepare_v2(db, select_bad_actors, -1,
 			       &select_bad_actors_stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
@@ -232,21 +263,29 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	int num_cols = sqlite3_column_count(select_bad_actors_stmt);
-	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Num of SentryPeer bad_actors is: %i\n",
-			num_cols);
-	}
-
-	bad_actors = realloc(bad_actors, num_cols * sizeof(bad_actor));
+	bad_actors = realloc(bad_actors, row_count * sizeof(bad_actor));
 	assert(bad_actors);
 
-	while (sqlite3_step(select_bad_actors_stmt) == SQLITE_ROW) {
-		int64_t row_id = sqlite3_column_int64(select_bad_actors_stmt, 0);
+	int64_t row_num = 0;
+	while (row_num < row_count) {
+		if (sqlite3_step(select_bad_actors_stmt) != SQLITE_ROW) {
+			fprintf(stderr, "Error stepping statement: %s\n",
+				sqlite3_errmsg(db));
+			sqlite3_close(db);
+			free(bad_actors[row_num].source_ip);
+			free(bad_actors);
+			return EXIT_FAILURE;
+		}
 
-		bad_actors[row_id].source_ip = util_duplicate_string((
-			const char *)sqlite3_column_text(select_bad_actors_stmt,
-							 4)); // source_ip
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Column name is '%s', with value: %s\n",
+				sqlite3_column_name(select_bad_actors_stmt, 4),
+				sqlite3_column_text(select_bad_actors_stmt, 4));
+		}
+		bad_actors[row_num].source_ip =
+			(char *)sqlite3_column_text(select_bad_actors_stmt,
+						    4); // source_ip
+		row_num++;
 	}
 	assert(bad_actors);
 
