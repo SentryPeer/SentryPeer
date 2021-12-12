@@ -247,7 +247,7 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 			row_count);
 #endif
 #ifdef __APPLE__
-		fprintf(stderr, "Row count in honey table is: %ll\n",
+		fprintf(stderr, "Row count in honey table is: %lld\n",
 			row_count);
 
 #endif
