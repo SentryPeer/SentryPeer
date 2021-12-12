@@ -156,6 +156,7 @@ void test_bad_actors(void **state)
 		bad_actors[row_num].source_ip = strdup("127.0.0.1");
 		row_num++;
 	}
+
 	bad_actors_destroy(&bad_actors, row_count);
 	assert_null(bad_actors);
 }

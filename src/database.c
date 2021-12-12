@@ -244,10 +244,13 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 	if (config->debug_mode || config->verbose_mode) {
 #ifdef __linux__
 		fprintf(stderr, "Row count in honey table is: %ld\n",
-#elif __APPLE__
-		fprintf(stderr, "Row count in honey table is: %ll\n",
-#endif
 			row_count);
+#endif
+#ifdef __APPLE__
+		fprintf(stderr, "Row count in honey table is: %ll\n",
+			row_count);
+
+#endif
 	}
 
 	if (sqlite3_finalize(get_row_count_stmt) != SQLITE_OK) {
@@ -307,5 +310,7 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		fprintf(stderr, "Failed to close database\n");
 		return EXIT_FAILURE;
 	}
+
+	bad_actors_destroy(&bad_actors, row_count);
 	return EXIT_SUCCESS;
 }
