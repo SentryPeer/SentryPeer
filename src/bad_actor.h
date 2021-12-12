@@ -15,6 +15,7 @@
 #define SENTRYPEER_BAD_ACTOR_H 1
 
 #include "utils.h"
+#include <stdint.h>
 
 // Modern C - Manning. Chapter 6, Section 6.4:
 // Takeaway 6.29
@@ -44,7 +45,9 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 			 char *transport_type, char *user_agent,
 			 char *collected_method, char *created_by_node_id);
 
-//  Destructor
+//  Destructors
 void bad_actor_destroy(bad_actor **self_ptr);
+void bad_actors_destroy(bad_actor **self_ptr, int64_t row_count);
+
 
 #endif //SENTRYPEER_BAD_ACTOR_H

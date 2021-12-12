@@ -36,7 +36,7 @@
  * @param session session handle
  * @param connection connection to use
  */
-static int not_found_page(const void *cls, const char *mime,
+static int page_not_found(const void *cls, const char *mime,
 			  struct MHD_Connection *connection)
 {
 	int ret;
@@ -49,8 +49,13 @@ static int not_found_page(const void *cls, const char *mime,
 	if (NULL == response)
 		return MHD_NO;
 	ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
-	MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
-				mime);
+	if (MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
+				    mime) == MHD_NO) {
+		fprintf(stderr, "Failed to add header\n");
+		MHD_destroy_response(response);
+		return MHD_NO;
+	}
+
 	MHD_destroy_response(response);
 	return ret;
 }
@@ -104,7 +109,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 
 	// TODO: Do some routes here
 	if (0 != strncasecmp(url, "/health-check", 13)) {
-		return not_found_page(cls, "text/html", connection);
+		return page_not_found(cls, "text/html", connection);
 	}
 
 	if (&dummy != *ptr) {

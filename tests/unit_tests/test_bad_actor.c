@@ -11,6 +11,7 @@
                              |___/
 */
 
+#define _GNU_SOURCE
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -140,4 +141,21 @@ void test_bad_actor(void **state)
 
 	bad_actor_destroy(&bad_actor_event);
 	assert_null(bad_actor_event);
+}
+
+void test_bad_actors(void **state)
+{
+	(void)state; /* unused */
+
+	int64_t row_count = 100;
+	bad_actor *bad_actors = calloc(row_count, sizeof(bad_actor));
+	assert_non_null(bad_actors);
+
+	int row_num = 0;
+	while (row_num < row_count) {
+		bad_actors[row_num].source_ip = strdup("127.0.0.1");
+		row_num++;
+	}
+	bad_actors_destroy(&bad_actors, row_count);
+	assert_null(bad_actors);
 }

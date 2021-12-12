@@ -271,9 +271,8 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		if (sqlite3_step(select_bad_actors_stmt) != SQLITE_ROW) {
 			fprintf(stderr, "Error stepping statement: %s\n",
 				sqlite3_errmsg(db));
+			bad_actors_destroy(&bad_actors, row_count);
 			sqlite3_close(db);
-			free(bad_actors[row_num].source_ip);
-			free(bad_actors);
 			return EXIT_FAILURE;
 		}
 
@@ -282,9 +281,11 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 				sqlite3_column_name(select_bad_actors_stmt, 4),
 				sqlite3_column_text(select_bad_actors_stmt, 4));
 		}
-		bad_actors[row_num].source_ip =
-			(char *)sqlite3_column_text(select_bad_actors_stmt,
-						    4); // source_ip
+		const unsigned char *source_ip =
+			sqlite3_column_text(select_bad_actors_stmt,
+					    4); // source_ip
+		bad_actors[row_num].source_ip = strdup((const char *)source_ip);
+
 		row_num++;
 	}
 	assert(bad_actors);
@@ -292,6 +293,7 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 	if (sqlite3_finalize(select_bad_actors_stmt) != SQLITE_OK) {
 		fprintf(stderr, "Error finalizing statement: %s\n",
 			sqlite3_errmsg(db));
+		bad_actors_destroy(&bad_actors, row_count);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}

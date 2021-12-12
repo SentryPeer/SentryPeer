@@ -15,5 +15,6 @@
 #define SENTRYPEER_TEST_BAD_ACTOR_H 1
 
 void test_bad_actor(void **state);
+void test_bad_actors(void **state);
 
 #endif //SENTRYPEER_TEST_BAD_ACTOR_H

@@ -38,6 +38,7 @@ int main(void)
 		cmocka_unit_test(test_conf),
 		cmocka_unit_test(test_utils),
 		cmocka_unit_test(test_bad_actor),
+		cmocka_unit_test(test_bad_actors),
 		cmocka_unit_test_setup_teardown(
 			test_open_select_close_sqlite_db, test_setup_sqlite_db,
 			test_teardown_sqlite_db),
