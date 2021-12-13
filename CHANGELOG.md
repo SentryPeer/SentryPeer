@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added environment variable support for all command line options
 - The [sqlite](https://www.sqlite.org) `sentrypeer.db` database (call it what you like) location is now configurable via the `-f` flag and `SENTRYPEER_DB_FILE` environment variable. Default is the current working directory `./sentrypeer.db`
 - Updated man page
+- Add SentryPeer to Sonatype Lift static analysis
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

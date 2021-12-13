@@ -256,7 +256,7 @@ void test_db_select_bad_actors(void **state)
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
 
-	bad_actor *bad_actors = calloc(1, sizeof(bad_actor));
+	bad_actor *bad_actors = 0;
 	assert_int_equal(db_select_bad_actors(bad_actors, config),
 			 EXIT_SUCCESS);
 }

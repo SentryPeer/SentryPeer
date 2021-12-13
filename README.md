@@ -78,6 +78,7 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 
 If you are going to build from this repository, you will need to have the following installed:
 
+  - `git`, `autoconf`, `automake` and `autoconf-archive` (Debian/Ubuntu) 
   - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)

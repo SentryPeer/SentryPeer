@@ -270,7 +270,7 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	bad_actors = realloc(bad_actors, row_count * sizeof(bad_actor));
+	bad_actors = calloc(row_count, sizeof(bad_actor));
 	assert(bad_actors);
 
 	int64_t row_num = 0;
