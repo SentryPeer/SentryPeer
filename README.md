@@ -4,6 +4,7 @@
 
 A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
 
+[![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
