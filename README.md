@@ -25,6 +25,9 @@ Of course, if you don't want to run any of this and just buy access to the data 
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
+[![Chat on Slack](https://img.shields.io/badge/chat-slack-brightgreen.svg)](https://sentrypeer.slack.com)
+[![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
+
 ### Screenshots
 
 Here's a mockup of the web UI which is subject to change.
