@@ -19,20 +19,24 @@
 
 #include "test_utils.h"
 #include "../../src/utils.h"
+#include "../../src/conf.h"
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void test_utils(void **state)
 {
 	(void)state; /* unused */
 
 	// String utils
-	char string_to_copy[] = "I'm a string that will be copied!";
-	assert_non_null(string_to_copy);
+	char string_to_duplicate[] = "I'm a string that will be copied!";
+	assert_non_null(string_to_duplicate);
 
-	char *string_copied = util_duplicate_string(string_to_copy);
+	// util_duplicate_string
+	char *string_copied = util_duplicate_string(string_to_duplicate);
 	assert_non_null(string_copied);
-	assert_string_equal(string_to_copy, string_copied);
+	assert_string_equal(string_to_duplicate, string_copied);
 	free(string_copied);
 	fprintf(stderr,
 		"Freed string_copied successfully at line number %d in file %s\n",
@@ -42,6 +46,22 @@ void test_utils(void **state)
 	// "6.19 Initialization or assignment with 0 makes a pointer null."
 	string_copied = 0;
 	assert_null(string_copied);
+
+	// util_copy_string
+	char *destination_string = calloc(PATH_MAX + 1, sizeof(char));
+	assert_non_null(destination_string);
+	destination_string = util_copy_string(destination_string,
+					      string_to_duplicate, PATH_MAX);
+	assert_non_null(destination_string);
+	assert_null(destination_string[strlen(destination_string)]);
+	assert_string_equal(destination_string, string_to_duplicate);
+
+	free(destination_string);
+	fprintf(stderr,
+		"Freed destination_string successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+	destination_string = 0;
+	assert_null(destination_string);
 
 	// uuid utils
 	char uuid_string[UTILS_UUID_STRING_LEN];

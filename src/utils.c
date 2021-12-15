@@ -55,6 +55,23 @@ char *util_duplicate_string(const char *string)
 	return duplicate;
 }
 
+char *util_copy_string(char *dest, const char *src, size_t dest_len)
+{
+	assert(src);
+	assert(dest);
+	assert(dest_len > 0);
+
+	if (strlen(src) > dest_len) {
+		return NULL;
+	}
+
+	strncpy(dest, src, dest_len);
+	assert(dest);
+	assert(dest[strlen(dest)] == 0);
+
+	return dest;
+}
+
 char *util_uuid_generate_string(char *uuid_string)
 {
 	assert(uuid_string);

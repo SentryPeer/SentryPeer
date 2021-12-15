@@ -17,13 +17,14 @@
 #define TIMESTAMP_LEN 40
 #define UTILS_UUID_STRING_LEN 37
 
+#include <stddef.h>
+
 /**
  * Get the current time suitable for event logging.
  *
  * @param event_timestamp The timestamp to fill.
  * @return The current time in format YYYY-MM-DD HH:MM:SS.XXXXXXXXX
  */
-
 char *event_timestamp(char *event_timestamp);
 
 /**
@@ -32,8 +33,18 @@ char *event_timestamp(char *event_timestamp);
  * @param string The string to duplicate.
  * @return A new string with the same contents as the original
  */
-
 char *util_duplicate_string(const char *string);
+
+/**
+ * Copy a string (must be freed by caller).
+ *
+ * @param dest The string to copy to.
+ * @param src The string to copy from.
+ * @param dest_len The maximum length of the string to copy.
+ * @return A pointer to the destination string.
+ */
+char *util_copy_string(char *dest, const char *src, size_t dest_len);
+
 
 /**
  * Generate a uuid.
@@ -41,7 +52,6 @@ char *util_duplicate_string(const char *string);
  * @param uuid_string The string to fill.
  * @return A uuid in string format.
  */
-
 char *util_uuid_generate_string(char *uuid_string);
 
 #endif //SENTRYPEER_UTILS_H

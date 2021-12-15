@@ -31,12 +31,44 @@ sentrypeer_config *sentrypeer_config_new(void)
 	sentrypeer_config *self = malloc(sizeof(sentrypeer_config));
 	assert(self);
 
-	self->db_file = malloc(sizeof(char) * PATH_MAX + 1);
+	self->db_file = calloc(PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
 
-	strncpy(self->db_file, DEFAULT_DB_FILE_NAME, PATH_MAX);
-	assert(self->db_file);
+	/* From SonarCloud:
 
+	  Recommended Secure Coding Practices
+
+ 	  * C11 provides, in its annex K, the strncpy_s and the wcsncpy_s that
+ 	    were designed as safer alternatives to strcpy and wcscpy. It’s not
+ 	    recommended to use them in all circumstances, because they introduce
+ 	    a runtime overhead and require to write more code for error
+ 	    handling, but they perform checks that will limit the consequences
+ 	    of calling the function with bad arguments.
+ 	  * Even if your compiler does not exactly support annex K, you probably
+ 	    have access to similar functions
+ 	  * If you are using strncpy and wsncpy as a safer version of strcpy and
+ 	    wcscpy, you should instead consider strcpy_s and wcscpy_s, because
+ 	    these functions have several shortcomings:
+    	        * It’s not easy to detect truncation
+	        * Too much work is done to fill the buffer with 0, leading to
+	          suboptimal performance
+                * Unless manually corrected, the dest string might not be
+                  null-terminated
+	  * If you want to use strcpy and wcscpy functions and detect if the
+	    string was truncated, the pattern is the following:
+		* Set the last character of the buffer to null
+    		* Call the function
+    		* Check if the last character of the buffer is still null
+
+	  See
+		OWASP Top 10 2021 Category A6 - Vulnerable and Outdated Components
+		OWASP Top 10 2017 Category A9 - Using Components with Known Vulnerabilities
+		MITRE, CWE-120 - Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')
+		CERT, STR07-C. - Use the bounds-checking interfaces for string manipulation
+
+	 */
+
+	util_copy_string(self->db_file, DEFAULT_DB_FILE_NAME, PATH_MAX);
 	return self;
 }
 
@@ -134,9 +166,8 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 int process_env_vars(sentrypeer_config *config)
 {
 	if (getenv("SENTRYPEER_DB_FILE")) {
-		strncpy(config->db_file, getenv("SENTRYPEER_DB_FILE"),
-			PATH_MAX);
-		assert(config->db_file);
+		util_copy_string(config->db_file, getenv("SENTRYPEER_DB_FILE"),
+				 PATH_MAX);
 	}
 	if (getenv("SENTRYPEER_SYSLOG")) {
 		config->syslog_mode = true;
@@ -155,9 +186,9 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 	if (cli_db_file_location == NULL) {
 		// try to get from the environment
 		if (getenv("SENTRYPEER_DB_FILE")) {
-			strncpy(config->db_file, getenv("SENTRYPEER_DB_FILE"),
-				PATH_MAX);
-			assert(config->db_file);
+			util_copy_string(config->db_file,
+					 getenv("SENTRYPEER_DB_FILE"),
+					 PATH_MAX);
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"SentryPeer db file location set via SENTRYPEER_DB_FILE env var to: %s\n",
@@ -177,6 +208,7 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 				PATH_MAX - strlen(config->db_file));
 			strncat(config->db_file, DEFAULT_DB_FILE_NAME,
 				PATH_MAX - strlen(config->db_file));
+			assert(config->db_file[strlen(config->db_file)] == 0);
 
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
@@ -188,8 +220,8 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 	}
 
 	if (cli_db_file_location[0] == '/') {
-		strncpy(config->db_file, cli_db_file_location, PATH_MAX);
-		assert(config->db_file);
+		util_copy_string(config->db_file, cli_db_file_location,
+				 PATH_MAX);
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr,
 				"SentryPeer db file location set via cli -f to: %s\n",

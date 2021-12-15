@@ -36,7 +36,7 @@
  * @param session session handle
  * @param connection connection to use
  */
-static int page_not_found(const void *cls, const char *mime,
+static int page_not_found(const void *cls, const char *content_type,
 			  struct MHD_Connection *connection)
 {
 	int ret;
@@ -50,7 +50,7 @@ static int page_not_found(const void *cls, const char *mime,
 		return MHD_NO;
 	ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
 	if (MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
-				    mime) == MHD_NO) {
+				    content_type) == MHD_NO) {
 		fprintf(stderr, "Failed to add header\n");
 		MHD_destroy_response(response);
 		return MHD_NO;
