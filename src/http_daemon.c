@@ -13,13 +13,12 @@
 
 #include "conf.h"
 #include "http_daemon.h"
+#include "http_common.h"
+#include "http_routes.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
-#include <strings.h>
 #include <stdlib.h>
-#include <arpa/inet.h>
 
 #include <microhttpd.h>
 #include <jansson.h>
@@ -28,36 +27,31 @@
 #define NOT_FOUND_ERROR                                                        \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
-/**
- * Handler used to generate a 404 reply.
- *
- * @param cls a 'const char *' with the HTML webpage to return
- * @param mime mime type to use
- * @param session session handle
- * @param connection connection to use
- */
-static int page_not_found(const void *cls, const char *content_type,
-			  struct MHD_Connection *connection)
+static int health_check_route(const void *cls,
+			      struct MHD_Connection *connection)
 {
-	int ret;
-	struct MHD_Response *response;
+	const char *reply_to_get = 0;
+	const char *html_text =
+		"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
+	const char *content_type = 0;
 
-	/* unsupported HTTP method */
-	response = MHD_create_response_from_buffer(strlen(NOT_FOUND_ERROR),
-						   (void *)NOT_FOUND_ERROR,
-						   MHD_RESPMEM_PERSISTENT);
-	if (NULL == response)
-		return MHD_NO;
-	ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
-	if (MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
-				    content_type) == MHD_NO) {
-		fprintf(stderr, "Failed to add header\n");
-		MHD_destroy_response(response);
-		return MHD_NO;
+	if (json_is_requested(connection)) {
+		json_t *api_reply_to_get_json =
+			json_pack("{s:s, s:s, s:s}", "status", "OK", "message",
+				  "Hello from SentryPeer!", "version",
+				  PACKAGE_VERSION);
+		reply_to_get =
+			json_dumps(api_reply_to_get_json, JSON_INDENT(2));
+		content_type = CONTENT_TYPE_JSON;
+		// Free the json object
+		json_decref(api_reply_to_get_json);
+	} else {
+		content_type = CONTENT_TYPE_HTML;
+		reply_to_get = html_text;
 	}
 
-	MHD_destroy_response(response);
-	return ret;
+	return finalise_response(connection, reply_to_get, content_type,
+				 MHD_HTTP_OK);
 }
 
 static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
@@ -66,51 +60,9 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 			       size_t *upload_data_size, void **ptr)
 {
 	static int dummy;
-	const char *reply_to_get = 0;
-	const char *html_text =
-		"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
-	char content_type_json[] = "application/json";
-	bool json_requested = false;
-
-	if (MHD_lookup_connection_value(connection, MHD_HEADER_KIND,
-					MHD_HTTP_HEADER_CONTENT_TYPE) != NULL) {
-		fprintf(stderr, "Content-Type is: %s\n",
-			MHD_lookup_connection_value(
-				connection, MHD_HEADER_KIND,
-				MHD_HTTP_HEADER_CONTENT_TYPE));
-
-		if (strncasecmp(MHD_lookup_connection_value(
-					connection, MHD_HEADER_KIND,
-					MHD_HTTP_HEADER_CONTENT_TYPE),
-				content_type_json,
-				strlen(content_type_json)) == 0) {
-			json_t *api_reply_to_get_json =
-				json_pack("{s:s, s:s, s:s}", "status", "OK",
-					  "message", "Hello from SentryPeer!",
-					  "version", PACKAGE_VERSION);
-			reply_to_get = json_dumps(api_reply_to_get_json,
-						  JSON_INDENT(2));
-			json_requested = true;
-			// Free the json object
-			json_decref(api_reply_to_get_json);
-		} else {
-			reply_to_get = html_text;
-		}
-	} else {
-		reply_to_get = html_text;
-	}
-
-	struct MHD_Response *response;
-	// https://lists.gnu.org/archive/html/libmicrohttpd/2020-06/msg00013.html
-	enum MHD_Result ret;
 
 	if (strcmp(method, MHD_HTTP_METHOD_GET) != 0)
 		return MHD_NO; /* unexpected method */
-
-	// TODO: Do some routes here
-	if (0 != strncasecmp(url, "/health-check", 13)) {
-		return page_not_found(cls, "text/html", connection);
-	}
 
 	if (&dummy != *ptr) {
 		/* The first time only the headers are valid,
@@ -118,46 +70,58 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 		*ptr = &dummy;
 		return MHD_YES;
 	}
+
 	if (0 != *upload_data_size)
 		return MHD_NO; /* upload data in a GET!? */
 	*ptr = NULL; /* clear context pointer */
-	response = MHD_create_response_from_buffer(strlen(reply_to_get),
-						   (void *)reply_to_get,
-						   MHD_RESPMEM_PERSISTENT);
-	if (response != NULL) {
-		if (json_requested &&
-		    (MHD_add_response_header(response,
-					     MHD_HTTP_HEADER_CONTENT_TYPE,
-					     content_type_json) == MHD_NO)) {
-			fprintf(stderr, "Failed to add header\n");
-			MHD_destroy_response(response);
-			return MHD_NO;
-		}
 
-		const struct sockaddr *addr =
-			MHD_get_connection_info(
-				connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS)
-				->client_addr;
+	log_http_client_ip(url, connection);
 
-		if (addr != NULL) {
-			char client_ip_str[INET6_ADDRSTRLEN];
-			inet_ntop(
-				addr->sa_family,
-				addr->sa_family == AF_INET ?
-					(void *)&(((struct sockaddr_in *)addr)
-							  ->sin_addr) :
-					      (void *)&(((struct sockaddr_in6 *)addr)
-							  ->sin6_addr),
-				client_ip_str, sizeof(client_ip_str));
-
-			fprintf(stderr, "GET %s from Client IP: %s\n", url,
-				client_ip_str);
-		}
-		ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-		MHD_destroy_response(response);
-		return ret;
+	if (0 == strncmp(url, HEALTH_CHECK_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return health_check_route(cls, connection);
+	} else if (0 == strncmp(url, HOME_PAGE_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, HOME_PAGE_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, IP_ADDRESSES_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, IP_ADDRESSES_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, IP_ADDRESS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, IP_ADDRESS_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, IP_ADDRESSES_IPSET_ROUTE,
+				HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, IP_ADDRESSES_IPSET_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, NUMBERS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, NUMBERS_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, NUMBER_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, NUMBER_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, COUNTRIES_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, COUNTRIES_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, COUNTRY_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, COUNTRY_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, COUNTRY_CITY_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, COUNTRY_CITY_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, USER_AGENTS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, USER_AGENTS_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, USER_AGENT_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, USER_AGENT_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, SIP_METHODS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, SIP_METHODS_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+	} else if (0 == strncmp(url, SIP_METHOD_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+		return finalise_response(connection, SIP_METHOD_ROUTE,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
 	} else {
-		return MHD_NO;
+		return finalise_response(connection, NOT_FOUND_ERROR,
+					 CONTENT_TYPE_HTML, MHD_HTTP_NOT_FOUND);
 	}
 }
 

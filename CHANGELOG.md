@@ -25,6 +25,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The [sqlite](https://www.sqlite.org) `sentrypeer.db` database (call it what you like) location is now configurable via the `-f` flag and `SENTRYPEER_DB_FILE` environment variable. Default is the current working directory `./sentrypeer.db`
 - Updated man page
 - Add SentryPeer to Sonatype Lift static analysis
+- API and Web routes available are:
+  - `/`
+  - `/health-check`
+  - `/ip-addresses`
+  - `/ip-addresses/{ip_address}`
+  - `/ip-addresses/ipset`
+  - `/numbers`
+  - `/numbers/{number}`
+  - `/countries`
+  - `/countries/{country}`
+  - `/countries/{country}/{city}`
+  - `/user-agents`
+  - `/user-agents/{user_agent}`
+  - `/sip-methods`
+  - `/sip-methods/{sip_method}`
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called
