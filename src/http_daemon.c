@@ -27,8 +27,7 @@
 #define NOT_FOUND_ERROR                                                        \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
-static int health_check_route(const void *cls,
-			      struct MHD_Connection *connection)
+static int health_check_route(struct MHD_Connection *connection)
 {
 	const char *reply_to_get = 0;
 	const char *html_text =
@@ -78,7 +77,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 	log_http_client_ip(url, connection);
 
 	if (0 == strncmp(url, HEALTH_CHECK_ROUTE, HTTP_ROUTES_MAX_LEN)) {
-		return health_check_route(cls, connection);
+		return health_check_route(connection);
 	} else if (0 == strncmp(url, HOME_PAGE_ROUTE, HTTP_ROUTES_MAX_LEN)) {
 		return finalise_response(connection, HOME_PAGE_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
