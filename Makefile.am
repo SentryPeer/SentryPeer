@@ -33,6 +33,7 @@ sentrypeer_SOURCES= \
     src/conf.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/http_routes.h \
     src/http_common.c \
     src/http_common.h \
     src/http_api.c \
@@ -55,6 +56,7 @@ unit_test_sources = \
     src/http_common.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/http_routes.h \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \
