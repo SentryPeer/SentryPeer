@@ -42,6 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/sip-methods/{sip_method}`
 - OpenAPI specification repo is available at https://github.com/SentryPeer/API-Specification with the openapi.json file
   to be served at `http://<host>:8082/openapi.json` (TODO)
+- New headers added to API responses:
+  - `X-Powered-By`: `SentryPeer`
+  - `X-SentryPeer-Version`: `0.0.3`
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

@@ -218,7 +218,6 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 {
 	sqlite3 *db;
 	assert(config->db_file);
-	fprintf(stderr, "row_count is: %ld\n", *row_count);
 	bad_actor *bad_actors_array = *bad_actors;
 
 	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
