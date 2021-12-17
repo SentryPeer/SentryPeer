@@ -130,14 +130,14 @@ void bad_actor_destroy(bad_actor **self_ptr)
 	}
 }
 
-void bad_actors_destroy(bad_actor **self_ptr, int64_t row_count)
+void bad_actors_destroy(bad_actor **self_ptr, const int64_t *row_count)
 {
 	assert(self_ptr);
 	if (*self_ptr) {
 		bad_actor *self = *self_ptr;
 
 		int64_t row_num = 0;
-		while (row_num < row_count) {
+		while (row_num < *row_count) {
 			free(self[row_num].source_ip);
 			row_num++;
 		}

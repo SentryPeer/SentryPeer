@@ -158,6 +158,6 @@ void test_bad_actors(void **state)
 	}
 
 	assert_string_equal(bad_actors[29].source_ip, "127.0.0.1");
-	bad_actors_destroy(&bad_actors, row_count);
+	bad_actors_destroy(&bad_actors, &row_count);
 	assert_null(bad_actors);
 }

@@ -213,9 +213,14 @@ int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
+int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
+			     sentrypeer_config const *config)
 {
 	sqlite3 *db;
+	assert(config->db_file);
+	fprintf(stderr, "row_count is: %ld\n", *row_count);
+	bad_actor *bad_actors_array = *bad_actors;
+
 	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
 		fprintf(stderr, "Failed to open database: %s\n",
 			sqlite3_errmsg(db));
@@ -239,12 +244,12 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	int64_t row_count = sqlite3_column_int64(get_row_count_stmt, 0);
+	*row_count = sqlite3_column_int64(get_row_count_stmt, 0);
 	assert(row_count);
 	if (config->debug_mode || config->verbose_mode) {
 #ifdef __linux__
 		fprintf(stderr, "Row count in honey table is: %ld\n",
-			row_count);
+			*row_count);
 #endif
 #ifdef __APPLE__
 		fprintf(stderr, "Row count in honey table is: %lld\n",
@@ -270,15 +275,15 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	bad_actors = calloc(row_count, sizeof(bad_actor));
-	assert(bad_actors);
+	bad_actors_array = calloc(*row_count, sizeof(bad_actor));
+	assert(bad_actors_array);
 
 	int64_t row_num = 0;
-	while (row_num < row_count) {
+	while (row_num < *row_count) {
 		if (sqlite3_step(select_bad_actors_stmt) != SQLITE_ROW) {
 			fprintf(stderr, "Error stepping statement: %s\n",
 				sqlite3_errmsg(db));
-			bad_actors_destroy(&bad_actors, row_count);
+			bad_actors_destroy(&bad_actors_array, row_count);
 			sqlite3_close(db);
 			return EXIT_FAILURE;
 		}
@@ -291,26 +296,25 @@ int db_select_bad_actors(bad_actor *bad_actors, sentrypeer_config const *config)
 		const unsigned char *source_ip =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    4); // source_ip
-		bad_actors[row_num].source_ip = strdup((const char *)source_ip);
+		bad_actors_array[row_num].source_ip = strdup((const char *)source_ip);
 
 		row_num++;
 	}
-	assert(bad_actors);
+	assert(bad_actors_array);
 
 	if (sqlite3_finalize(select_bad_actors_stmt) != SQLITE_OK) {
 		fprintf(stderr, "Error finalizing statement: %s\n",
 			sqlite3_errmsg(db));
-		bad_actors_destroy(&bad_actors, row_count);
+		bad_actors_destroy(&bad_actors_array, row_count);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
 	if (sqlite3_close(db) != SQLITE_OK) {
-		bad_actors_destroy(&bad_actors, row_count);
+		bad_actors_destroy(&bad_actors_array, row_count);
 		fprintf(stderr, "Failed to close database\n");
 		return EXIT_FAILURE;
 	}
-
-	bad_actors_destroy(&bad_actors, row_count);
+	*bad_actors = bad_actors_array;
 	return EXIT_SUCCESS;
 }

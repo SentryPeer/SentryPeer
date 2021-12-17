@@ -30,4 +30,8 @@
 #define SIP_METHODS_ROUTE "/sip-methods"
 #define SIP_METHOD_ROUTE "/sip-methods/:sip_method"
 
+int health_check_route(struct MHD_Connection *connection);
+int ip_addresses_route(struct MHD_Connection *connection,
+		       sentrypeer_config *config);
+
 #endif //SENTRYPEER_HTTP_ROUTES_H

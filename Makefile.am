@@ -20,7 +20,7 @@
 ##
 ## Published by O’Reilly Media, Inc.
 ##
-## Updated: 2021-12-02
+## Updated: 2021-12-17
 ## Author: Gavin Henry <ghenry@sentrypeer.org (GH)
 ##
 ######
@@ -31,11 +31,13 @@ sentrypeer_SOURCES= \
     src/sentrypeer.h \
     src/conf.c \
     src/conf.h \
+    src/http_common.c \
+    src/http_common.h \
     src/http_daemon.c \
     src/http_daemon.h \
     src/http_routes.h \
-    src/http_common.c \
-    src/http_common.h \
+    src/http_health_check_route.c \
+    src/http_ip_addresses_route.c \
     src/http_api.c \
     src/http_api.h \
     src/http_ui.c \
@@ -57,6 +59,8 @@ unit_test_sources = \
     src/http_daemon.c \
     src/http_daemon.h \
     src/http_routes.h \
+    src/http_health_check_route.c \
+    src/http_ip_addresses_route.c \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \

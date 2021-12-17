@@ -18,6 +18,6 @@
 
 #define HTTP_DAEMON_PORT 8082
 
-int http_daemon_init(sentrypeer_config const *config);
+int http_daemon_init(sentrypeer_config *config);
 
 #endif //SENTRYPEER_HTTP_DAEMON_H

@@ -47,7 +47,7 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 
 //  Destructors
 void bad_actor_destroy(bad_actor **self_ptr);
-void bad_actors_destroy(bad_actor **self_ptr, int64_t row_count);
+void bad_actors_destroy(bad_actor **self_ptr, const int64_t *row_count);
 
 
 #endif //SENTRYPEER_BAD_ACTOR_H

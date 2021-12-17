@@ -27,38 +27,13 @@
 #define NOT_FOUND_ERROR                                                        \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
-static int health_check_route(struct MHD_Connection *connection)
-{
-	const char *reply_to_get = 0;
-	const char *html_text =
-		"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
-	const char *content_type = 0;
-
-	if (json_is_requested(connection)) {
-		json_t *api_reply_to_get_json =
-			json_pack("{s:s, s:s, s:s}", "status", "OK", "message",
-				  "Hello from SentryPeer!", "version",
-				  PACKAGE_VERSION);
-		reply_to_get =
-			json_dumps(api_reply_to_get_json, JSON_INDENT(2));
-		content_type = CONTENT_TYPE_JSON;
-		// Free the json object
-		json_decref(api_reply_to_get_json);
-	} else {
-		content_type = CONTENT_TYPE_HTML;
-		reply_to_get = html_text;
-	}
-
-	return finalise_response(connection, reply_to_get, content_type,
-				 MHD_HTTP_OK);
-}
-
 static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 			       const char *url, const char *method,
 			       const char *version, const char *upload_data,
 			       size_t *upload_data_size, void **ptr)
 {
 	static int dummy;
+	sentrypeer_config *config = (sentrypeer_config *)cls;
 
 	if (strcmp(method, MHD_HTTP_METHOD_GET) != 0)
 		return MHD_NO; /* unexpected method */
@@ -76,14 +51,14 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 
 	log_http_client_ip(url, connection);
 
+	// TODO: Switch to a dispatch table or similar later if more routes are added
 	if (0 == strncmp(url, HEALTH_CHECK_ROUTE, HTTP_ROUTES_MAX_LEN)) {
 		return health_check_route(connection);
 	} else if (0 == strncmp(url, HOME_PAGE_ROUTE, HTTP_ROUTES_MAX_LEN)) {
 		return finalise_response(connection, HOME_PAGE_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
 	} else if (0 == strncmp(url, IP_ADDRESSES_ROUTE, HTTP_ROUTES_MAX_LEN)) {
-		return finalise_response(connection, IP_ADDRESSES_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+		return ip_addresses_route(connection, config);
 	} else if (0 == strncmp(url, IP_ADDRESS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
 		return finalise_response(connection, IP_ADDRESS_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
@@ -124,7 +99,7 @@ static enum MHD_Result ahc_get(void *cls, struct MHD_Connection *connection,
 	}
 }
 
-int http_daemon_init(sentrypeer_config const *config)
+int http_daemon_init(sentrypeer_config *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Starting http daemon...\n");
@@ -133,8 +108,8 @@ int http_daemon_init(sentrypeer_config const *config)
 	struct MHD_Daemon *daemon;
 
 	daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION,
-				  HTTP_DAEMON_PORT, NULL, NULL, &ahc_get, NULL,
-				  MHD_OPTION_END);
+				  HTTP_DAEMON_PORT, NULL, NULL, &ahc_get,
+				  config, MHD_OPTION_END);
 	if (daemon == NULL) {
 		return EXIT_FAILURE;
 	}

@@ -12,6 +12,7 @@
 */
 
 #include "http_common.h"
+#include <config.h>
 
 #include <stdbool.h>
 #include <arpa/inet.h>
@@ -75,8 +76,22 @@ int finalise_response(struct MHD_Connection *connection, const char *reply_data,
 	if (NULL == response)
 		return MHD_NO;
 	int ret = MHD_queue_response(connection, status_code, response);
-	if (MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_ENCODING,
+	if (MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
 				    content_type) == MHD_NO) {
+		fprintf(stderr, "Failed to add header\n");
+		MHD_destroy_response(response);
+		return MHD_NO;
+	}
+
+	if (MHD_add_response_header(response, "X-Powered-By", "SentryPeer") ==
+	    MHD_NO) {
+		fprintf(stderr, "Failed to add header\n");
+		MHD_destroy_response(response);
+		return MHD_NO;
+	}
+
+	if (MHD_add_response_header(response, "X-SentryPeer-Version",
+				    PACKAGE_VERSION) == MHD_NO) {
 		fprintf(stderr, "Failed to add header\n");
 		MHD_destroy_response(response);
 		return MHD_NO;

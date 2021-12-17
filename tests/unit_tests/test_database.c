@@ -257,6 +257,10 @@ void test_db_select_bad_actors(void **state)
 	assert_non_null(config);
 
 	bad_actor *bad_actors = 0;
-	assert_int_equal(db_select_bad_actors(bad_actors, config),
+	int64_t row_count = 0;
+	assert_int_equal(db_select_bad_actors(&bad_actors, &row_count, config),
 			 EXIT_SUCCESS);
+	bad_actors_destroy(&bad_actors, &row_count);
+	fprintf(stderr, "Freed bad_actors.\n");
+	assert_null(bad_actors);
 }
