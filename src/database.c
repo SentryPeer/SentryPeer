@@ -252,8 +252,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 #endif
 #ifdef __APPLE__
 		fprintf(stderr, "Row count in honey table is: %lld\n",
-			row_count);
-
+			*row_count);
 #endif
 	}
 

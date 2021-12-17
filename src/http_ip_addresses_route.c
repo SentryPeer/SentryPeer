@@ -50,10 +50,13 @@ int ip_addresses_route(struct MHD_Connection *connection,
 					  bad_actors[row_num].source_ip));
 			row_num++;
 		}
-		reply = json_dumps(json_arr, JSON_INDENT(2));
+		json_t *json_final_obj =
+			json_pack("{s:o}", "ip_addresses", json_arr);
+		reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
-		// Free the json object
+		// Free the json objects
 		json_decref(json_arr);
+		json_decref(json_final_obj);
 		bad_actors_destroy(&bad_actors, &row_count);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
