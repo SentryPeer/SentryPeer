@@ -51,7 +51,8 @@ int ip_addresses_route(struct MHD_Connection *connection,
 			row_num++;
 		}
 		json_t *json_final_obj =
-			json_pack("{s:o}", "ip_addresses", json_arr);
+			json_pack("{s:i,s:o}", "ip_addresses_total", row_count,
+				  "ip_addresses", json_arr);
 		reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the json objects

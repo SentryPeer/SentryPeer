@@ -214,7 +214,7 @@ int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
 }
 
 int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
-			     sentrypeer_config const *config)
+			 sentrypeer_config const *config)
 {
 	sqlite3 *db;
 	assert(config->db_file);
@@ -228,8 +228,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 	}
 
 	sqlite3_stmt *get_row_count_stmt;
-	char get_row_count[] = "SELECT count(*) from honey;";
-	if (sqlite3_prepare_v2(db, get_row_count, -1, &get_row_count_stmt,
+	if (sqlite3_prepare_v2(db, GET_ROWS_DISTINCT_SOURCE_IP_COUNT, -1, &get_row_count_stmt,
 			       NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
 			sqlite3_errmsg(db));
@@ -264,7 +263,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 	}
 
 	sqlite3_stmt *select_bad_actors_stmt;
-	char select_bad_actors[] = "SELECT * FROM honey;";
+	char select_bad_actors[] = GET_ROWS_DISTINCT_SOURCE_IP;
 	if (sqlite3_prepare_v2(db, select_bad_actors, -1,
 			       &select_bad_actors_stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
@@ -288,13 +287,14 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "Column name is '%s', with value: %s\n",
-				sqlite3_column_name(select_bad_actors_stmt, 4),
-				sqlite3_column_text(select_bad_actors_stmt, 4));
+				sqlite3_column_name(select_bad_actors_stmt, 0),
+				sqlite3_column_text(select_bad_actors_stmt, 0));
 		}
 		const unsigned char *source_ip =
 			sqlite3_column_text(select_bad_actors_stmt,
-					    4); // source_ip
-		bad_actors_array[row_num].source_ip = strdup((const char *)source_ip);
+					    0); // source_ip
+		bad_actors_array[row_num].source_ip =
+			strdup((const char *)source_ip);
 
 		row_num++;
 	}
