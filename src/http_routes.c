@@ -23,9 +23,9 @@
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
 enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
-			       const char *url, const char *method,
-			       const char *version, const char *upload_data,
-			       size_t *upload_data_size, void **ptr)
+			      const char *url, const char *method,
+			      const char *version, const char *upload_data,
+			      size_t *upload_data_size, void **ptr)
 {
 	static int dummy;
 	sentrypeer_config *config = (sentrypeer_config *)cls;

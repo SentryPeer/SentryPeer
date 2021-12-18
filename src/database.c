@@ -228,8 +228,8 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 	}
 
 	sqlite3_stmt *get_row_count_stmt;
-	if (sqlite3_prepare_v2(db, GET_ROWS_DISTINCT_SOURCE_IP_COUNT, -1, &get_row_count_stmt,
-			       NULL) != SQLITE_OK) {
+	if (sqlite3_prepare_v2(db, GET_ROWS_DISTINCT_SOURCE_IP_COUNT, -1,
+			       &get_row_count_stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
 			sqlite3_errmsg(db));
 		sqlite3_close(db);
