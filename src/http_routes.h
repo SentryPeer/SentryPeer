@@ -30,6 +30,13 @@
 #define SIP_METHODS_ROUTE "/sip-methods"
 #define SIP_METHOD_ROUTE "/sip-methods/:sip_method"
 
+#include <microhttpd.h>
+#include "conf.h"
+
+enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
+			       const char *url, const char *method,
+			       const char *version, const char *upload_data,
+			       size_t *upload_data_size, void **ptr);
 int health_check_route(struct MHD_Connection *connection);
 int ip_addresses_route(struct MHD_Connection *connection,
 		       sentrypeer_config *config);

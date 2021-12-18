@@ -35,6 +35,7 @@ sentrypeer_SOURCES= \
     src/http_common.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/http_routes.c \
     src/http_routes.h \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
@@ -58,6 +59,7 @@ unit_test_sources = \
     src/http_common.h \
     src/http_daemon.c \
     src/http_daemon.h \
+    src/http_routes.c \
     src/http_routes.h \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
