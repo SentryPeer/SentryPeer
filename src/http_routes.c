@@ -12,7 +12,7 @@
 */
 
 #include <jansson.h>
-#include <config.h>
+#include "config.h"
 #include <string.h>
 
 #include "http_routes.h"

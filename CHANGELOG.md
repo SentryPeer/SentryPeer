@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `X-Powered-By`: `SentryPeer`
   - `X-SentryPeer-Version`: `0.0.3`
 - `ip_addresses` API endpoint also now shows total number of distinct IP addresses in the database
+- `PCRE2` library is now required for building SentryPeer
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

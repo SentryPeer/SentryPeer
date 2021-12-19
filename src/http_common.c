@@ -12,7 +12,7 @@
 */
 
 #include "http_common.h"
-#include <config.h>
+#include "config.h"
 
 #include <stdbool.h>
 #include <arpa/inet.h>

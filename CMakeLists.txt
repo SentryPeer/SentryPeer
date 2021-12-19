@@ -21,8 +21,11 @@ set(CMAKE_C_STANDARD 11)
 add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
-        ${CMAKE_SOURCE_DIR}/src/http_daemon.c
         ${CMAKE_SOURCE_DIR}/src/http_common.c
+        ${CMAKE_SOURCE_DIR}/src/http_daemon.c
+        ${CMAKE_SOURCE_DIR}/src/http_routes.c
+        ${CMAKE_SOURCE_DIR}/src/http_health_check_route.c
+        ${CMAKE_SOURCE_DIR}/src/http_ip_addresses_route.c
         ${CMAKE_SOURCE_DIR}/src/http_api.c
         ${CMAKE_SOURCE_DIR}/src/http_ui.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c

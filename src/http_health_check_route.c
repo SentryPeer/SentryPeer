@@ -14,7 +14,7 @@
 #include "http_common.h"
 #include <microhttpd.h>
 #include <jansson.h>
-#include <config.h>
+#include "config.h"
 
 int health_check_route(struct MHD_Connection *connection)
 {

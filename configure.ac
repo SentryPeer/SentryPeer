@@ -57,6 +57,10 @@ AC_SEARCH_LIBS(MHD_start_daemon, microhttpd, [], [
   AC_MSG_ERROR([MHD_start_daemon() is not available. libmicrohttpd-dev / libmicrohttpd-devel or equivalent is required.])
 ])
 
+AC_SEARCH_LIBS(pcre2_compile_8, pcre2-8, [], [
+  AC_MSG_ERROR([pcre2_compile_8() is not available. libpcre2-dev / pcre2-devel or equivalent is required.])
+])
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h syslog.h unistd.h])
 

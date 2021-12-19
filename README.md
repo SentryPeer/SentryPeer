@@ -88,20 +88,21 @@ If you are going to build from this repository, you will need to have the follow
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
   - `libmicrohttpd-dev` (Debian/Ubuntu) or `libmicrohttpd-devel` (Fedora)
   - `libjansson-dev` (Debian/Ubuntu) or `jansson-devel` (Fedora)
+  - `libpcre2-dev` (Debian/Ubuntu) or `pcre2-devel` (Fedora)
   - `libcurl-dev` (Debian/Ubuntu) or `libcurl-devel` (Fedora)
   - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
 
 Fedora:
 
-    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel
+    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install libosip cmocka libmicrohttpd jansson libcurl
+    brew install libosip cmocka libmicrohttpd jansson libcurl libpcre2
 
 then (make check is highly recommended):
 

@@ -83,6 +83,8 @@ unit_test_sources = \
     tests/unit_tests/test_database.h \
     tests/unit_tests/test_http_api.c \
     tests/unit_tests/test_http_api.h \
+    tests/unit_tests/test_ip_address_regex.c \
+    tests/unit_tests/test_ip_address_regex.h \
     tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

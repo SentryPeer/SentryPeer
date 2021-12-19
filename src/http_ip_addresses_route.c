@@ -17,7 +17,7 @@
 
 #include <microhttpd.h>
 #include <jansson.h>
-#include <config.h>
+#include "config.h"
 
 #include "http_common.h"
 #include "bad_actor.h"
