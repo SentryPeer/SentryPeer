@@ -18,6 +18,7 @@
 #include <cmocka.h>
 
 #include "test_http_api.h"
+#include "../../src/http_routes.h"
 #include "../../src/http_daemon.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,4 +96,27 @@ void test_http_api_get(void **state)
 		curl_global_cleanup();
 		sentrypeer_config_destroy(&config);
 	}
+}
+
+void test_route_regex_check(void **state)
+{
+	(void)state; /* unused */
+
+	char *matched_string = 0;
+	sentrypeer_config *config = sentrypeer_config_new();
+	config->debug_mode = true;
+	assert_null(matched_string);
+	assert_int_equal(route_regex_check("/ip-addresses/8.8.8.8",
+					   IP_ADDRESS_ROUTE, &matched_string,
+					   config),
+			 0);
+	assert_non_null(matched_string);
+	assert_string_equal(matched_string, "8.8.8.8");
+
+	sentrypeer_config_destroy(&config);
+
+	// Check a double-free for fun.
+	free(matched_string);
+	matched_string = 0;
+	free(matched_string);
 }

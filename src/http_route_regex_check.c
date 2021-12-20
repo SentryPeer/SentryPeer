@@ -11,31 +11,25 @@
                              |___/
 */
 
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <stdint.h>
-#include <cmocka.h>
-
-#include "test_ip_address_regex.h"
-
 #define PCRE2_CODE_UNIT_WIDTH 8
 
 #include <stdio.h>
 #include <string.h>
 #include <pcre2.h>
+#include <assert.h>
 
-void test_ip_address_regex(void **state)
+#include "utils.h"
+#include "conf.h"
+
+int route_regex_check(const char *url, const char *regex, char **matched_string,
+		      sentrypeer_config *config)
 {
-	(void)state; /* unused */
-
 	pcre2_code *re;
 	PCRE2_SPTR
 	pattern; /* PCRE2_SPTR is a pointer to unsigned code units of */
 	PCRE2_SPTR subject; /* the appropriate width (in this case, 8 bits). */
 
 	int errornumber;
-	int i;
 	int rc;
 
 	PCRE2_SIZE erroroffset;
@@ -49,8 +43,8 @@ cast to PCRE2_SPTR because we are working in 8-bit code units. The subject
 length is cast to PCRE2_SIZE for completeness, though PCRE2_SIZE is in fact
 defined to be size_t. */
 
-	pattern = (PCRE2_SPTR) "/ip-addresses/(.*)";
-	subject = (PCRE2_SPTR) "/ip-addresses/8.8.8.8"; // url from MHD
+	pattern = (PCRE2_SPTR)regex;
+	subject = (PCRE2_SPTR)url;
 	subject_length = (PCRE2_SIZE)strlen((char *)subject);
 
 	/*************************************************************************
@@ -71,8 +65,8 @@ defined to be size_t. */
 	if (re == NULL) {
 		PCRE2_UCHAR buffer[256];
 		pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
-		printf("PCRE2 compilation failed at offset %d: %s\n",
-		       (int)erroroffset, buffer);
+		fprintf(stderr, "PCRE2 compilation failed at offset %d: %s\n",
+			(int)erroroffset, buffer);
 	}
 
 	/*************************************************************************
@@ -103,25 +97,16 @@ defined to be size_t. */
 	/* Matching failed: handle error cases */
 
 	if (rc < 0) {
-		switch (rc) {
-		case PCRE2_ERROR_NOMATCH:
-			printf("No match\n");
-			break;
-		/* Handle other special cases if you like  */
-		default:
-			printf("Matching error %d\n", rc);
-			break;
-		}
 		pcre2_match_data_free(
 			match_data); /* Release memory used for the match */
 		pcre2_code_free(re); /*   data and the compiled pattern. */
+		return EXIT_FAILURE;
 	}
 
 	/* Match succeeded. Get a pointer to the output vector, where string offsets
 are stored. */
 
 	ovector = pcre2_get_ovector_pointer(match_data);
-	printf("Match succeeded at offset %d\n", (int)ovector[0]);
 
 	/*************************************************************************
 * We have found the first match within the subject string. If the output *
@@ -132,8 +117,13 @@ are stored. */
 	/* The output vector wasn't big enough. This should not happen, because we used
 pcre2_match_data_create_from_pattern() above. */
 
-	if (rc == 0)
-		printf("ovector was not big enough for all the captured substrings\n");
+	if (rc == 0) {
+		fprintf(stderr,
+			"ovector was not big enough for all the captured substrings\n");
+		pcre2_match_data_free(match_data);
+		pcre2_code_free(re);
+		return EXIT_FAILURE;
+	}
 
 	/* Since release 10.38 PCRE2 has locked out the use of \K in lookaround
 assertions. However, there is an option to re-enable the old behaviour. If that
@@ -143,33 +133,24 @@ program, we show how to detect this case, but it shouldn't arise because the
 option is never set. */
 
 	if (ovector[0] > ovector[1]) {
-		printf("\\K was used in an assertion to set the match start after its end.\n"
-		       "From end to start the match was: %.*s\n",
-		       (int)(ovector[0] - ovector[1]),
-		       (char *)(subject + ovector[1]));
-		printf("Run abandoned\n");
+		fprintf(stderr,
+			"\\K was used in an assertion to set the match start after its end.\n"
+			"From end to start the match was: %.*s\n",
+			(int)(ovector[0] - ovector[1]),
+			(char *)(subject + ovector[1]));
+		fprintf(stderr, "Run abandoned\n");
 		pcre2_match_data_free(match_data);
 		pcre2_code_free(re);
+		return EXIT_FAILURE;
 	}
 
-	/* Show substrings stored in the output vector by number. Obviously, in a real
-application you might want to do things other than print them. */
-
-	for (i = 0; i < rc; i++) {
-		PCRE2_SPTR substring_start = subject + ovector[2 * i];
-		PCRE2_SIZE substring_length =
-			ovector[2 * i + 1] - ovector[2 * i];
-		printf("%2d: %.*s\n", i, (int)substring_length,
-		       (char *)substring_start);
-	}
 	// Our capture is the first, so when i = 1, 2 * 1 = 2, hence ovector[2 * 1]
-	assert_string_equal("8.8.8.8", (char *)(subject + ovector[2]));
+	*matched_string = util_duplicate_string((char *)(subject + ovector[2]));
+	assert(matched_string);
 
-	/**************************************************************************
-* That concludes the basic part of this demonstration program. We have    *
-* compiled a pattern, and performed a single match. The code that follows *
-* shows first how to access named substrings, and then how to code for    *
-* repeated matches on the same subject.                                   *
-**************************************************************************/
+	if (config->debug_mode || config->verbose_mode) {
+		printf("\nMatched string: %s\n", *matched_string);
+	}
+
+	return EXIT_SUCCESS;
 }
-

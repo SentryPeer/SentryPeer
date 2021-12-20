@@ -18,7 +18,8 @@
 #define HOME_PAGE_ROUTE "/"
 #define HEALTH_CHECK_ROUTE "/health-check"
 #define IP_ADDRESSES_ROUTE "/ip-addresses"
-#define IP_ADDRESS_ROUTE "/ip-addresses/:ip_address"
+// ./tests/tools/pcre2demo "/ip-addresses/(.+)" "/ip-addresses/8.8.8.8"
+#define IP_ADDRESS_ROUTE "/ip-addresses/(.+)"
 #define IP_ADDRESSES_IPSET_ROUTE "/ip-addresses/ipset"
 #define NUMBERS_ROUTE "/numbers"
 #define NUMBER_ROUTE "/numbers/:number"
@@ -34,11 +35,17 @@
 #include "conf.h"
 
 enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
-			       const char *url, const char *method,
-			       const char *version, const char *upload_data,
-			       size_t *upload_data_size, void **ptr);
+			      const char *url, const char *method,
+			      const char *version, const char *upload_data,
+			      size_t *upload_data_size, void **ptr);
+
+int route_check(const char *url, const char *route, sentrypeer_config *config);
+int route_regex_check(const char *url, const char *regex, char **matched_string,
+		      sentrypeer_config *config);
 int health_check_route(struct MHD_Connection *connection);
 int ip_addresses_route(struct MHD_Connection *connection,
 		       sentrypeer_config *config);
+int ip_address_route(char *ip_address, struct MHD_Connection *connection,
+		     sentrypeer_config *config);
 
 #endif //SENTRYPEER_HTTP_ROUTES_H

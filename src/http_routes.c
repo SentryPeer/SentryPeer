@@ -22,6 +22,26 @@
 #define NOT_FOUND_ERROR                                                        \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
+int route_check(const char *url, const char *route, sentrypeer_config *config)
+{
+	// We don't want any partial matches (e.g. "/ip-" matches "/ip-address")
+	// or "/ip-address/8.8.8.8" matches "/ip-address".
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Checking url: %s, against route: %s\n", url,
+			route);
+	}
+	if (strcmp(url, route) == 0) {
+		// The route is an exact match.
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Route is an exact match.\n");
+		}
+		return EXIT_SUCCESS;
+	} else {
+		// The route is not a match.
+		return EXIT_FAILURE;
+	}
+}
+
 enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			      const char *url, const char *method,
 			      const char *version, const char *upload_data,
@@ -45,50 +65,62 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 	*ptr = NULL; /* clear context pointer */
 
 	log_http_client_ip(url, connection);
+	char *matched_ip_address = 0;
 
 	// TODO: Switch to a dispatch table or similar later if more routes are added
-	if (0 == strncmp(url, HEALTH_CHECK_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	if (route_check(url, HEALTH_CHECK_ROUTE, config) == EXIT_SUCCESS) {
 		return health_check_route(connection);
-	} else if (0 == strncmp(url, HOME_PAGE_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, HOME_PAGE_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, HOME_PAGE_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, IP_ADDRESSES_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, IP_ADDRESSES_ROUTE, config) ==
+		   EXIT_SUCCESS) {
 		return ip_addresses_route(connection, config);
-	} else if (0 == strncmp(url, IP_ADDRESS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
-		return finalise_response(connection, IP_ADDRESS_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, IP_ADDRESSES_IPSET_ROUTE,
-				HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_regex_check(url, IP_ADDRESS_ROUTE, &matched_ip_address,
+				     config) == EXIT_SUCCESS) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Matched ip address route: %s\n",
+				IP_ADDRESS_ROUTE);
+		}
+		return ip_address_route(matched_ip_address, connection, config);
+	} else if (route_check(url, IP_ADDRESSES_IPSET_ROUTE, config) ==
+		   EXIT_SUCCESS) {
 		return finalise_response(connection, IP_ADDRESSES_IPSET_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, NUMBERS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, NUMBERS_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, NUMBERS_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, NUMBER_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, NUMBER_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, NUMBER_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, COUNTRIES_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, COUNTRIES_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRIES_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, COUNTRY_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, COUNTRY_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRY_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, COUNTRY_CITY_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, COUNTRY_CITY_ROUTE, config) ==
+		   EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRY_CITY_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, USER_AGENTS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, USER_AGENTS_ROUTE, config) ==
+		   EXIT_SUCCESS) {
 		return finalise_response(connection, USER_AGENTS_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, USER_AGENT_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, USER_AGENT_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, USER_AGENT_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, SIP_METHODS_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, SIP_METHODS_ROUTE, config) ==
+		   EXIT_SUCCESS) {
 		return finalise_response(connection, SIP_METHODS_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
-	} else if (0 == strncmp(url, SIP_METHOD_ROUTE, HTTP_ROUTES_MAX_LEN)) {
+	} else if (route_check(url, SIP_METHOD_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, SIP_METHOD_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
 	} else {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "No route matched.\n");
+		}
 		return finalise_response(connection, NOT_FOUND_ERROR,
 					 CONTENT_TYPE_HTML, MHD_HTTP_NOT_FOUND);
 	}

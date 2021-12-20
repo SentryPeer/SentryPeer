@@ -24,6 +24,7 @@
 #include "test_bad_actor.h"
 #include "test_database.h"
 #include "test_http_api.h"
+#include "test_http_route_check.h"
 #include "test_ip_address_regex.h"
 
 /* A test case that does nothing and succeeds. */
@@ -51,8 +52,9 @@ int main(void)
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
 		cmocka_unit_test(test_http_api_get),
+		cmocka_unit_test(test_http_route_check),
 		cmocka_unit_test(test_ip_address_regex),
-
+		cmocka_unit_test(test_route_regex_check),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

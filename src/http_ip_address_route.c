@@ -23,56 +23,42 @@
 #include "bad_actor.h"
 #include "database.h"
 
-int ip_addresses_route(struct MHD_Connection *connection,
-		       sentrypeer_config *config)
+int ip_address_route(char *ip_address, struct MHD_Connection *connection,
+		     sentrypeer_config *config)
 {
 	const char *reply = 0;
-	bad_actor *bad_actors = 0;
-	int64_t row_count = 0;
+	bad_actor *bad_actor_found = 0;
 
-	if (db_select_bad_actors(&bad_actors, &row_count, config) !=
+	if (db_select_bad_actor_by_ip(ip_address, &bad_actor_found, config) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to select bad actors from database\n");
 		return MHD_NO;
 	}
 
-	if ((bad_actors != 0) && (row_count > 0)) {
-		int64_t row_num = 0;
-		json_t *json_arr = json_array();
-
-		while (row_num < row_count) {
-			if (config->verbose_mode || config->debug_mode) {
-				fprintf(stderr, "source_ip: %s\n",
-					bad_actors[row_num].source_ip);
-			}
-
-			json_array_append(
-				json_arr,
-				json_pack("{s:s}", "ip_address",
-
-					  bad_actors[row_num].source_ip));
-			row_num++;
+	if (bad_actor_found != 0) {
+		if (config->verbose_mode || config->debug_mode) {
+			fprintf(stderr, "bad_actor ip found: %s\n",
+				bad_actor_found->source_ip);
 		}
-		json_t *json_final_obj =
-			json_pack("{s:i,s:o}", "ip_addresses_total", row_count,
-				  "ip_addresses", json_arr);
+
+		json_t *json_final_obj = json_pack("{s:s}", "ip_address",
+						   bad_actor_found->source_ip);
 		reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the json objects
-		json_decref(json_arr);
 		json_decref(json_final_obj);
-		bad_actors_destroy(&bad_actors, &row_count);
+		bad_actor_destroy(&bad_actor_found);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_OK);
 	} else {
 		json_t *json_no_data =
-			json_pack("{s:s}", "message", "No bad actors found");
+			json_pack("{s:s}", "message", "No bad actor found");
 		reply = json_dumps(json_no_data, JSON_INDENT(2));
 
 		// Free the json object
 		json_decref(json_no_data);
-		bad_actors_destroy(&bad_actors, &row_count);
+		bad_actor_destroy(&bad_actor_found);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);

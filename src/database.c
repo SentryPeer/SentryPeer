@@ -201,7 +201,8 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
+int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
+			      bad_actor **bad_actor_found,
 			      sentrypeer_config const *config)
 {
 	return EXIT_SUCCESS;

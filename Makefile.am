@@ -37,8 +37,10 @@ sentrypeer_SOURCES= \
     src/http_daemon.h \
     src/http_routes.c \
     src/http_routes.h \
+    src/http_route_regex_check.c \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
+    src/http_ip_address_route.c \
     src/http_api.c \
     src/http_api.h \
     src/http_ui.c \
@@ -61,8 +63,10 @@ unit_test_sources = \
     src/http_daemon.h \
     src/http_routes.c \
     src/http_routes.h \
+    src/http_route_regex_check.c \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
+    src/http_ip_address_route.c \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \
@@ -83,6 +87,8 @@ unit_test_sources = \
     tests/unit_tests/test_database.h \
     tests/unit_tests/test_http_api.c \
     tests/unit_tests/test_http_api.h \
+    tests/unit_tests/test_http_route_check.c \
+    tests/unit_tests/test_http_route_check.h \
     tests/unit_tests/test_ip_address_regex.c \
     tests/unit_tests/test_ip_address_regex.h \
     tests/unit_tests/runner.c
