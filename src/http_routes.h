@@ -39,13 +39,14 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			      const char *version, const char *upload_data,
 			      size_t *upload_data_size, void **ptr);
 
-int route_check(const char *url, const char *route, sentrypeer_config *config);
+int route_check(const char *url, const char *route,
+		sentrypeer_config const *config);
 int route_regex_check(const char *url, const char *regex, char **matched_string,
-		      sentrypeer_config *config);
+		      sentrypeer_config const *config);
 int health_check_route(struct MHD_Connection *connection);
 int ip_addresses_route(struct MHD_Connection *connection,
-		       sentrypeer_config *config);
+		       sentrypeer_config const *config);
 int ip_address_route(char *ip_address, struct MHD_Connection *connection,
-		     sentrypeer_config *config);
+		     sentrypeer_config const *config);
 
 #endif //SENTRYPEER_HTTP_ROUTES_H

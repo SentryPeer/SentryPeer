@@ -22,7 +22,7 @@
 #define NOT_FOUND_ERROR                                                        \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
 
-int route_check(const char *url, const char *route, sentrypeer_config *config)
+int route_check(const char *url, const char *route, sentrypeer_config const *config)
 {
 	// We don't want any partial matches (e.g. "/ip-" matches "/ip-address")
 	// or "/ip-address/8.8.8.8" matches "/ip-address".
