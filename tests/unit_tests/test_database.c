@@ -34,7 +34,7 @@ int test_setup_sqlite_db(void **state)
 {
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
-	strncpy(config->db_file, TEST_DB_FILE, PATH_MAX);
+	strncpy(config->db_file, TEST_DB_FILE, SENTRYPEER_PATH_MAX);
 	assert_non_null(config->db_file);
 
 	*state = config;

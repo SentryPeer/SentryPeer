@@ -48,10 +48,10 @@ void test_utils(void **state)
 	assert_null(string_copied);
 
 	// util_copy_string
-	char *destination_string = calloc(PATH_MAX + 1, sizeof(char));
+	char *destination_string = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert_non_null(destination_string);
 	destination_string = util_copy_string(destination_string,
-					      string_to_duplicate, PATH_MAX);
+					      string_to_duplicate, SENTRYPEER_PATH_MAX);
 	assert_non_null(destination_string);
 	assert_null(destination_string[strlen(destination_string)]);
 	assert_string_equal(destination_string, string_to_duplicate);

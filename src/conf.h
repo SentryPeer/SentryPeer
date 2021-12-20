@@ -17,7 +17,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 
-#define PATH_MAX 4096
+#define SENTRYPEER_PATH_MAX 4096
 
 typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {

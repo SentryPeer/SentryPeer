@@ -31,9 +31,10 @@ sentrypeer_config *sentrypeer_config_new(void)
 	sentrypeer_config *self = malloc(sizeof(sentrypeer_config));
 	assert(self);
 
-	self->db_file = calloc(PATH_MAX + 1, sizeof(char));
+	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
-	util_copy_string(self->db_file, DEFAULT_DB_FILE_NAME, PATH_MAX);
+	util_copy_string(self->db_file, DEFAULT_DB_FILE_NAME,
+			 SENTRYPEER_PATH_MAX);
 
 	return self;
 }
@@ -133,7 +134,7 @@ int process_env_vars(sentrypeer_config *config)
 {
 	if (getenv("SENTRYPEER_DB_FILE")) {
 		util_copy_string(config->db_file, getenv("SENTRYPEER_DB_FILE"),
-				 PATH_MAX);
+				 SENTRYPEER_PATH_MAX);
 	}
 	if (getenv("SENTRYPEER_SYSLOG")) {
 		config->syslog_mode = true;
@@ -154,7 +155,7 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 		if (getenv("SENTRYPEER_DB_FILE")) {
 			util_copy_string(config->db_file,
 					 getenv("SENTRYPEER_DB_FILE"),
-					 PATH_MAX);
+					 SENTRYPEER_PATH_MAX);
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"SentryPeer db file location set via SENTRYPEER_DB_FILE env var to: %s\n",
@@ -162,7 +163,8 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 			}
 		} else {
 			// Set to current working directory absolute path with our own db file name
-			if (getcwd(config->db_file, PATH_MAX) == NULL) {
+			if (getcwd(config->db_file, SENTRYPEER_PATH_MAX) ==
+			    NULL) {
 				fprintf(stderr,
 					"Error: Failed to get current working directory\n");
 				perror("getcwd");
@@ -171,9 +173,9 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 
 			// Build the db file path
 			strncat(config->db_file, "/",
-				PATH_MAX - strlen(config->db_file));
+				SENTRYPEER_PATH_MAX - strlen(config->db_file));
 			strncat(config->db_file, DEFAULT_DB_FILE_NAME,
-				PATH_MAX - strlen(config->db_file));
+				SENTRYPEER_PATH_MAX - strlen(config->db_file));
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"SentryPeer db file location set to current working dir: %s\n",
@@ -185,7 +187,7 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 
 	if (cli_db_file_location[0] == '/') {
 		util_copy_string(config->db_file, cli_db_file_location,
-				 PATH_MAX);
+				 SENTRYPEER_PATH_MAX);
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr,
 				"SentryPeer db file location set via cli -f to: %s\n",
