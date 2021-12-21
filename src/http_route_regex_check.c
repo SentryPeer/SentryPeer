@@ -150,7 +150,8 @@ option is never set. */
 	assert(matched_string);
 
 	if (config->debug_mode || config->verbose_mode) {
-		printf("\nroute_regex_check matched: %s\n", *matched_string);
+		fprintf(stderr, "\nroute_regex_check matched: %s\n",
+			*matched_string);
 	}
 
 	return EXIT_SUCCESS;

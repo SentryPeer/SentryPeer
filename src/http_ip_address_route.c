@@ -23,23 +23,24 @@
 #include "bad_actor.h"
 #include "database.h"
 
-int ip_address_route(char *ip_address, struct MHD_Connection *connection,
+int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		     sentrypeer_config const *config)
 {
 	const char *reply = 0;
 	bad_actor *bad_actor_found = 0;
+	char *ip_address_str = *ip_address;
 
-	if (db_select_bad_actor_by_ip(ip_address, &bad_actor_found, config) !=
+	if (db_select_bad_actor_by_ip(ip_address_str, &bad_actor_found, config) !=
 	    EXIT_SUCCESS) {
 		json_t *json_no_data =
 			json_pack("{s:s}", "message", "No bad actor found");
 		reply = json_dumps(json_no_data, JSON_INDENT(2));
 
 		// Free the objects
-		free(ip_address);
+		free(ip_address_str);
 		ip_address = 0;
+		ip_address_str = 0;
 		json_decref(json_no_data);
-
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);
 	} else { // Found!!!!
@@ -53,7 +54,9 @@ int ip_address_route(char *ip_address, struct MHD_Connection *connection,
 		reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the objects
-		free(ip_address);
+		free(ip_address_str);
+		ip_address = 0;
+		ip_address_str = 0;
 		json_decref(json_final_obj);
 		free(bad_actor_found->source_ip);
 		free(bad_actor_found);

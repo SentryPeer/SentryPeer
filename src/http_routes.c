@@ -89,7 +89,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 
 		if (valid_ip_address_format(matched_ip_address) ==
 		    EXIT_SUCCESS) {
-			return ip_address_route(matched_ip_address, connection,
+			return ip_address_route(&matched_ip_address, connection,
 						config);
 		} else {
 			return finalise_response(connection,
