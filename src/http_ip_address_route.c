@@ -37,9 +37,8 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		reply = json_dumps(json_no_data, JSON_INDENT(2));
 
 		// Free the objects
-		free(ip_address_str);
-		ip_address = 0;
-		ip_address_str = 0;
+		free(*ip_address);
+		*ip_address = 0;
 		json_decref(json_no_data);
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);
@@ -54,9 +53,8 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the objects
-		free(ip_address_str);
-		ip_address = 0;
-		ip_address_str = 0;
+		free(*ip_address);
+		*ip_address = 0;
 		json_decref(json_final_obj);
 		free(bad_actor_found->source_ip);
 		free(bad_actor_found);
