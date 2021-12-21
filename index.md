@@ -2,8 +2,9 @@
 
 <img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
-A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
+A distributed list of bad actor IP addresses and phone numbers collected via a SIP Honeypot.
 
+[![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
@@ -24,6 +25,9 @@ Of course, if you don't want to run any of this and just buy access to the data 
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
+[![Chat on Slack](https://img.shields.io/badge/chat-slack-brightgreen.svg)](https://sentrypeer.slack.com)
+[![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
+
 ### Screenshots
 
 Here's a mockup of the web UI which is subject to change.
@@ -40,14 +44,13 @@ Screenshots of agents and APIs to come...
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
-- [ ] User can **pay to get all data collected** via [SentryPeer commercial website](https://sentrypeer.com) (one day, maybe.)
 - [x] UDP transport
 - [ ] TCP transport
 - [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] **Local** data copy for **fast access** - feature / cli flag
 - [x] **Local** API for **fast access** - feature / cli flag
-- [ ] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] **Local** Web GUI for **fast access** - feature / cli flag
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
@@ -78,25 +81,27 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 
 If you are going to build from this repository, you will need to have the following installed:
 
+  - `git`, `autoconf`, `automake` and `autoconf-archive` (Debian/Ubuntu) 
   - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
   - `libmicrohttpd-dev` (Debian/Ubuntu) or `libmicrohttpd-devel` (Fedora)
   - `libjansson-dev` (Debian/Ubuntu) or `jansson-devel` (Fedora)
+  - `libpcre2-dev` (Debian/Ubuntu) or `pcre2-devel` (Fedora)
   - `libcurl-dev` (Debian/Ubuntu) or `libcurl-devel` (Fedora)
   - `libcmocka-dev` (Debian/Ubuntu) or `libcmocka-devel` (Fedora) - for unit tests
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev
+    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
 
 Fedora:
 
-    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel
+    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install libosip cmocka libmicrohttpd jansson libcurl
+    brew install libosip cmocka libmicrohttpd jansson libcurl libpcre2
 
 then (make check is highly recommended):
 
@@ -177,7 +182,97 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 [sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
 
-The REST API and web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+### RESTful API 
+
+The RESTful API is almost complete web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+
+Right now you can call `/health-check`, like so:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /health-check HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+>
+< HTTP/1.1 200 OK
+< Connection: Keep-Alive
+< Content-Length: 81
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:27:15 GMT
+<
+{
+  "status": "OK",
+  "message": "Hello from SentryPeer!",
+  "version": "0.0.3"
+ }
+```
+
+and  `/ip-addresses`:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /ip-addresses HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+< HTTP/1.1 200 OK
+< Connection: Keep-Alive
+< Content-Length: 6495
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:29:13 GMT
+< 
+{
+  "ip_addresses_total": 2,
+  "ip_addresses": [
+    {
+      "ip_address": "193.107.216.27"
+    },
+    {
+      "ip_address": "193.46.255.152"
+    }
+    ...
+  ]
+}
+```
+
+and lastly `/ip-address/{ip-address}`:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /ip-addresses/8.8.8.8 HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+< HTTP/1.1 404 Not Found
+< Connection: Keep-Alive
+< Content-Length: 37
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:33:51 GMT
+< 
+{
+  "message": "No bad actor found"
+}
+```
+
+
 
 ### Syslog and Fail2ban
 
@@ -202,10 +297,6 @@ See [CONTRIBUTING](./CONTRIBUTING.md)
 ### Project Website
 
 https://sentrypeer.org
- 
-### Commercial Services (one day, maybe)
- 
-https://sentrypeer.com
 
 ### Trademark
 
