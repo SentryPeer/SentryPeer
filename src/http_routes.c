@@ -18,11 +18,15 @@
 #include "http_routes.h"
 #include "http_common.h"
 #include "conf.h"
+#include "utils.h"
 
-#define NOT_FOUND_ERROR                                                        \
+#define NOT_FOUND_ERROR_HTML                                                   \
 	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
+#define NOT_FOUND_ERROR_JSON                                                   \
+	"{\"error\": \"The requested resource could not be found.\"}"
 
-int route_check(const char *url, const char *route, sentrypeer_config const *config)
+int route_check(const char *url, const char *route,
+		sentrypeer_config const *config)
 {
 	// We don't want any partial matches (e.g. "/ip-" matches "/ip-address")
 	// or "/ip-address/8.8.8.8" matches "/ip-address".
@@ -48,7 +52,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			      size_t *upload_data_size, void **ptr)
 {
 	static int dummy;
-	sentrypeer_config *config = (sentrypeer_config *)cls;
+	sentrypeer_config const *config = (sentrypeer_config *)cls;
 
 	if (strcmp(method, MHD_HTTP_METHOD_GET) != 0)
 		return MHD_NO; /* unexpected method */
@@ -82,7 +86,17 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			fprintf(stderr, "Matched ip address route: %s\n",
 				IP_ADDRESS_ROUTE);
 		}
-		return ip_address_route(matched_ip_address, connection, config);
+
+		if (valid_ip_address_format(matched_ip_address) ==
+		    EXIT_SUCCESS) {
+			return ip_address_route(matched_ip_address, connection,
+						config);
+		} else {
+			return finalise_response(connection,
+						 NOT_FOUND_ERROR_JSON,
+						 CONTENT_TYPE_JSON,
+						 MHD_HTTP_NOT_FOUND);
+		}
 	} else if (route_check(url, IP_ADDRESSES_IPSET_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return finalise_response(connection, IP_ADDRESSES_IPSET_ROUTE,
@@ -121,7 +135,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "No route matched.\n");
 		}
-		return finalise_response(connection, NOT_FOUND_ERROR,
-					 CONTENT_TYPE_HTML, MHD_HTTP_NOT_FOUND);
+		return finalise_response(connection, NOT_FOUND_ERROR_JSON,
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
 	}
 }

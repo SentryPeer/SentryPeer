@@ -19,6 +19,8 @@
 #include <string.h>
 #include <assert.h>
 #include <uuid/uuid.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
 
 char *event_timestamp(char *event_timestamp)
 {
@@ -82,4 +84,19 @@ char *util_uuid_generate_string(char *uuid_string)
 
 	uuid_unparse_lower(binary_uuid, uuid_string);
 	return uuid_string;
+}
+
+int valid_ip_address_format(const char *ip_address_to_check)
+{
+	assert(ip_address_to_check);
+	unsigned char buf_not_used[sizeof(struct in6_addr)];
+
+	if (inet_pton(AF_INET, ip_address_to_check, buf_not_used) == 1) {
+		return EXIT_SUCCESS;
+	} else if (inet_pton(AF_INET6, ip_address_to_check, buf_not_used) ==
+		   1) {
+		return EXIT_SUCCESS;
+	} else {
+		return EXIT_FAILURE;
+	}
 }

@@ -30,16 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/health-check`
   - `/ip-addresses`
   - `/ip-addresses/{ip_address}`
-  - `/ip-addresses/ipset`
-  - `/numbers`
-  - `/numbers/{number}`
-  - `/countries`
-  - `/countries/{country}`
-  - `/countries/{country}/{city}`
-  - `/user-agents`
-  - `/user-agents/{user_agent}`
-  - `/sip-methods`
-  - `/sip-methods/{sip_method}`
 - OpenAPI specification repo is available at https://github.com/SentryPeer/API-Specification with the openapi.json file
   to be served at `http://<host>:8082/openapi.json` (TODO)
 - New headers added to API responses:
@@ -47,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `X-SentryPeer-Version`: `0.0.3`
 - `ip_addresses` API endpoint also now shows total number of distinct IP addresses in the database
 - `PCRE2` library is now required for building SentryPeer
+- All IP address queries now use `inet_pton` to validate IPv4 or IPv6 addresses
 
 ## [0.0.2] - 2021-11-24
 - Properly exit when `sentrypeer -h` is called

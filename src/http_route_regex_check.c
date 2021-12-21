@@ -22,8 +22,9 @@
 #include "conf.h"
 
 int route_regex_check(const char *url, const char *regex, char **matched_string,
-		      sentrypeer_config *config)
+		      sentrypeer_config const *config)
 {
+	// Basically all from https://www.pcre.org/current/doc/html/pcre2demo.html
 	pcre2_code *re;
 	PCRE2_SPTR
 	pattern; /* PCRE2_SPTR is a pointer to unsigned code units of */
@@ -149,7 +150,7 @@ option is never set. */
 	assert(matched_string);
 
 	if (config->debug_mode || config->verbose_mode) {
-		printf("\nMatched string: %s\n", *matched_string);
+		printf("\nroute_regex_check matched: %s\n", *matched_string);
 	}
 
 	return EXIT_SUCCESS;

@@ -2,7 +2,7 @@
 
 <img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
-A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot.
+A distributed list of bad actor IP addresses and phone numbers collected via a SIP Honeypot.
 
 [![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
@@ -44,7 +44,6 @@ Screenshots of agents and APIs to come...
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
-- [ ] User can **pay to get all data collected** via [SentryPeer commercial website](https://sentrypeer.com) (one day, maybe.)
 - [x] UDP transport
 - [ ] TCP transport
 - [ ] TLS transport
@@ -183,7 +182,97 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 [sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
 
-The REST API and web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+### RESTful API 
+
+The RESTful API is almost complete web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+
+Right now you can call `/health-check`, like so:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /health-check HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+>
+< HTTP/1.1 200 OK
+< Connection: Keep-Alive
+< Content-Length: 81
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:27:15 GMT
+<
+{
+  "status": "OK",
+  "message": "Hello from SentryPeer!",
+  "version": "0.0.3"
+ }
+```
+
+and  `/ip-addresses`:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /ip-addresses HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+< HTTP/1.1 200 OK
+< Connection: Keep-Alive
+< Content-Length: 6495
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:29:13 GMT
+< 
+{
+  "ip_addresses_total": 2,
+  "ip_addresses": [
+    {
+      "ip_address": "193.107.216.27"
+    },
+    {
+      "ip_address": "193.46.255.152"
+    }
+    ...
+  ]
+}
+```
+
+and lastly `/ip-address/{ip-address}`:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /ip-addresses/8.8.8.8 HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+< HTTP/1.1 404 Not Found
+< Connection: Keep-Alive
+< Content-Length: 37
+< X-SentryPeer-Version: 0.0.3
+< X-Powered-By: SentryPeer
+< Content-Type: application/json
+< Date: Tue, 21 Dec 2021 18:33:51 GMT
+< 
+{
+  "message": "No bad actor found"
+}
+```
+
+
 
 ### Syslog and Fail2ban
 
@@ -208,10 +297,6 @@ See [CONTRIBUTING](./CONTRIBUTING.md)
 ### Project Website
 
 https://sentrypeer.org
- 
-### Commercial Services (one day, maybe)
- 
-https://sentrypeer.com
 
 ### Trademark
 

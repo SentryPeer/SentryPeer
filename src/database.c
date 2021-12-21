@@ -64,7 +64,7 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 			sentrypeer_config const *config)
 {
 	sqlite3 *db;
-	sqlite3_stmt *insert_bad_actor_stmt;
+	sqlite3_stmt *insert_bad_actor_stmt = 0;
 
 	assert(config->db_file);
 
@@ -202,9 +202,70 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 }
 
 int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
-			      bad_actor **bad_actor_found,
+			      bad_actor **bad_actor_to_find,
 			      sentrypeer_config const *config)
 {
+	sqlite3 *db;
+	assert(config->db_file);
+	bad_actor *bad_actor_found = *bad_actor_to_find;
+
+	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to open database: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	sqlite3_stmt *find_bad_actor_stmt = 0;
+	if (sqlite3_prepare_v2(db, GET_BAD_ACTOR_BY_IP, -1,
+			       &find_bad_actor_stmt, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+	bad_actor_found = malloc(sizeof(bad_actor));
+	assert(bad_actor_found);
+
+	if (sqlite3_bind_text(find_bad_actor_stmt, 1, bad_actor_ip_address, -1,
+			      SQLITE_STATIC) != SQLITE_OK) {
+		fprintf(stderr, "Failed to bind IP address: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	// Nothing found
+	if (sqlite3_step(find_bad_actor_stmt) != SQLITE_ROW) {
+		sqlite3_finalize(find_bad_actor_stmt);
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	const unsigned char *source_ip =
+		sqlite3_column_text(find_bad_actor_stmt,
+				    0); // source_ip
+	bad_actor_found->source_ip = strdup((const char *)source_ip);
+	assert(bad_actor_found->source_ip);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Found source_ip in honey table: %s\n",
+			bad_actor_found->source_ip);
+	}
+
+	if (sqlite3_finalize(find_bad_actor_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_close(db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to close database\n");
+		return EXIT_FAILURE;
+	}
+
+	*bad_actor_to_find = bad_actor_found;
 	return EXIT_SUCCESS;
 }
 
@@ -228,7 +289,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 		return EXIT_FAILURE;
 	}
 
-	sqlite3_stmt *get_row_count_stmt;
+	sqlite3_stmt *get_row_count_stmt = 0;
 	if (sqlite3_prepare_v2(db, GET_ROWS_DISTINCT_SOURCE_IP_COUNT, -1,
 			       &get_row_count_stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
@@ -263,7 +324,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 		return EXIT_FAILURE;
 	}
 
-	sqlite3_stmt *select_bad_actors_stmt;
+	sqlite3_stmt *select_bad_actors_stmt = 0;
 	char select_bad_actors[] = GET_ROWS_DISTINCT_SOURCE_IP;
 	if (sqlite3_prepare_v2(db, select_bad_actors, -1,
 			       &select_bad_actors_stmt, NULL) != SQLITE_OK) {
@@ -294,6 +355,7 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 		const unsigned char *source_ip =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    0); // source_ip
+
 		bad_actors_array[row_num].source_ip =
 			strdup((const char *)source_ip);
 

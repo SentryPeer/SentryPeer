@@ -24,43 +24,43 @@
 #include "database.h"
 
 int ip_address_route(char *ip_address, struct MHD_Connection *connection,
-		     sentrypeer_config *config)
+		     sentrypeer_config const *config)
 {
 	const char *reply = 0;
 	bad_actor *bad_actor_found = 0;
 
 	if (db_select_bad_actor_by_ip(ip_address, &bad_actor_found, config) !=
 	    EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to select bad actors from database\n");
-		return MHD_NO;
-	}
-
-	if (bad_actor_found != 0) {
-		if (config->verbose_mode || config->debug_mode) {
-			fprintf(stderr, "bad_actor ip found: %s\n",
-				bad_actor_found->source_ip);
-		}
-
-		json_t *json_final_obj = json_pack("{s:s}", "ip_address",
-						   bad_actor_found->source_ip);
-		reply = json_dumps(json_final_obj, JSON_INDENT(2));
-
-		// Free the json objects
-		json_decref(json_final_obj);
-		bad_actor_destroy(&bad_actor_found);
-
-		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
-					 MHD_HTTP_OK);
-	} else {
 		json_t *json_no_data =
 			json_pack("{s:s}", "message", "No bad actor found");
 		reply = json_dumps(json_no_data, JSON_INDENT(2));
 
-		// Free the json object
+		// Free the objects
+		free(ip_address);
+		ip_address = 0;
 		json_decref(json_no_data);
-		bad_actor_destroy(&bad_actor_found);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);
+	} else { // Found!!!!
+		if (config->verbose_mode || config->debug_mode) {
+			fprintf(stderr, "bad_actor IP found: %s\n",
+				bad_actor_found->source_ip);
+		}
+
+		json_t *json_final_obj = json_pack("{s:s}", "bad_actor_found",
+						   bad_actor_found->source_ip);
+		reply = json_dumps(json_final_obj, JSON_INDENT(2));
+
+		// Free the objects
+		free(ip_address);
+		ip_address = 0;
+		json_decref(json_final_obj);
+		free(bad_actor_found->source_ip);
+		free(bad_actor_found);
+		bad_actor_found = 0;
+
+		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
+					 MHD_HTTP_OK);
 	}
 }

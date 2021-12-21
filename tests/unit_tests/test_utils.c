@@ -48,10 +48,11 @@ void test_utils(void **state)
 	assert_null(string_copied);
 
 	// util_copy_string
-	char *destination_string = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
+	char *destination_string =
+		calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert_non_null(destination_string);
-	destination_string = util_copy_string(destination_string,
-					      string_to_duplicate, SENTRYPEER_PATH_MAX);
+	destination_string = util_copy_string(
+		destination_string, string_to_duplicate, SENTRYPEER_PATH_MAX);
 	assert_non_null(destination_string);
 	assert_null(destination_string[strlen(destination_string)]);
 	assert_string_equal(destination_string, string_to_duplicate);
@@ -70,4 +71,12 @@ void test_utils(void **state)
 	assert_string_not_equal(uuid_string, "");
 	assert_string_not_equal(uuid_string,
 				"00000000-0000-0000-0000-000000000000");
+
+	// valid_ip_address_format
+	assert_int_equal(valid_ip_address_format("127.0.0.1"), EXIT_SUCCESS);
+	assert_int_equal(valid_ip_address_format(
+				 "2001:0db8:85a3:0000:0000:8a2e:0370:7334"),
+			 EXIT_SUCCESS);
+	assert_int_equal(valid_ip_address_format("NOT_AN_IP_ADDRESS"),
+			 EXIT_FAILURE);
 }

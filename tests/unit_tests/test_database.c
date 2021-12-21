@@ -172,6 +172,7 @@ int test_teardown_sqlite_db(void **state)
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
 
+	fprintf(stderr, "Removing database: %s\n", config->db_file);
 	assert_int_equal(remove(config->db_file), EXIT_SUCCESS);
 	fprintf(stderr, "Removed database successfully.\n");
 

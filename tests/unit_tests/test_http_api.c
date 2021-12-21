@@ -45,9 +45,9 @@ size_t curl_to_jansson_to_version(void *buffer, size_t size, size_t nmemb,
 
 void test_http_api_get(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
 
-	sentrypeer_config *config = sentrypeer_config_new();
 	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
@@ -60,7 +60,7 @@ void test_http_api_get(void **state)
 	CURL *easyhandle = curl_easy_init();
 	assert_non_null(easyhandle);
 	if (easyhandle) {
-		// This is 200 OK
+		// Health Check. This is 200 OK
 		curl_easy_setopt(easyhandle, CURLOPT_URL,
 				 "http://127.0.0.1:8082/health-check");
 		struct curl_slist *headers = NULL;
@@ -91,10 +91,34 @@ void test_http_api_get(void **state)
 			__LINE__ - 1, __FILE__, http_response_code);
 		assert_int_equal(http_response_code, 404);
 
+		// Bad actor 404 Not Found
+		curl_easy_setopt(easyhandle, CURLOPT_URL,
+				 "http://127.0.0.1:8082/ip-addresses/8.8.8.8");
+		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
+		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
+		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+				  &http_response_code);
+		fprintf(stderr,
+			"Response code for 404 test at line number %d in file %s is: %ld\n",
+			__LINE__ - 1, __FILE__, http_response_code);
+		assert_int_equal(http_response_code, 404);
+
+		// Bad actor check 200 OK (switch to BAD_ACTOR_SOURCE_IP from test_database.h)
+		curl_easy_setopt(
+			easyhandle, CURLOPT_URL,
+			"http://127.0.0.1:8082/ip-addresses/104.149.141.214");
+		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
+		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
+		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+				  &http_response_code);
+		fprintf(stderr,
+			"Response code for 200 test at line number %d in file %s is: %ld\n",
+			__LINE__ - 1, __FILE__, http_response_code);
+		assert_int_equal(http_response_code, 200);
+
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(easyhandle);
 		curl_global_cleanup();
-		sentrypeer_config_destroy(&config);
 	}
 }
 

@@ -45,7 +45,6 @@ char *util_duplicate_string(const char *string);
  */
 char *util_copy_string(char *dest, const char *src, size_t dest_len);
 
-
 /**
  * Generate a uuid.
  *
@@ -53,5 +52,13 @@ char *util_copy_string(char *dest, const char *src, size_t dest_len);
  * @return A uuid in string format.
  */
 char *util_uuid_generate_string(char *uuid_string);
+
+/**
+ * Validate an IP address
+ *
+ * @param ip_address_to_check The "IP address" to check.
+ * @return EXIT_SUCCESS (0) if the IP address is valid, EXIT_FAILURE (0) otherwise.
+ */
+int valid_ip_address_format(const char *ip_address_to_check);
 
 #endif //SENTRYPEER_UTILS_H

@@ -24,6 +24,8 @@
 int db_insert_bad_actor(bad_actor const *bad_actor_event,
 			sentrypeer_config const *config);
 
+#define GET_BAD_ACTOR_BY_IP                                                    \
+	"SELECT DISTINCT(source_ip) FROM honey WHERE source_ip = ?;"
 int db_select_bad_actor_by_ip(char *bad_actor_ip_address, bad_actor **bad_actor,
 			      sentrypeer_config const *config);
 

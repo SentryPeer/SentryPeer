@@ -24,7 +24,7 @@
 #include "database.h"
 
 int ip_addresses_route(struct MHD_Connection *connection,
-		       sentrypeer_config *config)
+		       sentrypeer_config const *config)
 {
 	const char *reply = 0;
 	bad_actor *bad_actors = 0;
