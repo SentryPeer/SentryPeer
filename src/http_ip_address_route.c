@@ -54,7 +54,6 @@ int ip_address_route(char *ip_address, struct MHD_Connection *connection,
 
 		// Free the objects
 		free(ip_address);
-		ip_address = 0;
 		json_decref(json_final_obj);
 		free(bad_actor_found->source_ip);
 		free(bad_actor_found);
