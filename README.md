@@ -93,15 +93,15 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
+    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
 
 Fedora:
 
-    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install libosip cmocka libmicrohttpd jansson libcurl libpcre2
+    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson libcurl libpcre2
 
 then (make check is highly recommended):
 

@@ -71,7 +71,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 	log_http_client_ip(url, connection);
 	char *matched_ip_address = 0;
 
-	// TODO: Switch to a dispatch table or similar later if more routes are added
+	// TODO: Switch to a dispatch table or similar later as starting to hurt eyes.
 	if (route_check(url, HEALTH_CHECK_ROUTE, config) == EXIT_SUCCESS) {
 		return health_check_route(connection);
 	} else if (route_check(url, HOME_PAGE_ROUTE, config) == EXIT_SUCCESS) {
@@ -92,6 +92,8 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			return ip_address_route(&matched_ip_address, connection,
 						config);
 		} else {
+			free(matched_ip_address);
+			matched_ip_address = 0;
 			return finalise_response(connection,
 						 NOT_FOUND_ERROR_JSON,
 						 CONTENT_TYPE_JSON,
