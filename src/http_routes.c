@@ -89,10 +89,9 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 		} else {
 			free(matched_ip_address);
 			matched_ip_address = 0;
-			return finalise_response(connection,
-						 NOT_FOUND_ERROR_JSON,
+			return finalise_response(connection, BAD_DATA_JSON,
 						 CONTENT_TYPE_JSON,
-						 MHD_HTTP_NOT_FOUND);
+						 MHD_HTTP_BAD_REQUEST);
 		}
 	} else if (route_check(url, IP_ADDRESSES_IPSET_ROUTE, config) ==
 		   EXIT_SUCCESS) {

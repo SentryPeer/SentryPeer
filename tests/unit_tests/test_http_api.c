@@ -116,6 +116,19 @@ void test_http_api_get(void **state)
 			__LINE__ - 1, __FILE__, http_response_code);
 		assert_int_equal(http_response_code, 200);
 
+		// Bad actor 400 Bad Data
+		curl_easy_setopt(
+			easyhandle, CURLOPT_URL,
+			"http://127.0.0.1:8082/ip-addresses/104.14da3afcsasd");
+		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
+		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
+		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+				  &http_response_code);
+		fprintf(stderr,
+			"Response code for 400 test at line number %d in file %s is: %ld\n",
+			__LINE__ - 1, __FILE__, http_response_code);
+		assert_int_equal(http_response_code, 400);
+
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(easyhandle);
 		curl_global_cleanup();

@@ -20,6 +20,7 @@
 #define CONTENT_TYPE_JSON "application/json"
 #define NOT_FOUND_ERROR_JSON                                                   \
 	"{\"error\": \"The requested resource could not be found.\"}"
+#define BAD_DATA_JSON "{\"error\": \"The request data was invalid\"}"
 #define NOT_FOUND_BAD_ACTOR_JSON "{\"message\": \"No bad actor found\"}"
 #define NOT_FOUND_BAD_ACTORS_JSON "{\"message\": \"No bad actors found\"}"
 
