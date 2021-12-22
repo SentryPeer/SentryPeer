@@ -120,15 +120,6 @@ int sip_daemon_init(sentrypeer_config const *config)
 	}
 	freeaddrinfo(bind_address); // Not needed anymore
 
-	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Setting database error log callback...\n");
-	}
-	if (db_set_error_log_callback() != EXIT_SUCCESS) {
-		fprintf(stderr, "Couldn't set database error log callback\n");
-		CLOSESOCKET(socket_listen);
-		return EXIT_FAILURE;
-	}
-
 	fd_set master;
 	FD_ZERO(&master);
 	FD_SET(socket_listen, &master);

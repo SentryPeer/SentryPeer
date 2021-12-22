@@ -19,6 +19,7 @@
 #include <jansson.h>
 #include "config.h"
 
+#include "http_routes.h"
 #include "http_common.h"
 #include "bad_actor.h"
 #include "database.h"
@@ -33,7 +34,8 @@ int ip_addresses_route(struct MHD_Connection *connection,
 	if (db_select_bad_actors(&bad_actors, &row_count, config) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to select bad actors from database\n");
-		return MHD_NO;
+		return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
 	}
 
 	if ((bad_actors != 0) && (row_count > 0)) {

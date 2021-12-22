@@ -38,27 +38,15 @@ const char create_table_sql[] =
 	"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 	");";
 
+const char create_source_ip_index[] =
+	"CREATE INDEX IF NOT EXISTS source_ip_index ON honey (source_ip);";
+
 const char insert_bad_actor[] =
 	"INSERT INTO honey (event_timestamp,"
 	"   event_uuid, collected_method, source_ip,"
 	"   called_number, transport_type, method,"
 	"   user_agent, sip_message, created_by_node_id) "
 	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-void db_error_log_callback(int err_code, const char *msg)
-{
-	fprintf(stderr, "Database error (%d): %s\n", err_code, msg);
-}
-
-int db_set_error_log_callback(void)
-{
-	if (sqlite3_config(SQLITE_CONFIG_LOG, db_error_log_callback, NULL) !=
-	    SQLITE_OK) {
-		fprintf(stderr, "Failed to set error log callback\n");
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
-}
 
 int db_insert_bad_actor(bad_actor const *bad_actor_event,
 			sentrypeer_config const *config)
@@ -88,6 +76,12 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 
 	if (sqlite3_exec(db, create_table_sql, NULL, NULL, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to create table\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_exec(db, create_source_ip_index, NULL, NULL, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to create index\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}

@@ -64,6 +64,9 @@ int test_setup_sqlite_db(void **state)
 		"   created_at DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"
 		");";
 
+	const char create_source_ip_index[] =
+		"CREATE INDEX IF NOT EXISTS source_ip_index ON honey (source_ip);";
+
 	const char insert_bad_actor[] =
 		"INSERT INTO honey (event_timestamp,"
 		"   event_uuid, collected_method, source_ip,"
@@ -82,6 +85,13 @@ int test_setup_sqlite_db(void **state)
 			 SQLITE_OK);
 	fprintf(stderr,
 		"Created table successfully using: %s at line number %d in file %s\n",
+		create_table_sql, __LINE__ - 1, __FILE__);
+
+	assert_int_equal(sqlite3_exec(db, create_source_ip_index, NULL, NULL,
+				      NULL),
+			 SQLITE_OK);
+	fprintf(stderr,
+		"Created index on source_ip successfully using: %s at line number %d in file %s\n",
 		create_table_sql, __LINE__ - 1, __FILE__);
 
 	assert_int_equal(sqlite3_prepare_v2(db, insert_bad_actor, -1,
@@ -156,13 +166,10 @@ int test_setup_sqlite_db(void **state)
 		"Finalized insert bad actor statement at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	// TODO: If we do this, we get free() crashes. Investigate. Only on "make check"
-	// 	Running tests/unit_test/runner doesn't.
-	// 	See: https://sqlite.org/forum/forumpost/e5dcc68d32
-	//	sqlite3_close(db);
-	//	fprintf(stderr,
-	//		"Closed database successfully at line number %d in file %s\n",
-	//		__LINE__ - 1, __FILE__);
+	sqlite3_close(db);
+	fprintf(stderr,
+		"Closed database successfully at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
 	return EXIT_SUCCESS;
 }

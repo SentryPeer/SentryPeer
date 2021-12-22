@@ -20,11 +20,6 @@
 #include "conf.h"
 #include "utils.h"
 
-#define NOT_FOUND_ERROR_HTML                                                   \
-	"<html><head><title>404 Not found</title></head><body><h1>404 Error</h1><h2>The requested resource could not be found.</h2></body></html>"
-#define NOT_FOUND_ERROR_JSON                                                   \
-	"{\"error\": \"The requested resource could not be found.\"}"
-
 int route_check(const char *url, const char *route,
 		sentrypeer_config const *config)
 {

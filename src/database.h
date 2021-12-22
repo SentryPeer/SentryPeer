@@ -38,7 +38,4 @@ int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
 int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config);
 
-int db_set_error_log_callback(void);
-void db_error_log_callback(int err_code, const char *msg);
-
 #endif //SENTRYPEER_DATABASE_H
