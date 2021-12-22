@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	0.0.3
+Version:	0.0.4
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -52,6 +52,14 @@ make check
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Dec 22 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.4-1
+- Updated README.md copy and paste example for installation instructions from this repository
+- Fixed memory leak in route regex matching
+- Removed global sqlite error log callback which caused segfaults when trying to show error messages (threads)
+- Added an index to the database to speed up searching for IP addresses
+- Fixed a segfault when trying to search for IP address/s in an empty database due to global error log bug above
+- Better error messages on API responses
+- Removed some unnecessary jansson usage
 * Tue Dec 21 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.3-1
 - Added `event_uuid`, `collected_method` (passive or responsive) and `created_by_node_id` (aa uuid) columns to `honey` table
 - Extended `bad_actor` data structure to provide above
