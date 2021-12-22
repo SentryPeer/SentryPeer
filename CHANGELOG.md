@@ -6,11 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Updated README.md copy and paste example for installation instructions from this repository
-- Memory leak in route regex matching
+- Fixed memory leak in route regex matching
 - Removed global sqlite error log callback which caused segfaults when trying to show error messages (threads)
 - Added an index to the database to speed up searching for IP addresses
 - Fixed a segfault when trying to search for IP address/s in an empty database due to global error log bug above
 - Better error messages on API responses
+- Removed some unnecessary jansson usage
 
 ## [0.0.3] - 2021-12-21
 - Added `event_uuid`, `collected_method` (passive or responsive) and `created_by_node_id` (aa uuid) columns to `honey` table

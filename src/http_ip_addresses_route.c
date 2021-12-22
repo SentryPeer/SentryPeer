@@ -19,7 +19,6 @@
 #include <jansson.h>
 #include "config.h"
 
-#include "http_routes.h"
 #include "http_common.h"
 #include "bad_actor.h"
 #include "database.h"
@@ -68,15 +67,8 @@ int ip_addresses_route(struct MHD_Connection *connection,
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
 					 MHD_HTTP_OK);
 	} else {
-		json_t *json_no_data =
-			json_pack("{s:s}", "message", "No bad actors found");
-		reply = json_dumps(json_no_data, JSON_INDENT(2));
-
-		// Free the json object
-		json_decref(json_no_data);
 		bad_actors_destroy(&bad_actors, &row_count);
-
-		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
-					 MHD_HTTP_NOT_FOUND);
+		return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
 	}
 }

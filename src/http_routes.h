@@ -30,9 +30,6 @@
 #define USER_AGENT_ROUTE "/user-agents/:user_agent"
 #define SIP_METHODS_ROUTE "/sip-methods"
 #define SIP_METHOD_ROUTE "/sip-methods/:sip_method"
-#define NOT_FOUND_ERROR_JSON                                                   \
-	"{\"error\": \"The requested resource could not be found.\"}"
-#define NOT_FOUND_BAD_ACTORS_JSON "{\"message\": \"No bad actors found\"}"
 
 #include <microhttpd.h>
 #include "conf.h"

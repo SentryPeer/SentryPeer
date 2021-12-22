@@ -32,15 +32,11 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 
 	if (db_select_bad_actor_by_ip(ip_address_str, &bad_actor_found, config) !=
 	    EXIT_SUCCESS) {
-		json_t *json_no_data =
-			json_pack("{s:s}", "message", "No bad actor found");
-		reply = json_dumps(json_no_data, JSON_INDENT(2));
 
 		// Free the objects
 		free(*ip_address);
 		*ip_address = 0;
-		json_decref(json_no_data);
-		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
+		return finalise_response(connection, NOT_FOUND_BAD_ACTOR_JSON, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);
 	} else { // Found!!!!
 		if (config->verbose_mode || config->debug_mode) {
