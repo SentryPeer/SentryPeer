@@ -14,6 +14,7 @@
 // Bring in getaddrinfo and others as -std=c18 bins them off
 #define _GNU_SOURCE
 
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
