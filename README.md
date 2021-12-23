@@ -6,7 +6,7 @@ A distributed list of bad actor IP addresses and phone numbers collected via a S
 
 [![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
-[![Docker Hub](https://img.shields.io/badge/docker-hub-brightgreen.svg)](https://hub.docker.com/u/SentryPeer)
+[![Docker Hub](https://img.shields.io/badge/docker-hub-brightgreen.svg)](https://hub.docker.com/r/sentrypeer/sentrypeer)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
