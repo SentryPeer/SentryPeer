@@ -6,6 +6,7 @@ A distributed list of bad actor IP addresses and phone numbers collected via a S
 
 [![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
+[![Docker Hub](https://img.shields.io/badge/docker-hub-brightgreen.svg)](https://hub.docker.com/u/SentryPeer)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
@@ -71,6 +72,25 @@ I started this because I wanted to do [C network programming](https://github.com
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
+### Docker
+
+You can build the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
+Or build yourself:
+
+    sudo docker build -t sentrypeer .
+    sudo docker run -d -p 5060:5060 -p 8082:8082 sentrypeer:latest
+
+Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:5060/health-check` to see if it's running.
+
+#### Environment Variables
+
+    ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
+    ENV SENTRYPEER_SYSLOG=1
+    ENV SENTRYPEER_VERBOSE=1
+    ENV SENTRYPEER_DEBUG=1
+
+Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
+
 ### Installation
  
 You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
@@ -93,11 +113,13 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
+    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev \
+    libcmocka-dev uuid-dev libcurl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
 
 Fedora:
 
-    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel \
+    libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 

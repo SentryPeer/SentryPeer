@@ -22,13 +22,19 @@ Source0:	https://github.com/SentryPeer/SentryPeer/releases/download/v%{version}/
 
 BuildRequires:	gcc
 BuildRequires:	make
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	autoconf-archive
 BuildRequires:	libcmocka-devel
 BuildRequires:	libosip2-devel
 BuildRequires:	sqlite-devel
 BuildRequires:	libuuid-devel
 BuildRequires:	libmicrohttpd-devel
+BuildRequires:	libcurl-devel
+BuildRequires:	jansson-devel
+BuildRequires:	pcre2-devel
 
-%description	
+%description
 SentryPeer is a distributed peer to peer list of bad IP addresses and
 phone numbers collected via a SIP Honeypot.
 
@@ -60,6 +66,7 @@ make check
 - Fixed a segfault when trying to search for IP address/s in an empty database due to global error log bug above
 - Better error messages on API responses
 - Removed some unnecessary jansson usage
+- Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
 * Tue Dec 21 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.3-1
 - Added `event_uuid`, `collected_method` (passive or responsive) and `created_by_node_id` (aa uuid) columns to `honey` table
 - Extended `bad_actor` data structure to provide above
