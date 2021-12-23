@@ -11,18 +11,16 @@
 #                              __/ |
 #                             |___/
 #
-FROM debian:latest AS build
+FROM alpine:3.15 AS build
 
 LABEL maintainer="Gavin Henry, ghenry@sentrypeer.org"
 
-RUN apt-get update
+RUN apk add --no-cache autoconf automake autoconf-archive \
+	git sqlite-dev cmocka-dev util-linux-dev curl-dev \
+	pcre2-dev jansson-dev libmicrohttpd-dev build-base
 
-RUN DEBIAN_FRONTEND=noninterfactive TZ=Etc/UTC \
-	apt-get install -y autoconf automake autoconf-archive \
-	build-essential git libosip2-dev libsqlite3-dev \
-	libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev \
-	libjansson-dev libmicrohttpd-dev \
-	&& rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    libosip2-dev
 
 RUN git clone https://github.com/SentryPeer/SentryPeer.git
 
