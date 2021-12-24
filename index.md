@@ -6,6 +6,7 @@ A distributed list of bad actor IP addresses and phone numbers collected via a S
 
 [![Stability: Experimental](https://masterminds.github.io/stability/experimental.svg)](https://masterminds.github.io/stability/experimental.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
+[![Docker Hub](https://img.shields.io/badge/docker-hub-brightgreen.svg)](https://hub.docker.com/r/sentrypeer/sentrypeer)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
@@ -21,11 +22,9 @@ This is basically a fraud detection tool. It lets bad actors try to make phone c
 
 Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
-Of course, if you don't want to run any of this and just buy access to the data that users have opted in to share, then that's a choice too. One day, maybe.
-
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
-[![Chat on Slack](https://img.shields.io/badge/chat-slack-brightgreen.svg)](https://sentrypeer.slack.com)
+[![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
 [![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
 
 ### Screenshots
@@ -59,7 +58,7 @@ Screenshots of agents and APIs to come...
 - [x] Small binary size for IoT usage
 - [x] Cross-platform
 - [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
-- [ ] Container on Docker Hub for latest build - Reference https://github.com/natm/iocontrollergw/blob/master/.github/workflows/cd.yaml and https://github.com/natm/iocontrollergw/blob/master/.github/workflows/ci.yaml (plus Nat's Dockerfile :-) )
+- [x] Container on [Docker Hub for latest build](https://hub.docker.com/r/sentrypeer/sentrypeer)
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
 
@@ -70,6 +69,25 @@ TBD :-)
 I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
+
+### Docker
+
+You can build the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
+Or build yourself:
+
+    sudo docker build -t sentrypeer .
+    sudo docker run -d -p 5060:5060 -p 8082:8082 sentrypeer:latest
+
+Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:5060/health-check` to see if it's running.
+
+#### Environment Variables
+
+    ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
+    ENV SENTRYPEER_SYSLOG=1
+    ENV SENTRYPEER_VERBOSE=1
+    ENV SENTRYPEER_DEBUG=1
+
+Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
 
 ### Installation
  
@@ -93,15 +111,17 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl-dev libpcre2-dev
+    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev \
+    libcmocka-dev uuid-dev libcurl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
 
 Fedora:
 
-    sudo dnf install libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel \
+    libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install libosip cmocka libmicrohttpd jansson libcurl libpcre2
+    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson libcurl libpcre2
 
 then (make check is highly recommended):
 
@@ -184,7 +204,7 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 ### RESTful API 
 
-The RESTful API is almost complete web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
 Right now you can call `/health-check`, like so:
 
