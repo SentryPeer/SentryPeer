@@ -22,11 +22,9 @@ This is basically a fraud detection tool. It lets bad actors try to make phone c
 
 Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
-Of course, if you don't want to run any of this and just buy access to the data that users have opted in to share, then that's a choice too. One day, maybe.
-
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
-[![Chat on Slack](https://img.shields.io/badge/chat-slack-brightgreen.svg)](https://sentrypeer.slack.com)
+[![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
 [![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
 
 ### Screenshots
@@ -60,7 +58,7 @@ Screenshots of agents and APIs to come...
 - [x] Small binary size for IoT usage
 - [x] Cross-platform
 - [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
-- [ ] Container on Docker Hub for latest build - Reference https://github.com/natm/iocontrollergw/blob/master/.github/workflows/cd.yaml and https://github.com/natm/iocontrollergw/blob/master/.github/workflows/ci.yaml (plus Nat's Dockerfile :-) )
+- [x] Container on [Docker Hub for latest build](https://hub.docker.com/r/sentrypeer/sentrypeer)
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
 
@@ -206,7 +204,7 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 ### RESTful API 
 
-The RESTful API is almost complete web UI are coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
 Right now you can call `/health-check`, like so:
 
