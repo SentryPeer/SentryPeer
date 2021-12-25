@@ -33,8 +33,6 @@ Here's a mockup of the web UI which is subject to change.
 
 [![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
 
-Screenshots of agents and APIs to come...
-
 ### Goals
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
@@ -72,7 +70,7 @@ I started this because I wanted to do [C network programming](https://github.com
 
 ### Docker
 
-You can build the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
+You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
 Or build yourself:
 
     sudo docker build -t sentrypeer .
