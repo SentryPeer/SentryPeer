@@ -19,12 +19,15 @@ Summary:	SIP peer to peer honeypot for VoIP
 License:	GPLv2 or GPLv3
 URL:		https://sentrypeer.org
 Source0:	https://github.com/SentryPeer/SentryPeer/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/%{name}.options
+Source2:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/%{name}.service
 
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	autoconf-archive
+BuildRequires:  systemd
 BuildRequires:	libcmocka-devel
 BuildRequires:	libosip2-devel
 BuildRequires:	sqlite-devel
@@ -33,6 +36,7 @@ BuildRequires:	libmicrohttpd-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	jansson-devel
 BuildRequires:	pcre2-devel
+Requires(pre): shadow-utils
 
 %description
 SentryPeer is a distributed peer to peer list of bad IP addresses and
@@ -45,17 +49,33 @@ phone numbers collected via a SIP Honeypot.
 %configure
 %make_build
 
+%pre
+getent group %{name} >/dev/null || groupadd -r %{name}
+getent passwd %{name} >/dev/null || \
+    useradd -r -g %{name} -d /home/%{name} -s /sbin/nologin \
+    -c "Used to run %{name}" %{name}
+exit 0
+
 %install
 %make_install
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
+mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 
 %check
 make check
 
+%post
+systemctl enable %{name}.service
+
 %files
-%license LICENSE.GPL-2.0-only LICENSE.GPL-3.0-only COPYING
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %doc AUTHORS CHANGELOG.md README.md COPYRIGHT
+%license LICENSE.GPL-2.0-only LICENSE.GPL-3.0-only COPYING
+%attr(0700,%{name},%{name}) %dir %{_sharedstatedir}/%{name}
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1*
+%{_unitdir}/%{name}.service
 
 %changelog
 * Wed Dec 22 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.4-1
@@ -101,5 +121,5 @@ make check
 - `ip_addresses` API endpoint also now shows total number of distinct IP addresses in the database
 - `PCRE2` library is now required for building SentryPeer
 - All IP address queries now use `inet_pton` to validate IPv4 or IPv6 addresses
-* Wed Nov 25 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.2-1
+* Thu Nov 25 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.2-1
 - First version
