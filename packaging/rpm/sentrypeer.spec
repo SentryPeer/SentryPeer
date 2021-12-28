@@ -23,6 +23,7 @@ Source1:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/pac
 Source2:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/%{name}.service
 
 BuildRequires:	gcc
+BuildRequires:	gcc-c++
 BuildRequires:	make
 BuildRequires:	autoconf
 BuildRequires:	automake
