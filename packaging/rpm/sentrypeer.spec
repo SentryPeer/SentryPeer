@@ -54,7 +54,7 @@ phone numbers collected via a SIP Honeypot.
 getent group %{name} >/dev/null || groupadd -r %{name}
 getent passwd %{name} >/dev/null || \
     useradd -r -g %{name} -d /home/%{name} -s /sbin/nologin \
-    -c "Used to run %{name}" %{name}
+    -c "%{name} system account" %{name}
 exit 0
 
 %install
