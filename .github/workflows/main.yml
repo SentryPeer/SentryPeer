@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
-# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org>
+# Copyright (c) 2022 Gavin Henry <ghenry@sentrypeer.org>
 
 name: Build and Test
 on:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-20.04, macos-11]
         cc: [gcc, clang]
     env:
       CC: ${{ matrix.cc }}
