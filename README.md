@@ -89,7 +89,13 @@ Either set these in the Dockerfile or in your `Dockerfile.env` file or docker ru
 
 ### Installation
  
-You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
+Debian or Fedora packages are always available from the release page for the current version of SentryPeer:
+
+   https://github.com/SentryPeer/SentryPeer/releases
+
+#### Building from source
+
+You have two options for installation from source. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
 
 If you are a Fedora user, you can install this via [Fedora copr](https://copr.fedorainfracloud.org/coprs/):
 
