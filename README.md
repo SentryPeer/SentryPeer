@@ -68,6 +68,11 @@ I started this because I wanted to do [C network programming](https://github.com
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
+### Talks
+
+- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/ 
+- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+
 ### Docker
 
 You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).

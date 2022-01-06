@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-/* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /*
    _____            _              _____
   / ____|          | |            |  __ \
@@ -155,11 +155,8 @@ int sip_daemon_init(sentrypeer_config const *config)
 				if (config->debug_mode ||
 				    config->verbose_mode) {
 					fprintf(stderr,
-						"connection closed. (%d)\n",
-						GETSOCKETERRNO());
-					perror("recvfrom() failed.");
+						"Empty packet received.\n");
 				}
-				return EXIT_FAILURE;
 			}
 
 			// Format timestamp like ngrep does
@@ -200,19 +197,23 @@ int sip_daemon_init(sentrypeer_config const *config)
 
 			// TODO: update once with have TCP and TLS
 			char transport_type[] = "UDP";
+			// TODO: Update for responsive mode
 			char collected_method[] = "passive";
 			bad_actor *bad_actor_event =
 				bad_actor_new(0, client_ip_address_buffer, 0, 0,
 					      transport_type, 0,
 					      collected_method, 0);
 
-			if ((sip_message_parser(read_packet_buf, bytes_received,
-						bad_actor_event, config)) !=
-			    EXIT_SUCCESS) {
-				if (config->debug_mode ||
-				    config->verbose_mode) {
-					fprintf(stderr,
-						"Parsing this SIP packet failed.\n");
+			if (bytes_received > 0) {
+				if ((sip_message_parser(
+					    read_packet_buf, bytes_received,
+					    bad_actor_event, config)) !=
+				    EXIT_SUCCESS) {
+					if (config->debug_mode ||
+					    config->verbose_mode) {
+						fprintf(stderr,
+							"Parsing this SIP packet failed.\n");
+					}
 				}
 			}
 
@@ -230,6 +231,37 @@ int sip_daemon_init(sentrypeer_config const *config)
 					"Saving bad actor to db failed\n");
 			}
 			bad_actor_destroy(&bad_actor_event);
+
+			// TODO Create reply headers with libosip2
+			char SIP_200_OK[] =
+				"SIP/2.0 200 OK\n"
+				"Via: SIP/2.0/UDP 127.0.0.1:56940\n"
+				"Call-ID: 1179563087@127.0.0.1\n"
+				"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\n"
+				"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\n"
+				"CSeq: 1 OPTIONS\n"
+				"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\n"
+				"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\n"
+				"Supported: 100rel, timer, replaces, norefersub\n"
+				"Accept-Encoding: text/plain\n"
+				"Accept-Language: en\n"
+				"Server: FPBX-14.0.16.11(14.7.8)\n"
+				"Content-Length:  0";
+
+			long bytes_sent =
+				sendto(socket_listen, SIP_200_OK,
+				       sizeof(SIP_200_OK), 0,
+				       (struct sockaddr *)&client_address,
+				       client_len);
+			if (bytes_sent < 1) {
+				if (config->debug_mode ||
+				    config->verbose_mode) {
+					fprintf(stderr,
+						"Connection failed. (%d)\n",
+						GETSOCKETERRNO());
+					perror("sendto() failed.");
+				}
+			}
 		}
 	}
 	CLOSESOCKET(socket_listen);

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org>
+
 name: SonarCloud Scan
 on:
   push:
@@ -48,7 +51,7 @@ jobs:
       - name: Run build-wrapper
         run: |
           sudo apt-get install autoconf-archive libosip2-dev libcmocka-dev uuid-dev \
-          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev
+          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev libpcre2-dev
           sudo add-apt-repository ppa:savoury1/utilities
           sudo apt-get update
           sudo apt-get install libmicrohttpd-dev

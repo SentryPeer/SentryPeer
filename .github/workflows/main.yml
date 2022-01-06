@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
-# Copyright (c) 2022 Gavin Henry <ghenry@sentrypeer.org>
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org>
 
 name: Build and Test
 on:
@@ -34,7 +34,8 @@ jobs:
             libcmocka-dev \
             uuid-dev \
             libjansson-dev \
-            libcurl4-openssl-dev
+            libcurl4-openssl-dev \
+            libpcre2-dev
             brew install cmocka
             sudo add-apt-repository ppa:savoury1/utilities
             sudo apt-get update
@@ -49,6 +50,7 @@ jobs:
             brew install libmicrohttpd
             brew install curl
             brew install cmocka
+            brew install pcre2
           fi
       - name: Build and Clean
         run: |

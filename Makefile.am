@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-# Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 #
 #   _____            _              _____
 #  / ____|          | |            |  __ \
@@ -91,6 +91,8 @@ unit_test_sources = \
     tests/unit_tests/test_http_route_check.h \
     tests/unit_tests/test_ip_address_regex.c \
     tests/unit_tests/test_ip_address_regex.h \
+    tests/unit_tests/test_sip_message.c \
+    tests/unit_tests/test_sip_message.h \
     tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

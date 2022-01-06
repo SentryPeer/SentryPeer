@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-/* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /*
    _____            _              _____
   / ____|          | |            |  __ \
@@ -25,6 +25,7 @@ struct sentrypeer_config {
 	bool verbose_mode;
 	bool debug_mode;
 	bool daemon_mode;
+	bool responsive_mode;
 	bool foreground_mode;
 	bool sip_mode;
 	bool bgp_mode;

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-/* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /* 
    _____            _              _____
   / ____|          | |            |  __ \
@@ -165,6 +165,11 @@ application you might want to do things other than print them. */
 	// Our capture is the first, so when i = 1, 2 * 1 = 2, hence ovector[2 * 1]
 	assert_string_equal("8.8.8.8", (char *)(subject + ovector[2]));
 
+	// Final clean up
+	pcre2_match_data_free(
+		match_data); /* Release memory used for the match */
+	pcre2_code_free(re); /*   data and the compiled pattern. */
+
 	/**************************************************************************
 * That concludes the basic part of this demonstration program. We have    *
 * compiled a pattern, and performed a single match. The code that follows *
@@ -172,4 +177,3 @@ application you might want to do things other than print them. */
 * repeated matches on the same subject.                                   *
 **************************************************************************/
 }
-

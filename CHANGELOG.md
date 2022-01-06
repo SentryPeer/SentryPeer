@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
 - Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)
+- Only parse SIP packets if UDP packet payload is > 0 bytes
 - Fedora and Debian packaging now available for each release
+- HTTP regex route memory leak fix
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository

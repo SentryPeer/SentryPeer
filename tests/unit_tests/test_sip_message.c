@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
-/*
+/* 
    _____            _              _____
   / ____|          | |            |  __ \
  | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
@@ -11,13 +11,9 @@
                              |___/
 */
 
-#ifndef SENTRYPEER_HTTP_DAEMON_H
-#define SENTRYPEER_HTTP_DAEMON_H 1
+#include "test_sip_message.h"
 
-#include "conf.h"
-
-#define HTTP_DAEMON_PORT 8082
-
-int http_daemon_init(sentrypeer_config *config);
-
-#endif //SENTRYPEER_HTTP_DAEMON_H
+void test_sip_message(void **state)
+{
+	(void)state; /* unused */
+}

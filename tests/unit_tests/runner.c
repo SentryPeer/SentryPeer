@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-/* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /*
    _____            _              _____
   / ____|          | |            |  __ \
@@ -26,6 +26,7 @@
 #include "test_http_api.h"
 #include "test_http_route_check.h"
 #include "test_ip_address_regex.h"
+#include "test_sip_message.h"
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -57,6 +58,7 @@ int main(void)
 		cmocka_unit_test(test_http_route_check),
 		cmocka_unit_test(test_ip_address_regex),
 		cmocka_unit_test(test_route_regex_check),
+		cmocka_unit_test(test_sip_message),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

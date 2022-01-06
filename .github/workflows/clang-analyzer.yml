@@ -1,5 +1,6 @@
-# Found this at https://github.com/maxmind/libmaxminddb/blob/main/.github/workflows/clang-analyzer.yml
-# See what it finds...
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org>
+
 name: Clang Static Analysis
 on:
   push:
@@ -24,6 +25,7 @@ jobs:
           uuid-dev \
           libmicrohttpd-dev \
           libjansson-dev \
+          libpcre2-dev \
           libcurl4-openssl-dev
           sudo add-apt-repository ppa:savoury1/utilities
           sudo apt-get update

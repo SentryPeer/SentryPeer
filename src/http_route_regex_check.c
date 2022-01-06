@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
-/* Copyright (c) 2021 Gavin Henry <ghenry@sentrypeer.org> */
+/* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /* 
    _____            _              _____
   / ____|          | |            |  __ \
@@ -153,6 +153,9 @@ option is never set. */
 		fprintf(stderr, "\nroute_regex_check matched: %s\n",
 			*matched_string);
 	}
+
+	pcre2_match_data_free(match_data);
+	pcre2_code_free(re);
 
 	return EXIT_SUCCESS;
 }
