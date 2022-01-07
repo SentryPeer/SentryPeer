@@ -1,4 +1,4 @@
-## SentryPeer
+## SentryPeer<sup>&reg;</sup>
 
 <img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
@@ -32,8 +32,6 @@ The sharing part...you only get other users' data if you [share yours](https://e
 Here's a mockup of the web UI which is subject to change.
 
 [![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
-
-Screenshots of agents and APIs to come...
 
 ### Goals
 
@@ -70,9 +68,14 @@ I started this because I wanted to do [C network programming](https://github.com
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
+### Talks
+
+- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/ 
+- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+
 ### Docker
 
-You can build the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
+You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
 Or build yourself:
 
     sudo docker build -t sentrypeer .
@@ -91,7 +94,13 @@ Either set these in the Dockerfile or in your `Dockerfile.env` file or docker ru
 
 ### Installation
  
-You have two options for installation. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
+Debian or Fedora packages are always available from the release page for the current version of SentryPeer:
+
+   https://github.com/SentryPeer/SentryPeer/releases
+
+#### Building from source
+
+You have two options for installation from source. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.
 
 If you are a Fedora user, you can install this via [Fedora copr](https://copr.fedorainfracloud.org/coprs/):
 
@@ -320,7 +329,7 @@ https://sentrypeer.org
 
 ### Trademark
 
-[**SENTRYPEER** is a pending registered trademark](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003700947) of Gavin Henry
+[**SENTRYPEER** is a registered trademark](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003700947) of Gavin Henry
 
 ### Questions, Bug reports, Feature Requests
 
