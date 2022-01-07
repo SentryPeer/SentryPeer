@@ -1,4 +1,4 @@
-## SentryPeer
+## SentryPeer<sup>&reg;</sup>
 
 <img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
@@ -329,7 +329,7 @@ https://sentrypeer.org
 
 ### Trademark
 
-[**SENTRYPEER** is a pending registered trademark](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003700947) of Gavin Henry
+[**SENTRYPEER** is a registered trademark](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003700947) of Gavin Henry
 
 ### Questions, Bug reports, Feature Requests
 

@@ -25,7 +25,7 @@ jobs:
             libcmocka-dev \
             uuid-dev \
             libjansson-dev \
-            libpcre2-dev \          
+            libpcre2-dev \
             libcurl4-openssl-dev
             sudo add-apt-repository ppa:savoury1/utilities
             sudo apt-get update

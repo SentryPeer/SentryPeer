@@ -63,7 +63,6 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 
 	char *uuid_string = malloc(UTILS_UUID_STRING_LEN);
 	assert(uuid_string);
-	util_uuid_generate_string(uuid_string);
 
 	self->event_timestamp = event_timestamp(time_str);
 	self->event_uuid = util_uuid_generate_string(uuid_string);

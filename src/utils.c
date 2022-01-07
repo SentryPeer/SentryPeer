@@ -83,6 +83,8 @@ char *util_uuid_generate_string(char *uuid_string)
 	assert(binary_uuid);
 
 	uuid_unparse_lower(binary_uuid, uuid_string);
+
+	assert(uuid_string);
 	return uuid_string;
 }
 
