@@ -83,6 +83,14 @@ int finalise_response(struct MHD_Connection *connection, const char *reply_data,
 		return MHD_NO;
 	}
 
+	// CORS - https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin
+	if (MHD_add_response_header(response, "Access-Control-Allow-Origin",
+				    "*") == MHD_NO) {
+		fprintf(stderr, "Failed to add header\n");
+		MHD_destroy_response(response);
+		return MHD_NO;
+	}
+
 	if (MHD_add_response_header(response, "X-Powered-By", "SentryPeer") ==
 	    MHD_NO) {
 		fprintf(stderr, "Failed to add header\n");

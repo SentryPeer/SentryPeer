@@ -43,8 +43,6 @@ sentrypeer_SOURCES= \
     src/http_ip_address_route.c \
     src/http_api.c \
     src/http_api.h \
-    src/http_ui.c \
-    src/http_ui.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \

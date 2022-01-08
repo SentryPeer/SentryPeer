@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTTP regex route memory leak fix
 - vue.js SPA is now in for start web gui
 - Remove duplicate uuid_generate call in bad_actor structure
+- Add CORS header to all API responses
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository

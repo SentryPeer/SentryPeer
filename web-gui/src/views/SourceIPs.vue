@@ -16,7 +16,8 @@
     <div class="col">
       <div class="card mb-5">
         <div class="card-header">
-          Data collected between 17:00 and 18:00 UTC
+          Total IP addresses collected between 17:00 and 18:00 UTC:
+          <strong class="float-end">{{ ip_addresses_total }}</strong>
         </div>
         <div class="card-body">
           <table class="table">
@@ -27,45 +28,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>20.63.64.190</td>
+              <tr v-for="item in ip_addresses" :key="item">
+                <td>{{ item.ip_address }}</td>
                 <td class="text-end">1576481</td>
-              </tr>
-              <tr>
-                <td>141.94.139.30</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>193.46.255.243</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>23.148.145.28</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>40.86.206.158</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>51.104.46.51</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>104.149.156.10</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>92.118.63.42</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>104.149.141.122</td>
-                <td class="text-end">125</td>
-              </tr>
-              <tr>
-                <td>23.148.145.212</td>
-                <td class="text-end">125</td>
               </tr>
             </tbody>
           </table>
@@ -74,3 +39,42 @@
     </div>
   </div>
 </template>
+<script>
+import { useToast } from "vue-toastification"
+
+export default {
+  name: "SourceIPs",
+  data() {
+    return {
+      name: "SourceIPs",
+      ip_addresses: null,
+      ip_address_total: null,
+    }
+  },
+  methods: {
+    getIPAddresses() {
+      fetch("http://localhost:8082/ip-addresses")
+        .then(async (response) => {
+          const data = await response.json()
+
+          // check for error response
+          if (!response.ok) {
+            // get error message from body or default to response statusText
+            const error = (data && data.message) || response.statusText
+            return Promise.reject(error)
+          }
+
+          this.ip_addresses = data.ip_addresses
+          this.ip_addresses_total = data.ip_addresses_total
+        })
+        .catch((error) => {
+          const toast = useToast()
+          toast.error("SentryPeer API error: " + error.message)
+        })
+    },
+  },
+  created() {
+    this.getIPAddresses()
+  },
+}
+</script>
