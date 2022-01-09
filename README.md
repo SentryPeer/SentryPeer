@@ -24,6 +24,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
+![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
 [![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
 
