@@ -13,6 +13,11 @@
 
 // Bring in getaddrinfo and others as -std=c18 bins them off
 #define _GNU_SOURCE
+
+#ifdef __APPLE__
+#define __APPLE_USE_RFC_3542
+#endif
+
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <net/if.h>
@@ -33,10 +38,6 @@
 #include "database.h"
 
 #define PACKET_BUFFER_SIZE 1024
-
-#ifdef __APPLE__
-#define __APPLE_USE_RFC_3542
-#endif
 
 /*
  * Hands-On Network Programming with C, page 117
@@ -113,11 +114,13 @@ int sip_daemon_init(sentrypeer_config const *config)
 	}
 
 	int optname = 0;
+	int protocol = IPPROTO_IP;
 #ifdef HAVE_IP_PKTINFO
 	if (bind_address->ai_family == AF_INET) {
 		optname = IP_PKTINFO;
 	} else if (bind_address->ai_family == AF_INET6) {
 		optname = IPV6_RECVPKTINFO;
+		protocol = IPPROTO_IPV6;
 	}
 #elif defined(HAVE_IP_RECVDSTADDR)
 	optname = IP_RECVDSTADDR;
@@ -125,7 +128,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 
 	// TODO: move to a function if a new setsockopt() is needed
 	enable = 1;
-	if (setsockopt(socket_listen, IPPROTO_IP, optname, &enable,
+	if (setsockopt(socket_listen, protocol, optname, &enable,
 		       sizeof(enable)) < 0) {
 		perror("setsockopt() failed.");
 		CLOSESOCKET(socket_listen);
