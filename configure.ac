@@ -62,37 +62,39 @@ AC_SEARCH_LIBS(pcre2_compile_8, pcre2-8, [], [
 ])
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h syslog.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
+AC_TYPE_INT64_T
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime inet_ntoa localtime_r memset select socket strndup strnlen])
+AC_FUNC_STRNLEN
+AC_CHECK_FUNCS([clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
 
 AC_MSG_CHECKING(for IP_PKTINFO)
-AC_TRY_COMPILE([#include <netdb.h>], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
   int opt = IP_PKTINFO;
-], [
+]])],[
   AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_IP_PKTINFO, 1, [Have IP_PKTINFO])
-], [
+],[
   AC_MSG_RESULT(no)
 ])
 
 AC_MSG_CHECKING(for IP_RECVDSTADDR)
-AC_TRY_COMPILE([#include <netinet/in.h>], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   int opt = IP_RECVDSTADDR;
-], [
+]])],[
   AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_IP_RECVDSTADDR, 1, [Have IP_RECVDSTADDR])
-], [
+],[
   AC_MSG_RESULT(no)
 ])
 
