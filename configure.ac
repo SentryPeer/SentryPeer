@@ -68,11 +68,12 @@ AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h st
 AC_CHECK_HEADER_STDBOOL
 AC_TYPE_INT64_T
 AC_TYPE_SIZE_T
+AC_TYPE_UINT32_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_STRNLEN
-AC_CHECK_FUNCS([clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup])
+AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
