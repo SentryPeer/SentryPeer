@@ -60,7 +60,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-f fullpath for sentrypeer.db] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-f fullpath for sentrypeer.db] [-r] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -68,6 +68,12 @@ void print_usage(void)
 	fprintf(stderr, "  -V,      Print version\n");
 	fprintf(stderr,
 		"  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env\n");
+	fprintf(stderr,
+		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
+	fprintf(stderr,
+		"  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env\n");
+	fprintf(stderr,
+		"  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env\n");
 	fprintf(stderr,
 		"  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env\n");
 	fprintf(stderr,
@@ -89,14 +95,17 @@ void print_version(void)
 int process_cli(sentrypeer_config *config, int argc, char **argv)
 {
 	int cli_option;
+	config->api_mode = false;
+	config->debug_mode = false;
+	config->sip_responsive_mode = false;
 	config->syslog_mode = false;
 	config->verbose_mode = false;
-	config->debug_mode = false;
+	config->web_gui_mode = false;
 
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVf:svd")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVf:adrsvw")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -113,14 +122,23 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'a':
+			config->api_mode = true;
+			break;
+		case 'd':
+			config->debug_mode = true;
+			break;
+		case 'r':
+			config->sip_responsive_mode = true;
+			break;
 		case 's':
 			config->syslog_mode = true;
 			break;
 		case 'v':
 			config->verbose_mode = true;
 			break;
-		case 'd':
-			config->debug_mode = true;
+		case 'w':
+			config->web_gui_mode = true;
 			break;
 		default:
 			print_usage();
@@ -135,6 +153,15 @@ int process_env_vars(sentrypeer_config *config)
 	if (getenv("SENTRYPEER_DB_FILE")) {
 		util_copy_string(config->db_file, getenv("SENTRYPEER_DB_FILE"),
 				 SENTRYPEER_PATH_MAX);
+	}
+	if (getenv("SENTRYPEER_API")) {
+		config->api_mode = true;
+	}
+	if (getenv("SENTRYPEER_WEB_GUI")) {
+		config->web_gui_mode = true;
+	}
+	if (getenv("SENTRYPEER_SIP_RESPONSIVE")) {
+		config->sip_responsive_mode = true;
 	}
 	if (getenv("SENTRYPEER_SYSLOG")) {
 		config->syslog_mode = true;

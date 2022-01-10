@@ -70,8 +70,17 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 	if (route_check(url, HEALTH_CHECK_ROUTE, config) == EXIT_SUCCESS) {
 		return health_check_route(connection);
 	} else if (route_check(url, HOME_PAGE_ROUTE, config) == EXIT_SUCCESS) {
-		return finalise_response(connection, HOME_PAGE_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+		if (config->web_gui_mode) {
+			return finalise_response(
+				connection, "Vue.js SPA will be served here.",
+				CONTENT_TYPE_HTML, MHD_HTTP_OK);
+		} else {
+			return finalise_response(connection,
+						 NOT_FOUND_ERROR_JSON,
+						 CONTENT_TYPE_JSON,
+						 MHD_HTTP_NOT_FOUND);
+		}
+
 	} else if (route_check(url, IP_ADDRESSES_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return ip_addresses_route(connection, config);

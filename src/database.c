@@ -266,12 +266,6 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actor_by_uuid(const char *bad_actor_event_uuid,
-				sentrypeer_config const *config)
-{
-	return EXIT_SUCCESS;
-}
-
 int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config)
 {

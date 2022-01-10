@@ -24,13 +24,11 @@ struct sentrypeer_config {
 	bool syslog_mode;
 	bool verbose_mode;
 	bool debug_mode;
-	bool daemon_mode;
-	bool responsive_mode;
-	bool foreground_mode;
-	bool sip_mode;
-	bool bgp_mode;
+	bool sip_responsive_mode;
 	bool api_mode;
 	bool web_gui_mode;
+	bool sip_agent_mode;
+	bool bgp_agent_mode;
 	char *db_file;
 };
 

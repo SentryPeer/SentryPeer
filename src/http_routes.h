@@ -14,7 +14,6 @@
 #ifndef SENTRYPEER_HTTP_ROUTES_H
 #define SENTRYPEER_HTTP_ROUTES_H 1
 
-#define HTTP_ROUTES_MAX_LEN 1024
 #define HOME_PAGE_ROUTE "/"
 #define HEALTH_CHECK_ROUTE "/health-check"
 #define IP_ADDRESSES_ROUTE "/ip-addresses"

@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - vue.js SPA is now in for start web gui
 - Remove duplicate uuid_generate call in bad_actor structure
 - Add CORS header to all API responses
+- Add more header checks to configure.ac
+- Switch to `recvmsg` for receiving UDP packets, so we can save the **destination IP address** of probes
+- SIP responsive mode can be enabled to reply to SIP probes. This will prompt **INVITE**'s from bad actors for phone 
+  call attempts, so you can collect the phone numbers
+- API mode can be set to enable replies to RESTful API requests. Depending on your node deployment type, you may not 
+  want to enable this
+- Web GUI mode can be set to enable the [Vue.js](https://vuejs.org/) SPA. Depending on your node deployment type, you 
+  might not want this
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository

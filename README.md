@@ -46,9 +46,10 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] TCP transport
 - [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
-- [x] **Local** data copy for **fast access** - feature / cli flag
-- [x] **Local** API for **fast access** - feature / cli flag
-- [x] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] SIP responsive mode can be enabled to collect data - cli / env flag   
+- [x] **Local** data copy for **fast access** - cli / env db location flag
+- [x] **Local** API for **fast access** - cli / env flag
+- [x] **Local** Web GUI for **fast access** - cli / env flag
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
@@ -87,6 +88,9 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 #### Environment Variables
 
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
+    ENV SENTRYPEER_API=1
+    ENV SENTRYPEER_WEB_GUI=1
+    ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SYSLOG=1
     ENV SENTRYPEER_VERBOSE=1
     ENV SENTRYPEER_DEBUG=1
@@ -150,16 +154,18 @@ We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew
 
 ### Running SentryPeer
 
-Once built, you can run like so to start in debug mode and syslog logging (this won't work as a daemon yet):
+Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
+the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
-    ./sentrypeer -ds
+    ./sentrypeer -adrsw
     Starting sentrypeer...
-    Starting http daemon...
+    API mode enabled, starting http daemon...
+    Web GUI mode enabled...
     Configuring local address...
     Creating socket...
     Binding socket to local address...
-    Setting database error log callback...
     Listening for incoming connections...
+    SIP responsive mode enabled. Will reply to SIP probes...
 
 when you get a probe request, you can see something like the following in the terminal:
 

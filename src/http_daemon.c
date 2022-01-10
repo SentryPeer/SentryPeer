@@ -23,7 +23,7 @@
 int http_daemon_init(sentrypeer_config *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Starting http daemon...\n");
+		fprintf(stderr, "API mode enabled, starting http daemon...\n");
 	}
 
 	struct MHD_Daemon *daemon;

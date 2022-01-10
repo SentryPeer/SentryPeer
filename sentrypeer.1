@@ -4,7 +4,7 @@ sentrypeer \- A distributed list of bad IP addresses and phone numbers collected
 
 .SH SYNOPSIS
 .B sentrypeer
-[\-hVsvd]
+[\-hVfadrsvw]
 .SH DESCRIPTION
 .B SentryPeer
 is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
@@ -27,17 +27,29 @@ shows the version of SentryPeer
 .BI "\-f
 Set 'sentrypeer.db' location or set SENTRYPEER_DB_FILE environment variable
 .TP
+.BI "\-a
+Runs SentryPeer with the RESTful API or set SENTRYPEER_API=1 environment variable
+.TP
+.BI "\-r
+Runs SentryPeer in SIP responsive mode or set SENTRYPEER_SIP_RESPONSIVE=1 environment variable. Enables replies to SIP
+probes to prompt INVITEs and actual attacks
+.TP
 .BI "\-s
-Runs SentryPeer with syslog logging or set SENTRYPEER_SYSLOG=1 environment variable. Allows Fail2ban to use SentryPeer to block IP addresses
+Runs SentryPeer with syslog logging or set SENTRYPEER_SYSLOG=1 environment variable. Allows Fail2ban to use SentryPeer
+to block IP addresses
 .TP
 .BI "\-v
 Runs SentryPeer in verbose mode or set SENTRYPEER_VERBOSE=1 environment variable
 .TP
+.BI "\-w
+Runs SentryPeer with the Web GUI enabled or set SENTRYPEER_WEB_GUI=1 environment variable
+.TP
 .BI "-d
 Runs SentryPeer in debug mode (preferred method at the moment) or set SENTRYPEER_DEBUG=1 environment variable
 .SH USING SENTRYPEER
-For now, the only way to use SentryPeer is to run it standalone via the console in these early stages. Peer to Peer
-is the next step.
+You can run SentryPeer via the console, use a Docker image via Docker Hub, build your own container with the Dockerfile
+on GitHub or install a deb or rpm. It looks like you installed from source or a package if you're reading this :-) Peer
+to Peer is the next step.
 .SH BUGS
 Issues and can be raised on the SentryPeer GitHub page:
 

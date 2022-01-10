@@ -27,8 +27,7 @@ void test_conf(void **state)
 {
 	(void)state; /* unused */
 
-	sentrypeer_config *config =
-		sentrypeer_config_new();
+	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
 
@@ -62,6 +61,22 @@ void test_conf(void **state)
 	assert_int_equal(setenv("SENTRYPEER_VERBOSE", "1", 1), EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->verbose_mode);
+
+	assert_int_equal(setenv("SENTRYPEER_SIP_RESPONSIVE", "1", 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_true(config->sip_responsive_mode);
+
+	assert_int_equal(setenv("SENTRYPEER_API", "1", 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_true(config->api_mode);
+
+
+	assert_int_equal(setenv("SENTRYPEER_WEB_GUI", "1", 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_true(config->web_gui_mode);
 
 	assert_int_equal(setenv("SENTRYPEER_SYSLOG", "1", 1), EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);

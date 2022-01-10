@@ -44,16 +44,25 @@ int main(int argc, char **argv)
 	}
 
 	// Threaded, so start the HTTP daemon first
-	if (http_daemon_init(config) == EXIT_FAILURE) {
-		fprintf(stderr, "Failed to start %s server on port %d\n",
-			"HTTP", HTTP_DAEMON_PORT);
-		perror("http_daemon_init");
-		if (config->syslog_mode) {
-			syslog(LOG_ERR,
-			       "Failed to start %s server on port %d\n", "HTTP",
-			       HTTP_DAEMON_PORT);
+	if (config->api_mode) {
+		if (http_daemon_init(config) == EXIT_FAILURE) {
+			fprintf(stderr,
+				"Failed to start %s server on port %d\n",
+				"HTTP", HTTP_DAEMON_PORT);
+			perror("http_daemon_init");
+			if (config->syslog_mode) {
+				syslog(LOG_ERR,
+				       "Failed to start %s server on port %d\n",
+				       "HTTP", HTTP_DAEMON_PORT);
+			}
+			exit(EXIT_FAILURE);
 		}
-		exit(EXIT_FAILURE);
+
+		if (config->web_gui_mode) {
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr, "Web GUI mode enabled...\n");
+			}
+		}
 	}
 
 	// Blocking, so start the SIP daemon last

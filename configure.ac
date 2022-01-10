@@ -76,6 +76,26 @@ AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
 
+AC_MSG_CHECKING(for IP_PKTINFO)
+AC_TRY_COMPILE([#include <netdb.h>], [
+  int opt = IP_PKTINFO;
+], [
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_IP_PKTINFO, 1, [Have IP_PKTINFO])
+], [
+  AC_MSG_RESULT(no)
+])
+
+AC_MSG_CHECKING(for IP_RECVDSTADDR)
+AC_TRY_COMPILE([#include <netinet/in.h>], [
+  int opt = IP_RECVDSTADDR;
+], [
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_IP_RECVDSTADDR, 1, [Have IP_RECVDSTADDR])
+], [
+  AC_MSG_RESULT(no)
+])
+
 if [[ ! -z "${GIT}" ]]; then
 	REVISION=`git rev-parse --short HEAD`
 else
