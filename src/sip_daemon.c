@@ -34,6 +34,10 @@
 
 #define PACKET_BUFFER_SIZE 1024
 
+#ifdef __APPLE__
+#define __APPLE_USE_RFC_3542
+#endif
+
 /*
  * Hands-On Network Programming with C, page 117
  * UDP Server (move to libevent and/or 0MQ Routers/zproto/zproject/Zyre:
@@ -205,7 +209,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 				    cmsg->cmsg_type != IP_PKTINFO) {
 					continue;
 				}
-				struct in_pktinfo *pi =
+				struct in_pktinfo const *pi =
 					(struct in_pktinfo *)CMSG_DATA(cmsg);
 				char interName[20];
 				memset(interName, 0, 20);
