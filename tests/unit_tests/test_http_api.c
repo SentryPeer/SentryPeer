@@ -135,7 +135,6 @@ void test_http_api_get(void **state)
 		curl_easy_cleanup(easyhandle);
 		curl_global_cleanup();
 	}
-	MHD_free(
 }
 
 void test_route_regex_check(void **state)
