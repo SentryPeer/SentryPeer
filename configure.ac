@@ -16,6 +16,7 @@
 AC_PREREQ([2.69])
 AC_INIT([sentrypeer],[0.0.5],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
+AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG(C)
