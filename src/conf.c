@@ -31,6 +31,15 @@ sentrypeer_config *sentrypeer_config_new(void)
 	sentrypeer_config *self = malloc(sizeof(sentrypeer_config));
 	assert(self);
 
+	self->syslog_mode = false;
+	self->verbose_mode = false;
+	self->debug_mode = false;
+	self->sip_responsive_mode = false;
+	self->api_mode = false;
+	self->web_gui_mode = false;
+	self->sip_agent_mode = false;
+	self->bgp_agent_mode = false;
+
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
 	util_copy_string(self->db_file, DEFAULT_DB_FILE_NAME,

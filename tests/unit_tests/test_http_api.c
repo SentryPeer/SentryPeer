@@ -40,6 +40,8 @@ size_t curl_to_jansson_to_version(void *buffer, size_t size, size_t nmemb,
 			    PACKAGE_VERSION);
 
 	*((json_t **)userp) = json;
+	json_decref(json);
+
 	return size * nmemb;
 }
 
@@ -133,6 +135,7 @@ void test_http_api_get(void **state)
 		curl_easy_cleanup(easyhandle);
 		curl_global_cleanup();
 	}
+	MHD_free(
 }
 
 void test_route_regex_check(void **state)

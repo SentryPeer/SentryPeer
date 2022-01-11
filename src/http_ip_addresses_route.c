@@ -47,15 +47,22 @@ int ip_addresses_route(struct MHD_Connection *connection,
 					bad_actors[row_num].source_ip);
 			}
 
-			json_array_append(
-				json_arr,
-				json_pack("{s:s,s:s,s:s}", "ip_address",
+			if (json_array_append_new(
+				    json_arr,
+				    json_pack("{s:s,s:s,s:s}", "ip_address",
 
-					  bad_actors[row_num].source_ip,
-					  "seen_last",
-					  bad_actors[row_num].seen_last,
-					  "seen_count",
-					  bad_actors[row_num].seen_count));
+					      bad_actors[row_num].source_ip,
+					      "seen_last",
+					      bad_actors[row_num].seen_last,
+					      "seen_count",
+					      bad_actors[row_num].seen_count)) !=
+			    EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Failed to append bad actor to json array\n");
+				return finalise_response(
+					connection, NOT_FOUND_BAD_ACTORS_JSON,
+					CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
+			}
 			row_num++;
 		}
 		json_t *json_final_obj =
@@ -65,7 +72,6 @@ int ip_addresses_route(struct MHD_Connection *connection,
 
 		// Free the json objects
 		json_decref(json_arr);
-		json_decref(json_final_obj);
 		bad_actors_destroy(&bad_actors, &row_count);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
