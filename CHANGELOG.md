@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   want to enable this
 - Web GUI mode can be set to enable the [Vue.js](https://vuejs.org/) SPA. Depending on your node deployment type, you 
   might not want this
+- Add `seen_last` and `seen_count` bad_actor data structure for use in `ip_addresses` RESTful API resource
+- `ip_addresses` RESTful API resource results sorted by `seen_last` descending
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository

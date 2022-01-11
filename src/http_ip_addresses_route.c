@@ -49,9 +49,13 @@ int ip_addresses_route(struct MHD_Connection *connection,
 
 			json_array_append(
 				json_arr,
-				json_pack("{s:s}", "ip_address",
+				json_pack("{s:s,s:s,s:s}", "ip_address",
 
-					  bad_actors[row_num].source_ip));
+					  bad_actors[row_num].source_ip,
+					  "seen_last",
+					  bad_actors[row_num].seen_last,
+					  "seen_count",
+					  bad_actors[row_num].seen_count));
 			row_num++;
 		}
 		json_t *json_final_obj =

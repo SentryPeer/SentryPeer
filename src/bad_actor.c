@@ -73,6 +73,8 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 	self->transport_type = transport_type;
 	self->user_agent = user_agent;
 	self->collected_method = collected_method;
+	self->seen_last = 0;
+	self->seen_count = 0;
 
 	if (created_by_node_id) {
 		self->created_by_node_id = created_by_node_id;
@@ -124,6 +126,16 @@ void bad_actor_destroy(bad_actor **self_ptr)
 			osip_free(self->sip_message) self->sip_message = 0;
 		}
 
+		if (self->seen_last != 0) {
+			free(self->seen_last);
+			self->seen_last = 0;
+		}
+
+		if (self->seen_count != 0) {
+			free(self->seen_count);
+			self->seen_count = 0;
+		}
+
 		free(self);
 		*self_ptr = 0;
 	}
@@ -137,7 +149,7 @@ void bad_actors_destroy(bad_actor **self_ptr, const int64_t *row_count)
 
 		int64_t row_num = 0;
 		while (row_num < *row_count) {
-			free(self[row_num].source_ip);
+			bad_actor_destroy((bad_actor **)&self[row_num]);
 			row_num++;
 		}
 		free(self);

@@ -81,7 +81,7 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	}
 
 	if (sqlite3_exec(db, create_source_ip_index, NULL, NULL, NULL) != SQLITE_OK) {
-		fprintf(stderr, "Failed to create index\n");
+		fprintf(stderr, "Failed to create source_ip_index\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
@@ -316,7 +316,8 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 	}
 
 	sqlite3_stmt *select_bad_actors_stmt = 0;
-	char select_bad_actors[] = GET_ROWS_DISTINCT_SOURCE_IP;
+	char select_bad_actors[] =
+		GET_ROWS_DISTINCT_SOURCE_IP_WITH_COUNT_AND_DATE;
 	if (sqlite3_prepare_v2(db, select_bad_actors, -1,
 			       &select_bad_actors_stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "Failed to prepare statement: %s\n",
@@ -349,6 +350,20 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 
 		bad_actors_array[row_num].source_ip =
 			strdup((const char *)source_ip);
+
+		const unsigned char *seen_last =
+			sqlite3_column_text(select_bad_actors_stmt,
+					    1); // seen_last
+
+		bad_actors_array[row_num].seen_last =
+			strdup((const char *)seen_last);
+
+		const unsigned char *seen_count =
+			sqlite3_column_text(select_bad_actors_stmt,
+					    2); // seen_count
+
+		bad_actors_array[row_num].seen_count =
+			strdup((const char *)seen_count);
 
 		row_num++;
 	}

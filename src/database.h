@@ -29,9 +29,13 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 int db_select_bad_actor_by_ip(char *bad_actor_ip_address, bad_actor **bad_actor,
 			      sentrypeer_config const *config);
 
+#define GET_BAD_ACTOR_BY_IP_WITH_DETAILS                                       \
+	"SELECT DISTINCT(source_ip), max(event_timestamp) as seen_last, count(source_ip) as seen_total FROM honey WHERE source_ip = ? order by event_timestamp DESC;"
+
 #define GET_ROWS_DISTINCT_SOURCE_IP_COUNT                                      \
 	"SELECT COUNT(DISTINCT source_ip) from honey;"
-#define GET_ROWS_DISTINCT_SOURCE_IP "SELECT DISTINCT source_ip FROM honey;"
+#define GET_ROWS_DISTINCT_SOURCE_IP_WITH_COUNT_AND_DATE                        \
+	"SELECT source_ip, max(event_timestamp) as seen_last, count(source_ip) as seen_total FROM honey GROUP BY source_ip order by event_timestamp DESC;"
 int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config);
 

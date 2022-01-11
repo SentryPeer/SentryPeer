@@ -273,10 +273,14 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
   "ip_addresses_total": 2,
   "ip_addresses": [
     {
-      "ip_address": "193.107.216.27"
+      "ip_address": "193.107.216.27",
+      "seen_last": "2022-01-11 13:30:48.703603359",
+      "seen_count":	"1263"
     },
     {
       "ip_address": "193.46.255.152"
+      "seen_last": "2022-01-11 13:28:27.348926406",
+      "seen_count": "3220"      
     }
     ...
   ]

@@ -37,6 +37,8 @@ struct bad_actor {
 	char *method;
 	char *transport_type;
 	char *user_agent;
+	char *seen_last;
+	char *seen_count;
 };
 
 //  Constructor
