@@ -229,7 +229,7 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 		return EXIT_FAILURE;
 	}
 
-	// Nothing found
+	// Nothing found. No need to free bad_actor_found->source_ip
 	if (sqlite3_step(find_bad_actor_stmt) != SQLITE_ROW) {
 		sqlite3_finalize(find_bad_actor_stmt);
 		free(bad_actor_found);
@@ -239,7 +239,7 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 
 	const unsigned char *source_ip =
 		sqlite3_column_text(find_bad_actor_stmt,
-				    0); // source_ip
+				    0); // source_ip needs to be freed
 	bad_actor_found->source_ip = strdup((const char *)source_ip);
 	assert(bad_actor_found->source_ip);
 

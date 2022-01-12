@@ -32,7 +32,6 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		// Free the objects
 		free(*ip_address);
 		*ip_address = 0;
-		free(bad_actor_found->source_ip);
 		free(bad_actor_found);
 		bad_actor_found = 0;
 		return finalise_response(connection, NOT_FOUND_BAD_ACTOR_JSON, CONTENT_TYPE_JSON,
