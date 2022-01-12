@@ -175,7 +175,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 			struct sockaddr_storage client_address;
 			socklen_t client_len = sizeof(client_address);
 
-			char read_packet_buf[PACKET_BUFFER_SIZE];
+			char read_packet_buf[PACKET_BUFFER_SIZE] = { 0 };
 			char cmbuf[0x100];
 
 			struct msghdr msg_hdr = {
@@ -214,17 +214,12 @@ int sip_daemon_init(sentrypeer_config const *config)
 				}
 				struct in_pktinfo const *pi =
 					(struct in_pktinfo *)CMSG_DATA(cmsg);
-				char interName[20];
-				memset(interName, 0, 20);
-				if_indextoname(pi->ipi_ifindex, interName);
-				printf("! ================================================= !\n");
-				printf("ipi_ifindex: %d\n", pi->ipi_ifindex);
-				printf("interface name: %s\n", interName);
-				printf("ipi_addr: %s\n",
-				       inet_ntoa(pi->ipi_addr));
-				printf("ipi_spec_dst: %s\n",
-				       inet_ntoa(pi->ipi_spec_dst));
-				printf("! ================================================= !\n");
+				if (config->debug_mode ||
+				    config->verbose_mode) {
+					fprintf(stderr,
+						"Destination IP address of UDP packet is: %s\n",
+						inet_ntoa(pi->ipi_spec_dst));
+				}
 			}
 #elif defined(HAVE_IP_RECVDSTADDR)
 			for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg_hdr);
@@ -235,17 +230,12 @@ int sip_daemon_init(sentrypeer_config const *config)
 				}
 				struct in_addr *in =
 					(struct in_addr *)CMSG_DATA(cmsg);
-				char interName[20];
-				memset(interName, 0, 20);
-				if_indextoname(in->sin_ifindex, interName);
-				printf("! ================================================= !\n");
-				printf("sin_ifindex: %d\n", in->sin_ifindex);
-				printf("interface name: %s\n", interName);
-				printf("sin_addr: %s\n",
-				       inet_ntoa(in->sin_addr));
-				printf("ipi_spec_dst: %s\n",
-				       inet_ntoa(in->sin_spec_dst));
-				printf("! ================================================= !\n");
+				if (config->debug_mode ||
+				    config->verbose_mode) {
+					fprintf(stderr,
+						"Destination IP address of UDP packet is: %s\n",
+						inet_ntoa(in->ipi_spec_dst));
+				}
 			}
 #endif
 			// Format timestamp like ngrep does

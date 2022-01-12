@@ -148,6 +148,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'w':
 			config->web_gui_mode = true;
+			config->api_mode = true;
 			break;
 		default:
 			print_usage();
@@ -168,6 +169,7 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_WEB_GUI")) {
 		config->web_gui_mode = true;
+		config->api_mode = true;
 	}
 	if (getenv("SENTRYPEER_SIP_RESPONSIVE")) {
 		config->sip_responsive_mode = true;

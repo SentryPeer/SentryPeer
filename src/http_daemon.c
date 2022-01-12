@@ -35,6 +35,4 @@ int http_daemon_init(sentrypeer_config *config)
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
-
-	// MHD_stop_daemon(d);
 }

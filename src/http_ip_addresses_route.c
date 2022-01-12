@@ -1,7 +1,3 @@
-//
-// Created by ghenry on 17/12/2021.
-//
-
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /* 
@@ -59,6 +55,9 @@ int ip_addresses_route(struct MHD_Connection *connection,
 			    EXIT_SUCCESS) {
 				fprintf(stderr,
 					"Failed to append bad actor to json array\n");
+				// Free the json objects
+				json_decref(json_arr);
+				bad_actors_destroy(&bad_actors, &row_count);
 				return finalise_response(
 					connection, NOT_FOUND_BAD_ACTORS_JSON,
 					CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);

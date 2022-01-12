@@ -1,7 +1,3 @@
-//
-// Created by ghenry on 17/12/2021.
-//
-
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
 /* 
@@ -36,6 +32,9 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		// Free the objects
 		free(*ip_address);
 		*ip_address = 0;
+		free(bad_actor_found->source_ip);
+		free(bad_actor_found);
+		bad_actor_found = 0;
 		return finalise_response(connection, NOT_FOUND_BAD_ACTOR_JSON, CONTENT_TYPE_JSON,
 					 MHD_HTTP_NOT_FOUND);
 	} else { // Found!!!!
