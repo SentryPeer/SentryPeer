@@ -34,6 +34,10 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Check for libraries.
+PKG_CHECK_MODULES(libosip2, osipparser2 >= 5.0, [], [
+  AC_MSG_WARN([It is highly recommended to install libosip2 >= 5.0])
+])
+
 AC_SEARCH_LIBS(osip_message_init, osipparser2, [], [
   AC_MSG_ERROR([osip_message_init() is not available. libosip2-dev / libosip2-devel or equivalent is required.])
 ])

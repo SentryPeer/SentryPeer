@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ip_addresses` RESTful API resource results sorted by `seen_last` descending
 - Add AC_USE_SYSTEM_EXTENSIONS to configure.ac
 - Web GUI mode needs the API to be enabled, so if you don't set API mode, we automatically set it
+- Clean up test RESTful API code to fix test suite crashes on macOS
+- Highly recommend v5+ of libosip2 v5 via `./configure`
+- Correct homebrew installation instructions for SentryPeer
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository

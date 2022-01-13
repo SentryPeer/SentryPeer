@@ -26,8 +26,8 @@
 #include <jansson.h>
 #include <config.h>
 
-size_t curl_to_jansson_to_version(void *buffer, size_t size, size_t nmemb,
-				  void *userp)
+static size_t curl_to_jansson_to_version(void *buffer, size_t size,
+					 size_t nmemb, void *userp)
 {
 	json_t *json = json_loadb(buffer, size * nmemb, 0, NULL);
 	assert_non_null(json);
@@ -45,10 +45,63 @@ size_t curl_to_jansson_to_version(void *buffer, size_t size, size_t nmemb,
 	return size * nmemb;
 }
 
+int test_http_api_health_check_version(void)
+{
+	CURL *curl = curl_easy_init();
+	assert_non_null(curl);
+
+	curl_easy_setopt(curl, CURLOPT_URL,
+			 "http://localhost:8082/health-check");
+
+	struct curl_slist *headers = NULL;
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+			 curl_to_jansson_to_version);
+
+	assert_int_equal(curl_easy_perform(curl), CURLE_OK);
+
+	curl_easy_cleanup(curl);
+	curl_slist_free_all(headers);
+
+	return EXIT_SUCCESS;
+}
+
+// Returns response code from curl
+static long curl_get_url(const char *url)
+{
+	CURL *curl;
+	CURLcode res;
+
+	long http_response_code = 0;
+
+	curl = curl_easy_init();
+	if (!curl) {
+		fprintf(stderr, "curl_easy_init() failed\n");
+		return CURLE_FAILED_INIT;
+	}
+
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	res = curl_easy_perform(curl);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_perform() failed: %s\n",
+			curl_easy_strerror(res));
+		return EXIT_FAILURE;
+	}
+
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
+	curl_easy_cleanup(curl);
+
+	return http_response_code;
+}
+
 void test_http_api_get(void **state)
 {
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
+
+	assert_int_equal(curl_global_init(CURL_GLOBAL_ALL), CURLE_OK);
 
 	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
@@ -58,83 +111,36 @@ void test_http_api_get(void **state)
 	fprintf(stderr, "http_daemon started at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	curl_global_init(CURL_GLOBAL_ALL);
-	CURL *easyhandle = curl_easy_init();
-	assert_non_null(easyhandle);
-	if (easyhandle) {
-		// Health Check. This is 200 OK
-		curl_easy_setopt(easyhandle, CURLOPT_URL,
-				 "http://127.0.0.1:8082/health-check");
-		struct curl_slist *headers = NULL;
-		headers = curl_slist_append(headers,
-					    "Content-Type: application/json");
-		curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers);
-		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION,
-				 curl_to_jansson_to_version);
-		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
+	assert_int_equal(test_http_api_health_check_version(), EXIT_SUCCESS);
+	fprintf(stderr,
+		"test_http_api_health_check_version res at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
 
-		long http_response_code = 0;
-		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
-				  &http_response_code);
-		fprintf(stderr,
-			"Response code for 200 test at line number %d in file %s is: %ld\n",
-			__LINE__ - 1, __FILE__, http_response_code);
-		assert_int_equal(http_response_code, 200);
+	// Health Check. This is 200 OK
+	assert_int_equal(curl_get_url("http://localhost:8082/health-check"),
+			 200);
 
-		// This is 404 Not Found
-		curl_easy_setopt(easyhandle, CURLOPT_URL,
-				 "http://127.0.0.1:8082/blah");
-		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
-		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
-		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
-				  &http_response_code);
-		fprintf(stderr,
-			"Response code for 404 test at line number %d in file %s is: %ld\n",
-			__LINE__ - 1, __FILE__, http_response_code);
-		assert_int_equal(http_response_code, 404);
+	// This is 404 Not Found
+	assert_int_equal(curl_get_url("http://127.0.0.1:8082/blah"), 404);
 
-		// Bad actor 404 Not Found
-		curl_easy_setopt(easyhandle, CURLOPT_URL,
-				 "http://127.0.0.1:8082/ip-addresses/8.8.8.8");
-		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
-		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
-		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
-				  &http_response_code);
-		fprintf(stderr,
-			"Response code for 404 test at line number %d in file %s is: %ld\n",
-			__LINE__ - 1, __FILE__, http_response_code);
-		assert_int_equal(http_response_code, 404);
+	// Bad actor 404 Not Found
+	assert_int_equal(
+		curl_get_url("http://127.0.0.1:8082/ip-addresses/8.8.8.8"),
+		404);
 
-		// Bad actor check 200 OK (switch to BAD_ACTOR_SOURCE_IP from test_database.h)
-		curl_easy_setopt(
-			easyhandle, CURLOPT_URL,
-			"http://127.0.0.1:8082/ip-addresses/104.149.141.214");
-		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
-		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
-		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
-				  &http_response_code);
-		fprintf(stderr,
-			"Response code for 200 test at line number %d in file %s is: %ld\n",
-			__LINE__ - 1, __FILE__, http_response_code);
-		assert_int_equal(http_response_code, 200);
+	// Bad actor check 200 OK (switch to BAD_ACTOR_SOURCE_IP from test_database.h)
+	assert_int_equal(
+		curl_get_url(
+			"http://127.0.0.1:8082/ip-addresses/104.149.141.214"),
+		200);
 
-		// Bad actor 400 Bad Data
-		curl_easy_setopt(
-			easyhandle, CURLOPT_URL,
-			"http://127.0.0.1:8082/ip-addresses/104.14da3afcsasd");
-		curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, NULL);
-		assert_int_equal(curl_easy_perform(easyhandle), CURLE_OK);
-		curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
-				  &http_response_code);
-		fprintf(stderr,
-			"Response code for 400 test at line number %d in file %s is: %ld\n",
-			__LINE__ - 1, __FILE__, http_response_code);
-		assert_int_equal(http_response_code, 400);
+	// Bad actor 400 Bad Data
+	assert_int_equal(
+		curl_get_url(
+			"http://127.0.0.1:8082/ip-addresses/104.14da3afcsasd"),
+		400);
 
-		curl_slist_free_all(headers);
-		curl_easy_cleanup(easyhandle);
-		curl_global_cleanup();
-	}
+	curl_global_cleanup();
 }
 
 void test_route_regex_check(void **state)

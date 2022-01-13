@@ -135,7 +135,7 @@ Fedora:
 
 macOS:
 
-    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson libcurl libpcre2
+    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson curl pcre2
 
 then (make check is highly recommended):
 
