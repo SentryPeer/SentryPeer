@@ -270,7 +270,6 @@ void test_db_select_bad_actors(void **state)
 			 EXIT_SUCCESS);
 	assert_non_null(bad_actors);
 	assert_int_not_equal(row_count, 0);
-	fprintf(stderr, "row_count is: %ld", row_count);
 
 	bad_actors_destroy(&bad_actors, &row_count);
 	fprintf(stderr, "Freed bad_actors.\n");

@@ -218,14 +218,14 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
-	bad_actor *bad_actor_found = malloc(sizeof(bad_actor));
+	bad_actor *bad_actor_found = bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0);
 	assert(bad_actor_found);
 
 	if (sqlite3_bind_text(find_bad_actor_stmt, 1, bad_actor_ip_address, -1,
 			      SQLITE_STATIC) != SQLITE_OK) {
 		fprintf(stderr, "Failed to bind IP address: %s\n",
 			sqlite3_errmsg(db));
-		free(bad_actor_found);
+		bad_actor_destroy(&bad_actor_found);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
@@ -233,7 +233,7 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 	// Nothing found. No need to free bad_actor_found->source_ip
 	if (sqlite3_step(find_bad_actor_stmt) != SQLITE_ROW) {
 		sqlite3_finalize(find_bad_actor_stmt);
-		free(bad_actor_found);
+		bad_actor_destroy(&bad_actor_found);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
@@ -253,14 +253,14 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 	if (sqlite3_finalize(find_bad_actor_stmt) != SQLITE_OK) {
 		fprintf(stderr, "Error finalizing statement: %s\n",
 			sqlite3_errmsg(db));
-		free(bad_actor_found);
+		bad_actor_destroy(&bad_actor_found);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
 	if (sqlite3_close(db) != SQLITE_OK) {
 		fprintf(stderr, "Failed to close database\n");
-		free(bad_actor_found);
+		bad_actor_destroy(&bad_actor_found);
 		return EXIT_FAILURE;
 	}
 
