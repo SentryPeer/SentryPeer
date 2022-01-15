@@ -25,6 +25,27 @@
 #include "../../src/bad_actor.h"
 #include "../../src/sip_parser.h"
 
+static bad_actor *test_bad_actor_event_new(void)
+{
+	char test_source_ip[] = "104.149.141.214";
+	char test_transport_type[] = "UDP";
+	char test_collected_method[] = "passive";
+
+	bad_actor *bad_actor_event =
+		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0,
+			      test_transport_type, 0, test_collected_method, 0);
+	assert_non_null(bad_actor_event);
+	assert_string_equal(bad_actor_event->source_ip, test_source_ip);
+	assert_string_equal(bad_actor_event->transport_type,
+			    test_transport_type);
+
+	fprintf(stderr,
+		"New bad actor event created at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
+	return bad_actor_event;
+}
+
 void test_bad_actor(void **state)
 {
 	(void)state; /* unused */
@@ -80,67 +101,62 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
-	char test_source_ip[] = "104.149.141.214";
-	char test_transport_type[] = "UDP";
-	char test_collected_method[] = "passive";
-
-	bad_actor *bad_actor_event =
-		bad_actor_new(0, test_source_ip, 0, 0, test_transport_type, 0,
-			      test_collected_method, 0);
-	assert_non_null(bad_actor_event);
-	assert_string_equal(bad_actor_event->source_ip, test_source_ip);
-	assert_string_equal(bad_actor_event->transport_type,
-			    test_transport_type);
-
-	fprintf(stderr,
-		"New bad actor event created at line number %d in file %s\n",
-		__LINE__ - 1, __FILE__);
-
 	struct sentrypeer_config config;
 	config.debug_mode = true;
 	fprintf(stderr, "debug_mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
+	bad_actor *bad_actor_event1 = test_bad_actor_event_new();
 	assert_int_equal(
 		sip_message_parser(test_invalid_sip_message_to_parse,
 				   strlen(test_invalid_sip_message_to_parse),
-				   bad_actor_event, &config),
+				   bad_actor_event1, &config),
 		EXIT_FAILURE);
+
 	fprintf(stderr,
 		"Invalid SIP message processed at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
+	bad_actor_destroy(&bad_actor_event1);
+	assert_null(bad_actor_event1);
 
+	bad_actor *bad_actor_event2 = test_bad_actor_event_new();
 	assert_int_equal(
 		sip_message_parser(test_valid_sip_message_to_parse,
 				   strlen(test_valid_sip_message_to_parse),
-				   bad_actor_event, &config),
+				   bad_actor_event2, &config),
 		EXIT_SUCCESS);
 	fprintf(stderr,
 		"Valid SIP message processed at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	assert_string_equal(bad_actor_event->called_number, "100");
-	assert_string_equal(bad_actor_event->user_agent, "friendly-scanner");
-	assert_string_equal(bad_actor_event->method, "OPTIONS");
+	assert_string_equal(bad_actor_event2->called_number, "100");
+	assert_string_equal(bad_actor_event2->user_agent, "friendly-scanner");
+	assert_string_equal(bad_actor_event2->method, "OPTIONS");
+	bad_actor_destroy(&bad_actor_event2);
+	assert_null(bad_actor_event2);
 
+	bad_actor *bad_actor_event3 = test_bad_actor_event_new();
 	assert_int_equal(
 		sip_message_parser(
 			test_valid_sip_message_to_parse_no_called_number,
-			strlen(test_valid_sip_message_to_parse),
-			bad_actor_event, &config),
+			strlen(test_valid_sip_message_to_parse_no_called_number),
+			bad_actor_event3, &config),
 		EXIT_SUCCESS);
-	assert_string_equal(bad_actor_event->called_number,
+	assert_string_equal(bad_actor_event3->called_number,
 			    BAD_ACTOR_NOT_FOUND);
+	bad_actor_destroy(&bad_actor_event3);
+	assert_null(bad_actor_event3);
 
-	assert_int_equal(sip_message_parser(
-				 test_valid_sip_message_to_parse_no_user_agent,
-				 strlen(test_valid_sip_message_to_parse),
-				 bad_actor_event, &config),
-			 EXIT_SUCCESS);
-	assert_string_equal(bad_actor_event->user_agent, BAD_ACTOR_NOT_FOUND);
-
-	bad_actor_destroy(&bad_actor_event);
-	assert_null(bad_actor_event);
+	bad_actor *bad_actor_event4 = test_bad_actor_event_new();
+	assert_int_equal(
+		sip_message_parser(
+			test_valid_sip_message_to_parse_no_user_agent,
+			strlen(test_valid_sip_message_to_parse_no_user_agent),
+			bad_actor_event4, &config),
+		EXIT_SUCCESS);
+	assert_string_equal(bad_actor_event4->user_agent, BAD_ACTOR_NOT_FOUND);
+	bad_actor_destroy(&bad_actor_event4);
+	assert_null(bad_actor_event4);
 }
 
 void test_bad_actors(void **state)
@@ -148,16 +164,20 @@ void test_bad_actors(void **state)
 	(void)state; /* unused */
 
 	int64_t row_count = 100;
-	bad_actor *bad_actors = calloc(row_count, sizeof(bad_actor));
+	bad_actor **bad_actors = calloc(row_count, sizeof(*bad_actors));
 	assert_non_null(bad_actors);
 
 	int row_num = 0;
 	while (row_num < row_count) {
-		bad_actors[row_num].source_ip = strdup("127.0.0.1");
+		bad_actors[row_num] =
+			bad_actor_new(0, util_duplicate_string("127.0.0.1"), 0,
+				      0, 0, 0, 0, 0);
 		row_num++;
 	}
 
-	assert_string_equal(bad_actors[29].source_ip, "127.0.0.1");
-	bad_actors_destroy(&bad_actors, &row_count);
+	assert_string_equal(bad_actors[29]->source_ip, "127.0.0.1");
+	bad_actors_destroy(bad_actors, &row_count);
+	free(bad_actors);
+	bad_actors = 0;
 	assert_null(bad_actors);
 }

@@ -281,10 +281,10 @@ int sip_daemon_init(sentrypeer_config const *config)
 			if (config->sip_responsive_mode == true)
 				strcpy(collected_method, "responsive");
 
-			bad_actor *bad_actor_event =
-				bad_actor_new(0, client_ip_address_buffer, 0, 0,
-					      transport_type, 0,
-					      collected_method, 0);
+			bad_actor *bad_actor_event = bad_actor_new(
+				0,
+				util_duplicate_string(client_ip_address_buffer),
+				0, 0, transport_type, 0, collected_method, 0);
 
 			if (bytes_received > 0) {
 				if ((sip_message_parser(
@@ -348,4 +348,5 @@ int sip_daemon_init(sentrypeer_config const *config)
 		}
 	}
 	CLOSESOCKET(socket_listen);
+	return EXIT_SUCCESS;
 }

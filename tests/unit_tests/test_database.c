@@ -235,7 +235,7 @@ void test_db_insert_bad_actor(void **state)
 	char test_transport_type[] = "UDP";
 	char test_collected_method[] = "passive";
 	bad_actor *bad_actor_event =
-		bad_actor_new(0, test_source_ip, 0, 0, test_transport_type, 0,
+		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0, test_transport_type, 0,
 			      test_collected_method, 0);
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",
@@ -268,6 +268,10 @@ void test_db_select_bad_actors(void **state)
 	int64_t row_count = 0;
 	assert_int_equal(db_select_bad_actors(&bad_actors, &row_count, config),
 			 EXIT_SUCCESS);
+	assert_non_null(bad_actors);
+	assert_int_not_equal(row_count, 0);
+	fprintf(stderr, "row_count is: %ld", row_count);
+
 	bad_actors_destroy(&bad_actors, &row_count);
 	fprintf(stderr, "Freed bad_actors.\n");
 	assert_null(bad_actors);

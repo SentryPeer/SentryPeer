@@ -80,7 +80,8 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 		return EXIT_FAILURE;
 	}
 
-	if (sqlite3_exec(db, create_source_ip_index, NULL, NULL, NULL) != SQLITE_OK) {
+	if (sqlite3_exec(db, create_source_ip_index, NULL, NULL, NULL) !=
+	    SQLITE_OK) {
 		fprintf(stderr, "Failed to create source_ip_index\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
@@ -240,7 +241,8 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 	const unsigned char *source_ip =
 		sqlite3_column_text(find_bad_actor_stmt,
 				    0); // source_ip needs to be freed
-	bad_actor_found->source_ip = strdup((const char *)source_ip);
+	bad_actor_found->source_ip =
+		util_duplicate_string((const char *)source_ip);
 	assert(bad_actor_found->source_ip);
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -349,21 +351,21 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 					    0); // source_ip
 
 		bad_actors_array[row_num].source_ip =
-			strdup((const char *)source_ip);
+			util_duplicate_string((const char *)source_ip);
 
 		const unsigned char *seen_last =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    1); // seen_last
 
 		bad_actors_array[row_num].seen_last =
-			strdup((const char *)seen_last);
+			util_duplicate_string((const char *)seen_last);
 
 		const unsigned char *seen_count =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    2); // seen_count
 
 		bad_actors_array[row_num].seen_count =
-			strdup((const char *)seen_count);
+			util_duplicate_string((const char *)seen_count);
 
 		row_num++;
 	}

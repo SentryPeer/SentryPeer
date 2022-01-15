@@ -106,19 +106,24 @@ void bad_actor_destroy(bad_actor **self_ptr)
 			self->event_uuid = 0;
 		}
 
+		if (self->source_ip != 0) {
+			free(self->source_ip);
+			self->source_ip = 0;
+		}
+
 		if (self->called_number != 0) {
 			free(self->called_number);
 			self->called_number = 0;
 		}
 
-		if (self->user_agent != 0) {
-			free(self->user_agent);
-			self->user_agent = 0;
-		}
-
 		if (self->method != 0) {
 			free(self->method);
 			self->method = 0;
+		}
+
+		if (self->user_agent != 0) {
+			free(self->user_agent);
+			self->user_agent = 0;
 		}
 
 		// As per osip_message_to_str();
@@ -141,18 +146,15 @@ void bad_actor_destroy(bad_actor **self_ptr)
 	}
 }
 
-void bad_actors_destroy(bad_actor **self_ptr, const int64_t *row_count)
+void bad_actors_destroy(bad_actor **bad_actors, const int64_t *row_count)
 {
-	assert(self_ptr);
-	if (*self_ptr) {
-		bad_actor *self = *self_ptr;
-
+	assert(bad_actors);
+	if (*bad_actors) {
 		int64_t row_num = 0;
 		while (row_num < *row_count) {
-			bad_actor_destroy((bad_actor **)&self[row_num]);
+			bad_actor_destroy(&bad_actors[row_num]);
 			row_num++;
 		}
-		free(self);
-		*self_ptr = 0;
+		*bad_actors = 0;
 	}
 }

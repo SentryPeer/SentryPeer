@@ -112,9 +112,6 @@ void test_http_api_get(void **state)
 		__LINE__ - 1, __FILE__);
 
 	assert_int_equal(test_http_api_health_check_version(), EXIT_SUCCESS);
-	fprintf(stderr,
-		"test_http_api_health_check_version res at line number %d in file %s\n",
-		__LINE__ - 1, __FILE__);
 
 	// Health Check. This is 200 OK
 	assert_int_equal(curl_get_url("http://localhost:8082/health-check"),

@@ -124,7 +124,7 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
+          -std=c18 -fpie -fpic -g3 -O0 \
           -fstack-protector-strong -grecord-gcc-switches \
           -Werror=format-security -Werror=implicit-function-declaration \
           -Wmisleading-indentation $(LIBASAN_FLAGS)
