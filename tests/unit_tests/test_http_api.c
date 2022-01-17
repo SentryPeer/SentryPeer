@@ -160,6 +160,7 @@ void test_route_regex_check(void **state)
 	assert_string_equal(matched_string, "8.8.8.8");
 
 	sentrypeer_config_destroy(&config);
+	assert_null(config);
 
 	// Check a double-free for fun.
 	free(matched_string);

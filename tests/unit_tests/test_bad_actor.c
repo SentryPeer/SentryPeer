@@ -101,8 +101,9 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
-	struct sentrypeer_config config;
-	config.debug_mode = true;
+	sentrypeer_config *config = sentrypeer_config_new();
+	config->debug_mode = true;
+
 	fprintf(stderr, "debug_mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
@@ -110,7 +111,7 @@ void test_bad_actor(void **state)
 	assert_int_equal(
 		sip_message_parser(test_invalid_sip_message_to_parse,
 				   strlen(test_invalid_sip_message_to_parse),
-				   bad_actor_event1, &config),
+				   bad_actor_event1, config),
 		EXIT_FAILURE);
 
 	fprintf(stderr,
@@ -123,7 +124,7 @@ void test_bad_actor(void **state)
 	assert_int_equal(
 		sip_message_parser(test_valid_sip_message_to_parse,
 				   strlen(test_valid_sip_message_to_parse),
-				   bad_actor_event2, &config),
+				   bad_actor_event2, config),
 		EXIT_SUCCESS);
 	fprintf(stderr,
 		"Valid SIP message processed at line number %d in file %s\n",
@@ -140,7 +141,7 @@ void test_bad_actor(void **state)
 		sip_message_parser(
 			test_valid_sip_message_to_parse_no_called_number,
 			strlen(test_valid_sip_message_to_parse_no_called_number),
-			bad_actor_event3, &config),
+			bad_actor_event3, config),
 		EXIT_SUCCESS);
 	assert_string_equal(bad_actor_event3->called_number,
 			    BAD_ACTOR_NOT_FOUND);
@@ -152,11 +153,14 @@ void test_bad_actor(void **state)
 		sip_message_parser(
 			test_valid_sip_message_to_parse_no_user_agent,
 			strlen(test_valid_sip_message_to_parse_no_user_agent),
-			bad_actor_event4, &config),
+			bad_actor_event4, config),
 		EXIT_SUCCESS);
 	assert_string_equal(bad_actor_event4->user_agent, BAD_ACTOR_NOT_FOUND);
 	bad_actor_destroy(&bad_actor_event4);
 	assert_null(bad_actor_event4);
+
+	sentrypeer_config_destroy(&config);
+	assert_null(config);
 }
 
 void test_bad_actors(void **state)

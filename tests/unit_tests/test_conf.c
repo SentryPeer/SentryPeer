@@ -83,4 +83,5 @@ void test_conf(void **state)
 	assert_true(config->syslog_mode);
 
 	sentrypeer_config_destroy(&config);
+	assert_null(config);
 }
