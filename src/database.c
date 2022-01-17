@@ -329,14 +329,14 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 
 	bad_actor **bad_actors_array =
 		calloc(*row_count, sizeof(*bad_actors_array));
-	assert(bad_actors);
+	assert(bad_actors_array);
 
 	int64_t row_num = 0;
 	while (row_num < *row_count) {
 		if (sqlite3_step(select_bad_actors_stmt) != SQLITE_ROW) {
 			fprintf(stderr, "Error stepping statement: %s\n",
 				sqlite3_errmsg(db));
-			free(bad_actors); // Nothing in there yet
+			free(bad_actors_array); // Nothing in there yet
 			sqlite3_close(db);
 			return EXIT_FAILURE;
 		}
@@ -369,18 +369,20 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 
 		row_num++;
 	}
-	assert(bad_actors);
+	assert(bad_actors_array);
 
 	if (sqlite3_finalize(select_bad_actors_stmt) != SQLITE_OK) {
 		fprintf(stderr, "Error finalizing statement: %s\n",
 			sqlite3_errmsg(db));
 		bad_actors_destroy(bad_actors_array, row_count);
+		free(bad_actors_array);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
 	if (sqlite3_close(db) != SQLITE_OK) {
 		bad_actors_destroy(bad_actors_array, row_count);
+		free(bad_actors_array);
 		fprintf(stderr, "Failed to close database\n");
 		return EXIT_FAILURE;
 	}

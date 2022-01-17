@@ -89,30 +89,30 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 		bad_actor_event->user_agent =
 			util_duplicate_string(BAD_ACTOR_NOT_FOUND);
 	}
-//
-//	if (config->debug_mode || config->verbose_mode) {
-//		fprintf(stderr,
-//			"Bad Actor is:\n"
-//			"Event Timestamp: %s\n"
-//			"Event UUID: %s\n"
-//			"SIP Message: %s\n"
-//			"Source IP: %s\n"
-//			"Called Number: %s\n"
-//			"SIP Method: %s\n"
-//			"Transport Type: %s\n"
-//			"User Agent: %s\n"
-//			"Collected Method: %s\n"
-//			"Created by Node Id: %s\n",
-//			bad_actor_event->event_timestamp,
-//			bad_actor_event->event_uuid,
-//			bad_actor_event->sip_message,
-//			bad_actor_event->source_ip,
-//			bad_actor_event->called_number, bad_actor_event->method,
-//			bad_actor_event->transport_type,
-//			bad_actor_event->user_agent,
-//			bad_actor_event->collected_method,
-//			bad_actor_event->created_by_node_id);
-//	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr,
+			"Bad Actor is:\n"
+			"Event Timestamp: %s\n"
+			"Event UUID: %s\n"
+			"SIP Message: %s\n"
+			"Source IP: %s\n"
+			"Called Number: %s\n"
+			"SIP Method: %s\n"
+			"Transport Type: %s\n"
+			"User Agent: %s\n"
+			"Collected Method: %s\n"
+			"Created by Node Id: %s\n",
+			bad_actor_event->event_timestamp,
+			bad_actor_event->event_uuid,
+			bad_actor_event->sip_message,
+			bad_actor_event->source_ip,
+			bad_actor_event->called_number, bad_actor_event->method,
+			bad_actor_event->transport_type,
+			bad_actor_event->user_agent,
+			bad_actor_event->collected_method,
+			bad_actor_event->created_by_node_id);
+	}
 	osip_message_free(parsed_sip_message);
 
 	return EXIT_SUCCESS;
