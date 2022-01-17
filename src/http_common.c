@@ -19,6 +19,7 @@
 #include <string.h>
 #include <strings.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void log_http_client_ip(const char *url, struct MHD_Connection *connection)
 {
@@ -68,10 +69,16 @@ bool json_is_requested(struct MHD_Connection *connection)
 }
 
 int finalise_response(struct MHD_Connection *connection, const char *reply_data,
-		      const char *content_type, int status_code)
+		      const char *content_type, int status_code,
+		      bool free_reply_data)
 {
+	enum MHD_ResponseMemoryMode memory_mode = MHD_RESPMEM_PERSISTENT;
+	if (free_reply_data) {
+		memory_mode = MHD_RESPMEM_MUST_FREE;
+	}
+
 	struct MHD_Response *response = MHD_create_response_from_buffer(
-		strlen(reply_data), (void *)reply_data, MHD_RESPMEM_PERSISTENT);
+		strlen(reply_data), (void *)reply_data, memory_mode);
 
 	if (NULL == response)
 		return MHD_NO;

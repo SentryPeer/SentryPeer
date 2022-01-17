@@ -18,26 +18,22 @@
 
 int health_check_route(struct MHD_Connection *connection)
 {
-	const char *reply_to_get = 0;
-	const char *html_text =
-		"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
-	const char *content_type = 0;
-
 	if (json_is_requested(connection)) {
 		json_t *api_reply_to_get_json =
 			json_pack("{s:s, s:s, s:s}", "status", "OK", "message",
 				  "Hello from SentryPeer!", "version",
 				  PACKAGE_VERSION);
-		reply_to_get =
+		const char *json_reply_to_get =
 			json_dumps(api_reply_to_get_json, JSON_INDENT(2));
-		content_type = CONTENT_TYPE_JSON;
 		// Free the json object
 		json_decref(api_reply_to_get_json);
-	} else {
-		content_type = CONTENT_TYPE_HTML;
-		reply_to_get = html_text;
-	}
 
-	return finalise_response(connection, reply_to_get, content_type,
-				 MHD_HTTP_OK);
+		return finalise_response(connection, json_reply_to_get,
+					 CONTENT_TYPE_JSON, MHD_HTTP_OK, true);
+	} else {
+		const char *html_text =
+			"<html><body><h1>Hello from SentryPeer!</h1><h2>All is well!</h2></body></html>";
+		return finalise_response(connection, html_text,
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
+	}
 }

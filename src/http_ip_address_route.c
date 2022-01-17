@@ -22,7 +22,6 @@
 int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		     sentrypeer_config const *config)
 {
-	const char *reply = 0;
 	bad_actor *bad_actor_found = 0;
 	char *ip_address_str = *ip_address;
 
@@ -33,7 +32,8 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		*ip_address = 0;
 		bad_actor_destroy(&bad_actor_found);
 		return finalise_response(connection, NOT_FOUND_BAD_ACTOR_JSON,
-					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
+					 false);
 	} else { // Found!!!!
 		if (config->verbose_mode || config->debug_mode) {
 			fprintf(stderr, "bad_actor IP found: %s\n",
@@ -42,7 +42,8 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 
 		json_t *json_final_obj = json_pack("{s:s}", "bad_actor_found",
 						   bad_actor_found->source_ip);
-		reply = json_dumps(json_final_obj, JSON_INDENT(2));
+
+		const char *reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the objects
 		free(*ip_address);
@@ -51,6 +52,6 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		bad_actor_destroy(&bad_actor_found);
 
 		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
-					 MHD_HTTP_OK);
+					 MHD_HTTP_OK, true);
 	}
 }

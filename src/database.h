@@ -36,7 +36,7 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address, bad_actor **bad_actor,
 	"SELECT COUNT(DISTINCT source_ip) from honey;"
 #define GET_ROWS_DISTINCT_SOURCE_IP_WITH_COUNT_AND_DATE                        \
 	"SELECT source_ip, max(event_timestamp) as seen_last, count(source_ip) as seen_total FROM honey GROUP BY source_ip order by event_timestamp DESC;"
-int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
+int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config);
 
 #endif //SENTRYPEER_DATABASE_H

@@ -125,11 +125,15 @@ void test_http_api_get(void **state)
 		curl_get_url("http://127.0.0.1:8082/ip-addresses/8.8.8.8"),
 		404);
 
-	// Bad actor check 200 OK (switch to BAD_ACTOR_SOURCE_IP from test_database.h)
+	// Bad actor check 200 OK (switch to BAD_ACTOR_SOURCE_IP from test_database.c)
 	assert_int_equal(
 		curl_get_url(
 			"http://127.0.0.1:8082/ip-addresses/104.149.141.214"),
 		200);
+
+	// Bad actors check 200 OK
+	assert_int_equal(curl_get_url("http://127.0.0.1:8082/ip-addresses"),
+			 200);
 
 	// Bad actor 400 Bad Data
 	assert_int_equal(

@@ -155,6 +155,5 @@ void bad_actors_destroy(bad_actor **bad_actors, const int64_t *row_count)
 			bad_actor_destroy(&bad_actors[row_num]);
 			row_num++;
 		}
-		*bad_actors = 0;
 	}
 }

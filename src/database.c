@@ -268,12 +268,11 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
+int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config)
 {
 	sqlite3 *db;
 	assert(config->db_file);
-	bad_actor *bad_actors_array = *bad_actors;
 
 	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
 		fprintf(stderr, "Failed to open database: %s\n",
@@ -328,15 +327,16 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 		return EXIT_FAILURE;
 	}
 
-	bad_actors_array = calloc(*row_count, sizeof(bad_actor));
-	assert(bad_actors_array);
+	bad_actor **bad_actors_array =
+		calloc(*row_count, sizeof(*bad_actors_array));
+	assert(bad_actors);
 
 	int64_t row_num = 0;
 	while (row_num < *row_count) {
 		if (sqlite3_step(select_bad_actors_stmt) != SQLITE_ROW) {
 			fprintf(stderr, "Error stepping statement: %s\n",
 				sqlite3_errmsg(db));
-			bad_actors_destroy(&bad_actors_array, row_count);
+			free(bad_actors); // Nothing in there yet
 			sqlite3_close(db);
 			return EXIT_FAILURE;
 		}
@@ -350,37 +350,37 @@ int db_select_bad_actors(bad_actor **bad_actors, int64_t *row_count,
 			sqlite3_column_text(select_bad_actors_stmt,
 					    0); // source_ip
 
-		bad_actors_array[row_num].source_ip =
-			util_duplicate_string((const char *)source_ip);
-
 		const unsigned char *seen_last =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    1); // seen_last
-
-		bad_actors_array[row_num].seen_last =
-			util_duplicate_string((const char *)seen_last);
 
 		const unsigned char *seen_count =
 			sqlite3_column_text(select_bad_actors_stmt,
 					    2); // seen_count
 
-		bad_actors_array[row_num].seen_count =
+		bad_actors_array[row_num] = bad_actor_new(
+			0, util_duplicate_string((const char *)source_ip), 0, 0,
+			0, 0, 0, 0);
+
+		bad_actors_array[row_num]->seen_last =
+			util_duplicate_string((const char *)seen_last);
+		bad_actors_array[row_num]->seen_count =
 			util_duplicate_string((const char *)seen_count);
 
 		row_num++;
 	}
-	assert(bad_actors_array);
+	assert(bad_actors);
 
 	if (sqlite3_finalize(select_bad_actors_stmt) != SQLITE_OK) {
 		fprintf(stderr, "Error finalizing statement: %s\n",
 			sqlite3_errmsg(db));
-		bad_actors_destroy(&bad_actors_array, row_count);
+		bad_actors_destroy(bad_actors_array, row_count);
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
 
 	if (sqlite3_close(db) != SQLITE_OK) {
-		bad_actors_destroy(&bad_actors_array, row_count);
+		bad_actors_destroy(bad_actors_array, row_count);
 		fprintf(stderr, "Failed to close database\n");
 		return EXIT_FAILURE;
 	}

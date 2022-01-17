@@ -264,14 +264,16 @@ void test_db_select_bad_actors(void **state)
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
 
-	bad_actor *bad_actors = 0;
+	bad_actor **bad_actors = 0;
 	int64_t row_count = 0;
 	assert_int_equal(db_select_bad_actors(&bad_actors, &row_count, config),
 			 EXIT_SUCCESS);
 	assert_non_null(bad_actors);
 	assert_int_not_equal(row_count, 0);
 
-	bad_actors_destroy(&bad_actors, &row_count);
+	bad_actors_destroy(bad_actors, &row_count);
 	fprintf(stderr, "Freed bad_actors.\n");
+	free(bad_actors);
+	bad_actors = 0;
 	assert_null(bad_actors);
 }

@@ -73,12 +73,12 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 		if (config->web_gui_mode) {
 			return finalise_response(
 				connection, "Vue.js SPA will be served here.",
-				CONTENT_TYPE_HTML, MHD_HTTP_OK);
+				CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 		} else {
 			return finalise_response(connection,
 						 NOT_FOUND_ERROR_JSON,
 						 CONTENT_TYPE_JSON,
-						 MHD_HTTP_NOT_FOUND);
+						 MHD_HTTP_NOT_FOUND, false);
 		}
 
 	} else if (route_check(url, IP_ADDRESSES_ROUTE, config) ==
@@ -100,47 +100,48 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			matched_ip_address = 0;
 			return finalise_response(connection, BAD_DATA_JSON,
 						 CONTENT_TYPE_JSON,
-						 MHD_HTTP_BAD_REQUEST);
+						 MHD_HTTP_BAD_REQUEST, false);
 		}
 	} else if (route_check(url, IP_ADDRESSES_IPSET_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return finalise_response(connection, IP_ADDRESSES_IPSET_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, NUMBERS_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, NUMBERS_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, NUMBER_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, NUMBER_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, COUNTRIES_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRIES_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, COUNTRY_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRY_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, COUNTRY_CITY_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRY_CITY_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, USER_AGENTS_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return finalise_response(connection, USER_AGENTS_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, USER_AGENT_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, USER_AGENT_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, SIP_METHODS_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return finalise_response(connection, SIP_METHODS_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, SIP_METHOD_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, SIP_METHOD_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK);
+					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else {
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "No route matched.\n");
 		}
 		return finalise_response(connection, NOT_FOUND_ERROR_JSON,
-					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND);
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
+					 false);
 	}
 }

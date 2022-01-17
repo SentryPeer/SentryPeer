@@ -348,5 +348,4 @@ int sip_daemon_init(sentrypeer_config const *config)
 		}
 	}
 	CLOSESOCKET(socket_listen);
-	return EXIT_SUCCESS;
 }

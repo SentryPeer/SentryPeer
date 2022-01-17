@@ -28,6 +28,7 @@ void log_http_client_ip(const char *url, struct MHD_Connection *connection);
 bool json_is_requested(struct MHD_Connection *connection);
 
 int finalise_response(struct MHD_Connection *connection, const char *reply_data,
-		      const char *content_type, int status_code);
+		      const char *content_type, int status_code,
+		      bool free_reply_data);
 
 #endif //SENTRYPEER_HTTP_COMMON_H

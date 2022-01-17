@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Highly recommend v5+ of libosip2 via `./configure`
 - Correct homebrew installation instructions for SentryPeer
 - Major test suite refactor for memory leak fixes
+- Replies with json no longer leak memory
 
 ## [0.0.4] - 2021-12-22
 - Updated README.md copy and paste example for installation instructions from this repository
