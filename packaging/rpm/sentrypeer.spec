@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	0.0.4
+Version:	0.0.5
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,32 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Tue Jan 18 2022 Gavin Henry <ghenry@sentrypeer.org> 0.0.5-1
+- Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
+- Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)
+- Only parse SIP packets if UDP packet payload is > 0 bytes
+- Fedora and Debian packaging now available for each release
+- HTTP regex route memory leak fix
+- vue.js SPA is now in for start web gui
+- Remove duplicate uuid_generate call in bad_actor structure
+- Add CORS header to all API responses
+- Add more header checks to configure.ac
+- Switch to `recvmsg` for receiving UDP packets, so we can save the **destination IP address** of probes
+- SIP responsive mode can be enabled to reply to SIP probes. This will prompt **INVITE**'s from bad actors for phone
+  call attempts, so you can collect the phone numbers
+- API mode can be set to enable replies to RESTful API requests. Depending on your node deployment type, you may not
+  want to enable this
+- Web GUI mode can be set to enable the [Vue.js](https://vuejs.org/) SPA. Depending on your node deployment type, you
+  might not want this
+- Add `seen_last` and `seen_count` bad_actor data structure for use in `ip_addresses` RESTful API resource
+- `ip_addresses` RESTful API resource results sorted by `seen_last` descending
+- Add AC_USE_SYSTEM_EXTENSIONS to configure.ac
+- Web GUI mode needs the API to be enabled, so if you don't set API mode, we automatically set it
+- Clean up test RESTful API code to fix test suite crashes on macOS
+- Highly recommend v5+ of libosip2 via `./configure`
+- Correct homebrew installation instructions for SentryPeer
+- Major test suite refactor for memory leak fixes
+- Replies with json no longer leak memory
 * Wed Dec 22 2021 Gavin Henry <ghenry@sentrypeer.org> 0.0.4-1
 - Updated README.md copy and paste example for installation instructions from this repository
 - Fixed memory leak in route regex matching

@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.0.5] - 2022-01-18
 - Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
 - Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)
 - Only parse SIP packets if UDP packet payload is > 0 bytes
