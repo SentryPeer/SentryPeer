@@ -27,9 +27,9 @@
 #include <config.h>
 
 static size_t curl_to_jansson_to_version(void *buffer, size_t size,
-					 size_t nmemb, void *userp)
+					 size_t nmemb, json_t *json)
 {
-	json_t *json = json_loadb(buffer, size * nmemb, 0, NULL);
+	json = json_loadb(buffer, size * nmemb, 0, NULL);
 	assert_non_null(json);
 
 	json_t *sentrypeer_version_json = json_object_get(json, "version");
@@ -39,9 +39,7 @@ static size_t curl_to_jansson_to_version(void *buffer, size_t size,
 	assert_string_equal(json_string_value(sentrypeer_version_json),
 			    PACKAGE_VERSION);
 
-	*((json_t **)userp) = json;
 	json_decref(json);
-
 	return size * nmemb;
 }
 
@@ -50,15 +48,18 @@ int test_http_api_health_check_version(void)
 	CURL *curl = curl_easy_init();
 	assert_non_null(curl);
 
+	json_t *json = 0;
+
 	curl_easy_setopt(curl, CURLOPT_URL,
 			 "http://localhost:8082/health-check");
 
-	struct curl_slist *headers = NULL;
+	struct curl_slist *headers = 0;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
 			 curl_to_jansson_to_version);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
 
 	assert_int_equal(curl_easy_perform(curl), CURLE_OK);
 

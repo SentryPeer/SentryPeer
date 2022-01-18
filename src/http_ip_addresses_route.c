@@ -20,69 +20,73 @@
 #include "database.h"
 
 int ip_addresses_route(struct MHD_Connection *connection,
-                       sentrypeer_config const *config) {
-    const char *reply = 0;
-    bad_actor **bad_actors = 0;
-    int64_t row_count = 0;
+		       sentrypeer_config const *config)
+{
+	const char *reply = 0;
+	bad_actor **bad_actors = 0;
+	int64_t row_count = 0;
 
-    if (db_select_bad_actors(&bad_actors, &row_count, config) !=
-        EXIT_SUCCESS) {
-        fprintf(stderr, "Failed to select bad actors from database\n");
-        return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
-                                 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
-                                 false);
-    }
+	if (db_select_bad_actors(&bad_actors, &row_count, config) !=
+	    EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to select bad actors from database\n");
+		return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
+					 false);
+	}
 
-    if ((bad_actors != 0) && (row_count > 0)) {
-        int64_t row_num = 0;
-        json_t *json_arr = json_array();
+	if ((bad_actors != 0) && (row_count > 0)) {
+		int64_t row_num = 0;
+		json_t *json_arr = json_array();
 
-        while (row_num < row_count) {
-            if (config->verbose_mode || config->debug_mode) {
-                fprintf(stderr, "source_ip: %s\n",
-                        bad_actors[row_num]->source_ip);
-            }
+		while (row_num < row_count) {
+			if (config->verbose_mode || config->debug_mode) {
+				fprintf(stderr, "source_ip: %s\n",
+					bad_actors[row_num]->source_ip);
+			}
 
-            if (json_array_append_new(
-                    json_arr,
-                    json_pack(
-                            "{s:s,s:s,s:s}", "ip_address",
+			if (json_array_append_new(
+				    json_arr,
+				    json_pack(
+					    "{s:s,s:s,s:s}", "ip_address",
 
-                            bad_actors[row_num]->source_ip,
-                            "seen_last",
-                            bad_actors[row_num]->seen_last,
-                            "seen_count",
-                            bad_actors[row_num]->seen_count)) !=
-                EXIT_SUCCESS) {
-                fprintf(stderr,
-                        "Failed to append bad actor to json array\n");
-                // Free the json objects
-                json_decref(json_arr);
-                bad_actors_destroy(bad_actors, &row_count);
-                return finalise_response(
-                        connection, NOT_FOUND_BAD_ACTORS_JSON,
-                        CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
-                        false);
-            }
-            row_num++;
-        }
-        json_t *json_final_obj =
-                json_pack("{s:i,s:o}", "ip_addresses_total", row_count,
-                          "ip_addresses", json_arr);
-        reply = json_dumps(json_final_obj, JSON_INDENT(2));
+					    bad_actors[row_num]->source_ip,
+					    "seen_last",
+					    bad_actors[row_num]->seen_last,
+					    "seen_count",
+					    bad_actors[row_num]->seen_count)) !=
+			    EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Failed to append bad actor to json array\n");
 
-        // Free the json objects
-        json_decref(json_final_obj);
-        bad_actors_destroy(bad_actors, &row_count);
-        free(bad_actors);
+				// Free the json objects
+				json_decref(json_arr);
+				bad_actors_destroy(bad_actors, &row_count);
+				free(bad_actors);
 
-        return finalise_response(connection, reply, CONTENT_TYPE_JSON,
-                                 MHD_HTTP_OK, true);
-    } else {
-        bad_actors_destroy(bad_actors, &row_count);
-        free(bad_actors);
-        return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
-                                 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
-                                 false);
-    }
+				return finalise_response(
+					connection, NOT_FOUND_BAD_ACTORS_JSON,
+					CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
+					false);
+			}
+			row_num++;
+		}
+		json_t *json_final_obj =
+			json_pack("{s:i,s:o}", "ip_addresses_total", row_count,
+				  "ip_addresses", json_arr);
+		reply = json_dumps(json_final_obj, JSON_INDENT(2));
+
+		// Free the json objects
+		json_decref(json_final_obj);
+		bad_actors_destroy(bad_actors, &row_count);
+		free(bad_actors);
+
+		return finalise_response(connection, reply, CONTENT_TYPE_JSON,
+					 MHD_HTTP_OK, true);
+	} else {
+		bad_actors_destroy(bad_actors, &row_count);
+		free(bad_actors);
+		return finalise_response(connection, NOT_FOUND_BAD_ACTORS_JSON,
+					 CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
+					 false);
+	}
 }
