@@ -262,6 +262,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 			}
 
 			if (config->debug_mode || config->verbose_mode) {
+#if INTPTR_MAX == INT64_MAX
 				fprintf(stderr,
 					"read_packet_buf size is: %lu: \n",
 					sizeof(read_packet_buf));
@@ -269,6 +270,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 					"read_packet_buf length is: %lu: \n",
 					strnlen(read_packet_buf,
 						PACKET_BUFFER_SIZE));
+#endif
 				fprintf(stderr,
 					"bytes_received size is: %d: \n\n",
 					bytes_received);
