@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6] - 2022-01-21
+- Fix rpm build on Fedora due to wrongly defined libcurl callback definition issue causing `make check` to fail
+
 ## [0.0.5] - 2022-01-18
 - Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
 - Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)

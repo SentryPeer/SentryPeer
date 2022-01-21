@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	0.0.5
+Version:	0.0.6
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,8 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Fri Jan 21 2022 Gavin Henry <ghenry@sentrypeer.org> 0.0.6-1
+- Fix rpm build on Fedora due to curl callback definition issue causing `make check` to fail
 * Tue Jan 18 2022 Gavin Henry <ghenry@sentrypeer.org> 0.0.5-1
 - Switched from 404 to Error 400 on invalid request data at `/ip-addresses/{blah}`
 - Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)

@@ -85,6 +85,8 @@ unit_test_sources = \
     tests/unit_tests/test_database.h \
     tests/unit_tests/test_http_api.c \
     tests/unit_tests/test_http_api.h \
+    tests/unit_tests/test_http_api_version.c \
+    tests/unit_tests/test_http_api.h \
     tests/unit_tests/test_http_route_check.c \
     tests/unit_tests/test_http_route_check.h \
     tests/unit_tests/test_ip_address_regex.c \
