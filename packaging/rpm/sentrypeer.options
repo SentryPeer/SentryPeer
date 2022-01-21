@@ -13,4 +13,4 @@
 
 # what extra options to give sentrypeer binary?
 #  See sentrypeer -h for options
-OPTIONS='-s -f /var/lib/sentrypeer/sentrypeer.db'
+OPTIONS='-awrs -f /var/lib/sentrypeer/sentrypeer.db'
