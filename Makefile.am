@@ -42,6 +42,7 @@ sentrypeer_SOURCES= \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
     src/http_called_numbers_route.c \
+    src/http_called_number_route.c \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
@@ -65,6 +66,7 @@ unit_test_sources = \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
     src/http_called_numbers_route.c \
+    src/http_called_number_route.c \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \
@@ -115,6 +117,14 @@ maintainer-clean-local:
 	-rm -rf $(top_srcdir)/build
 	-rm -rf $(top_srcdir)/m4
 	-rm -rf $(top_srcdir)/autom4te.cache
+
+.PHONY: bootstrap
+bootstrap:
+	./bootstrap.sh
+	./configure
+	make
+	make check
+	make distcheck
 
 # From http://mij.oltrelinux.com/devel/autoconf-automake/
 # what flags you want to pass to the C compiler & linker

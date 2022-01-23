@@ -38,11 +38,17 @@ int db_select_bad_actor_by_ip(char *bad_actor_ip_address, bad_actor **bad_actor,
 	"SELECT source_ip, max(event_timestamp) as seen_last, count(source_ip) as seen_total FROM honey GROUP BY source_ip order by event_timestamp DESC;"
 int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 			 sentrypeer_config const *config);
-#define GET_ROWS_DISTINCT_PHONE_NUMBER_COUNT                                      \
+
+#define GET_PHONE_NUMBER                                                       \
+	"SELECT DISTINCT(called_number) FROM honey WHERE called_number = ?;"
+int db_select_phone_number(char *phone_number, bad_actor **phone_number_to_find,
+			   sentrypeer_config const *config);
+
+#define GET_ROWS_DISTINCT_PHONE_NUMBER_COUNT                                   \
 	"SELECT COUNT(DISTINCT called_number) from honey;"
-#define GET_ROWS_DISTINCT_PHONE_NUMBER_WITH_COUNT_AND_DATE                        \
+#define GET_ROWS_DISTINCT_PHONE_NUMBER_WITH_COUNT_AND_DATE                     \
 	"SELECT called_number, max(event_timestamp) as seen_last, count(called_number) as seen_total FROM honey WHERE called_number is not NULL GROUP BY called_number order by event_timestamp DESC;"
 int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
-			 sentrypeer_config const *config);
+			     sentrypeer_config const *config);
 
 #endif //SENTRYPEER_DATABASE_H

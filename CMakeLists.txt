@@ -29,6 +29,7 @@ add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/http_ip_addresses_route.c
         ${CMAKE_SOURCE_DIR}/src/http_ip_address_route.c
         ${CMAKE_SOURCE_DIR}/src/http_called_numbers_route.c
+        ${CMAKE_SOURCE_DIR}/src/http_called_number_route.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/utils.c

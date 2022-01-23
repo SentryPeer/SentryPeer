@@ -526,3 +526,74 @@ int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
 	*phone_numbers = phone_numbers_array;
 	return EXIT_SUCCESS;
 }
+
+int db_select_phone_number(char *phone_number, bad_actor **phone_number_to_find,
+			   sentrypeer_config const *config)
+{
+	sqlite3 *db;
+	assert(config->db_file);
+
+	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to open database: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	sqlite3_stmt *find_phone_number_stmt = 0;
+	if (sqlite3_prepare_v2(db, GET_PHONE_NUMBER, -1,
+			       &find_phone_number_stmt, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+	bad_actor *phone_number_found = bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0);
+	assert(phone_number_found);
+
+	if (sqlite3_bind_text(find_phone_number_stmt, 1, phone_number, -1,
+			      SQLITE_STATIC) != SQLITE_OK) {
+		fprintf(stderr, "Failed to bind called_number: %s\n",
+			sqlite3_errmsg(db));
+		bad_actor_destroy(&phone_number_found);
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	// Nothing found. No need to free bad_actor_found->source_ip
+	if (sqlite3_step(find_phone_number_stmt) != SQLITE_ROW) {
+		sqlite3_finalize(find_phone_number_stmt);
+		bad_actor_destroy(&phone_number_found);
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	const unsigned char *called_number =
+		sqlite3_column_text(find_phone_number_stmt,
+				    0); // called_number needs to be freed
+	phone_number_found->called_number =
+		util_duplicate_string((const char *)called_number);
+	assert(phone_number_found->called_number);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Found called_number in honey table: %s\n",
+			phone_number_found->called_number);
+	}
+
+	if (sqlite3_finalize(find_phone_number_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		bad_actor_destroy(&phone_number_found);
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_close(db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to close database\n");
+		bad_actor_destroy(&phone_number_found);
+		return EXIT_FAILURE;
+	}
+
+	*phone_number_to_find = phone_number_found;
+	return EXIT_SUCCESS;
+}

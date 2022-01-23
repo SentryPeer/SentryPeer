@@ -65,6 +65,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 
 	log_http_client_ip(url, connection);
 	char *matched_ip_address = 0;
+	char *matched_phone_number = 0;
 
 	// TODO: Switch to a dispatch table or similar later as starting to hurt eyes.
 	if (route_check(url, HEALTH_CHECK_ROUTE, config) == EXIT_SUCCESS) {
@@ -108,9 +109,15 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, NUMBERS_ROUTE, config) == EXIT_SUCCESS) {
 		return called_numbers_route(connection, config);
-	} else if (route_check(url, NUMBER_ROUTE, config) == EXIT_SUCCESS) {
-		return finalise_response(connection, NUMBER_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
+	} else if (route_regex_check(url, NUMBER_ROUTE, &matched_phone_number,
+				     config) == EXIT_SUCCESS) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Called Number route: %s\n",
+				IP_ADDRESS_ROUTE);
+		}
+
+		return called_number_route(&matched_phone_number, connection,
+					   config);
 	} else if (route_check(url, COUNTRIES_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, COUNTRIES_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);

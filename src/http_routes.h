@@ -21,7 +21,7 @@
 #define IP_ADDRESS_ROUTE "/ip-addresses/(.+)"
 #define IP_ADDRESSES_IPSET_ROUTE "/ip-addresses/ipset"
 #define NUMBERS_ROUTE "/numbers"
-#define NUMBER_ROUTE "/numbers/:number"
+#define NUMBER_ROUTE "/numbers/(.+)"
 #define COUNTRIES_ROUTE "/countries"
 #define COUNTRY_ROUTE "/countries/:country"
 #define COUNTRY_CITY_ROUTE "/countries/:country/:city"
@@ -49,5 +49,7 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		     sentrypeer_config const *config);
 int called_numbers_route(struct MHD_Connection *connection,
 			 sentrypeer_config const *config);
+int called_number_route(char **phone_number, struct MHD_Connection *connection,
+			sentrypeer_config const *config);
 
 #endif //SENTRYPEER_HTTP_ROUTES_H
