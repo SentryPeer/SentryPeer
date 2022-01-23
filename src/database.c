@@ -206,7 +206,7 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	return EXIT_SUCCESS;
 }
 
-int db_select_bad_actor_by_ip(char *bad_actor_ip_address,
+int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
 			      bad_actor **bad_actor_to_find,
 			      sentrypeer_config const *config)
 {
@@ -527,7 +527,8 @@ int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
 	return EXIT_SUCCESS;
 }
 
-int db_select_phone_number(char *phone_number, bad_actor **phone_number_to_find,
+int db_select_phone_number(const char *phone_number,
+			   bad_actor **phone_number_to_find,
 			   sentrypeer_config const *config)
 {
 	sqlite3 *db;

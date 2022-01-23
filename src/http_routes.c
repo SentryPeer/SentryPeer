@@ -113,7 +113,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 				     config) == EXIT_SUCCESS) {
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "Called Number route: %s\n",
-				IP_ADDRESS_ROUTE);
+				NUMBER_ROUTE);
 		}
 
 		return called_number_route(&matched_phone_number, connection,

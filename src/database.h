@@ -26,7 +26,8 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 
 #define GET_BAD_ACTOR_BY_IP                                                    \
 	"SELECT DISTINCT(source_ip) FROM honey WHERE source_ip = ?;"
-int db_select_bad_actor_by_ip(char *bad_actor_ip_address, bad_actor **bad_actor,
+int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
+			      bad_actor **bad_actor,
 			      sentrypeer_config const *config);
 
 #define GET_BAD_ACTOR_BY_IP_WITH_DETAILS                                       \
@@ -41,7 +42,8 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 
 #define GET_PHONE_NUMBER                                                       \
 	"SELECT DISTINCT(called_number) FROM honey WHERE called_number = ?;"
-int db_select_phone_number(char *phone_number, bad_actor **phone_number_to_find,
+int db_select_phone_number(const char *phone_number,
+			   bad_actor **phone_number_to_find,
 			   sentrypeer_config const *config);
 
 #define GET_ROWS_DISTINCT_PHONE_NUMBER_COUNT                                   \
