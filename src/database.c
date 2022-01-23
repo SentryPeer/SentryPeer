@@ -41,6 +41,9 @@ const char create_table_sql[] =
 const char create_source_ip_index[] =
 	"CREATE INDEX IF NOT EXISTS source_ip_index ON honey (source_ip);";
 
+const char create_called_number_index[] =
+	"CREATE INDEX IF NOT EXISTS called_number_index ON honey (called_number);";
+
 const char insert_bad_actor[] =
 	"INSERT INTO honey (event_timestamp,"
 	"   event_uuid, collected_method, source_ip,"
@@ -83,6 +86,13 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	if (sqlite3_exec(db, create_source_ip_index, NULL, NULL, NULL) !=
 	    SQLITE_OK) {
 		fprintf(stderr, "Failed to create source_ip_index\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_exec(db, create_called_number_index, NULL, NULL, NULL) !=
+	    SQLITE_OK) {
+		fprintf(stderr, "Failed to create called_number_index\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
@@ -300,7 +310,8 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 	assert(row_count);
 	if (config->debug_mode || config->verbose_mode) {
 #ifdef __linux__
-		fprintf(stderr, "Row count in honey table is: %ld\n",
+		fprintf(stderr,
+			"Distinct source_ip row count in honey table is: %ld\n",
 			*row_count);
 #endif
 #ifdef __APPLE__
@@ -387,5 +398,131 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 		return EXIT_FAILURE;
 	}
 	*bad_actors = bad_actors_array;
+	return EXIT_SUCCESS;
+}
+
+int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
+			     sentrypeer_config const *config)
+{
+	sqlite3 *db;
+	assert(config->db_file);
+
+	if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
+		fprintf(stderr, "Failed to open database: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	sqlite3_stmt *get_row_count_stmt = 0;
+	if (sqlite3_prepare_v2(db, GET_ROWS_DISTINCT_PHONE_NUMBER_COUNT, -1,
+			       &get_row_count_stmt, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+	if (sqlite3_step(get_row_count_stmt) != SQLITE_ROW) {
+		fprintf(stderr, "Error stepping statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	*row_count = sqlite3_column_int64(get_row_count_stmt, 0);
+	assert(row_count);
+	if (config->debug_mode || config->verbose_mode) {
+#ifdef __linux__
+		fprintf(stderr,
+			"Distinct called_number row count in honey table is: %ld\n",
+			*row_count);
+#endif
+#ifdef __APPLE__
+		fprintf(stderr, "Row count in honey table is: %lld\n",
+			*row_count);
+#endif
+	}
+
+	if (sqlite3_finalize(get_row_count_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	sqlite3_stmt *select_phone_numbers_stmt = 0;
+	char select_called_numbers[] =
+		GET_ROWS_DISTINCT_PHONE_NUMBER_WITH_COUNT_AND_DATE;
+	if (sqlite3_prepare_v2(db, select_called_numbers, -1,
+			       &select_phone_numbers_stmt, NULL) != SQLITE_OK) {
+		fprintf(stderr, "Failed to prepare statement: %s\n",
+			sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	bad_actor **phone_numbers_array =
+		calloc(*row_count, sizeof(*phone_numbers_array));
+	assert(phone_numbers_array);
+
+	int64_t row_num = 0;
+	while (row_num < *row_count) {
+		if (sqlite3_step(select_phone_numbers_stmt) != SQLITE_ROW) {
+			fprintf(stderr, "Error stepping statement: %s\n",
+				sqlite3_errmsg(db));
+			free(phone_numbers_array); // Nothing in there yet
+			sqlite3_close(db);
+			return EXIT_FAILURE;
+		}
+
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Column name is '%s', with value: %s\n",
+				sqlite3_column_name(select_phone_numbers_stmt,
+						    0),
+				sqlite3_column_text(select_phone_numbers_stmt,
+						    0));
+		}
+		const unsigned char *called_number =
+			sqlite3_column_text(select_phone_numbers_stmt,
+					    0); // called_number
+
+		const unsigned char *seen_last =
+			sqlite3_column_text(select_phone_numbers_stmt,
+					    1); // seen_last
+
+		const unsigned char *seen_count =
+			sqlite3_column_text(select_phone_numbers_stmt,
+					    2); // seen_count
+
+		phone_numbers_array[row_num] = bad_actor_new(
+			0, 0,
+			util_duplicate_string((const char *)called_number), 0,
+			0, 0, 0, 0);
+
+		phone_numbers_array[row_num]->seen_last =
+			util_duplicate_string((const char *)seen_last);
+		phone_numbers_array[row_num]->seen_count =
+			util_duplicate_string((const char *)seen_count);
+
+		row_num++;
+	}
+	assert(phone_numbers_array);
+
+	if (sqlite3_finalize(select_phone_numbers_stmt) != SQLITE_OK) {
+		fprintf(stderr, "Error finalizing statement: %s\n",
+			sqlite3_errmsg(db));
+		bad_actors_destroy(phone_numbers_array, row_count);
+		free(phone_numbers_array);
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_close(db) != SQLITE_OK) {
+		bad_actors_destroy(phone_numbers_array, row_count);
+		free(phone_numbers_array);
+		fprintf(stderr, "Failed to close database\n");
+		return EXIT_FAILURE;
+	}
+	*phone_numbers = phone_numbers_array;
 	return EXIT_SUCCESS;
 }

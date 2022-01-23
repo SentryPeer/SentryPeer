@@ -47,5 +47,7 @@ int ip_addresses_route(struct MHD_Connection *connection,
 		       sentrypeer_config const *config);
 int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		     sentrypeer_config const *config);
+int called_numbers_route(struct MHD_Connection *connection,
+			 sentrypeer_config const *config);
 
 #endif //SENTRYPEER_HTTP_ROUTES_H

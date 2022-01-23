@@ -23,6 +23,7 @@
 #define BAD_DATA_JSON "{\"error\": \"The request data was invalid\"}"
 #define NOT_FOUND_BAD_ACTOR_JSON "{\"message\": \"No bad actor found\"}"
 #define NOT_FOUND_BAD_ACTORS_JSON "{\"message\": \"No bad actors found\"}"
+#define NOT_FOUND_PHONE_NUMBERS_JSON "{\"message\": \"No phone numbers found\"}"
 
 void log_http_client_ip(const char *url, struct MHD_Connection *connection);
 bool json_is_requested(struct MHD_Connection *connection);

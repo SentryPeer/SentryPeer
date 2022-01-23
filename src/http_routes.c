@@ -107,8 +107,7 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 		return finalise_response(connection, IP_ADDRESSES_IPSET_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, NUMBERS_ROUTE, config) == EXIT_SUCCESS) {
-		return finalise_response(connection, NUMBERS_ROUTE,
-					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
+		return called_numbers_route(connection, config);
 	} else if (route_check(url, NUMBER_ROUTE, config) == EXIT_SUCCESS) {
 		return finalise_response(connection, NUMBER_ROUTE,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);

@@ -41,8 +41,7 @@ sentrypeer_SOURCES= \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
-    src/http_api.c \
-    src/http_api.h \
+    src/http_called_numbers_route.c \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
@@ -65,6 +64,7 @@ unit_test_sources = \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
+    src/http_called_numbers_route.c \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \

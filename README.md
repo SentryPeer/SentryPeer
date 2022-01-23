@@ -50,6 +50,10 @@ Here's a mockup of the web UI which is subject to change.
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
 - [x] **Local** Web GUI for **fast access** - cli / env flag
+- [x] Query API for IP addresses of bad actors
+- [ ] Query API for IPSET of bad actors
+- [x] Query API for a particular IP address of a bad actor
+- [x] Query API for attempted phone numbers called of bad actors
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag

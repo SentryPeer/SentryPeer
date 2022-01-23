@@ -67,6 +67,9 @@ int test_setup_sqlite_db(void **state)
 	const char create_source_ip_index[] =
 		"CREATE INDEX IF NOT EXISTS source_ip_index ON honey (source_ip);";
 
+	const char create_called_number_index[] =
+		"CREATE INDEX IF NOT EXISTS called_number_index ON honey (called_number);";
+
 	const char insert_bad_actor[] =
 		"INSERT INTO honey (event_timestamp,"
 		"   event_uuid, collected_method, source_ip,"
@@ -92,6 +95,13 @@ int test_setup_sqlite_db(void **state)
 			 SQLITE_OK);
 	fprintf(stderr,
 		"Created index on source_ip successfully using: %s at line number %d in file %s\n",
+		create_table_sql, __LINE__ - 1, __FILE__);
+
+	assert_int_equal(sqlite3_exec(db, create_called_number_index, NULL, NULL,
+				      NULL),
+			 SQLITE_OK);
+	fprintf(stderr,
+		"Created index on called_number successfully using: %s at line number %d in file %s\n",
 		create_table_sql, __LINE__ - 1, __FILE__);
 
 	assert_int_equal(sqlite3_prepare_v2(db, insert_bad_actor, -1,
