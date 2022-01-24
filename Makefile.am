@@ -10,20 +10,6 @@
 #                              __/ |
 #                             |___/
 #
-######
-##
-## Example from Page 81 of:
-##
-## 21st Century C, Second Edition by Ben Klemens
-##
-## Copyright © 2015 Ben Klemens. All rights reserved.
-##
-## Published by O’Reilly Media, Inc.
-##
-## Updated: 2021-12-17
-## Author: Gavin Henry <ghenry@sentrypeer.org (GH)
-##
-######
 
 bin_PROGRAMS=sentrypeer
 sentrypeer_SOURCES= \
@@ -122,7 +108,7 @@ maintainer-clean-local:
 bootstrap:
 	./bootstrap.sh
 	./configure
-	make
+	make clean
 	make check
 	make distcheck
 

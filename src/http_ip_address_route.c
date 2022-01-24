@@ -23,7 +23,7 @@ int ip_address_route(char **ip_address, struct MHD_Connection *connection,
 		     sentrypeer_config const *config)
 {
 	bad_actor *bad_actor_found = 0;
-	char *ip_address_str = *ip_address;
+	const char *ip_address_str = *ip_address;
 
 	if (db_select_bad_actor_by_ip(ip_address_str, &bad_actor_found,
 				      config) != EXIT_SUCCESS) {

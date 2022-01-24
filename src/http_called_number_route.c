@@ -23,7 +23,7 @@ int called_number_route(char **phone_number, struct MHD_Connection *connection,
 			sentrypeer_config const *config)
 {
 	bad_actor *phone_number_found = 0;
-	char *phone_number_str = *phone_number;
+	const char *phone_number_str = *phone_number;
 
 	if (db_select_phone_number(phone_number_str, &phone_number_found,
 				   config) != EXIT_SUCCESS) {

@@ -71,8 +71,8 @@ int main(int argc, char **argv)
 		perror("sip_daemon_init");
 		if (config->syslog_mode) {
 			syslog(LOG_ERR,
-			       "Failed to start %s server on port %d\n", "SIP",
-			       HTTP_DAEMON_PORT);
+			       "Failed to start %s server on port %s\n", "SIP",
+			       SIP_DAEMON_PORT);
 		}
 		exit(EXIT_FAILURE);
 	}

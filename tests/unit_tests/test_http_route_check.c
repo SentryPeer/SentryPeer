@@ -31,9 +31,11 @@ void test_http_route_check(void **state)
 
 	char route0[] = "/";
 	char route1[] = "/ip-addresses/8.8.8.8";
-	char route2[] = "/ip-addresses/";
+	char route2[] = "/ip-addresses";
 	char route3[] = "/health-check/";
 	char route4[] = "/health-check";
+	char route5[] = "/numbers";
+	char route6[] = "/numbers/123456789";
 
 	// Expect no matches.
 	assert_int_not_equal(route_check(route0, requested_url, config), 0);
@@ -41,6 +43,8 @@ void test_http_route_check(void **state)
 	assert_int_not_equal(route_check(route2, requested_url, config), 0);
 	assert_int_not_equal(route_check(route3, requested_url, config), 0);
 	assert_int_not_equal(route_check(route4, requested_url, config), 0);
+	assert_int_not_equal(route_check(route5, requested_url, config), 0);
+	assert_int_not_equal(route_check(route6, requested_url, config), 0);
 
 	// Test a route that is smaller than all, but more than "/". Expect no matches.
 	char requested_url_middle_size[] = "/test/rt";
@@ -55,6 +59,10 @@ void test_http_route_check(void **state)
 		route_check(route3, requested_url_middle_size, config), 0);
 	assert_int_not_equal(
 		route_check(route4, requested_url_middle_size, config), 0);
+	assert_int_not_equal(
+		route_check(route5, requested_url_middle_size, config), 0);
+	assert_int_not_equal(
+		route_check(route6, requested_url_middle_size, config), 0);
 
 	// Test a route that is smaller than all, but has a partial match, apart from end of url. Expect no matches.
 	char requested_url_middle_size_partial[] = "/ip-/";
@@ -73,6 +81,12 @@ void test_http_route_check(void **state)
 		0);
 	assert_int_not_equal(
 		route_check(route4, requested_url_middle_size_partial, config),
+		0);
+	assert_int_not_equal(
+		route_check(route5, requested_url_middle_size_partial, config),
+		0);
+	assert_int_not_equal(
+		route_check(route6, requested_url_middle_size_partial, config),
 		0);
 
 	// Test a route that is smaller than all, but has a partial match. No end of url. Expect no matches.
@@ -98,9 +112,17 @@ void test_http_route_check(void **state)
 		route_check(route4, requested_url_middle_size_partial_no_end,
 			    config),
 		0);
+	assert_int_not_equal(
+		route_check(route5, requested_url_middle_size_partial_no_end,
+			    config),
+		0);
+	assert_int_not_equal(
+		route_check(route6, requested_url_middle_size_partial_no_end,
+			    config),
+		0);
 
 	// Test a match.
-	char requested_url_match[] = "/ip-addresses/";
+	char requested_url_match[] = "/ip-addresses";
 	assert_int_equal(route_check(route2, requested_url_match, config), 0);
 
 	// Test a bigger url that than we have a route for. Expect no matches.

@@ -213,8 +213,10 @@ Called Number: 100
 SIP Method: OPTIONS
 Transport Type: UDP
 User Agent: friendly-scanner
-Collected Method: passive
+Collected Method: responsive
 Created by Node Id: fac3fa20-8c2c-445b-8661-50a70fa9e873
+SentryPeer db file location is: sentrypeer.db
+Destination IP address of UDP packet is: xx.xx.xx.xx
 ```
 
 You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlitebrowser](https://sqlitebrowser.org/) or sqlite3 command line tool.
@@ -238,20 +240,21 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 > User-Agent: curl/7.79.1
 > Accept: */*
 > Content-Type: application/json
->
+> 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Connection: Keep-Alive
-< Content-Length: 81
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:16:25 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:27:15 GMT
-<
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 81
+< 
 {
   "status": "OK",
   "message": "Hello from SentryPeer!",
-  "version": "0.0.3"
- }
+  "version": "1.0.0"
+}
 ```
 
 and  `/ip-addresses`:
@@ -266,16 +269,17 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 > Accept: */*
 > Content-Type: application/json
 > 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Connection: Keep-Alive
-< Content-Length: 6495
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:17:05 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:29:13 GMT
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 50175
 < 
 {
-  "ip_addresses_total": 2,
+  "ip_addresses_total": 396,
   "ip_addresses": [
     {
       "ip_address": "193.107.216.27",
@@ -292,7 +296,7 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 }
 ```
 
-and lastly `/ip-address/{ip-address}`:
+and a single IP address query `/ip-address/{ip-address}`:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
@@ -304,20 +308,46 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8
 > Accept: */*
 > Content-Type: application/json
 > 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 404 Not Found
-< Connection: Keep-Alive
-< Content-Length: 37
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:17:57 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:33:51 GMT
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 33
 < 
+* Connection #0 to host localhost left intact
 {
   "message": "No bad actor found"
 }
 ```
 
+and lastly a phone number query for a number a bad actor tried to call:
 
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/8784946812410967
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /numbers/8784946812410967 HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Mon, 24 Jan 2022 11:19:53 GMT
+< Content-Type: application/json
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 46
+< 
+{
+  "phone_number_found": "8784946812410967"
+}
+```
 
 ### Syslog and Fail2ban
 

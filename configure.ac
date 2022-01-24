@@ -14,7 +14,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer],[0.0.6],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[1.0.0],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/sentrypeer.h])

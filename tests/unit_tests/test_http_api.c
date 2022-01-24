@@ -98,6 +98,17 @@ void test_http_api_get(void **state)
 			"http://127.0.0.1:8082/ip-addresses/104.14da3afcsasd"),
 		400);
 
+	// Phone numbers check 200 OK
+	assert_int_equal(curl_get_url("http://127.0.0.1:8082/numbers"), 200);
+
+	// Phone number 404 Not Found
+	assert_int_equal(
+		curl_get_url("http://127.0.0.1:8082/numbers/123456789"), 404);
+
+	// Phone number 200 OK
+	assert_int_equal(curl_get_url("http://127.0.0.1:8082/numbers/100"),
+			 200);
+
 	curl_global_cleanup();
 }
 

@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	0.0.6
+Version:	1.0.0
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
