@@ -33,6 +33,7 @@
 int test_setup_sqlite_db(void **state)
 {
 	sentrypeer_config *config = sentrypeer_config_new();
+	config->debug_mode = true;
 	assert_non_null(config);
 	strncpy(config->db_file, TEST_DB_FILE, SENTRYPEER_PATH_MAX);
 	assert_non_null(config->db_file);
@@ -253,7 +254,6 @@ void test_db_insert_bad_actor(void **state)
 		__LINE__ - 1, __FILE__);
 	assert_non_null(bad_actor_event);
 
-	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 

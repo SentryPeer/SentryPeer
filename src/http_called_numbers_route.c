@@ -22,7 +22,7 @@
 int called_numbers_route(struct MHD_Connection *connection,
 			 sentrypeer_config const *config)
 {
-	const char *reply = 0;
+	const char *reply = NULL;
 	bad_actor **phone_numbers = 0;
 	int64_t row_count = 0;
 

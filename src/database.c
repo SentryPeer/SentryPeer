@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
+#include <inttypes.h>
 
 const char schema_check[] = "PRAGMA user_version;";
 const char create_table_sql[] =
@@ -309,15 +310,10 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 	*row_count = sqlite3_column_int64(get_row_count_stmt, 0);
 	assert(row_count);
 	if (config->debug_mode || config->verbose_mode) {
-#ifdef __linux__
 		fprintf(stderr,
-			"Distinct source_ip row count in honey table is: %ld\n",
+			"Distinct source_ip row count in honey table is: %" PRId64
+			"n",
 			*row_count);
-#endif
-#ifdef __APPLE__
-		fprintf(stderr, "Row count in honey table is: %lld\n",
-			*row_count);
-#endif
 	}
 
 	if (sqlite3_finalize(get_row_count_stmt) != SQLITE_OK) {
@@ -432,15 +428,10 @@ int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
 	*row_count = sqlite3_column_int64(get_row_count_stmt, 0);
 	assert(row_count);
 	if (config->debug_mode || config->verbose_mode) {
-#ifdef __linux__
 		fprintf(stderr,
-			"Distinct called_number row count in honey table is: %ld\n",
+			"Distinct called_number row count in honey table is: %" PRId64
+			"\n",
 			*row_count);
-#endif
-#ifdef __APPLE__
-		fprintf(stderr, "Row count in honey table is: %lld\n",
-			*row_count);
-#endif
 	}
 
 	if (sqlite3_finalize(get_row_count_stmt) != SQLITE_OK) {

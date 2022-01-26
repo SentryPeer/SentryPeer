@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org>
+
+name: Cppcheck Static Analysis
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * *' # Daily at 10:00 UTC
+jobs:
+  clang-analyzer:
+    name: Cppcheck Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo apt-get install \
+          autoconf-archive \
+          libosip2-dev \
+          clang-tools \
+          libcmocka-dev \
+          uuid-dev \
+          libmicrohttpd-dev \
+          libjansson-dev \
+          libpcre2-dev \
+          libcurl4-openssl-dev \
+          cppcheck
+          sudo add-apt-repository ppa:savoury1/utilities
+          sudo apt-get update
+          sudo apt-get install libmicrohttpd-dev
+      - run: |
+          set -x
+          cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/
+          cppcheck --enable=warning,performance,portability,style --error-exitcode=1 tests/

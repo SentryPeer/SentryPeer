@@ -22,4 +22,4 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.
 
 **Package version or git hash**
-- Version of SentryPeer [e.g. 1.0.0]
+- Version of SentryPeer [e.g. 2.0.0]

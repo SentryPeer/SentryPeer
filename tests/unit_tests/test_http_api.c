@@ -60,7 +60,6 @@ void test_http_api_get(void **state)
 
 	assert_int_equal(curl_global_init(CURL_GLOBAL_ALL), CURLE_OK);
 
-	config->debug_mode = true;
 	fprintf(stderr, "Debug mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
