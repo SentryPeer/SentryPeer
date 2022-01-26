@@ -357,6 +357,19 @@ With `sentrypeer -s`, you parse syslog and use Fail2Ban to block the IP address 
 Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.36, Method: OPTIONS, Agent: sipsak 0.9.7
 ```
 
+### IPv6 Multicast Address
+
+The project has an IANA IPv6 multicast address for the purpose of sending messages between SentryPeer peers
+
+    Addresses: FF0X:0:0:0:0:0:0:172
+    Description: SentryPeer
+    Contact: Gavin Henry <ghenry at sentrypeer.org>
+    Registration Date: 2022-01-26
+
+Please see http://www.iana.org/assignments/ipv6-multicast-addresses
+
+The assigned variable-scope address -- which can also be listed as "FF0X::172" for short -- the "X" denotes any possible scope.
+
 ### License
  
 Great reading - [How to choose a license for your own work](https://www.gnu.org/licenses/license-recommendations.en.html)
