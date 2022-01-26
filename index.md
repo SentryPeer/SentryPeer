@@ -24,6 +24,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 
 The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
 
+![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
 [![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
 
@@ -45,9 +46,15 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] TCP transport
 - [ ] TLS transport
 - [ ] Data is max 7(?) days old as useless otherwise
-- [x] **Local** data copy for **fast access** - feature / cli flag
-- [x] **Local** API for **fast access** - feature / cli flag
-- [x] **Local** Web GUI for **fast access** - feature / cli flag
+- [x] SIP responsive mode can be enabled to collect data - cli / env flag   
+- [x] **Local** data copy for **fast access** - cli / env db location flag
+- [x] **Local** API for **fast access** - cli / env flag
+- [x] **Local** Web GUI for **fast access** - cli / env flag
+- [x] Query API for IP addresses of bad actors
+- [ ] Query API for IPSET of bad actors
+- [x] Query API for a particular IP address of a bad actor
+- [x] Query API for attempted phone numbers called by bad actors
+- [x] Query API for an attempted phone number called by a bad actor
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
 - [ ] Peer to Peer data replication - feature / cli flag
 - [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
@@ -86,6 +93,9 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 #### Environment Variables
 
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
+    ENV SENTRYPEER_API=1
+    ENV SENTRYPEER_WEB_GUI=1
+    ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SYSLOG=1
     ENV SENTRYPEER_VERBOSE=1
     ENV SENTRYPEER_DEBUG=1
@@ -130,7 +140,7 @@ Fedora:
 
 macOS:
 
-    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson libcurl libpcre2
+    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson curl pcre2
 
 then (make check is highly recommended):
 
@@ -149,16 +159,18 @@ We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew
 
 ### Running SentryPeer
 
-Once built, you can run like so to start in debug mode and syslog logging (this won't work as a daemon yet):
+Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
+the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
-    ./sentrypeer -ds
+    ./sentrypeer -draws
     Starting sentrypeer...
-    Starting http daemon...
+    API mode enabled, starting http daemon...
+    Web GUI mode enabled...
     Configuring local address...
     Creating socket...
     Binding socket to local address...
-    Setting database error log callback...
     Listening for incoming connections...
+    SIP responsive mode enabled. Will reply to SIP probes...
 
 when you get a probe request, you can see something like the following in the terminal:
 
@@ -201,8 +213,10 @@ Called Number: 100
 SIP Method: OPTIONS
 Transport Type: UDP
 User Agent: friendly-scanner
-Collected Method: passive
+Collected Method: responsive
 Created by Node Id: fac3fa20-8c2c-445b-8661-50a70fa9e873
+SentryPeer db file location is: sentrypeer.db
+Destination IP address of UDP packet is: xx.xx.xx.xx
 ```
 
 You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlitebrowser](https://sqlitebrowser.org/) or sqlite3 command line tool.
@@ -226,20 +240,21 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 > User-Agent: curl/7.79.1
 > Accept: */*
 > Content-Type: application/json
->
+> 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Connection: Keep-Alive
-< Content-Length: 81
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:16:25 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:27:15 GMT
-<
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 81
+< 
 {
   "status": "OK",
   "message": "Hello from SentryPeer!",
-  "version": "0.0.3"
- }
+  "version": "1.0.0"
+}
 ```
 
 and  `/ip-addresses`:
@@ -254,29 +269,34 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 > Accept: */*
 > Content-Type: application/json
 > 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Connection: Keep-Alive
-< Content-Length: 6495
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:17:05 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:29:13 GMT
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 50175
 < 
 {
-  "ip_addresses_total": 2,
+  "ip_addresses_total": 396,
   "ip_addresses": [
     {
-      "ip_address": "193.107.216.27"
+      "ip_address": "193.107.216.27",
+      "seen_last": "2022-01-11 13:30:48.703603359",
+      "seen_count":	"1263"
     },
     {
       "ip_address": "193.46.255.152"
+      "seen_last": "2022-01-11 13:28:27.348926406",
+      "seen_count": "3220"      
     }
     ...
   ]
 }
 ```
 
-and lastly `/ip-address/{ip-address}`:
+and a single IP address query `/ip-address/{ip-address}`:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
@@ -288,20 +308,46 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8
 > Accept: */*
 > Content-Type: application/json
 > 
+* Mark bundle as not supporting multiuse
 < HTTP/1.1 404 Not Found
-< Connection: Keep-Alive
-< Content-Length: 37
-< X-SentryPeer-Version: 0.0.3
-< X-Powered-By: SentryPeer
+< Date: Mon, 24 Jan 2022 11:17:57 GMT
 < Content-Type: application/json
-< Date: Tue, 21 Dec 2021 18:33:51 GMT
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 33
 < 
+* Connection #0 to host localhost left intact
 {
   "message": "No bad actor found"
 }
 ```
 
+and lastly a phone number query for a number a bad actor tried to call:
 
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/8784946812410967
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /numbers/8784946812410967 HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/7.79.1
+> Accept: */*
+> Content-Type: application/json
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Mon, 24 Jan 2022 11:19:53 GMT
+< Content-Type: application/json
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 1.0.0
+< Content-Length: 46
+< 
+{
+  "phone_number_found": "8784946812410967"
+}
+```
 
 ### Syslog and Fail2ban
 
