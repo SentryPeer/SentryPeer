@@ -108,6 +108,10 @@ void test_http_api_get(void **state)
 	assert_int_equal(curl_get_url("http://127.0.0.1:8082/numbers/100"),
 			 200);
 
+	assert_int_equal(http_daemon_stop(config), EXIT_SUCCESS);
+	fprintf(stderr, "http_daemon stopped at line number %d in file %s\n",
+		__LINE__ - 1, __FILE__);
+
 	curl_global_cleanup();
 }
 

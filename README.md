@@ -359,7 +359,7 @@ Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.3
 
 ### IPv6 Multicast Address
 
-The project has an IANA IPv6 multicast address for the purpose of sending messages between SentryPeer peers
+The project has an IANA IPv6 multicast address for the purpose of sending messages between SentryPeer peers.
 
     Addresses: FF0X:0:0:0:0:0:0:172
     Description: SentryPeer

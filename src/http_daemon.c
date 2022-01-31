@@ -34,5 +34,18 @@ int http_daemon_init(sentrypeer_config *config)
 	if (daemon == NULL) {
 		return EXIT_FAILURE;
 	}
+	config->http_daemon = daemon;
+
+	return EXIT_SUCCESS;
+}
+
+int http_daemon_stop(sentrypeer_config *config)
+{
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Stopping http daemon...\n");
+	}
+
+	MHD_stop_daemon(config->http_daemon);
+
 	return EXIT_SUCCESS;
 }

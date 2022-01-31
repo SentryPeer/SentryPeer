@@ -50,7 +50,7 @@
  *
  * Has socket() input? Yes, move on. No, go back to select().
  *
- * recvfrom();
+ * recvmsg();
  * sip_parse_request(); etc
  * send();
  *

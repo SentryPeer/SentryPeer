@@ -30,6 +30,7 @@ struct sentrypeer_config {
 	bool sip_agent_mode;
 	bool bgp_agent_mode;
 	char *db_file;
+	struct MHD_Daemon *http_daemon;
 };
 
 //  Constructor

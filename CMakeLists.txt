@@ -20,6 +20,7 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
+        ${CMAKE_SOURCE_DIR}/src/signal_handler.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
         ${CMAKE_SOURCE_DIR}/src/http_common.c
         ${CMAKE_SOURCE_DIR}/src/http_daemon.c

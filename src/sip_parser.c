@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <assert.h>
 
 #include "sip_parser.h"
 #include "conf.h"
@@ -53,7 +54,7 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 	}
 
 	// Full SIP Message
-	size_t sip_message_length;
+	size_t sip_message_length = SIP_MESSAGE_MAX_LENGTH;
 	bad_actor_event->sip_message = 0; // Clear the previous SIP message
 	if (osip_message_to_str(parsed_sip_message,
 				&bad_actor_event->sip_message,

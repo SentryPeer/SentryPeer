@@ -102,6 +102,7 @@ void test_bad_actor(void **state)
 		"Content-Length: 0\r\n";
 
 	sentrypeer_config *config = sentrypeer_config_new();
+	assert_non_null(config);
 	config->debug_mode = true;
 
 	fprintf(stderr, "debug_mode set to true at line number %d in file %s\n",

@@ -15,6 +15,8 @@ bin_PROGRAMS=sentrypeer
 sentrypeer_SOURCES= \
     src/sentrypeer.c \
     src/sentrypeer.h \
+    src/signal_handler.c \
+    src/signal_handler.h \
     src/conf.c \
     src/conf.h \
     src/http_common.c \
@@ -41,6 +43,10 @@ sentrypeer_SOURCES= \
     src/database.h
 
 unit_test_sources = \
+    src/signal_handler.c \
+    src/signal_handler.h \
+    src/sip_daemon.c \
+    src/sip_daemon.h \
     src/http_common.c \
     src/http_common.h \
     src/http_daemon.c \
@@ -119,14 +125,7 @@ bootstrap:
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
-AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
-          -Wformat=2 -Wno-unused-parameter -Wshadow \
-          -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
-          -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
-          -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
-          -fstack-protector-strong -grecord-gcc-switches \
-          -Werror=format-security -Werror=implicit-function-declaration \
-          -Wmisleading-indentation $(LIBASAN_FLAGS)
+AM_CFLAGS =-Wall -Werror
 
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
