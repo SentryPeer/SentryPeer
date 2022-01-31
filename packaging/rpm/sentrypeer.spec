@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	1.0.0
+Version:	1.0.1
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,9 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Mon Jan 24 2022 Gavin Henry <ghenry@sentrypeer.org> 1.0.0-1
+- Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)
+- Called Numbers RESTful API resource live at (`http://x.x.x.x:8082/numbers`)
 * Fri Jan 21 2022 Gavin Henry <ghenry@sentrypeer.org> 0.0.6-1
 - Fix rpm build on Fedora due to curl callback definition issue causing `make check` to fail
 * Tue Jan 18 2022 Gavin Henry <ghenry@sentrypeer.org> 0.0.5-1

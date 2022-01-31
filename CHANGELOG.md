@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add signal handlers for SIGINT and SIGTERM to gracefully shut down the daemons
 
 ### Tests
-- Clean up some valgrind warnings
+- Clean up all valgrind warnings
 - Use the new http_daemon_stop() which calls MHD_stop_daemon() to clear up memory leaks, sockets etc. in tests
 
 ## [1.0.0] - 2022-01-24
