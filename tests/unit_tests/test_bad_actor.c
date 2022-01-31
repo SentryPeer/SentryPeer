@@ -33,11 +33,14 @@ static bad_actor *test_bad_actor_event_new(void)
 
 	bad_actor *bad_actor_event =
 		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0,
-			      test_transport_type, 0, test_collected_method, 0);
+			      util_duplicate_string(test_transport_type), 0,
+			      util_duplicate_string(test_collected_method), 0);
 	assert_non_null(bad_actor_event);
 	assert_string_equal(bad_actor_event->source_ip, test_source_ip);
 	assert_string_equal(bad_actor_event->transport_type,
 			    test_transport_type);
+	assert_string_equal(bad_actor_event->collected_method,
+			    test_collected_method);
 
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",

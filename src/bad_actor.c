@@ -111,6 +111,16 @@ void bad_actor_destroy(bad_actor **self_ptr)
 			self->source_ip = 0;
 		}
 
+		if (self->transport_type != 0) {
+			free(self->transport_type);
+			self->transport_type = 0;
+		}
+
+		if (self->collected_method != 0) {
+			free(self->collected_method);
+			self->collected_method = 0;
+		}
+
 		if (self->called_number != 0) {
 			free(self->called_number);
 			self->called_number = 0;

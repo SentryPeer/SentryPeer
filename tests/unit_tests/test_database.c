@@ -98,8 +98,8 @@ int test_setup_sqlite_db(void **state)
 		"Created index on source_ip successfully using: %s at line number %d in file %s\n",
 		create_table_sql, __LINE__ - 1, __FILE__);
 
-	assert_int_equal(sqlite3_exec(db, create_called_number_index, NULL, NULL,
-				      NULL),
+	assert_int_equal(sqlite3_exec(db, create_called_number_index, NULL,
+				      NULL, NULL),
 			 SQLITE_OK);
 	fprintf(stderr,
 		"Created index on called_number successfully using: %s at line number %d in file %s\n",
@@ -247,8 +247,9 @@ void test_db_insert_bad_actor(void **state)
 	char test_transport_type[] = "UDP";
 	char test_collected_method[] = "passive";
 	bad_actor *bad_actor_event =
-		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0, test_transport_type, 0,
-			      test_collected_method, 0);
+		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0,
+			      util_duplicate_string(test_transport_type), 0,
+			      util_duplicate_string(test_collected_method), 0);
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
