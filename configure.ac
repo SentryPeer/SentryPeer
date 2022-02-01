@@ -77,8 +77,17 @@ AC_TYPE_UINT32_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 AC_FUNC_STRNLEN
-AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup])
+AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup atexit])
+
+# Check for POSIX thread support
+AX_PTHREAD([
+  LIBS="$PTHREAD_LIBS $LIBS"
+  CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+  CC="$PTHREAD_CC"
+  ],
+[AC_MSG_ERROR([POSIX threads support is required])])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
