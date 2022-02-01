@@ -16,31 +16,19 @@
 #include <stdlib.h>
 #include <syslog.h>
 
-/* This flag controls termination and cleanup of MHD for Web API and GUI. */
-volatile sig_atomic_t cleanup_flag = 0;
+#include "signal_handler.h"
 
 /* Signal handler (used to intercept CTRL+C and SIGTERM) */
 static void signal_handler(int signo)
 {
-	// CTRL+C
-	if (signo == SIGINT) {
-		fprintf(stderr, "Caught SIGINT!\n");
-		cleanup_flag = 1;
-	} else if (signo == SIGTERM) {
-		fprintf(stderr, "Caught SIGTERM!\n");
-		cleanup_flag = 1;
-	} else {
-		// this should never happen
-		fprintf(stderr, "Unexpected signal!\n");
-		exit(EXIT_FAILURE);
-	}
-	exit(EXIT_SUCCESS);
+	// We don't care about the signal type at the moment
+	// Just set the flag, so we can exit cleanly
+	cleanup_flag = signo;
 }
 
 /* Termination handler (atexit) */
 static void termination_handler(void)
 {
-	fprintf(stderr, "Exiting via atexit()\n");
 	cleanup_flag = 1;
 	closelog();
 }

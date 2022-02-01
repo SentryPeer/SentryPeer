@@ -18,6 +18,7 @@
 #define __APPLE_USE_RFC_3542
 #endif
 
+#include <pthread.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <net/if.h>
@@ -38,6 +39,46 @@
 #include "database.h"
 
 #define PACKET_BUFFER_SIZE 1024
+
+void *sip_daemon_thread_start(void *arg)
+{
+	sip_daemon_init((sentrypeer_config *)arg);
+	return NULL;
+}
+
+int sip_daemon_run(sentrypeer_config *config)
+{
+	pthread_t sip_daemon_thread = 0;
+	const char *sip_daemon_thread_name = "sip_daemon";
+
+	if (pthread_create(&sip_daemon_thread, NULL, sip_daemon_thread_start,
+			   (void *)config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to create SIP daemon thread.\n");
+		return EXIT_FAILURE;
+	}
+	if (pthread_setname_np(sip_daemon_thread, sip_daemon_thread_name) !=
+	    EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
+		return EXIT_FAILURE;
+	}
+	config->sip_daemon_thread = sip_daemon_thread;
+
+	return EXIT_SUCCESS;
+}
+
+int sip_daemon_stop(sentrypeer_config *config)
+{
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Stopping sip daemon...\n");
+	}
+
+	if (pthread_cancel(config->sip_daemon_thread) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to cancel SIP daemon thread.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
 
 /*
  * Hands-On Network Programming with C, page 117

@@ -43,8 +43,6 @@ sentrypeer_SOURCES= \
     src/database.h
 
 unit_test_sources = \
-    src/signal_handler.c \
-    src/signal_handler.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/http_common.c \

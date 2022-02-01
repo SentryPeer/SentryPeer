@@ -26,5 +26,7 @@
 #define SIP_DAEMON_PORT "5060"
 
 int sip_daemon_init(sentrypeer_config const *config);
+int sip_daemon_run(sentrypeer_config *config);
+int sip_daemon_stop(sentrypeer_config *config);
 
 #endif //SENTRYPEER_SIP_DAEMON_H

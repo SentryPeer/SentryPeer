@@ -16,4 +16,6 @@
 
 int signal_handler_init(void);
 
+extern volatile sig_atomic_t cleanup_flag;
+
 #endif //SENTRYPEER_SIGNAL_HANDLER_H

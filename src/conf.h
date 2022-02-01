@@ -16,6 +16,7 @@
 
 #include <getopt.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #define SENTRYPEER_PATH_MAX 4096
 
@@ -31,6 +32,7 @@ struct sentrypeer_config {
 	bool bgp_agent_mode;
 	char *db_file;
 	struct MHD_Daemon *http_daemon;
+	pthread_t sip_daemon_thread;
 };
 
 //  Constructor

@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <assert.h>
+#include <signal.h>
+#include <unistd.h>
 
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
@@ -23,6 +25,8 @@
 #include "conf.h"
 #include "sip_daemon.h"
 #include "http_daemon.h"
+
+volatile sig_atomic_t cleanup_flag = 0;
 
 int main(int argc, char **argv)
 {
@@ -48,7 +52,7 @@ int main(int argc, char **argv)
 
 	// Threaded, so start the HTTP daemon first
 	if (config->api_mode) {
-		if (http_daemon_init(config) == EXIT_FAILURE) {
+		if (http_daemon_init(config) != EXIT_SUCCESS) {
 			fprintf(stderr,
 				"Failed to start %s server on port %d\n",
 				"HTTP", HTTP_DAEMON_PORT);
@@ -68,7 +72,7 @@ int main(int argc, char **argv)
 	}
 
 	// Blocking, so start the SIP daemon last
-	if (sip_daemon_init(config) == EXIT_FAILURE) {
+	if (sip_daemon_run(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to start %s server on port %s\n", "SIP",
 			SIP_DAEMON_PORT);
 		perror("sip_daemon_init");
@@ -79,6 +83,37 @@ int main(int argc, char **argv)
 		}
 		exit(EXIT_FAILURE);
 	}
+
+	// Wait for a signal to exit
+	while (cleanup_flag == 0) {
+		sleep(1);
+	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Stopping %s...\n", PACKAGE_NAME);
+		if (config->syslog_mode) {
+			syslog(LOG_ERR, "Stopping %s...\n", PACKAGE_NAME);
+		}
+	}
+
+	if (config->api_mode) {
+		if (http_daemon_stop(config) != EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Issue cleanly stopping http_daemon.\n");
+		}
+	}
+
+	if (sip_daemon_stop(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Issue cleanly stopping sip_daemon.\n");
+	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Stopped %s\n", PACKAGE_NAME);
+		if (config->syslog_mode) {
+			syslog(LOG_ERR, "Stopped %s\n", PACKAGE_NAME);
+		}
+	}
+	sentrypeer_config_destroy(&config);
 
 	return EXIT_SUCCESS;
 }
