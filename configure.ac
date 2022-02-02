@@ -15,6 +15,8 @@
 
 AC_PREREQ([2.69])
 AC_INIT([sentrypeer],[1.0.1],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+# Some weird issue with AX_PTHREAD macro that needs this to be called first:
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
