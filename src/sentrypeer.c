@@ -51,24 +51,21 @@ int main(int argc, char **argv)
 	}
 
 	// Threaded, so start the HTTP daemon first
-	if (config->api_mode) {
-		if (http_daemon_init(config) != EXIT_SUCCESS) {
-			fprintf(stderr,
-				"Failed to start %s server on port %d\n",
-				"HTTP", HTTP_DAEMON_PORT);
-			perror("http_daemon_init");
-			if (config->syslog_mode) {
-				syslog(LOG_ERR,
-				       "Failed to start %s server on port %d\n",
-				       "HTTP", HTTP_DAEMON_PORT);
-			}
-			exit(EXIT_FAILURE);
+	if (config->api_mode && (http_daemon_init(config) != EXIT_SUCCESS)) {
+		fprintf(stderr, "Failed to start %s server on port %d\n",
+			"HTTP", HTTP_DAEMON_PORT);
+		perror("http_daemon_init");
+		if (config->syslog_mode) {
+			syslog(LOG_ERR,
+			       "Failed to start %s server on port %d\n", "HTTP",
+			       HTTP_DAEMON_PORT);
 		}
+		exit(EXIT_FAILURE);
+	}
 
-		if (config->web_gui_mode &&
-		    (config->debug_mode || config->verbose_mode)) {
-			fprintf(stderr, "Web GUI mode enabled...\n");
-		}
+	if (config->web_gui_mode &&
+	    (config->debug_mode || config->verbose_mode)) {
+		fprintf(stderr, "Web GUI mode enabled...\n");
 	}
 
 	// Blocking, so start the SIP daemon last
@@ -96,11 +93,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (config->api_mode) {
-		if (http_daemon_stop(config) != EXIT_SUCCESS) {
-			fprintf(stderr,
-				"Issue cleanly stopping http_daemon.\n");
-		}
+	if (config->api_mode && (http_daemon_stop(config) != EXIT_SUCCESS)) {
+		fprintf(stderr, "Issue cleanly stopping http_daemon.\n");
 	}
 
 	if (sip_daemon_stop(config) != EXIT_SUCCESS) {

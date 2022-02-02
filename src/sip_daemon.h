@@ -27,6 +27,6 @@
 
 int sip_daemon_init(sentrypeer_config const *config);
 int sip_daemon_run(sentrypeer_config *config);
-int sip_daemon_stop(sentrypeer_config *config);
+int sip_daemon_stop(sentrypeer_config const *config);
 
 #endif //SENTRYPEER_SIP_DAEMON_H

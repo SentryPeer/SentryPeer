@@ -56,6 +56,12 @@ int sip_daemon_run(sentrypeer_config *config)
 		fprintf(stderr, "Failed to create SIP daemon thread.\n");
 		return EXIT_FAILURE;
 	}
+#ifdef __APPLE__
+	if (pthread_setname_np(sip_daemon_thread_name) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
+		return EXIT_FAILURE;
+	}
+#endif
 	if (pthread_setname_np(sip_daemon_thread, sip_daemon_thread_name) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
@@ -66,7 +72,7 @@ int sip_daemon_run(sentrypeer_config *config)
 	return EXIT_SUCCESS;
 }
 
-int sip_daemon_stop(sentrypeer_config *config)
+int sip_daemon_stop(sentrypeer_config const *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopping sip daemon...\n");
