@@ -61,12 +61,13 @@ int sip_daemon_run(sentrypeer_config *config)
 		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
 		return EXIT_FAILURE;
 	}
-#endif
+#else
 	if (pthread_setname_np(sip_daemon_thread, sip_daemon_thread_name) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
 		return EXIT_FAILURE;
 	}
+#endif
 	config->sip_daemon_thread = sip_daemon_thread;
 
 	return EXIT_SUCCESS;
