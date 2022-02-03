@@ -232,11 +232,13 @@ int sip_daemon_init(sentrypeer_config const *config)
 				.msg_control = cmbuf,
 				.msg_controllen = sizeof(cmbuf),
 			};
+			bzero(&msg_hdr, sizeof(msg_hdr));
 
 			struct iovec iov = {
 				.iov_base = read_packet_buf,
 				.iov_len = sizeof(read_packet_buf),
 			};
+			bzero(&iov, sizeof(iov));
 
 			msg_hdr.msg_iov = &iov;
 			msg_hdr.msg_iovlen = 1;
