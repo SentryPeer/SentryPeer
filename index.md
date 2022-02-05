@@ -42,6 +42,7 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
+- [x] Multithreaded
 - [x] UDP transport
 - [ ] TCP transport
 - [ ] TLS transport
@@ -359,7 +360,7 @@ Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.3
 
 ### IPv6 Multicast Address
 
-The project has an IANA IPv6 multicast address for the purpose of sending messages between SentryPeer peers
+The project has an IANA IPv6 multicast address for the purpose of sending messages between SentryPeer peers.
 
     Addresses: FF0X:0:0:0:0:0:0:172
     Description: SentryPeer
@@ -404,4 +405,5 @@ Special thanks to:
 
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
   - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
+  - [@joejag](https://github.com/joejag) for the [Pull Request](https://github.com/SentryPeer/SentryPeer/pull/19) for the start of [Terraform recipes to launch SentryPeer on different cloud providers #12](https://github.com/SentryPeer/SentryPeer/issues/12)
 
