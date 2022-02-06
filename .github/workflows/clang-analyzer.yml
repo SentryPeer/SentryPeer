@@ -33,5 +33,8 @@ jobs:
       - run: |
           set -x
           ./bootstrap.sh
-          scan-build ./configure
+        # See https://github.com/llvm/llvm-project/issues/53552
+        # for why I am commenting this out for now.
+        # scan-build ./configure
+          ./configure
           scan-build --status-bugs make
