@@ -32,13 +32,15 @@ RUN make
 RUN make check
 RUN make install
 
-
 # SIP Port 5060 and RESTful API
 EXPOSE 5060 8082
 
 # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
+# ENV SENTRYPEER_API=1
+# ENV SENTRYPEER_WEB_GUI=1
+# ENV SENTRYPEER_SIP_RESPONSIVE=1
 # ENV SENTRYPEER_SYSLOG=1
 # ENV SENTRYPEER_VERBOSE=1
 # ENV SENTRYPEER_DEBUG=1
 
-CMD ["./sentrypeer", "-d", "-s"]
+CMD ["./sentrypeer", "-d", "-r", "-a", "-w", "-s"]

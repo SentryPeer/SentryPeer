@@ -86,6 +86,8 @@ unit_test_sources = \
     tests/unit_tests/test_ip_address_regex.h \
     tests/unit_tests/test_sip_message.c \
     tests/unit_tests/test_sip_message.h \
+    tests/unit_tests/test_sip_daemon.c \
+    tests/unit_tests/test_sip_daemon.h \
     tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \

@@ -27,6 +27,7 @@
 #include "test_http_route_check.h"
 #include "test_ip_address_regex.h"
 #include "test_sip_message.h"
+#include "test_sip_daemon.h"
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -59,6 +60,7 @@ int main(void)
 		cmocka_unit_test(test_ip_address_regex),
 		cmocka_unit_test(test_route_regex_check),
 		cmocka_unit_test(test_sip_message),
+		cmocka_unit_test(test_sip_daemon),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

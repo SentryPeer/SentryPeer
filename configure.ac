@@ -83,12 +83,15 @@ AC_FUNC_REALLOC
 AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup atexit bzero])
 
-# Check for POSIX thread support
+# https://github.com/stedolan/jq/blob/master/configure.ac#L129
+# Find pthread, if we have it. We do this first because we may set -pthread on CFLAGS
+# which can cause various macros to be defined (__REENTRANT on Darwin, for example)
 AX_PTHREAD([
-  LIBS="$PTHREAD_LIBS $LIBS"
-  CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-  CC="$PTHREAD_CC"
-  ],
+   AC_DEFINE([HAVE_PTHREAD], [1], [Define if pthread is available])
+   LIBS="$PTHREAD_LIBS $LIBS"
+   CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+   CC="$PTHREAD_CC"
+],
 [AC_MSG_ERROR([POSIX threads support is required])])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
