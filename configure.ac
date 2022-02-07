@@ -72,17 +72,18 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
   AC_MSG_ERROR([pthread_create() is not available.])
 ])
 
-PKG_CHECK_MODULES([ZYRE], [libzyre], [
-   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
-   LIBS="$ZYRE_LIBS $LIBS"
-   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
-],
-[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
-AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
+# Uncomment this when we are using libzyre not just in tests
+#PKG_CHECK_MODULES([ZYRE], [libzyre], [
+#   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
+#   LIBS="$ZYRE_LIBS $LIBS"
+#   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
+#],
+#[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
+#AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
 
-AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
-    AC_MSG_ERROR([zyre_new() is not available. zyre is required.])
-])
+#AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
+#    AC_MSG_ERROR([zyre_new() is not available. zyre is required.])
+#])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
@@ -168,7 +169,15 @@ PKG_CHECK_EXISTS(cmocka >= 1.1.5,
 			]
 		)
 		AS_IF([test x"$cmocka_required_headers" != x"no"],
-			  [PKG_CHECK_MODULES([CMOCKA], [cmocka], [have_cmocka="yes"])]
+			  [PKG_CHECK_MODULES([CMOCKA], [cmocka], [have_cmocka="yes"])
+			   ###### Remove once libzyre is not just in tests
+			   PKG_CHECK_MODULES([ZYRE], [libzyre], [
+                 AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
+               ],
+               [AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
+               AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
+               #######
+			  ]
 		)],
 		dnl PKG_CHECK_EXISTS ACTION-IF-NOT-FOUND
 		[AC_MSG_WARN([No libcmocka-1.1.5 or newer library found, cmocka tests will not be built])]

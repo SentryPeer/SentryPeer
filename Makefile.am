@@ -140,7 +140,8 @@ AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
 if HAVE_ZYRE
-sentrypeer_LDADD= -lczmq -lzmq
+#sentrypeer_LDADD= -lczmq -lzmq
+tests_LDADD= -lczmq -lzmq
 endif
 
 if HAVE_CMOCKA
@@ -148,7 +149,7 @@ TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
-tests_unit_tests_runner_LDADD = -lcmocka $(sentrypeer_LDADD)
+tests_unit_tests_runner_LDADD = -lcmocka $(tests_LDADD)
 endif
 
 if HAVE_DOXYGEN
