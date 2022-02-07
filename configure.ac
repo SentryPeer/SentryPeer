@@ -72,7 +72,7 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
   AC_MSG_ERROR([pthread_create() is not available.])
 ])
 
-PKG_CHECK_MODULES([ZYRE], [zyre], [
+PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
    LIBS="$ZYRE_LIBS $LIBS"
    CFLAGS="$CFLAGS $ZYRE_CFLAGS"
