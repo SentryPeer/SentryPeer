@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Add signal handlers to gracefully shut down the SIP and HTTP daemons
 - Move SIP daemon into its own thread using pthreads
-- Add [Zyre](https://github.com/zeromq/zyre) build requirement to configure.ac for proximity-based Peer to Peer support 
-  with a few tests and update GitHub Actions
+- Add [Zyre](https://github.com/zeromq/zyre) for proximity-based Peer to Peer support with tests
 
 ### Tests
 - Clean up all valgrind warnings

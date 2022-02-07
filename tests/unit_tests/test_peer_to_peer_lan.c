@@ -17,9 +17,10 @@
 #include <stdint.h>
 #include <cmocka.h>
 
-#include "test_peer_to_peer_lan.h"
 #include <zyre.h>
 #include <config.h>
+
+#include "test_peer_to_peer_lan.h"
 
 #define ROOM "LAN-GROUP"
 

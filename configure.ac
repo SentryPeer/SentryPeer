@@ -72,10 +72,17 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
   AC_MSG_ERROR([pthread_create() is not available.])
 ])
 
+PKG_CHECK_MODULES([ZYRE], [zyre], [
+   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
+   LIBS="$ZYRE_LIBS $LIBS"
+   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
+],
+[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
+AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
+
 AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
-    AC_MSG_ERROR([zyre_new() is not available. libzyre-dev / libzyre-devel or equivalent is required.])
+    AC_MSG_ERROR([zyre_new() is not available. zyre is required.])
 ])
-AM_CONDITIONAL([HAVE_ZYRE], [test x$have_zyre = xyes])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
