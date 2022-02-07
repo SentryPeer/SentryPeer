@@ -74,10 +74,9 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
 
 PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
-   LIBS="$ZYRE_LIBS $LIBS"
-   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
+   LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
 ],
-[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
+[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually $ZYRE_LIBS.])])
 AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
 
 AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
