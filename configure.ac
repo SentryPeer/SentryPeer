@@ -101,6 +101,7 @@ AX_PTHREAD([
 PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
    LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
+   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
 ],
 [AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
 AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
