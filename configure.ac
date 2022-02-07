@@ -72,13 +72,6 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
   AC_MSG_ERROR([pthread_create() is not available.])
 ])
 
-PKG_CHECK_MODULES([ZYRE], [libzyre], [
-   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
-   LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
-],
-[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
-AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
-
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
 
@@ -104,6 +97,13 @@ AX_PTHREAD([
    CC="$PTHREAD_CC"
 ],
 [AC_MSG_ERROR([POSIX threads support is required])])
+
+PKG_CHECK_MODULES([ZYRE], [libzyre], [
+   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
+   LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
+],
+[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
+AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
