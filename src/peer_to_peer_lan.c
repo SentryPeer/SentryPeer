@@ -11,6 +11,8 @@
                              |___/
 */
 
+#include <zyre.h>
+
 #include "config.h"
 #include "conf.h"
 
