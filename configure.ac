@@ -76,12 +76,8 @@ PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
    LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
 ],
-[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually $ZYRE_LIBS.])])
+[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
 AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
-
-AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
-    AC_MSG_ERROR([zyre_new() is not available. zyre is required.])
-])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
