@@ -25,6 +25,7 @@
 #include "conf.h"
 #include "sip_daemon.h"
 #include "http_daemon.h"
+#include "peer_to_peer_lan.h"
 
 volatile sig_atomic_t cleanup_flag = 0;
 
@@ -68,15 +69,24 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Web GUI mode enabled...\n");
 	}
 
-	// Blocking, so start the SIP daemon last
 	if (sip_daemon_run(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to start %s server on port %s\n", "SIP",
 			SIP_DAEMON_PORT);
-		perror("sip_daemon_init");
+		perror("sip_daemon_run");
 		if (config->syslog_mode) {
 			syslog(LOG_ERR,
 			       "Failed to start %s server on port %s\n", "SIP",
 			       SIP_DAEMON_PORT);
+		}
+		exit(EXIT_FAILURE);
+	}
+
+	// TODO: Add p2p flag to config/cli
+	if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to start peer to peer LAN.\n");
+		perror("peer_to_peer_lan_run");
+		if (config->syslog_mode) {
+			syslog(LOG_ERR, "Failed to start peer to peer LAN\n");
 		}
 		exit(EXIT_FAILURE);
 	}
@@ -99,6 +109,11 @@ int main(int argc, char **argv)
 
 	if (sip_daemon_stop(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Issue cleanly stopping sip_daemon.\n");
+	}
+
+	// TODO: Add p2p flag to config/cli
+	if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
 	}
 
 	if (config->debug_mode || config->verbose_mode) {

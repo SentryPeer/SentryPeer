@@ -35,6 +35,8 @@ sentrypeer_SOURCES= \
     src/sip_daemon.h \
     src/sip_parser.c \
     src/sip_parser.h \
+    src/peer_to_peer_lan.c \
+    src/peer_to_peer_lan.h \
     src/utils.c \
     src/utils.h \
     src/bad_actor.c \
@@ -140,8 +142,7 @@ AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
 if HAVE_ZYRE
-#sentrypeer_LDADD= -lczmq -lzmq
-tests_LDADD= -lczmq -lzmq
+sentrypeer_LDADD= -lczmq -lzmq
 endif
 
 if HAVE_CMOCKA
@@ -149,7 +150,7 @@ TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
-tests_unit_tests_runner_LDADD = -lcmocka $(tests_LDADD)
+tests_unit_tests_runner_LDADD = -lcmocka $(sentrypeer_LDADD)
 endif
 
 if HAVE_DOXYGEN

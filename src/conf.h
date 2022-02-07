@@ -17,6 +17,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <zyre.h>
 
 #define SENTRYPEER_PATH_MAX 4096
 
@@ -33,6 +34,7 @@ struct sentrypeer_config {
 	char *db_file;
 	struct MHD_Daemon *http_daemon;
 	pthread_t sip_daemon_thread;
+	zyre_t *p2p_node;
 };
 
 //  Constructor
