@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Add signal handlers to gracefully shut down the SIP and HTTP daemons
 - Move SIP daemon into its own thread using pthreads
+- Add [Zyre](https://github.com/zeromq/zyre) build requirement to configure.ac for proximity-based Peer to Peer support 
+  with a few tests and update GitHub Actions
 
 ### Tests
 - Clean up all valgrind warnings
 - Use the new http_daemon_stop() which calls MHD_stop_daemon() to clear up memory leaks, sockets etc. in tests
+- Add tests for the sip_daemon_XXXX() functions
 
 ## [1.0.0] - 2022-01-24
 - Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)

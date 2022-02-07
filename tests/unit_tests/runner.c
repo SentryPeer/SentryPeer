@@ -28,6 +28,7 @@
 #include "test_ip_address_regex.h"
 #include "test_sip_message.h"
 #include "test_sip_daemon.h"
+#include "test_peer_to_peer_lan.h"
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -61,6 +62,7 @@ int main(void)
 		cmocka_unit_test(test_route_regex_check),
 		cmocka_unit_test(test_sip_message),
 		cmocka_unit_test(test_sip_daemon),
+		cmocka_unit_test(test_peer_to_peer_lan),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

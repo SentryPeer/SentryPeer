@@ -31,6 +31,7 @@ jobs:
           sudo add-apt-repository ppa:savoury1/utilities
           sudo apt-get update
           sudo apt-get install libmicrohttpd-dev
+          brew install --build-from-source zyre
       - run: |
           set -x
           cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/

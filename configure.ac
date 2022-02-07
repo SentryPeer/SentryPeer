@@ -68,6 +68,15 @@ AC_SEARCH_LIBS(pcre2_compile_8, pcre2-8, [], [
   AC_MSG_ERROR([pcre2_compile_8() is not available. libpcre2-dev / pcre2-devel or equivalent is required.])
 ])
 
+AC_SEARCH_LIBS(pthread_create, pthread, [], [
+  AC_MSG_ERROR([pthread_create() is not available.])
+])
+
+AC_SEARCH_LIBS(zyre_new, zyre, [have_zyre=yes], [
+    AC_MSG_ERROR([zyre_new() is not available. libzyre-dev / libzyre-devel or equivalent is required.])
+])
+AM_CONDITIONAL([HAVE_ZYRE], [test x$have_zyre = xyes])
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
 

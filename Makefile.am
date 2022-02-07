@@ -88,6 +88,8 @@ unit_test_sources = \
     tests/unit_tests/test_sip_message.h \
     tests/unit_tests/test_sip_daemon.c \
     tests/unit_tests/test_sip_daemon.h \
+    tests/unit_tests/test_peer_to_peer_lan.c \
+    tests/unit_tests/test_peer_to_peer_lan.h \
     tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
@@ -137,12 +139,16 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
 AM_LDFLAGS=
 ACLOCAL_AMFLAGS=-I m4
 
+if HAVE_ZYRE
+sentrypeer_LDADD= -lczmq -lzmq
+endif
+
 if HAVE_CMOCKA
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
-tests_unit_tests_runner_LDADD = -lcmocka
+tests_unit_tests_runner_LDADD = -lcmocka $(sentrypeer_LDADD)
 endif
 
 if HAVE_DOXYGEN
