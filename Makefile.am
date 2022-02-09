@@ -142,7 +142,9 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Werror=format-security -Werror=implicit-function-declaration \
           -Wmisleading-indentation $(LIBASAN_FLAGS)
 
-AM_LDFLAGS=
+# Adding this for now:
+# https://github.com/Homebrew/discussions/discussions/2587
+AM_LDFLAGS=-Wl,-rpath,/home/linuxbrew/.linuxbrew/lib
 ACLOCAL_AMFLAGS=-I m4
 
 if HAVE_CMOCKA
