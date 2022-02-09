@@ -100,11 +100,22 @@ AX_PTHREAD([
 
 PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
-   LIBS="$ZYRE_LIBS -lczmq -lzmq $LIBS"
+   LIBS="$ZYRE_LIBS $LIBS"
    CFLAGS="$CFLAGS $ZYRE_CFLAGS"
 ],
 [AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
 AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
+
+# These should both be there as libzyre needs them
+PKG_CHECK_MODULES([CZMQ], [libczmq], [
+   LIBS="$CZMQ_LIBS $LIBS"
+   CFLAGS="$CFLAGS $CZMQ_CFLAGS"
+])
+
+PKG_CHECK_MODULES([ZMQ], [libzmq], [
+   LIBS="$ZMQ_LIBS $LIBS"
+   CFLAGS="$CFLAGS $ZMQ_CFLAGS"
+])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])

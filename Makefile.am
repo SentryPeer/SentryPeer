@@ -129,10 +129,14 @@ bootstrap:
 #
 # Also see Effective C, page 205 in the PDF (adding -fpie -Wl,-pie fails on Fedora 34 (Workstation Edition) )
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
+#
+# https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+# Removing -Wredundant-decls as czmq is failing with it. Reported it
+# here - https://github.com/zeromq/czmq/issues/2205
 AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
-          -Wredundant-decls -Wnested-externs -Wmissing-include-dirs \
+          -Wnested-externs -Wmissing-include-dirs \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
           -fstack-protector-strong -grecord-gcc-switches \
           -Werror=format-security -Werror=implicit-function-declaration \

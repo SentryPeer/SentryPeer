@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Add signal handlers to gracefully shut down the SIP and HTTP daemons
+- Add signal handlers to gracefully shut down the SIP, P2P and HTTP daemons
 - Move SIP daemon into its own thread using pthreads
 - Add [Zyre](https://github.com/zeromq/zyre) for proximity-based Peer to Peer support with tests
 
@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clean up all valgrind warnings
 - Use the new http_daemon_stop() which calls MHD_stop_daemon() to clear up memory leaks, sockets etc. in tests
 - Add tests for the sip_daemon_XXXX() functions
+- Add tests for the peer_to_peer_lan_XXXX() functions
 
 ## [1.0.0] - 2022-01-24
 - Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)

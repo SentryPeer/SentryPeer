@@ -22,8 +22,7 @@ int peer_to_peer_lan_run(sentrypeer_config *config)
 		fprintf(stderr, "Starting peer to peer LAN mode...\n");
 	}
 
-	const char *name = PACKAGE_NAME;
-	zyre_t *node = zyre_new(name);
+	zyre_t *node = zyre_new(NULL);
 	assert(node);
 
 	if (zyre_start(node) != EXIT_SUCCESS) {
@@ -46,7 +45,7 @@ int peer_to_peer_lan_run(sentrypeer_config *config)
 		return EXIT_FAILURE;
 	}
 
-	if (zyre_shouts(node, PACKAGE_NAME, "Hello from %s", name) !=
+	if (zyre_shouts(node, PACKAGE_NAME, "Hello from %s", zyre_name(node)) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to shout to peer to peer LAN room.\n");
 		zyre_stop(node);

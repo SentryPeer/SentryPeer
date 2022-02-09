@@ -14,6 +14,8 @@
 #ifndef SENTRYPEER_PEER_TO_PEER_LAN_H
 #define SENTRYPEER_PEER_TO_PEER_LAN_H 1
 
+#include "conf.h"
+
 int peer_to_peer_lan_run(sentrypeer_config *config);
 int peer_to_peer_lan_stop(sentrypeer_config *config);
 
