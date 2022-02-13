@@ -94,9 +94,6 @@ int main(int argc, char **argv)
 	// Wait for a signal to exit
 	while (cleanup_flag == 0) {
 		sleep(1);
-		if (config->debug_mode || config->verbose_mode) {
-			fprintf(stderr, ".");
-		}
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
