@@ -80,7 +80,7 @@ build
 .idea
 
 # sqlite3 db
-sentrypeer.d*
+sentrypeer.db
 
 # dist
 sentrypeer-*
