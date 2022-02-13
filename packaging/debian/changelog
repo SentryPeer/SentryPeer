@@ -1,0 +1,76 @@
+sentrypeer (1.0.0-1) UNRELEASED; urgency=medium
+
+  * Called Number RESTful API resource live
+  * Called Numbers RESTful API resource live
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Mon, 24 Jan 2022 21:45:00 +0000
+
+sentrypeer (0.0.6-1) UNRELEASED; urgency=medium
+
+  * Fix incorrect libcurl usage
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Fri, 21 Jan 2022 17:13:00 +0000
+
+sentrypeer (0.0.5-1) UNRELEASED; urgency=medium
+
+  * Switched from 404 to Error 400 on invalid request data at 
+    /ip-addresses/{blah}
+  * Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)
+  * Only parse SIP packets if UDP packet payload is > 0 bytes
+  * Fedora and Debian packaging now available for each release
+  * HTTP regex route memory leak fix
+  * vue.js SPA is now in for start web gui
+  * Remove duplicate uuid_generate call in bad_actor structure
+  * Add CORS header to all API responses
+  * Add more header checks to configure.ac
+  * Switch to recvmsg for receiving UDP packets, so we can save the destination 
+    IP address of probes
+  * SIP responsive mode can be enabled to reply to SIP probes. This will prompt 
+    INVITE's from bad actors for phone call attempts, so you can collect the 
+    phone numbers
+  * API mode can be set to enable replies to RESTful API requests. Depending 
+    on your node deployment type, you may not want to enable this
+  * Web GUI mode can be set to enable the Vue.js SPA. Depending on your node 
+    deployment type, you might not want this
+  * Add seen_last and seen_count bad_actor data structure for use in 
+    ip_addresses RESTful API resource
+  * ip_addresses RESTful API resource results sorted by seen_last descending
+  * Add AC_USE_SYSTEM_EXTENSIONS to configure.ac
+  * Web GUI mode needs the API to be enabled, so if you don't set API mode, we 
+    automatically set it
+  * Clean up test RESTful API code to fix test suite crashes on macOS
+  * Highly recommend v5+ of libosip2 via ./configure
+  * Correct homebrew installation instructions for SentryPeer
+  * Major test suite refactor for memory leak fixes
+  * Replies with json no longer leak memory
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Tue, 18 Jan 2022 20:04:53 +0000
+
+sentrypeer (0.0.4-1) UNRELEASED; urgency=medium
+
+  * Updated README.md copy and paste example for installation instructions from this repository
+  * Fixed memory leak in route regex matching
+  * Removed global sqlite error log callback which caused segfaults when trying to show error messages (threads)
+  * Added an index to the database to speed up searching for IP addresses
+  * Fixed a segfault when trying to search for IP address/s in an empty database due to global error log bug above
+  * Better error messages on API responses
+  * Removed some unnecessary jansson usage
+  * Dockerfile and now listed on Docker Hub
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 22 Dec 2021 14:58:53 +0000
+
+sentrypeer (0.0.3-1) UNRELEASED; urgency=medium
+
+  * Added `event_uuid`, `collected_method` (passive or responsive) and `created_by_node_id` (aa uuid) columns to `honey` table
+  * Extended `bad_actor` data structure to provide above
+  * Added `libuuid` library requirement for `created_by_node_id` and `event_uuid` column of `honey` table
+  * Memory leak fix with bad_actor not being destroyed
+  * Added libmicrohttpd, curl and jansson to provide a RESTful API for honeypot data
+  * Added build requirement for libmicrohttpd and jansson
+  * Added syslog support for use with [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
+  * Logging to syslog is enabled via `-s` flag. Default is off
+  * Log `Source IP` to sqlite db and syslog (if enabled) to track probes that aren't SIP compliant
+  * systemd service file for SentryPeer
+  * Debian packaging placeholder
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 01 Dec 2021 14:58:53 +0000

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+#DEBHELPER#
+
+if [ "$1" = "purge" ]; then
+	rmdir /var/lib/sentrypeer || true
+	# delete sentrypeer daemon user, if it exists
+	if getent passwd sentrypeer > /dev/null ; then
+		deluser --quiet sentrypeer > /dev/null || true
+	fi
+fi
+
+exit 0
+

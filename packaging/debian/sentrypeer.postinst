@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = configure ]; then
+    getent group sentrypeer >/dev/null 2>&1 || addgroup --system sentrypeer
+    getent passwd sentrypeer >/dev/null 2>&1 ||
+	adduser --system --home /var/lib/sentrypeer \
+		--disabled-password --ingroup sentrypeer sentrypeer
+
+    # Create sentrypeer.db directory on fresh install
+    if [ -z "$2" ]; then
+	chown root:sentrypeer /var/lib/sentrypeer
+	chmod 775 /var/lib/sentrypeer
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0
+
