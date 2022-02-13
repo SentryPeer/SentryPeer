@@ -3,3 +3,4 @@ extraction:
     prepare:
       packages:
       - autoconf-archive
+      - brew install --build-from-source zyre
