@@ -92,7 +92,8 @@ int main(int argc, char **argv)
 	}
 
 	// Wait for a signal to exit
-	while (cleanup_flag == 0) {
+	// zsys_interrupted is from czmq (zsys.h) used by zyre
+	while (cleanup_flag == 0 && zsys_interrupted == 0) {
 		sleep(1);
 	}
 

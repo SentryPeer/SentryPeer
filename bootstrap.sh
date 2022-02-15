@@ -13,4 +13,5 @@
 #
 
 mkdir -p m4
+aclocal
 autoreconf --verbose --force --install || exit 1
