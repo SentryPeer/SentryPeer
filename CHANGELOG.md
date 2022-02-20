@@ -6,8 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Add signal handlers to gracefully shut down the SIP, P2P and HTTP daemons
-- Move SIP daemon into its own thread using pthreads
-- Add [Zyre](https://github.com/zeromq/zyre) for proximity-based Peer to Peer support with tests
+- Move SIP daemon into its own thread
+- Integrate the [Zyre](https://github.com/zeromq/zyre) library for proximity-based Peer to Peer support with tests
+- Integrate the [OpenDHT](https://github.com/savoirfairelinux/opendht) library for a 
+  [Kademlia](https://en.m.wikipedia.org/wiki/Kademlia) like distributed key-value with tests
 
 ### Tests
 - Clean up all valgrind warnings

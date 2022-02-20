@@ -56,6 +56,7 @@ target_link_libraries(sentrypeer -lcurl)
 target_link_libraries(sentrypeer -lzyre)
 target_link_libraries(sentrypeer -lzmq)
 target_link_libraries(sentrypeer -lczmq)
+target_link_libraries(sentrypeer -lopendht-c)
 
 # configure header file
 configure_file(

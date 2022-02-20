@@ -90,6 +90,8 @@ unit_test_sources = \
     tests/unit_tests/test_sip_message.h \
     tests/unit_tests/test_sip_daemon.c \
     tests/unit_tests/test_sip_daemon.h \
+    tests/unit_tests/test_peer_to_peer_dht.c \
+    tests/unit_tests/test_peer_to_peer_dht.h \
     tests/unit_tests/test_peer_to_peer_lan.c \
     tests/unit_tests/test_peer_to_peer_lan.h \
     tests/unit_tests/runner.c

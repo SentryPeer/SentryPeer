@@ -29,6 +29,7 @@
 #include "test_sip_message.h"
 #include "test_sip_daemon.h"
 #include "test_peer_to_peer_lan.h"
+#include "test_peer_to_peer_dht.h"
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -38,6 +39,10 @@ static void null_test_success(void **state)
 
 int main(void)
 {
+	// Use XML output here as it shows the time taken for each test. No
+	// other output types show this information.
+	cmocka_set_message_output(CM_OUTPUT_XML);
+
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(null_test_success),
 		cmocka_unit_test(test_conf),
@@ -63,6 +68,7 @@ int main(void)
 		cmocka_unit_test(test_sip_message),
 		cmocka_unit_test(test_sip_daemon),
 		cmocka_unit_test(test_peer_to_peer_lan),
+		cmocka_unit_test(test_peer_to_peer_dht),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

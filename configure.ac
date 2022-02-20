@@ -98,6 +98,14 @@ AX_PTHREAD([
 ],
 [AC_MSG_ERROR([POSIX threads support is required])])
 
+PKG_CHECK_MODULES([OPENDHT_C], [opendht-c], [
+   AC_DEFINE([HAVE_OPENDHT_C], [1], [Define if OpenDHT is available])
+   LIBS="$OPENDHT_C_LIBS $LIBS"
+   CFLAGS="$CFLAGS $OPENDHT_C_CFLAGS"
+],
+[AC_MSG_WARN([OpenDHT-c is not detected via pkg-config. Please install it manually.])])
+AM_CONDITIONAL([HAVE_OPENDHT_C], [test "$HAVE_OPENDHT_C" = "1"])
+
 PKG_CHECK_MODULES([ZYRE], [libzyre], [
    AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
    LIBS="$ZYRE_LIBS $LIBS"
@@ -110,12 +118,16 @@ AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
 PKG_CHECK_MODULES([CZMQ], [libczmq], [
    LIBS="$CZMQ_LIBS $LIBS"
    CFLAGS="$CFLAGS $CZMQ_CFLAGS"
-])
+],
+[AC_MSG_WARN([libczmq is not detected via pkg-config. Please install it manually.])])
+AM_CONDITIONAL([HAVE_CZMQ], [test "$HAVE_CZMQ" = "1"])
 
 PKG_CHECK_MODULES([ZMQ], [libzmq], [
    LIBS="$ZMQ_LIBS $LIBS"
    CFLAGS="$CFLAGS $ZMQ_CFLAGS"
-])
+],
+[AC_MSG_WARN([libzmq is not detected via pkg-config. Please install it manually.])])
+AM_CONDITIONAL([HAVE_ZMQ], [test "$HAVE_ZMQ" = "1"])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
