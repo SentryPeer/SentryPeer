@@ -9,13 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move SIP daemon into its own thread
 - Integrate the [Zyre](https://github.com/zeromq/zyre) library for proximity-based Peer to Peer support with tests
 - Integrate the [OpenDHT](https://github.com/savoirfairelinux/opendht) library for a 
-  [Kademlia](https://en.m.wikipedia.org/wiki/Kademlia) like distributed key-value with tests
+  [Kademlia](https://en.m.wikipedia.org/wiki/Kademlia) like distributed key-value storage with tests. We will store the 
+  public IP addresses of the nodes in the DHT so peers can find each other and share collected data
 
 ### Tests
 - Clean up all valgrind warnings
 - Use the new http_daemon_stop() which calls MHD_stop_daemon() to clear up memory leaks, sockets etc. in tests
 - Add tests for the sip_daemon_XXXX() functions
 - Add tests for the peer_to_peer_lan_XXXX() functions
+- Add tests for the peer_to_peer_dht_XXXX() functions
+- Switch to cmocka XML output format to show time taken for each test
 
 ## [1.0.0] - 2022-01-24
 - Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)
