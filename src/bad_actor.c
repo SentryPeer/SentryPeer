@@ -50,9 +50,10 @@
 */
 
 //  Constructor
+// TODO: make this smaller
 bad_actor *bad_actor_new(char *sip_message, char *source_ip,
-			 char *called_number, char *method,
-			 char *transport_type, char *user_agent,
+			 char *destination_ip, char *called_number,
+			 char *method, char *transport_type, char *user_agent,
 			 char *collected_method, char *created_by_node_id)
 {
 	bad_actor *self = malloc(sizeof(bad_actor));
@@ -68,6 +69,7 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 	self->event_uuid = util_uuid_generate_string(uuid_string);
 	self->sip_message = sip_message;
 	self->source_ip = source_ip;
+	self->destination_ip = destination_ip;
 	self->called_number = called_number;
 	self->method = method;
 	self->transport_type = transport_type;
@@ -109,6 +111,11 @@ void bad_actor_destroy(bad_actor **self_ptr)
 		if (self->source_ip != 0) {
 			free(self->source_ip);
 			self->source_ip = 0;
+		}
+
+		if (self->destination_ip != 0) {
+			free(self->destination_ip);
+			self->destination_ip = 0;
 		}
 
 		if (self->transport_type != 0) {

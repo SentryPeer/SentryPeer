@@ -21,6 +21,7 @@
 #include "conf.h"
 #include "utils.h"
 #include "database.h"
+#include "json_logger.h"
 
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
@@ -32,6 +33,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	assert(self);
 
 	self->syslog_mode = false;
+	self->json_log_mode = false;
 	self->verbose_mode = false;
 	self->debug_mode = false;
 	self->sip_responsive_mode = false;
@@ -43,6 +45,11 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
 	util_copy_string(self->db_file, DEFAULT_DB_FILE_NAME,
+			 SENTRYPEER_PATH_MAX);
+
+	self->json_log_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
+	assert(self->json_log_file);
+	util_copy_string(self->json_log_file, DEFAULT_JSON_LOG_FILE_NAME,
 			 SENTRYPEER_PATH_MAX);
 
 	return self;
@@ -61,6 +68,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 			free(self->db_file);
 			self->db_file = 0;
 		}
+
+		if (self->json_log_file != 0) {
+			free(self->json_log_file);
+			self->json_log_file = 0;
+		}
 		free(self);
 		*self_ptr = 0;
 	}
@@ -69,7 +81,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-f fullpath for sentrypeer.db] [-r] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-j] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -78,11 +90,15 @@ void print_usage(void)
 	fprintf(stderr,
 		"  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env\n");
 	fprintf(stderr,
+		"  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env\n");
+	fprintf(stderr,
 		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
 	fprintf(stderr,
 		"  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env\n");
 	fprintf(stderr,
 		"  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env\n");
+	fprintf(stderr,
+		"  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env\n");
 	fprintf(stderr,
 		"  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env\n");
 	fprintf(stderr,
@@ -107,6 +123,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	config->api_mode = false;
 	config->debug_mode = false;
 	config->sip_responsive_mode = false;
+	config->json_log_mode = false;
 	config->syslog_mode = false;
 	config->verbose_mode = false;
 	config->web_gui_mode = false;
@@ -114,7 +131,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVf:adrsvw")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:jdraws")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -131,6 +148,16 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'j':
+			if (set_json_log_file_location(config, optarg) !=
+			    EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Error: Failed to set json log file location\n");
+				perror("json log file location");
+				exit(EXIT_FAILURE);
+			}
+			config->json_log_mode = true;
+			break;
 		case 'a':
 			config->api_mode = true;
 			break;
@@ -139,6 +166,9 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'r':
 			config->sip_responsive_mode = true;
+			break;
+		case 'l':
+			config->json_log_mode = true;
 			break;
 		case 's':
 			config->syslog_mode = true;
@@ -164,6 +194,11 @@ int process_env_vars(sentrypeer_config *config)
 		util_copy_string(config->db_file, getenv("SENTRYPEER_DB_FILE"),
 				 SENTRYPEER_PATH_MAX);
 	}
+	if (getenv("SENTRYPEER_JSON_LOG_FILE")) {
+		util_copy_string(config->json_log_file,
+				 getenv("SENTRYPEER_JSON_LOG_FILE"),
+				 SENTRYPEER_PATH_MAX);
+	}
 	if (getenv("SENTRYPEER_API")) {
 		config->api_mode = true;
 	}
@@ -176,6 +211,9 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_SYSLOG")) {
 		config->syslog_mode = true;
+	}
+	if (getenv("SENTRYPEER_JSON_LOG")) {
+		config->json_log_mode = true;
 	}
 	if (getenv("SENTRYPEER_VERBOSE")) {
 		config->verbose_mode = true;
@@ -236,6 +274,66 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 		fprintf(stderr,
 			"Error: SentryPeer db file location must be an absolute path: %s\n",
 			cli_db_file_location);
+		return EXIT_FAILURE;
+	}
+}
+
+// TODO: When we use this for the 3rd time, re-work the lot as it's the same as set_db_file_location
+int set_json_log_file_location(sentrypeer_config *config,
+			       char *cli_json_log_file_location)
+{
+	if (cli_json_log_file_location == NULL) {
+		// try to get from the environment
+		if (getenv("SENTRYPEER_JSON_LOG_FILE")) {
+			util_copy_string(config->json_log_file,
+					 getenv("SENTRYPEER_JSON_LOG_FILE"),
+					 SENTRYPEER_PATH_MAX);
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"SentryPeer json log file location set via SENTRYPEER_JSON_LOG_FILE env var to: %s\n",
+					config->json_log_file);
+			}
+		} else {
+			// Set to current working directory absolute path with our own json log file name
+			if (getcwd(config->json_log_file,
+				   SENTRYPEER_PATH_MAX) == NULL) {
+				fprintf(stderr,
+					"Error: Failed to get current working directory\n");
+				perror("getcwd");
+				return EXIT_FAILURE;
+			}
+
+			// Build the db file path
+			strncat(config->json_log_file, "/",
+				SENTRYPEER_PATH_MAX -
+					strlen(config->json_log_file));
+			strncat(config->json_log_file,
+				DEFAULT_JSON_LOG_FILE_NAME,
+				SENTRYPEER_PATH_MAX -
+					strlen(config->json_log_file));
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"SentryPeer json log file location set to current working dir: %s\n",
+					config->json_log_file);
+			}
+		}
+		return EXIT_SUCCESS;
+	}
+
+	if (cli_json_log_file_location[0] == '/') {
+		util_copy_string(config->json_log_file,
+				 cli_json_log_file_location,
+				 SENTRYPEER_PATH_MAX);
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr,
+				"SentryPeer json log file location set via cli -f to: %s\n",
+				config->json_log_file);
+		}
+		return EXIT_SUCCESS;
+	} else {
+		fprintf(stderr,
+			"Error: SentryPeer json log file location must be an absolute path: %s\n",
+			cli_json_log_file_location);
 		return EXIT_FAILURE;
 	}
 }

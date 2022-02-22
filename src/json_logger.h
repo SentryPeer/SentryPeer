@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> */
-/*
+/* 
    _____            _              _____
   / ____|          | |            |  __ \
  | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
@@ -11,13 +11,14 @@
                              |___/
 */
 
-#ifndef SENTRYPEER_TEST_BAD_ACTOR_H
-#define SENTRYPEER_TEST_BAD_ACTOR_H 1
+#ifndef SENTRYPEER_JSON_LOGGER_H
+#define SENTRYPEER_JSON_LOGGER_H 1
 
-#include "../../src/bad_actor.h"
+#define DEFAULT_JSON_LOG_FILE_NAME "sentrypeer_json.log"
 
-void test_bad_actor(void **state);
-void test_bad_actors(void **state);
-bad_actor *test_bad_actor_event_new(void);
+#include "conf.h"
+#include "bad_actor.h"
 
-#endif //SENTRYPEER_TEST_BAD_ACTOR_H
+int json_log_bad_actor(const sentrypeer_config *config, const bad_actor *bad_actor);
+
+#endif //SENTRYPEER_JSON_LOGGER_H

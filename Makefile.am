@@ -41,6 +41,8 @@ sentrypeer_SOURCES= \
     src/utils.h \
     src/bad_actor.c \
     src/bad_actor.h \
+    src/json_logger.c \
+    src/json_logger.h \
     src/database.c \
     src/database.h
 
@@ -65,12 +67,16 @@ unit_test_sources = \
     src/bad_actor.h \
     src/conf.c \
     src/conf.h \
+    src/json_logger.c \
+    src/json_logger.h \
     src/utils.c \
     src/utils.h \
     src/database.c \
     src/database.h \
     tests/unit_tests/test_conf.c \
     tests/unit_tests/test_conf.h \
+    tests/unit_tests/test_json_logger.c \
+    tests/unit_tests/test_json_logger.h \
     tests/unit_tests/test_utils.c \
     tests/unit_tests/test_utils.h \
     tests/unit_tests/test_bad_actor.c \

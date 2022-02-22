@@ -1,10 +1,10 @@
-.TH SentryPeer 1 "December 2021" "SentryPeer"
+.TH SentryPeer 1 "March 2022" "SentryPeer"
 .SH NAME
 sentrypeer \- A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot
 
 .SH SYNOPSIS
 .B sentrypeer
-[\-hVfadrsvw]
+[\-hVvjlfdraws]
 .SH DESCRIPTION
 .B SentryPeer
 is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
@@ -27,12 +27,18 @@ shows the version of SentryPeer
 .BI "\-f
 Set 'sentrypeer.db' location or set SENTRYPEER_DB_FILE environment variable
 .TP
+.BI "\-j
+Enable json logging or use SENTRYPEER_JSON_LOG environment variable
+.TP
 .BI "\-a
 Runs SentryPeer with the RESTful API or set SENTRYPEER_API=1 environment variable
 .TP
 .BI "\-r
 Runs SentryPeer in SIP responsive mode or set SENTRYPEER_SIP_RESPONSIVE=1 environment variable. Enables replies to SIP
 probes to prompt INVITEs and actual attacks
+.TP
+.BI "\-l
+Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE environment variable
 .TP
 .BI "\-s
 Runs SentryPeer with syslog logging or set SENTRYPEER_SYSLOG=1 environment variable. Allows Fail2ban to use SentryPeer

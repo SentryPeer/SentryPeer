@@ -33,6 +33,7 @@ struct bad_actor {
 	char *created_by_node_id;
 	char *sip_message;
 	char *source_ip;
+	char *destination_ip;
 	char *called_number;
 	char *method;
 	char *transport_type;
@@ -43,13 +44,12 @@ struct bad_actor {
 
 //  Constructor
 bad_actor *bad_actor_new(char *sip_message, char *source_ip,
-			 char *called_number, char *method,
-			 char *transport_type, char *user_agent,
+			 char *destination_ip, char *called_number,
+			 char *method, char *transport_type, char *user_agent,
 			 char *collected_method, char *created_by_node_id);
 
 //  Destructors
 void bad_actor_destroy(bad_actor **self_ptr);
 void bad_actors_destroy(bad_actor **self_ptr, const int64_t *row_count);
-
 
 #endif //SENTRYPEER_BAD_ACTOR_H

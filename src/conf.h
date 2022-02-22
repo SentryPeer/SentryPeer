@@ -24,6 +24,7 @@
 typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {
 	bool syslog_mode;
+	bool json_log_mode;
 	bool verbose_mode;
 	bool debug_mode;
 	bool sip_responsive_mode;
@@ -32,6 +33,7 @@ struct sentrypeer_config {
 	bool sip_agent_mode;
 	bool bgp_agent_mode;
 	char *db_file;
+	char *json_log_file;
 	struct MHD_Daemon *http_daemon;
 	pthread_t sip_daemon_thread;
 	zyre_t *p2p_node;
@@ -48,5 +50,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv);
 int process_env_vars(sentrypeer_config *config);
 
 int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location);
+int set_json_log_file_location(sentrypeer_config *config,
+			       char *cli_json_log_file_location);
 
 #endif // SENTRYPEER_CONFIG_H

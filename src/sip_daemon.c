@@ -37,6 +37,7 @@
 #include "sip_daemon.h"
 #include "sip_parser.h"
 #include "database.h"
+#include "json_logger.h"
 
 #define PACKET_BUFFER_SIZE 1024
 
@@ -253,6 +254,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 			}
 
 			// TODO: Clean up
+			char *dest_ip_address_buffer = 0;
 #ifdef HAVE_IP_PKTINFO
 			for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg_hdr);
 			     cmsg != NULL; cmsg = CMSG_NXTHDR(&msg_hdr, cmsg)) {
@@ -262,6 +264,10 @@ int sip_daemon_init(sentrypeer_config const *config)
 				}
 				struct in_pktinfo const *pi =
 					(struct in_pktinfo *)CMSG_DATA(cmsg);
+
+				dest_ip_address_buffer = util_duplicate_string(
+					inet_ntoa(pi->ipi_spec_dst));
+
 				if (config->debug_mode ||
 				    config->verbose_mode) {
 					fprintf(stderr,
@@ -334,7 +340,8 @@ int sip_daemon_init(sentrypeer_config const *config)
 			bad_actor *bad_actor_event = bad_actor_new(
 				0,
 				util_duplicate_string(client_ip_address_buffer),
-				0, 0, util_duplicate_string(transport_type), 0,
+				dest_ip_address_buffer, 0, 0,
+				util_duplicate_string(transport_type), 0,
 				util_duplicate_string(collected_method), 0);
 
 			if (bytes_received > 0) {
@@ -356,6 +363,16 @@ int sip_daemon_init(sentrypeer_config const *config)
 				       bad_actor_event->source_ip,
 				       bad_actor_event->method,
 				       bad_actor_event->user_agent);
+			}
+
+			if (config->json_log_mode) {
+				if (json_log_bad_actor(config,
+						       bad_actor_event) !=
+				    EXIT_SUCCESS) {
+					fprintf(stderr,
+						"Saving bad_actor json to %s failed.\n",
+						config->json_log_file);
+				}
 			}
 
 			if (db_insert_bad_actor(bad_actor_event, config) !=

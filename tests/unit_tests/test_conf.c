@@ -53,6 +53,29 @@ void test_conf(void **state)
 	// Test that we set our own db file location to cwd of runner
 	assert_int_equal(set_db_file_location(config, NULL), EXIT_SUCCESS);
 
+	// TODO: Move these into their own test file or JSON group?
+	// Test that we reject this json log file location
+	char cli_json_log_file_location_wrong[] =
+		"tests/unit_tests/test_sentrypeer_json.log";
+	assert_int_equal(set_json_log_file_location(config,
+						    cli_json_log_file_location_wrong),
+			 EXIT_FAILURE);
+
+	// Test that we accept a valid json log file location
+	char cli_json_log_file_location[] = "/tests/unit_tests/test_sentrypeer_json.log";
+	assert_int_equal(set_json_log_file_location(config, cli_json_log_file_location),
+			 EXIT_SUCCESS);
+
+	assert_int_equal(setenv("SENTRYPEER_JSON_LOG_FILE", cli_json_log_file_location, 1),
+			 EXIT_SUCCESS);
+	// Test that we set our json log file location via the environment variable SENTRYPEER_JSON_LOG_FILE
+	assert_int_equal(set_json_log_file_location(config, NULL), EXIT_SUCCESS);
+	assert_string_equal(config->json_log_file, cli_json_log_file_location);
+
+	assert_int_equal(unsetenv("SENTRYPEER_JSON_LOG_FILE"), EXIT_SUCCESS);
+	// Test that we set our own json log file location to cwd of runner
+	assert_int_equal(set_json_log_file_location(config, NULL), EXIT_SUCCESS);
+
 	// Test non db file env vars
 	assert_int_equal(setenv("SENTRYPEER_DEBUG", "1", 1), EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
@@ -81,6 +104,10 @@ void test_conf(void **state)
 	assert_int_equal(setenv("SENTRYPEER_SYSLOG", "1", 1), EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->syslog_mode);
+
+	assert_int_equal(setenv("SENTRYPEER_JSON_LOG", "1", 1), EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_true(config->json_log_mode);
 
 	sentrypeer_config_destroy(&config);
 	assert_null(config);

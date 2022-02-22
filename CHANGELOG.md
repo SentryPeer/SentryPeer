@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integrate the [OpenDHT](https://github.com/savoirfairelinux/opendht) library for a 
   [Kademlia](https://en.m.wikipedia.org/wiki/Kademlia) like distributed key-value storage with tests. We will store the 
   public IP addresses of the nodes in the DHT so peers can find each other and share collected data
+- Zyre and OpenDHT are optional and detected at build time
+- Add `destination_ip` to bad_actor data structure
+- Add JSON logging to log bad actor events to a json file via `-j` flag and `SENTRYPEER_JSON_LOG` environment variable
 
 ### Tests
 - Clean up all valgrind warnings
@@ -19,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add tests for the peer_to_peer_lan_XXXX() functions
 - Add tests for the peer_to_peer_dht_XXXX() functions
 - Switch to cmocka XML output format to show time taken for each test
+- Update tests for new JSON log format and new `destination_ip` field in bad_actor data structure
 
 ## [1.0.0] - 2022-01-24
 - Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)

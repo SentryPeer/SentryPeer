@@ -247,7 +247,7 @@ void test_db_insert_bad_actor(void **state)
 	char test_transport_type[] = "UDP";
 	char test_collected_method[] = "passive";
 	bad_actor *bad_actor_event =
-		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0,
+		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0, 0,
 			      util_duplicate_string(test_transport_type), 0,
 			      util_duplicate_string(test_collected_method), 0);
 	fprintf(stderr,

@@ -19,7 +19,10 @@
 #include <stdint.h>
 #include <cmocka.h>
 
+#include <config.h>
+
 #include "test_conf.h"
+#include "test_json_logger.h"
 #include "test_utils.h"
 #include "test_bad_actor.h"
 #include "test_database.h"
@@ -28,8 +31,14 @@
 #include "test_ip_address_regex.h"
 #include "test_sip_message.h"
 #include "test_sip_daemon.h"
+
+#ifdef HAVE_ZYRE
 #include "test_peer_to_peer_lan.h"
+#endif
+
+#ifdef HAVE_OPENDHT_C
 #include "test_peer_to_peer_dht.h"
+#endif
 
 /* A test case that does nothing and succeeds. */
 static void null_test_success(void **state)
@@ -67,8 +76,17 @@ int main(void)
 		cmocka_unit_test(test_route_regex_check),
 		cmocka_unit_test(test_sip_message),
 		cmocka_unit_test(test_sip_daemon),
+		cmocka_unit_test_setup_teardown(test_json_logger,
+						test_setup_sqlite_db,
+						test_teardown_sqlite_db),
+
+#ifdef HAVE_ZYRE
 		cmocka_unit_test(test_peer_to_peer_lan),
+#endif
+
+#ifdef HAVE_OPENDHT_C
 		cmocka_unit_test(test_peer_to_peer_dht),
+#endif
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
