@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 
+#include "config.h"
 #ifndef DISABLE_ZYRE
 #include <zyre.h>
 #endif

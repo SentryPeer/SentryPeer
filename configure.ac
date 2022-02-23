@@ -36,7 +36,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Check for libraries.
-PKG_CHECK_MODULES(libosip2, osipparser2 >= 5.0, [], [
+PKG_CHECK_MODULES(libosip2, libosip2 >= 5.0, [], [
   AC_MSG_WARN([It is highly recommended to install libosip2 >= 5.0])
 ])
 
@@ -163,6 +163,7 @@ AC_ARG_ENABLE([opendht],
 AC_MSG_RESULT($disable_opendht)
 if test "$disable_opendht" = "yes"; then
   AC_DEFINE([DISABLE_OPENDHT], [1], [Disable OpenDHT support])
+  AC_MSG_WARN([OpenDHT support is disabled. Distributed Hash Tables will not be available])
 fi
 AM_CONDITIONAL([DISABLE_OPENDHT], [test x$disable_opendht = xyes])
 
@@ -174,6 +175,7 @@ AC_ARG_ENABLE([zyre],
 AC_MSG_RESULT($disable_zyre)
 if test "$disable_zyre" = "yes"; then
   AC_DEFINE([DISABLE_ZYRE], [1], [Disable Zyre support])
+  AC_MSG_WARN([Zyre support is disabled. Peer to Peer WAN or LAN mode will not be available])
 fi
 AM_CONDITIONAL([DISABLE_ZYRE], [test x$disable_zyre = xyes])
 
@@ -188,13 +190,6 @@ AC_SUBST(REVISION)
 
 # Ideas taken from https://github.com/staskobzar/libamip/blob/master/configure.ac
 #
-# Doxygen
-AC_CHECK_PROGS([DOXYGEN], [doxygen])
-if test -z "$DOXYGEN";
-   then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
-fi
-AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
-
 # Doxygen
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
