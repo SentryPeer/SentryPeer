@@ -11,6 +11,8 @@
                              |___/
 */
 
+#include <config.h>
+
 #ifndef DISABLE_OPENDHT  // This is a compile-time flag
 
 #ifndef SENTRYPEER_TEST_PEER_TO_PEER_DHT_H

@@ -11,6 +11,8 @@
                              |___/
 */
 
+#include <config.h>
+
 #ifndef DISABLE_ZYRE  // This is a compile-time flag
 
 #ifndef SENTRYPEER_TEST_PEER_TO_PEER_LAN_H

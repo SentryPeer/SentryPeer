@@ -10,8 +10,9 @@
                               __/ |
                              |___/
 */
+#include <config.h>
 
-#ifndef DISABLE_ZYRE  // This is a compile-time flag
+#ifndef DISABLE_ZYRE
 
 #include <zyre.h>
 

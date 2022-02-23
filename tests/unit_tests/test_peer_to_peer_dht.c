@@ -11,6 +11,8 @@
                              |___/
 */
 
+#include <config.h>
+
 #ifndef DISABLE_OPENDHT  // This is a compile-time flag
 
 #include <stdarg.h>
@@ -26,7 +28,6 @@
 #include <arpa/inet.h>
 
 #include <opendht/opendht_c.h>
-#include <config.h>
 
 #include "test_peer_to_peer_dht.h"
 

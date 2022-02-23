@@ -35,8 +35,6 @@ sentrypeer_SOURCES= \
     src/sip_daemon.h \
     src/sip_parser.c \
     src/sip_parser.h \
-    src/peer_to_peer_lan.c \
-    src/peer_to_peer_lan.h \
     src/utils.c \
     src/utils.h \
     src/bad_actor.c \
@@ -45,6 +43,12 @@ sentrypeer_SOURCES= \
     src/json_logger.h \
     src/database.c \
     src/database.h
+
+if !DISABLE_ZYRE
+    sentrypeer_SOURCES+= \
+    src/peer_to_peer_lan.c \
+    src/peer_to_peer_lan.h
+endif
 
 unit_test_sources = \
     src/sip_daemon.c \
@@ -95,12 +99,21 @@ unit_test_sources = \
     tests/unit_tests/test_sip_message.c \
     tests/unit_tests/test_sip_message.h \
     tests/unit_tests/test_sip_daemon.c \
-    tests/unit_tests/test_sip_daemon.h \
-    tests/unit_tests/test_peer_to_peer_dht.c \
-    tests/unit_tests/test_peer_to_peer_dht.h \
+    tests/unit_tests/test_sip_daemon.h
+
+if !DISABLE_ZYRE
+unit_test_sources += \
     tests/unit_tests/test_peer_to_peer_lan.c \
-    tests/unit_tests/test_peer_to_peer_lan.h \
-    tests/unit_tests/runner.c
+    tests/unit_tests/test_peer_to_peer_lan.h
+endif
+
+if !DISABLE_OPENDHT
+unit_test_sources += \
+    tests/unit_tests/test_peer_to_peer_dht.c \
+    tests/unit_tests/test_peer_to_peer_dht.h
+endif
+
+unit_test_sources += tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \

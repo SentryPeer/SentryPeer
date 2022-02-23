@@ -164,6 +164,7 @@ AC_MSG_RESULT($disable_opendht)
 if test "$disable_opendht" = "yes"; then
   AC_DEFINE([DISABLE_OPENDHT], [1], [Disable OpenDHT support])
 fi
+AM_CONDITIONAL([DISABLE_OPENDHT], [test x$disable_opendht = xyes])
 
 AC_MSG_CHECKING(if you'd like to disable Zyre support)
 AC_ARG_ENABLE([zyre],
@@ -174,6 +175,7 @@ AC_MSG_RESULT($disable_zyre)
 if test "$disable_zyre" = "yes"; then
   AC_DEFINE([DISABLE_ZYRE], [1], [Disable Zyre support])
 fi
+AM_CONDITIONAL([DISABLE_ZYRE], [test x$disable_zyre = xyes])
 
 if [[ ! -z "${GIT}" ]]; then
 	REVISION=`git rev-parse --short HEAD`

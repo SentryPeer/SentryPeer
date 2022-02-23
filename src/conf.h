@@ -17,7 +17,10 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <pthread.h>
+
+#ifndef DISABLE_ZYRE
 #include <zyre.h>
+#endif
 
 #define SENTRYPEER_PATH_MAX 4096
 
@@ -36,7 +39,11 @@ struct sentrypeer_config {
 	char *json_log_file;
 	struct MHD_Daemon *http_daemon;
 	pthread_t sip_daemon_thread;
+
+#ifndef DISABLE_ZYRE
 	zyre_t *p2p_node;
+#endif
+
 };
 
 //  Constructor

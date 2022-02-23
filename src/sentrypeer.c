@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-#ifndef DISABLE_ZYRE // This is a compile-time flag
+#ifndef DISABLE_ZYRE
 	// TODO: Add p2p flag to config/cli
 	if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to start peer to peer LAN.\n");
@@ -94,13 +94,15 @@ int main(int argc, char **argv)
 		}
 		exit(EXIT_FAILURE);
 	}
-#endif // DISABLE_ZYRE
 
-	// Wait for a signal to exit
-	// zsys_interrupted is from czmq (zsys.h) used by zyre
 	while (cleanup_flag == 0 && zsys_interrupted == 0) {
 		sleep(1);
 	}
+#else
+	while (cleanup_flag == 0) {
+		sleep(1);
+	}
+#endif // DISABLE_ZYRE
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopping %s...\n", PACKAGE_NAME);

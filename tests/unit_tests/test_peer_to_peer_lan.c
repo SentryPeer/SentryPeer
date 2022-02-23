@@ -11,6 +11,8 @@
                              |___/
 */
 
+#include <config.h>
+
 #ifndef DISABLE_ZYRE  // This is a compile-time flag
 
 #include <stdarg.h>
@@ -20,7 +22,6 @@
 #include <cmocka.h>
 
 #include <zyre.h>
-#include <config.h>
 
 #include "test_peer_to_peer_lan.h"
 
