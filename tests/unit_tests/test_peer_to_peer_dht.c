@@ -13,7 +13,7 @@
 
 #include <config.h>
 
-#ifndef DISABLE_OPENDHT  // This is a compile-time flag
+#if HAVE_OPENDHT_C != 0
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -179,4 +179,4 @@ void test_peer_to_peer_dht(void **state)
 	dht_runner_delete(runner);
 }
 
-#endif // DISABLE_OPENDHT
+#endif // HAVE_OPENDHT_C

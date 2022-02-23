@@ -13,7 +13,7 @@
 
 #include <config.h>
 
-#ifndef DISABLE_ZYRE  // This is a compile-time flag
+#if HAVE_ZYRE != 0
 
 #ifndef SENTRYPEER_PEER_TO_PEER_LAN_H
 #define SENTRYPEER_PEER_TO_PEER_LAN_H 1
@@ -25,4 +25,4 @@ int peer_to_peer_lan_stop(sentrypeer_config *config);
 
 #endif //SENTRYPEER_PEER_TO_PEER_LAN_H
 
-#endif // DISABLE_ZYRE
+#endif // HAVE_ZYRE

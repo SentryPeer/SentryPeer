@@ -13,7 +13,7 @@
 
 #include <config.h>
 
-#ifndef DISABLE_OPENDHT  // This is a compile-time flag
+#if HAVE_OPENDHT_C != 0
 
 #ifndef SENTRYPEER_TEST_PEER_TO_PEER_DHT_H
 #define SENTRYPEER_TEST_PEER_TO_PEER_DHT_H 1
@@ -22,4 +22,4 @@ void test_peer_to_peer_dht(void **state);
 
 #endif //SENTRYPEER_TEST_PEER_TO_PEER_DHT_H
 
-#endif // DISABLE_OPENDHT
+#endif // HAVE_ZYRE

@@ -13,7 +13,7 @@
 
 #include <config.h>
 
-#ifndef DISABLE_ZYRE  // This is a compile-time flag
+#if HAVE_ZYRE != 0
 
 #include <stdarg.h>
 #include <stddef.h>

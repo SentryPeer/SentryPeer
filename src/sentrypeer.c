@@ -26,9 +26,9 @@
 #include "sip_daemon.h"
 #include "http_daemon.h"
 
-#ifndef DISABLE_ZYRE // This is a compile-time flag
+#if HAVE_ZYRE !=0
 #include "peer_to_peer_lan.h"
-#endif // DISABLE_ZYRE
+#endif // HAVE_ZYRE
 
 volatile sig_atomic_t cleanup_flag = 0;
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-#ifndef DISABLE_ZYRE
+#if HAVE_ZYRE != 0
 	// TODO: Add p2p flag to config/cli
 	if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to start peer to peer LAN.\n");
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 	while (cleanup_flag == 0) {
 		sleep(1);
 	}
-#endif // DISABLE_ZYRE
+#endif // HAVE_ZYRE
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopping %s...\n", PACKAGE_NAME);
@@ -119,13 +119,12 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Issue cleanly stopping sip_daemon.\n");
 	}
 
-#ifndef DISABLE_ZYRE // This is a compile-time flag
-
+#if HAVE_ZYRE !=0
 	// TODO: Add p2p flag to config/cli
 	if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
 	}
-#endif // DISABLE_ZYRE
+#endif // HAVE_ZYRE
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopped %s\n", PACKAGE_NAME);

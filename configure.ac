@@ -162,7 +162,7 @@ AC_ARG_ENABLE([opendht],
     [disable_opendht="no"])
 AC_MSG_RESULT($disable_opendht)
 if test "$disable_opendht" = "yes"; then
-  AC_DEFINE([DISABLE_OPENDHT], [1], [Disable OpenDHT support])
+  AC_DEFINE([HAVE_OPENDHT_C], [0], [Disable OpenDHT support])
   AC_MSG_WARN([OpenDHT support is disabled. Distributed Hash Tables will not be available])
 fi
 AM_CONDITIONAL([DISABLE_OPENDHT], [test x$disable_opendht = xyes])
@@ -174,8 +174,8 @@ AC_ARG_ENABLE([zyre],
     [disable_zyre="no"])
 AC_MSG_RESULT($disable_zyre)
 if test "$disable_zyre" = "yes"; then
-  AC_DEFINE([DISABLE_ZYRE], [1], [Disable Zyre support])
-  AC_MSG_WARN([Zyre support is disabled. Peer to Peer WAN or LAN mode will not be available])
+  AC_DEFINE([HAVE_ZYRE], [0], [Disable Zyre support])
+  AC_MSG_WARN([Zyre support is disabled. Peer to Peer WAN and LAN mode will not be available])
 fi
 AM_CONDITIONAL([DISABLE_ZYRE], [test x$disable_zyre = xyes])
 

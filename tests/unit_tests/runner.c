@@ -32,11 +32,11 @@
 #include "test_sip_message.h"
 #include "test_sip_daemon.h"
 
-#ifdef HAVE_ZYRE
+#if HAVE_ZYRE !=0
 #include "test_peer_to_peer_lan.h"
 #endif
 
-#ifdef HAVE_OPENDHT_C
+#if HAVE_OPENDHT_C != 0
 #include "test_peer_to_peer_dht.h"
 #endif
 
@@ -80,11 +80,11 @@ int main(void)
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
 
-#ifndef DISABLE_ZYRE
+#if HAVE_ZYRE !=0
 		cmocka_unit_test(test_peer_to_peer_lan),
 #endif
 
-#ifndef DISABLE_OPENDHT
+#if HAVE_OPENDHT_C != 0
 		cmocka_unit_test(test_peer_to_peer_dht),
 #endif
 	};

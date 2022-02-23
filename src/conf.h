@@ -19,7 +19,7 @@
 #include <pthread.h>
 
 #include "config.h"
-#ifndef DISABLE_ZYRE
+#if HAVE_ZYRE !=0
 #include <zyre.h>
 #endif
 
@@ -41,7 +41,7 @@ struct sentrypeer_config {
 	struct MHD_Daemon *http_daemon;
 	pthread_t sip_daemon_thread;
 
-#ifndef DISABLE_ZYRE
+#if HAVE_ZYRE !=0
 	zyre_t *p2p_node;
 #endif
 

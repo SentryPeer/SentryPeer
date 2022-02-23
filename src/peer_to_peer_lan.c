@@ -12,7 +12,7 @@
 */
 #include <config.h>
 
-#ifndef DISABLE_ZYRE
+#if HAVE_ZYRE !=0
 
 #include <zyre.h>
 
