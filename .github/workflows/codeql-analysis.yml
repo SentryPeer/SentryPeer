@@ -39,15 +39,16 @@ jobs:
         languages: ${{ matrix.language }}
 
     - run: |
+        sudo apt-get update
         sudo apt-get install libosip2-dev libcmocka-dev uuid-dev \
         libmicrohttpd-dev \
         libjansson-dev \
         libcurl4-openssl-dev \
         libpcre2-dev \
-        autoconf-archive
-        sudo add-apt-repository ppa:savoury1/utilities
+        autoconf-archive -y
+        sudo add-apt-repository ppa:savoury1/utilities -y
         sudo apt-get update
-        sudo apt-get install libmicrohttpd-dev
+        sudo apt-get install libmicrohttpd-dev -y
         brew install --build-from-source zyre
     - run: |
         set -x

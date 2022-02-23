@@ -35,12 +35,12 @@ jobs:
             uuid-dev \
             libjansson-dev \
             libcurl4-openssl-dev \
-            libpcre2-dev
+            libpcre2-dev -y
             brew install cmocka
             brew install --build-from-source zyre
-            sudo add-apt-repository ppa:savoury1/utilities
+            sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
-            sudo apt-get install libmicrohttpd-dev
+            sudo apt-get install libmicrohttpd-dev -y
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             set -x

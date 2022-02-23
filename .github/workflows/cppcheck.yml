@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          sudo apt-get update
           sudo apt-get install \
           autoconf-archive \
           libosip2-dev \
@@ -27,10 +28,10 @@ jobs:
           libjansson-dev \
           libpcre2-dev \
           libcurl4-openssl-dev \
-          cppcheck
-          sudo add-apt-repository ppa:savoury1/utilities
+          cppcheck -y
+          sudo add-apt-repository ppa:savoury1/utilities -y
           sudo apt-get update
-          sudo apt-get install libmicrohttpd-dev
+          sudo apt-get install libmicrohttpd-dev -y
           brew install --build-from-source zyre
       - run: |
           set -x

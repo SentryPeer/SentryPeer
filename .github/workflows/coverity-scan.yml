@@ -27,9 +27,9 @@ jobs:
             libjansson-dev \
             libpcre2-dev \
             libcurl4-openssl-dev
-            sudo add-apt-repository ppa:savoury1/utilities
+            sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
-            sudo apt-get install libmicrohttpd-dev
+            sudo apt-get install libmicrohttpd-dev -y
             brew install --build-from-source zyre
 
       - name: Download Coverity Build Tool
