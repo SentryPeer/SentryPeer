@@ -47,6 +47,7 @@ Here's a mockup of the web UI which is subject to change.
 - [x] UDP transport
 - [ ] TCP transport
 - [ ] TLS transport
+- [x] [JSON logging](#json-log-format) to a file
 - [ ] Data is max 7(?) days old as useless otherwise
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
 - [x] **Local** data copy for **fast access** - cli / env db location flag
