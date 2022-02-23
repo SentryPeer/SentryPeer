@@ -11,6 +11,8 @@
                              |___/
 */
 
+#ifndef DISABLE_ZYRE  // This is a compile-time flag
+
 #include <zyre.h>
 
 #include "config.h"
@@ -72,3 +74,5 @@ int peer_to_peer_lan_stop(sentrypeer_config *config)
 
 	return EXIT_SUCCESS;
 }
+
+#endif // DISABLE_ZYRE

@@ -153,6 +153,28 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   AC_MSG_RESULT(no)
 ])
 
+# Allow a user to disable OpenDHT and Zyre, i.e. the Peer to Peer elements of SentryPeer for a
+# full standalone node (we've reversed logic so the default is to have these enabled)
+AC_MSG_CHECKING(if you'd like to disable OpenDHT support)
+AC_ARG_ENABLE([opendht],
+    AS_HELP_STRING([--disable-opendht], [Do not build with OpenDHT support]),
+    [disable_opendht="yes"],
+    [disable_opendht="no"])
+AC_MSG_RESULT($disable_opendht)
+if test "$disable_opendht" = "yes"; then
+  AC_DEFINE([DISABLE_OPENDHT], [1], [Disable OpenDHT support])
+fi
+
+AC_MSG_CHECKING(if you'd like to disable Zyre support)
+AC_ARG_ENABLE([zyre],
+    AS_HELP_STRING([--disable-zyre], [Do not build with Zyre support]),
+    [disable_zyre="yes"],
+    [disable_zyre="no"])
+AC_MSG_RESULT($disable_zyre)
+if test "$disable_zyre" = "yes"; then
+  AC_DEFINE([DISABLE_ZYRE], [1], [Disable Zyre support])
+fi
+
 if [[ ! -z "${GIT}" ]]; then
 	REVISION=`git rev-parse --short HEAD`
 else

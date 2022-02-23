@@ -26,9 +26,9 @@
 #include "sip_daemon.h"
 #include "http_daemon.h"
 
-#ifdef HAVE_ZYRE
+#ifndef DISABLE_ZYRE // This is a compile-time flag
 #include "peer_to_peer_lan.h"
-#endif
+#endif // DISABLE_ZYRE
 
 volatile sig_atomic_t cleanup_flag = 0;
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef HAVE_ZYRE
+#ifndef DISABLE_ZYRE // This is a compile-time flag
 	// TODO: Add p2p flag to config/cli
 	if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to start peer to peer LAN.\n");
@@ -94,7 +94,8 @@ int main(int argc, char **argv)
 		}
 		exit(EXIT_FAILURE);
 	}
-#endif
+#endif // DISABLE_ZYRE
+
 	// Wait for a signal to exit
 	// zsys_interrupted is from czmq (zsys.h) used by zyre
 	while (cleanup_flag == 0 && zsys_interrupted == 0) {
@@ -116,13 +117,13 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Issue cleanly stopping sip_daemon.\n");
 	}
 
-#ifdef HAVE_ZYRE
+#ifndef DISABLE_ZYRE // This is a compile-time flag
 
 	// TODO: Add p2p flag to config/cli
 	if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
 	}
-#endif
+#endif // DISABLE_ZYRE
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopped %s\n", PACKAGE_NAME);

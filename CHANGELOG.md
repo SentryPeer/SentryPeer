@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   public IP addresses of the nodes in the DHT so peers can find each other and share collected data
 - Zyre and OpenDHT are optional and detected at build time
 - Add `destination_ip` to bad_actor data structure
-- Add JSON logging to log bad actor events to a json file via `-j` flag and `SENTRYPEER_JSON_LOG` environment variable
+- Add JSON logging to log bad actor events to a json file via `-j` flag and `SENTRYPEER_JSON_LOG` environment variable, 
+  plus custom log file location via `-l` flag and `SENTRYPEER_JSON_LOG_FILE` environment variable
+- Add `--disable-opendht/zyre` flags to disable OpenDHT and Zyre build requirements. This allows a user to run 
+  SentryPeer as a full standalone node done at build time 
 
 ### Tests
 - Clean up all valgrind warnings

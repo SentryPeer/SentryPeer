@@ -11,6 +11,8 @@
                              |___/
 */
 
+#ifndef DISABLE_OPENDHT  // This is a compile-time flag
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -175,3 +177,5 @@ void test_peer_to_peer_dht(void **state)
 
 	dht_runner_delete(runner);
 }
+
+#endif // DISABLE_OPENDHT

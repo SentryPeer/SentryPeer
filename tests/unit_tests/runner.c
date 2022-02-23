@@ -80,11 +80,11 @@ int main(void)
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
 
-#ifdef HAVE_ZYRE
+#ifndef DISABLE_ZYRE
 		cmocka_unit_test(test_peer_to_peer_lan),
 #endif
 
-#ifdef HAVE_OPENDHT_C
+#ifndef DISABLE_OPENDHT
 		cmocka_unit_test(test_peer_to_peer_dht),
 #endif
 	};

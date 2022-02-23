@@ -11,6 +11,8 @@
                              |___/
 */
 
+#ifndef DISABLE_ZYRE  // This is a compile-time flag
+
 #ifndef SENTRYPEER_PEER_TO_PEER_LAN_H
 #define SENTRYPEER_PEER_TO_PEER_LAN_H 1
 
@@ -20,3 +22,5 @@ int peer_to_peer_lan_run(sentrypeer_config *config);
 int peer_to_peer_lan_stop(sentrypeer_config *config);
 
 #endif //SENTRYPEER_PEER_TO_PEER_LAN_H
+
+#endif // DISABLE_ZYRE

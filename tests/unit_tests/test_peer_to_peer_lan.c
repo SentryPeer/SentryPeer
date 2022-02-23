@@ -11,6 +11,8 @@
                              |___/
 */
 
+#ifndef DISABLE_ZYRE  // This is a compile-time flag
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -39,3 +41,5 @@ void test_peer_to_peer_lan(void **state)
 	zyre_stop(node);
 	zyre_destroy(&node);
 }
+
+#endif // DISABLE_ZYRE
