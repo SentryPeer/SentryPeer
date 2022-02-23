@@ -365,14 +365,12 @@ int sip_daemon_init(sentrypeer_config const *config)
 				       bad_actor_event->user_agent);
 			}
 
-			if (config->json_log_mode) {
-				if (json_log_bad_actor(config,
-						       bad_actor_event) !=
-				    EXIT_SUCCESS) {
-					fprintf(stderr,
-						"Saving bad_actor json to %s failed.\n",
-						config->json_log_file);
-				}
+			if (config->json_log_mode &&
+			    (json_log_bad_actor(config, bad_actor_event) !=
+			     EXIT_SUCCESS)) {
+				fprintf(stderr,
+					"Saving bad_actor json to %s failed.\n",
+					config->json_log_file);
 			}
 
 			if (db_insert_bad_actor(bad_actor_event, config) !=

@@ -364,7 +364,7 @@ Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.3
 ### JSON Log Format 
 
 With `sentrypeer -j`, you can produce a JSON log file of the bad actor's IP address and the phone number they tried to call 
-plus other metadata:
+plus other metadata (set a custom log file location with `-l`):
 
 ```json
 {

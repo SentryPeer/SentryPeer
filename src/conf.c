@@ -148,7 +148,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 			break;
-		case 'j':
+		case 'l':
 			if (set_json_log_file_location(config, optarg) !=
 			    EXIT_SUCCESS) {
 				fprintf(stderr,
@@ -167,7 +167,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 		case 'r':
 			config->sip_responsive_mode = true;
 			break;
-		case 'l':
+		case 'j':
 			config->json_log_mode = true;
 			break;
 		case 's':
@@ -198,6 +198,7 @@ int process_env_vars(sentrypeer_config *config)
 		util_copy_string(config->json_log_file,
 				 getenv("SENTRYPEER_JSON_LOG_FILE"),
 				 SENTRYPEER_PATH_MAX);
+		config->json_log_mode = true;
 	}
 	if (getenv("SENTRYPEER_API")) {
 		config->api_mode = true;
