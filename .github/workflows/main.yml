@@ -58,7 +58,7 @@ jobs:
         run: |
           set -x
           ./bootstrap.sh
-          ./configure
+          ./configure --disable-opendht
           make
           make check || (cat ./test-suite.log; false)
           ./sentrypeer -V
