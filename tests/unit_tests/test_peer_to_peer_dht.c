@@ -178,5 +178,6 @@ void test_peer_to_peer_dht(void **state)
 
 	dht_runner_delete(runner);
 }
-
+#else
+typedef int make_iso_compilers_happy;
 #endif // HAVE_OPENDHT_C

@@ -42,5 +42,6 @@ void test_peer_to_peer_lan(void **state)
 	zyre_stop(node);
 	zyre_destroy(&node);
 }
-
+#else
+typedef int make_iso_compilers_happy;
 #endif // DISABLE_ZYRE

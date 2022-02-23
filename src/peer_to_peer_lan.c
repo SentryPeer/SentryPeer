@@ -75,5 +75,6 @@ int peer_to_peer_lan_stop(sentrypeer_config *config)
 
 	return EXIT_SUCCESS;
 }
-
+#else
+typedef int make_iso_compilers_happy;
 #endif // DISABLE_ZYRE
