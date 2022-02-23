@@ -14,6 +14,7 @@ A distributed list of bad actor IP addresses and phone numbers collected via a S
 [![Clang Static Analysis](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml)
 [![Language grade: C](https://img.shields.io/lgtm/grade/cpp/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/context:cpp)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/context:javascript)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
 ### Introduction
@@ -98,6 +99,8 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_WEB_GUI=1
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SYSLOG=1
+    ENV SENTRYPEER_JSON_LOG=1
+    ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
     ENV SENTRYPEER_VERBOSE=1
     ENV SENTRYPEER_DEBUG=1
 
@@ -352,10 +355,33 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/878494
 
 ### Syslog and Fail2ban
 
-With `sentrypeer -s`, you parse syslog and use Fail2Ban to block the IP address of the bad actor.
+With `sentrypeer -s`, you parse syslog and use Fail2Ban to block the IP address of the bad actor:
 
 ```syslog
 Nov 30 21:32:16 localhost.localdomain sentrypeer[303741]: Source IP: 144.21.55.36, Method: OPTIONS, Agent: sipsak 0.9.7
+```
+
+### JSON Log Format 
+
+With `sentrypeer -j`, you can produce a JSON log file of the bad actor's IP address and the phone number they tried to call 
+plus other metadata (set a custom log file location with `-l`):
+
+```json
+{
+   "app_name":"sentrypeer",
+   "app_version":"v1.0.1",
+   "event_timestamp":"2022-02-22 11:19:15.848934346",
+   "event_uuid":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
+   "created_by_node_id":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
+   "collected_method":"responsive",
+   "transport_type":"UDP",
+   "source_ip":"45.134.144.128",
+   "destination_ip":"XX.XX.XX.XX",
+   "called_number":"0046812118532",
+   "sip_method":"OPTIONS",
+   "sip_user_agent":"friendly-scanner",
+   "sip_message":"full SIP message"
+}
 ```
 
 ### IPv6 Multicast Address
