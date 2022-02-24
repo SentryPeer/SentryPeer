@@ -11,7 +11,7 @@
 #                              __/ |
 #                             |___/
 #
-FROM alpine:3.15 AS build
+FROM alpine:3.15 AS builder
 #
 LABEL maintainer="Gavin Henry, ghenry@sentrypeer.org"
 #
