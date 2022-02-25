@@ -2,7 +2,7 @@
   "name": "web-gui",
   "copyright": "Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org> ",
   "author": "Gavin Henry <ghenry@sentrypeer.org>",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "SentryPeer",
   "homepage": "https://sentrypeer.org",
   "bug": "https://github.com/SentryPeer/SentryPeer/issues",
