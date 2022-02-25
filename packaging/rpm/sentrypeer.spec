@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	1.0.1
+Version:	1.2.0
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,8 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Fri Feb 25 2022 Gavin Henry <ghenry@sentrypeer.org> 1.2.0-1
+- Add JSON logging to log bad actor events and various other improvements
 * Mon Jan 24 2022 Gavin Henry <ghenry@sentrypeer.org> 1.0.0-1
 - Called Number RESTful API resource live at (`http://x.x.x.x:8082/numbers/{number}`)
 - Called Numbers RESTful API resource live at (`http://x.x.x.x:8082/numbers`)

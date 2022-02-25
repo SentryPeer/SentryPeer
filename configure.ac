@@ -14,7 +14,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer],[1.0.1],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[1.2.0],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 # Some weird issue with AX_PTHREAD macro that needs this to be called first:
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
@@ -119,14 +119,14 @@ PKG_CHECK_MODULES([CZMQ], [libczmq], [
    LIBS="$CZMQ_LIBS $LIBS"
    CFLAGS="$CFLAGS $CZMQ_CFLAGS"
 ],
-[AC_MSG_WARN([libczmq is not detected via pkg-config. Please install it manually.])])
+[AC_MSG_WARN([libczmq is not detected via pkg-config. Please install it manually if you'd like Peer to Peer mode.])])
 AM_CONDITIONAL([HAVE_CZMQ], [test "$HAVE_CZMQ" = "1"])
 
 PKG_CHECK_MODULES([ZMQ], [libzmq], [
    LIBS="$ZMQ_LIBS $LIBS"
    CFLAGS="$CFLAGS $ZMQ_CFLAGS"
 ],
-[AC_MSG_WARN([libzmq is not detected via pkg-config. Please install it manually.])])
+[AC_MSG_WARN([libzmq is not detected via pkg-config. Please install it manually if you'd like Peer to Peer mode.])])
 AM_CONDITIONAL([HAVE_ZMQ], [test "$HAVE_ZMQ" = "1"])
 
 AC_CHECK_PROG(GIT, git, 1.7.0, [
