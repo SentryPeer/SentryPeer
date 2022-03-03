@@ -25,12 +25,13 @@ sentrypeer_SOURCES= \
     src/http_daemon.h \
     src/http_routes.c \
     src/http_routes.h \
-    src/http_route_regex_check.c \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
     src/http_called_numbers_route.c \
     src/http_called_number_route.c \
+    src/regex_match.c \
+    src/regex_match.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
@@ -59,12 +60,13 @@ unit_test_sources = \
     src/http_daemon.h \
     src/http_routes.c \
     src/http_routes.h \
-    src/http_route_regex_check.c \
     src/http_health_check_route.c \
     src/http_ip_addresses_route.c \
     src/http_ip_address_route.c \
     src/http_called_numbers_route.c \
     src/http_called_number_route.c \
+    src/regex_match.c \
+    src/regex_match.h \
     src/sip_parser.c \
     src/sip_parser.h \
     src/bad_actor.c \
@@ -93,7 +95,7 @@ unit_test_sources = \
     tests/unit_tests/test_http_api_version.h \
     tests/unit_tests/test_http_api.h \
     tests/unit_tests/test_http_route_check.c \
-    tests/unit_tests/test_http_route_check.h \
+    tests/unit_tests/test_regex_match.h \
     tests/unit_tests/test_ip_address_regex.c \
     tests/unit_tests/test_ip_address_regex.h \
     tests/unit_tests/test_sip_message.c \

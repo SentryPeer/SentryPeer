@@ -46,6 +46,7 @@ int called_numbers_route(struct MHD_Connection *connection,
 					phone_numbers[row_num]->called_number);
 			}
 
+			json_error_t error;
 			if (json_array_append_new(
 				    json_arr,
 				    json_pack("{s:s,s:s,s:s}", "called_number",
@@ -55,11 +56,11 @@ int called_numbers_route(struct MHD_Connection *connection,
 					      "seen_last",
 					      phone_numbers[row_num]->seen_last,
 					      "seen_count",
-					      phone_numbers[row_num]
-						      ->seen_count)) !=
-			    EXIT_SUCCESS) {
+					      phone_numbers[row_num]->seen_count,
+					      &error)) != EXIT_SUCCESS) {
 				fprintf(stderr,
 					"Failed to append called_number to json array\n");
+				fprintf(stderr, "Error: %s\n", error.text);
 
 				// Free the json objects
 				json_decref(json_arr);
@@ -72,6 +73,7 @@ int called_numbers_route(struct MHD_Connection *connection,
 					CONTENT_TYPE_JSON, MHD_HTTP_NOT_FOUND,
 					false);
 			}
+
 			row_num++;
 		}
 		json_t *json_final_obj =

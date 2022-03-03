@@ -17,6 +17,7 @@
 
 #include "http_routes.h"
 #include "http_common.h"
+#include "regex_match.h"
 #include "conf.h"
 #include "utils.h"
 
@@ -85,8 +86,8 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 	} else if (route_check(url, IP_ADDRESSES_ROUTE, config) ==
 		   EXIT_SUCCESS) {
 		return ip_addresses_route(connection, config);
-	} else if (route_regex_check(url, IP_ADDRESS_ROUTE, &matched_ip_address,
-				     config) == EXIT_SUCCESS) {
+	} else if (regex_match(url, IP_ADDRESS_ROUTE, &matched_ip_address,
+			       config) == EXIT_SUCCESS) {
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "Matched ip address route: %s\n",
 				IP_ADDRESS_ROUTE);
@@ -109,8 +110,8 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 					 CONTENT_TYPE_HTML, MHD_HTTP_OK, false);
 	} else if (route_check(url, NUMBERS_ROUTE, config) == EXIT_SUCCESS) {
 		return called_numbers_route(connection, config);
-	} else if (route_regex_check(url, NUMBER_ROUTE, &matched_phone_number,
-				     config) == EXIT_SUCCESS) {
+	} else if (regex_match(url, NUMBER_ROUTE, &matched_phone_number,
+			       config) == EXIT_SUCCESS) {
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "Called Number route: %s\n",
 				NUMBER_ROUTE);

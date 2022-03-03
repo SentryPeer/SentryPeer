@@ -25,12 +25,12 @@ add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/http_common.c
         ${CMAKE_SOURCE_DIR}/src/http_daemon.c
         ${CMAKE_SOURCE_DIR}/src/http_routes.c
-        ${CMAKE_SOURCE_DIR}/src/http_route_regex_check.c
         ${CMAKE_SOURCE_DIR}/src/http_health_check_route.c
         ${CMAKE_SOURCE_DIR}/src/http_ip_addresses_route.c
         ${CMAKE_SOURCE_DIR}/src/http_ip_address_route.c
         ${CMAKE_SOURCE_DIR}/src/http_called_numbers_route.c
         ${CMAKE_SOURCE_DIR}/src/http_called_number_route.c
+        ${CMAKE_SOURCE_DIR}/src/regex_match.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/peer_to_peer_lan.c

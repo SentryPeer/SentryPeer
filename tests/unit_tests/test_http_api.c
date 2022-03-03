@@ -21,6 +21,7 @@
 #include "test_http_api_version.h"
 #include "../../src/http_routes.h"
 #include "../../src/http_daemon.h"
+#include "../../src/regex_match.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <curl/curl.h>
@@ -123,7 +124,7 @@ void test_route_regex_check(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	config->debug_mode = true;
 	assert_null(matched_string);
-	assert_int_equal(route_regex_check("/ip-addresses/8.8.8.8",
+	assert_int_equal(regex_match("/ip-addresses/8.8.8.8",
 					   IP_ADDRESS_ROUTE, &matched_string,
 					   config),
 			 0);

@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "conf.h"
 
-int route_regex_check(const char *url, const char *regex, char **matched_string,
+int regex_match(const char *string, const char *regex, char **matched_string,
 		      sentrypeer_config const *config)
 {
 	// Basically all from https://www.pcre.org/current/doc/html/pcre2demo.html
@@ -45,7 +45,7 @@ length is cast to PCRE2_SIZE for completeness, though PCRE2_SIZE is in fact
 defined to be size_t. */
 
 	pattern = (PCRE2_SPTR)regex;
-	subject = (PCRE2_SPTR)url;
+	subject = (PCRE2_SPTR)string;
 	subject_length = (PCRE2_SIZE)strlen((char *)subject);
 
 	/*************************************************************************

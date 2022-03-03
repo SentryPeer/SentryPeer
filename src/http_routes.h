@@ -21,7 +21,8 @@
 #define IP_ADDRESS_ROUTE "/ip-addresses/(.+)"
 #define IP_ADDRESSES_IPSET_ROUTE "/ip-addresses/ipset"
 #define NUMBERS_ROUTE "/numbers"
-#define NUMBER_ROUTE "/numbers/(\\+?[0-9]+$)" // +441234567890 or 441234567890 etc
+#define NUMBER_ROUTE                                                           \
+	"/numbers/(\\+?[0-9]+$)" // +441234567890 or 441234567890 etc
 #define COUNTRIES_ROUTE "/countries"
 #define COUNTRY_ROUTE "/countries/:country"
 #define COUNTRY_CITY_ROUTE "/countries/:country/:city"
@@ -40,8 +41,6 @@ enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 
 int route_check(const char *url, const char *route,
 		sentrypeer_config const *config);
-int route_regex_check(const char *url, const char *regex, char **matched_string,
-		      sentrypeer_config const *config);
 int health_check_route(struct MHD_Connection *connection);
 int ip_addresses_route(struct MHD_Connection *connection,
 		       sentrypeer_config const *config);
