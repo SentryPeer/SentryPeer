@@ -51,6 +51,12 @@ if !DISABLE_ZYRE
     src/peer_to_peer_lan.h
 endif
 
+if !DISABLE_OPENDHT
+    sentrypeer_SOURCES+= \
+    src/peer_to_peer_dht.c \
+    src/peer_to_peer_dht.h
+endif
+
 unit_test_sources = \
     src/sip_daemon.c \
     src/sip_daemon.h \

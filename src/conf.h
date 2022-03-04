@@ -19,8 +19,13 @@
 #include <pthread.h>
 
 #include "config.h"
+
 #if HAVE_ZYRE !=0
 #include <zyre.h>
+#endif
+
+#if HAVE_OPENDHT_C !=0
+#include <opendht/opendht_c.h>
 #endif
 
 #define SENTRYPEER_PATH_MAX 4096
@@ -36,6 +41,8 @@ struct sentrypeer_config {
 	bool web_gui_mode;
 	bool sip_agent_mode;
 	bool bgp_agent_mode;
+	bool p2p_dht_mode;
+	bool p2p_lan_mode;
 	char *db_file;
 	char *json_log_file;
 	struct MHD_Daemon *http_daemon;
@@ -43,6 +50,10 @@ struct sentrypeer_config {
 
 #if HAVE_ZYRE !=0
 	zyre_t *p2p_node;
+#endif
+
+#if HAVE_OPENDHT_C !=0
+	dht_runner *dht_node;
 #endif
 
 };

@@ -33,6 +33,7 @@ add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/regex_match.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
+        ${CMAKE_SOURCE_DIR}/src/peer_to_peer_dht.c
         ${CMAKE_SOURCE_DIR}/src/peer_to_peer_lan.c
         ${CMAKE_SOURCE_DIR}/src/utils.c
         ${CMAKE_SOURCE_DIR}/src/bad_actor.c

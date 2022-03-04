@@ -15,8 +15,6 @@
 #if HAVE_ZYRE !=0
 
 #include <zyre.h>
-
-#include "config.h"
 #include "conf.h"
 
 int peer_to_peer_lan_run(sentrypeer_config *config)

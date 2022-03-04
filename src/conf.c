@@ -41,6 +41,8 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->web_gui_mode = false;
 	self->sip_agent_mode = false;
 	self->bgp_agent_mode = false;
+	self->p2p_dht_mode = false;
+	self->p2p_lan_mode = false;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
@@ -81,7 +83,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-j] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -91,6 +93,8 @@ void print_usage(void)
 		"  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env\n");
 	fprintf(stderr,
 		"  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env\n");
+	fprintf(stderr,
+		"  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env\n");
 	fprintf(stderr,
 		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
 	fprintf(stderr,
@@ -127,11 +131,13 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	config->syslog_mode = false;
 	config->verbose_mode = false;
 	config->web_gui_mode = false;
+	config->p2p_dht_mode = false;
+	config->p2p_lan_mode = false;
 
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:jdraws")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdraws")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -169,6 +175,10 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'j':
 			config->json_log_mode = true;
+			break;
+		case 'p':
+			config->p2p_dht_mode = true;
+			config->p2p_lan_mode = true; // Split into own mode?
 			break;
 		case 's':
 			config->syslog_mode = true;
@@ -215,6 +225,10 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_JSON_LOG")) {
 		config->json_log_mode = true;
+	}
+	if (getenv("SENTRYPEER_PEER_TO_PEER")) {
+		config->p2p_dht_mode = true;
+		config->p2p_lan_mode = true;
 	}
 	if (getenv("SENTRYPEER_VERBOSE")) {
 		config->verbose_mode = true;

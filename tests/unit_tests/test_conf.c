@@ -109,6 +109,11 @@ void test_conf(void **state)
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->json_log_mode);
 
+	assert_int_equal(setenv("SENTRYPEER_PEER_TO_PEER", "1", 1), EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_true(config->p2p_lan_mode);
+	assert_true(config->p2p_dht_mode);
+
 	sentrypeer_config_destroy(&config);
 	assert_null(config);
 }

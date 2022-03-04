@@ -15,11 +15,15 @@
 
 #if HAVE_OPENDHT_C != 0
 
-#ifndef SENTRYPEER_TEST_PEER_TO_PEER_DHT_H
-#define SENTRYPEER_TEST_PEER_TO_PEER_DHT_H 1
+#ifndef SENTRYPEER_PEER_TO_PEER_DHT_H
+#define SENTRYPEER_PEER_TO_PEER_DHT_H 1
 
-void test_peer_to_peer_dht(void **state);
+#include "conf.h"
 
-#endif //SENTRYPEER_TEST_PEER_TO_PEER_DHT_H
+int peer_to_peer_dht_run(sentrypeer_config *config);
+int peer_to_peer_dht_stop(sentrypeer_config *config);
+
+#endif //SENTRYPEER_PEER_TO_PEER_DHT_H
 
 #endif // HAVE_OPENDHT_C
+
