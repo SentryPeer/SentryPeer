@@ -150,20 +150,16 @@ int main(int argc, char **argv)
 	}
 
 #if HAVE_ZYRE != 0
-	if (config->p2p_lan_mode) {
-		if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
-			fprintf(stderr,
-				"Issue cleanly stopping peer_to_peer_lan.\n");
-		}
+	if (config->p2p_lan_mode &&
+	    peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
 	}
 #endif // HAVE_ZYRE
 
 #if HAVE_OPENDHT_C != 0
-	if (config->p2p_dht_mode) {
-		if (peer_to_peer_dht_stop(config) != EXIT_SUCCESS) {
-			fprintf(stderr,
-				"Issue cleanly stopping peer_to_peer_dht.\n");
-		}
+	if (config->p2p_dht_mode &&
+	    peer_to_peer_dht_stop(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Issue cleanly stopping peer_to_peer_dht.\n");
 	}
 #endif // HAVE_OPENDHT_C
 
