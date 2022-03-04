@@ -135,9 +135,8 @@ void test_peer_to_peer_dht(void **state)
 
 	// Put data
 	const char data_str[] = "yo, this is some data";
-	dht_value *val = dht_value_new((const uint8_t*)data_str, strlen(data_str));
+	dht_value* val = dht_value_new_from_string(data_str);
 	assert_non_null(val);
-
 	dht_runner_put(runner, &h, val, dht_done_callback, runner, false);
 	dht_value_unref(val);
 
