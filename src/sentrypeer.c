@@ -89,34 +89,50 @@ int main(int argc, char **argv)
 	}
 
 #if HAVE_OPENDHT_C != 0
-	if (peer_to_peer_dht_run(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to start peer to peer DHT.\n");
-		perror("peer_to_peer_dht_run");
-		if (config->syslog_mode) {
-			syslog(LOG_ERR, "Failed to start peer to peer DHT\n");
+	if (config->p2p_dht_mode) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Peer to Peer DHT mode enabled...\n");
 		}
-		exit(EXIT_FAILURE);
+
+		if (peer_to_peer_dht_run(config) != EXIT_SUCCESS) {
+			fprintf(stderr, "Failed to start peer to peer DHT.\n");
+			perror("peer_to_peer_dht_run");
+			if (config->syslog_mode) {
+				syslog(LOG_ERR,
+				       "Failed to start peer to peer DHT\n");
+			}
+			exit(EXIT_FAILURE);
+		}
 	}
 #endif // HAVE_OPENDHT_C
 
 #if HAVE_ZYRE != 0
-	if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to start peer to peer LAN.\n");
-		perror("peer_to_peer_lan_run");
-		if (config->syslog_mode) {
-			syslog(LOG_ERR, "Failed to start peer to peer LAN\n");
+	if (config->p2p_lan_mode) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Peer to Peer LAN mode enabled...\n");
 		}
-		exit(EXIT_FAILURE);
-	}
 
-	while (cleanup_flag == 0 && zsys_interrupted == 0) {
-		sleep(1);
-	}
-#else
-	while (cleanup_flag == 0) {
-		sleep(1);
+		if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
+			fprintf(stderr, "Failed to start peer to peer LAN.\n");
+			perror("peer_to_peer_lan_run");
+			if (config->syslog_mode) {
+				syslog(LOG_ERR,
+				       "Failed to start peer to peer LAN\n");
+			}
+			exit(EXIT_FAILURE);
+		}
+
+		while (cleanup_flag == 0 && zsys_interrupted == 0) {
+			sleep(1);
+		}
 	}
 #endif // HAVE_ZYRE
+
+	if (!config->p2p_lan_mode) {
+		while (cleanup_flag == 0) {
+			sleep(1);
+		}
+	}
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Stopping %s...\n", PACKAGE_NAME);
@@ -134,16 +150,20 @@ int main(int argc, char **argv)
 	}
 
 #if HAVE_ZYRE != 0
-	// TODO: Add p2p flag to config/cli
-	if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
+	if (config->p2p_lan_mode) {
+		if (peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Issue cleanly stopping peer_to_peer_lan.\n");
+		}
 	}
 #endif // HAVE_ZYRE
 
 #if HAVE_OPENDHT_C != 0
-	// TODO: Add p2p flag to config/cli
-	if (peer_to_peer_dht_stop(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Issue cleanly stopping peer_to_peer_dht.\n");
+	if (config->p2p_dht_mode) {
+		if (peer_to_peer_dht_stop(config) != EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Issue cleanly stopping peer_to_peer_dht.\n");
+		}
 	}
 #endif // HAVE_OPENDHT_C
 

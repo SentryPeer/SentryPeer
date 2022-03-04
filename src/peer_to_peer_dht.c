@@ -34,6 +34,10 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 
 	config->dht_node = runner;
 
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Peer to peer DHT mode started.\n");
+	}
+
 	return EXIT_SUCCESS;
 }
 
