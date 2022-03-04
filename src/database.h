@@ -30,9 +30,6 @@ int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
 			      bad_actor **bad_actor,
 			      sentrypeer_config const *config);
 
-#define GET_BAD_ACTOR_BY_IP_WITH_DETAILS                                       \
-	"SELECT DISTINCT(source_ip), max(event_timestamp) as seen_last, count(source_ip) as seen_total FROM honey WHERE source_ip = ? order by event_timestamp DESC;"
-
 #define GET_ROWS_DISTINCT_SOURCE_IP_COUNT                                      \
 	"SELECT COUNT(DISTINCT source_ip) from honey;"
 #define GET_ROWS_DISTINCT_SOURCE_IP_WITH_COUNT_AND_DATE                        \
@@ -47,9 +44,10 @@ int db_select_phone_number(const char *phone_number,
 			   sentrypeer_config const *config);
 
 #define GET_ROWS_DISTINCT_PHONE_NUMBER_COUNT                                   \
-	"SELECT COUNT(DISTINCT called_number) from honey;"
+	"SELECT COUNT(DISTINCT called_number) from honey WHERE called_number LIKE '+%' OR printf('%d', called_number) = called_number;"
+// https://stackoverflow.com/a/32528946/1072411
 #define GET_ROWS_DISTINCT_PHONE_NUMBER_WITH_COUNT_AND_DATE                     \
-	"SELECT called_number, max(event_timestamp) as seen_last, count(called_number) as seen_total FROM honey WHERE called_number is not NULL GROUP BY called_number order by event_timestamp DESC;"
+	"SELECT called_number, max(event_timestamp) as seen_last, count(called_number) as seen_total FROM honey WHERE called_number LIKE '+%' OR printf('%d', called_number) = called_number GROUP BY called_number order by event_timestamp DESC;"
 int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
 			     sentrypeer_config const *config);
 
