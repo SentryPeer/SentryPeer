@@ -236,7 +236,9 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
-Right now you can call `/health-check`, like so:
+#### Endpoint /health-check
+
+Query the API to see if it's alive:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
@@ -264,7 +266,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 }
 ```
 
-and  `/ip-addresses`:
+#### Endpoint /ip-addresses
+
+List all the IP addresses that have been seen by SentryPeer:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
@@ -303,7 +307,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 }
 ```
 
-and a single IP address query `/ip-address/{ip-address}`:
+#### Endpoint /ip-address/{ip-address}
+
+Query a single IP address:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
@@ -330,7 +336,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8
 }
 ```
 
-and lastly a phone number query for a number a bad actor tried to call:
+#### Endpoint /numbers/{phone-number}
+
+Query a phone number a bad actor tried to call with optional `+` prefix:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/8784946812410967
