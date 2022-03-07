@@ -18,6 +18,7 @@
 #define UTILS_UUID_STRING_LEN 37
 
 #include <stddef.h>
+#include <sys/socket.h>
 
 /**
  * Get the current time suitable for event logging.
