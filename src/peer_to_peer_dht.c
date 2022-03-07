@@ -17,6 +17,7 @@
 
 #include <opendht/opendht_c.h>
 #include "conf.h"
+#include "utils.h"
 
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
@@ -75,29 +76,6 @@ static void op_context_free(void *user_data)
 {
 	struct op_context *ctx = (struct op_context *)user_data;
 	free(ctx);
-}
-
-static char *print_addr(const struct sockaddr *addr)
-{
-	char *s = NULL;
-	switch (addr->sa_family) {
-	case AF_INET: {
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)addr;
-		s = malloc(INET_ADDRSTRLEN);
-		inet_ntop(AF_INET, &(addr_in->sin_addr), s, INET_ADDRSTRLEN);
-		break;
-	}
-	case AF_INET6: {
-		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)addr;
-		s = malloc(INET6_ADDRSTRLEN);
-		inet_ntop(AF_INET6, &(addr_in6->sin6_addr), s,
-			  INET6_ADDRSTRLEN);
-		break;
-	}
-	default:
-		break;
-	}
-	return s;
 }
 
 int peer_to_peer_dht_run(sentrypeer_config *config)
@@ -166,7 +144,7 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	struct sockaddr **addrs = dht_runner_get_public_address(runner);
 	for (struct sockaddr **addrIt = addrs; *addrIt; addrIt++) {
 		struct sockaddr *addr = *addrIt;
-		char *addr_str = print_addr(addr);
+		char *addr_str = util_addr_string(addr);
 		free(addr);
 		printf("Found public address: %s\n", addr_str);
 		free(addr_str);

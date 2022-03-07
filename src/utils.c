@@ -102,3 +102,26 @@ int valid_ip_address_format(const char *ip_address_to_check)
 		return EXIT_FAILURE;
 	}
 }
+
+char *util_addr_string(const struct sockaddr *addr)
+{
+	char *s = NULL;
+	switch (addr->sa_family) {
+	case AF_INET: {
+		struct sockaddr_in *addr_in = (struct sockaddr_in *)addr;
+		s = malloc(INET_ADDRSTRLEN);
+		inet_ntop(AF_INET, &(addr_in->sin_addr), s, INET_ADDRSTRLEN);
+		break;
+	}
+	case AF_INET6: {
+		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)addr;
+		s = malloc(INET6_ADDRSTRLEN);
+		inet_ntop(AF_INET6, &(addr_in6->sin6_addr), s,
+			  INET6_ADDRSTRLEN);
+		break;
+	}
+	default:
+		break;
+	}
+	return s;
+}

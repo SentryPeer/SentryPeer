@@ -140,7 +140,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdrawsS")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdrRaws")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();

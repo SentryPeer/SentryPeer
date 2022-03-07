@@ -61,4 +61,12 @@ char *util_uuid_generate_string(char *uuid_string);
  */
 int valid_ip_address_format(const char *ip_address_to_check);
 
+/**
+ * Print an IP address
+ *
+ * @param addr The sockaddr structure to print.
+ * @return The IP address in string format.
+ */
+char *util_addr_string(const struct sockaddr *addr);
+
 #endif //SENTRYPEER_UTILS_H

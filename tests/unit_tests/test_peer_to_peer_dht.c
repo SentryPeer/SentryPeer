@@ -30,6 +30,7 @@
 #include <opendht/opendht_c.h>
 
 #include "test_peer_to_peer_dht.h"
+#include "../../src/utils.h"
 
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_NODE "bootstrap.jami.net"
@@ -77,29 +78,6 @@ static void op_context_free(void *user_data)
 	free(ctx);
 }
 
-static char *print_addr(const struct sockaddr *addr)
-{
-	char *s = NULL;
-	switch (addr->sa_family) {
-	case AF_INET: {
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)addr;
-		s = malloc(INET_ADDRSTRLEN);
-		inet_ntop(AF_INET, &(addr_in->sin_addr), s, INET_ADDRSTRLEN);
-		break;
-	}
-	case AF_INET6: {
-		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)addr;
-		s = malloc(INET6_ADDRSTRLEN);
-		inet_ntop(AF_INET6, &(addr_in6->sin6_addr), s,
-			  INET6_ADDRSTRLEN);
-		break;
-	}
-	default:
-		break;
-	}
-	return s;
-}
-
 void test_peer_to_peer_dht(void **state)
 {
 	(void)state; /* unused */
@@ -135,7 +113,7 @@ void test_peer_to_peer_dht(void **state)
 
 	// Put data
 	const char data_str[] = "yo, this is some data";
-	dht_value* val = dht_value_new_from_string(data_str);
+	dht_value *val = dht_value_new_from_string(data_str);
 	assert_non_null(val);
 	dht_runner_put(runner, &h, val, dht_done_callback, runner, false);
 	dht_value_unref(val);
@@ -165,7 +143,7 @@ void test_peer_to_peer_dht(void **state)
 
 	for (struct sockaddr **addrIt = addrs; *addrIt; addrIt++) {
 		struct sockaddr *addr = *addrIt;
-		char *addr_str = print_addr(addr);
+		char *addr_str = util_addr_string(addr);
 		free(addr);
 		fprintf(stderr, "Found public address: %s\n", addr_str);
 		free(addr_str);
