@@ -36,6 +36,7 @@ struct sentrypeer_config {
 	bool json_log_mode;
 	bool verbose_mode;
 	bool debug_mode;
+	bool sip_mode;
 	bool sip_responsive_mode;
 	bool api_mode;
 	bool web_gui_mode;
@@ -54,6 +55,8 @@ struct sentrypeer_config {
 
 #if HAVE_OPENDHT_C !=0
 	dht_runner *dht_node;
+	dht_infohash *dht_info_hash;
+	dht_op_token *dht_op_token;
 #endif
 
 };

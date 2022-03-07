@@ -42,13 +42,16 @@ Here's a mockup of the web UI which is subject to change.
 - [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
-- [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre)
+- [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-b` cli option)
+- [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre) with [OpenDHT](https://github.com/savoirfairelinux/opendht)
 - [x] Multithreaded
 - [x] UDP transport
 - [ ] TCP transport
 - [ ] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
 - [ ] Data is max 7(?) days old as useless otherwise
+- [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
+  not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
@@ -100,6 +103,7 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_WEB_GUI=1
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SYSLOG=1
+    ENV SENTRYPEER_PEER_TO_PEER=1
     ENV SENTRYPEER_JSON_LOG=1
     ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
     ENV SENTRYPEER_VERBOSE=1
@@ -234,7 +238,9 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
 
-Right now you can call `/health-check`, like so:
+#### Endpoint /health-check
+
+Query the API to see if it's alive:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
@@ -262,7 +268,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 }
 ```
 
-and  `/ip-addresses`:
+#### Endpoint /ip-addresses
+
+List all the IP addresses that have been seen by SentryPeer:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
@@ -301,7 +309,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 }
 ```
 
-and a single IP address query `/ip-address/{ip-address}`:
+#### Endpoint /ip-address/{ip-address}
+
+Query a single IP address:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
@@ -328,7 +338,9 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8
 }
 ```
 
-and lastly a phone number query for a number a bad actor tried to call:
+#### Endpoint /numbers/{phone-number}
+
+Query a phone number a bad actor tried to call with optional `+` prefix:
 
 ```bash
 curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/8784946812410967
@@ -383,6 +395,32 @@ plus other metadata (set a custom log file location with `-l`):
    "sip_user_agent":"friendly-scanner",
    "sip_message":"full SIP message"
 }
+```
+
+### Command Line Options
+
+```bash
+./sentrypeer -h
+Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+
+Options:
+  -h,      Print this help
+  -V,      Print version
+  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
+  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
+  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -a,      Enable RESTful API mode or use SENTRYPEER_API env
+  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
+  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
+  -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
+  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
+  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env
+  -v,      Enable verbose logging or use SENTRYPEER_VERBOSE env
+  -d,      Enable debug mode or use SENTRYPEER_DEBUG env
+
+Report bugs to https://github.com/SentryPeer/SentryPeer/issues
+
+See https://sentrypeer.org for more information.
 ```
 
 ### IPv6 Multicast Address

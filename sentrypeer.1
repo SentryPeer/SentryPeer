@@ -4,7 +4,7 @@ sentrypeer \- A distributed list of bad IP addresses and phone numbers collected
 
 .SH SYNOPSIS
 .B sentrypeer
-[\-hVvjlfdraws]
+[\-hVvjplfdrRaws]
 .SH DESCRIPTION
 .B SentryPeer
 is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
@@ -39,6 +39,10 @@ Runs SentryPeer with the RESTful API or set SENTRYPEER_API=1 environment variabl
 .BI "\-r
 Runs SentryPeer in SIP responsive mode or set SENTRYPEER_SIP_RESPONSIVE=1 environment variable. Enables replies to SIP
 probes to prompt INVITEs and actual attacks
+.TP
+.BI "\-R
+Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE environment variable. This allows you to run SentryPeer as an
+API server or just as a node that is part of the Peer to Peer network to replicate the data
 .TP
 .BI "\-l
 Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE environment variable

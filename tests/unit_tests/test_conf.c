@@ -90,6 +90,12 @@ void test_conf(void **state)
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->sip_responsive_mode);
 
+	assert_int_equal(setenv("SENTRYPEER_SIP_DISABLE", "1", 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_false(config->sip_mode);
+
+
 	assert_int_equal(setenv("SENTRYPEER_API", "1", 1),
 			 EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);

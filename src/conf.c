@@ -83,7 +83,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -101,6 +101,8 @@ void print_usage(void)
 		"  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env\n");
 	fprintf(stderr,
 		"  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env\n");
+	fprintf(stderr,
+		"  -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env\n");
 	fprintf(stderr,
 		"  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env\n");
 	fprintf(stderr,
@@ -126,6 +128,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	int cli_option;
 	config->api_mode = false;
 	config->debug_mode = false;
+	config->sip_mode = true; // Default on
 	config->sip_responsive_mode = false;
 	config->json_log_mode = false;
 	config->syslog_mode = false;
@@ -137,7 +140,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdraws")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdrawsS")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -172,6 +175,9 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'r':
 			config->sip_responsive_mode = true;
+			break;
+		case 'R':
+			config->sip_mode = false;
 			break;
 		case 'j':
 			config->json_log_mode = true;
@@ -219,6 +225,9 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_SIP_RESPONSIVE")) {
 		config->sip_responsive_mode = true;
+	}
+	if (getenv("SENTRYPEER_SIP_DISABLE")) {
+		config->sip_mode = false;
 	}
 	if (getenv("SENTRYPEER_SYSLOG")) {
 		config->syslog_mode = true;

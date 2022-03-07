@@ -76,16 +76,23 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Web GUI mode enabled...\n");
 	}
 
-	if (sip_daemon_run(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to start %s server on port %s\n", "SIP",
-			SIP_DAEMON_PORT);
-		perror("sip_daemon_run");
-		if (config->syslog_mode) {
-			syslog(LOG_ERR,
-			       "Failed to start %s server on port %s\n", "SIP",
-			       SIP_DAEMON_PORT);
+	if (config->sip_mode) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "SIP mode enabled...\n");
 		}
-		exit(EXIT_FAILURE);
+
+		if (sip_daemon_run(config) != EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Failed to start %s server on port %s\n", "SIP",
+				SIP_DAEMON_PORT);
+			perror("sip_daemon_run");
+			if (config->syslog_mode) {
+				syslog(LOG_ERR,
+				       "Failed to start %s server on port %s\n",
+				       "SIP", SIP_DAEMON_PORT);
+			}
+			exit(EXIT_FAILURE);
+		}
 	}
 
 #if HAVE_OPENDHT_C != 0
