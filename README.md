@@ -42,7 +42,7 @@ Here's a mockup of the web UI which is subject to change.
 - [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
-- [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-b` cli option)
+- [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
 - [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre) with [OpenDHT](https://github.com/savoirfairelinux/opendht)
 - [x] Multithreaded
 - [x] UDP transport
