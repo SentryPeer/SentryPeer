@@ -50,6 +50,8 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
 - [ ] Data is max 7(?) days old as useless otherwise
+- [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
+  not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
@@ -399,21 +401,22 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-s] [-v] [-d]
+Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
 
 Options:
--h,      Print this help
--V,      Print version
--f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
--j,      Enable json logging or use SENTRYPEER_JSON_LOG env
--p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
--a,      Enable RESTful API mode or use SENTRYPEER_API env
--w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
--r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
--l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
--s,      Enable syslog logging or use SENTRYPEER_SYSLOG env
--v,      Enable verbose logging or use SENTRYPEER_VERBOSE env
--d,      Enable debug mode or use SENTRYPEER_DEBUG env
+  -h,      Print this help
+  -V,      Print version
+  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
+  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
+  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -a,      Enable RESTful API mode or use SENTRYPEER_API env
+  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
+  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
+  -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
+  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
+  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env
+  -v,      Enable verbose logging or use SENTRYPEER_VERBOSE env
+  -d,      Enable debug mode or use SENTRYPEER_DEBUG env
 
 Report bugs to https://github.com/SentryPeer/SentryPeer/issues
 
