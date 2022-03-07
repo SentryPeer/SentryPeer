@@ -21,7 +21,7 @@
 #include <sys/socket.h>
 
 /**
- * Get the current time suitable for event logging.
+ * Get the current time suitable for event logging
  *
  * @param event_timestamp The timestamp to fill.
  * @return The current time in format YYYY-MM-DD HH:MM:SS.XXXXXXXXX
@@ -29,7 +29,7 @@
 char *event_timestamp(char *event_timestamp);
 
 /**
- * Duplicate a string (must be freed by caller).
+ * Duplicate a string (must be freed by caller)
  *
  * @param string The string to duplicate.
  * @return A new string with the same contents as the original
@@ -47,7 +47,7 @@ char *util_duplicate_string(const char *string);
 char *util_copy_string(char *dest, const char *src, size_t dest_len);
 
 /**
- * Generate a uuid.
+ * Generate a uuid
  *
  * @param uuid_string The string to fill.
  * @return A uuid in string format.
@@ -63,7 +63,7 @@ char *util_uuid_generate_string(char *uuid_string);
 int valid_ip_address_format(const char *ip_address_to_check);
 
 /**
- * Print an IP address
+ * Return an IP address in string format from a sockaddr (must be freed by caller)
  *
  * @param addr The sockaddr structure to print.
  * @return The IP address in string format.
