@@ -17,6 +17,73 @@
 #include "json_logger.h"
 #include "config.h"
 
+char *bad_actor_to_json(const sentrypeer_config *config,
+			const bad_actor *bad_actor_to_convert)
+{
+	json_error_t error;
+	json_t *json_bad_actor = json_pack(
+		"{s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}",
+		"app_name", PACKAGE_NAME, "app_version", PACKAGE_VERSION,
+		"event_timestamp",
+		bad_actor_to_convert->event_timestamp ?
+			bad_actor_to_convert->event_timestamp :
+			      "",
+		"event_uuid",
+		bad_actor_to_convert->event_uuid ?
+			bad_actor_to_convert->event_uuid :
+			      "",
+		"created_by_node_id",
+		bad_actor_to_convert->created_by_node_id ?
+			bad_actor_to_convert->created_by_node_id :
+			      "",
+		"collected_method",
+		bad_actor_to_convert->collected_method ?
+			bad_actor_to_convert->collected_method :
+			      "",
+		"transport_type",
+		bad_actor_to_convert->transport_type ?
+			bad_actor_to_convert->transport_type :
+			      "",
+		"source_ip",
+		bad_actor_to_convert->source_ip ?
+			bad_actor_to_convert->source_ip :
+			      "",
+		"destination_ip",
+		bad_actor_to_convert->destination_ip ?
+			bad_actor_to_convert->destination_ip :
+			      "",
+		"called_number",
+		bad_actor_to_convert->called_number ?
+			bad_actor_to_convert->called_number :
+			      "",
+		"sip_method",
+		bad_actor_to_convert->method ? bad_actor_to_convert->method :
+						     "",
+		"sip_user_agent",
+		bad_actor_to_convert->user_agent ?
+			bad_actor_to_convert->user_agent :
+			      "",
+		"sip_message",
+		bad_actor_to_convert->sip_message ?
+			bad_actor_to_convert->sip_message :
+			      "",
+		&error);
+	if (!json_bad_actor) {
+		fprintf(stderr, "Error creating json log object: %s\n",
+			error.text);
+		return NULL;
+	}
+
+	char *json_string = json_dumps(json_bad_actor, JSON_COMPACT);
+	json_decref(json_bad_actor);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Bad actor in JSON format: %s\n", json_string);
+	}
+
+	return json_string; // Caller must free
+}
+
 int json_log_bad_actor(const sentrypeer_config *config,
 		       const bad_actor *bad_actor_to_log)
 {
@@ -27,59 +94,12 @@ int json_log_bad_actor(const sentrypeer_config *config,
 		return EXIT_FAILURE;
 	}
 
-	json_error_t error;
-	json_t *json_bad_actor = json_pack(
-		"{s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}",
-		"app_name", PACKAGE_NAME, "app_version", PACKAGE_VERSION,
-		"event_timestamp",
-		bad_actor_to_log->event_timestamp ?
-			bad_actor_to_log->event_timestamp :
-			      "",
-		"event_uuid",
-		bad_actor_to_log->event_uuid ? bad_actor_to_log->event_uuid :
-						     "",
-		"created_by_node_id",
-		bad_actor_to_log->created_by_node_id ?
-			bad_actor_to_log->created_by_node_id :
-			      "",
-		"collected_method",
-		bad_actor_to_log->collected_method ?
-			bad_actor_to_log->collected_method :
-			      "",
-		"transport_type",
-		bad_actor_to_log->transport_type ?
-			bad_actor_to_log->transport_type :
-			      "",
-		"source_ip",
-		bad_actor_to_log->source_ip ? bad_actor_to_log->source_ip : "",
-		"destination_ip",
-		bad_actor_to_log->destination_ip ?
-			bad_actor_to_log->destination_ip :
-			      "",
-		"called_number",
-		bad_actor_to_log->called_number ?
-			bad_actor_to_log->called_number :
-			      "",
-		"sip_method",
-		bad_actor_to_log->method ? bad_actor_to_log->method : "",
-		"sip_user_agent",
-		bad_actor_to_log->user_agent ? bad_actor_to_log->user_agent :
-						     "",
-		"sip_message",
-		bad_actor_to_log->sip_message ? bad_actor_to_log->sip_message :
-						      "",
-		&error);
-	if (!json_bad_actor) {
-		fprintf(stderr, "Error creating json log object: %s\n",
-			error.text);
-		fclose(logfile);
-		return EXIT_FAILURE;
-	}
+	char *json_string =
+		bad_actor_to_json(config,
+				  bad_actor_to_log); // Caller must free
+	assert(json_string);
 
-	char *json_string = json_dumps(json_bad_actor, JSON_COMPACT);
 	fprintf(logfile, "%s\n", json_string);
-
-	json_decref(json_bad_actor);
 	free(json_string);
 
 	if (fclose(logfile) != EXIT_SUCCESS) {

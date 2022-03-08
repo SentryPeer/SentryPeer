@@ -19,6 +19,9 @@
 #include "conf.h"
 #include "bad_actor.h"
 
-int json_log_bad_actor(const sentrypeer_config *config, const bad_actor *bad_actor);
+char *bad_actor_to_json(const sentrypeer_config *config,
+			const bad_actor *bad_actor_to_convert);
+int json_log_bad_actor(const sentrypeer_config *config,
+		       const bad_actor *bad_actor);
 
 #endif //SENTRYPEER_JSON_LOGGER_H

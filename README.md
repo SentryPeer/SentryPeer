@@ -42,8 +42,9 @@ Here's a mockup of the web UI which is subject to change.
 - [x] User _owns their_ data
 - [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
 - [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
-- [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
-- [ ] Peer to Peer sharing of data - [Zyre (Zeromq)](https://github.com/zeromq/zyre) with [OpenDHT](https://github.com/savoirfairelinux/opendht)
+- [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-b` cli option)
+- [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
+- [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
 - [x] Multithreaded
 - [x] UDP transport
 - [ ] TCP transport
@@ -62,8 +63,7 @@ Here's a mockup of the web UI which is subject to change.
 - [x] Query API for attempted phone numbers called by bad actors
 - [x] Query API for an attempted phone number called by a bad actor
 - [x] [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) support via `syslog` as per [feature request](https://github.com/SentryPeer/SentryPeer/issues/6)
-- [ ] Peer to Peer data replication - feature / cli flag
-- [x] Local [sqlite](https://www.sqlite.org/index.html)/[lmdb](https://www.symas.com/symas-embedded-database-lmdb) database - feature / cli flag
+- [x] Local [sqlite](https://www.sqlite.org/index.html) database - feature / cli flag
 - [ ] Analytics - opt in
 - [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with or our own firewall with nftables
 - [x] Small binary size for IoT usage

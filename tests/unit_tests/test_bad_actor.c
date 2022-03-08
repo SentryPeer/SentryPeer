@@ -24,6 +24,7 @@
 #include "test_bad_actor.h"
 #include "../../src/bad_actor.h"
 #include "../../src/sip_parser.h"
+#include "../../src/json_logger.h"
 
 bad_actor *test_bad_actor_event_new(void)
 {
@@ -166,6 +167,11 @@ void test_bad_actor(void **state)
 	assert_string_equal(bad_actor_event4->user_agent, BAD_ACTOR_NOT_FOUND);
 	bad_actor_destroy(&bad_actor_event4);
 	assert_null(bad_actor_event4);
+
+	const bad_actor *bad_actor_event5 = test_bad_actor_event_new();
+	const char *bad_actor_json =
+		bad_actor_to_json(config, bad_actor_event5);
+	assert_non_null(bad_actor_json);
 
 	sentrypeer_config_destroy(&config);
 	assert_null(config);

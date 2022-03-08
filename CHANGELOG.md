@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Peer to Peer mode with CLI (`-p`) and ENV options to enable, added for DHT node using the OpenDHT library
 - Added `-R` flag to completely disable SIP mode. You can then run SentryPeer in API mode or DHT mode only etc. i.e. 
   not as a honeypot, but to serve local data
+- Added Peer to Peer bad_actor sharing, e.g. it gets saved on the DHT and consumed by other peers
 - RESTful API numbers resource (`/numbers`) now only returns numbers like +441234567890 or 441234567890
 - RESTful API number resource (`/numbers/{number}`) now only accepts +441234567890 or 441234567890 formats
+
+### Tests
+- More configuration CLI options tested
+- Bad Actor to JSON conversion tests - used to save on the DHT
 
 ## [1.2.0] - 2022-02-25
 - Add signal handlers to gracefully shut down the SIP, P2P and HTTP daemons

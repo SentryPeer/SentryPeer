@@ -39,6 +39,10 @@
 #include "database.h"
 #include "json_logger.h"
 
+#if HAVE_OPENDHT_C != 0
+#include "peer_to_peer_dht.h"
+#endif // HAVE_OPENDHT_C
+
 #define PACKET_BUFFER_SIZE 1024
 
 void *sip_daemon_thread_start(void *arg)
@@ -378,7 +382,6 @@ int sip_daemon_init(sentrypeer_config const *config)
 				fprintf(stderr,
 					"Saving bad actor to db failed\n");
 			}
-			bad_actor_destroy(&bad_actor_event);
 
 			if (config->sip_responsive_mode) {
 				// TODO Create reply headers with libosip2. Bad
@@ -411,6 +414,18 @@ int sip_daemon_init(sentrypeer_config const *config)
 					}
 				}
 			}
+
+			// Put on DHT last
+#if HAVE_OPENDHT_C != 0
+			if (config->p2p_dht_mode &&
+			    peer_to_peer_dht_save(config, bad_actor_event) !=
+				    EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Error saving bad_actor to peer_to_peer_dht.\n");
+			}
+#endif // HAVE_OPENDHT_C
+
+			bad_actor_destroy(&bad_actor_event);
 		}
 	}
 	CLOSESOCKET(socket_listen);

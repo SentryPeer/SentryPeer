@@ -19,9 +19,12 @@
 #define SENTRYPEER_PEER_TO_PEER_DHT_H 1
 
 #include "conf.h"
+#include "bad_actor.h"
 
 int peer_to_peer_dht_run(sentrypeer_config *config);
 int peer_to_peer_dht_stop(sentrypeer_config *config);
+int peer_to_peer_dht_save(sentrypeer_config const *config,
+		       bad_actor const *bad_actor_event);
 
 #endif //SENTRYPEER_PEER_TO_PEER_DHT_H
 

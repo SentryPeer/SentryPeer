@@ -117,6 +117,8 @@ endif
 
 if !DISABLE_OPENDHT
 unit_test_sources += \
+    src/peer_to_peer_dht.c \
+    src/peer_to_peer_dht.h \
     tests/unit_tests/test_peer_to_peer_dht.c \
     tests/unit_tests/test_peer_to_peer_dht.h
 endif

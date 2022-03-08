@@ -43,6 +43,7 @@ sentrypeer
 *.su
 *.idb
 *.pdb
+vgcore*
 
 # Autoconf and Automake outputs
 Makefile
@@ -84,6 +85,7 @@ sentrypeer.db
 
 # dist
 sentrypeer-*
+*.deb
 
 # Doxygen
 docs
@@ -100,3 +102,5 @@ tests/unit_tests/runner.log
 tests/unit_tests/runner.trs
 test_sentrypeer.db
 
+# SentryPeer json log
+sentrypeer_json.log
