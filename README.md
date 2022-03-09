@@ -118,6 +118,24 @@ Debian or Fedora packages are always available from the release page for the cur
 
    https://github.com/SentryPeer/SentryPeer/releases
 
+#### Ubuntu Package
+
+You can install SentryPeer from [our Ubuntu PPD](https://launchpad.net/~gavinhenry/+archive/ubuntu/sentrypeer) which
+is currently for Ubuntu 20 LTS (Focal Fossa):
+
+    sudo add-apt-repository ppa:gavinhenry/sentrypeer
+    sudo apt-get update
+
+This PPA can be added to your system manually by copying the lines below and adding them to your system's software 
+sources:
+
+    deb https://ppa.launchpadcontent.net/gavinhenry/sentrypeer/ubuntu focal main 
+    deb-src https://ppa.launchpadcontent.net/gavinhenry/sentrypeer/ubuntu focal main
+
+Then you can install SentryPeer:
+
+    sudo apt-get install sentrypeer
+
 #### Building from source
 
 You have two options for installation from source. CMake or autotools. Autotools is recommended at the moment. A release is an autotools build.

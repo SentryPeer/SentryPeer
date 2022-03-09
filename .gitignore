@@ -101,6 +101,7 @@ tests/unit_tests/runner
 tests/unit_tests/runner.log
 tests/unit_tests/runner.trs
 test_sentrypeer.db
+tests/unit_tests/test_sentrypeer.db-journal
 
 # SentryPeer json log
 sentrypeer_json.log

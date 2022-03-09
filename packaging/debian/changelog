@@ -2,7 +2,7 @@ sentrypeer (1.2.0-1) UNRELEASED; urgency=medium
 
   * Add JSON logging to log bad actor events and various other improvements
 
--- Gavin Henry <ghenry@sentrypeer.org>  Fri, 25 Feb 2022 21:45:00 +0000
+ -- Gavin Henry <ghenry@sentrypeer.org>  Fri, 25 Feb 2022 21:45:00 +0000
 
 sentrypeer (1.0.0-1) UNRELEASED; urgency=medium
 
