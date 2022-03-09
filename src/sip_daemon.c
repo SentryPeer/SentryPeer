@@ -56,6 +56,8 @@ int sip_daemon_run(sentrypeer_config *config)
 	pthread_t sip_daemon_thread = 0;
 	const char *sip_daemon_thread_name = "sip_daemon";
 
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+
 	if (pthread_create(&sip_daemon_thread, NULL, sip_daemon_thread_start,
 			   (void *)config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to create SIP daemon thread.\n");
@@ -86,6 +88,11 @@ int sip_daemon_stop(sentrypeer_config const *config)
 
 	if (pthread_cancel(config->sip_daemon_thread) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to cancel SIP daemon thread.\n");
+		return EXIT_FAILURE;
+	}
+
+	if(pthread_join(config->sip_daemon_thread, NULL) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to join SIP daemon thread.\n");
 		return EXIT_FAILURE;
 	}
 
@@ -346,7 +353,8 @@ int sip_daemon_init(sentrypeer_config const *config)
 				util_duplicate_string(client_ip_address_buffer),
 				dest_ip_address_buffer, 0, 0,
 				util_duplicate_string(transport_type), 0,
-				util_duplicate_string(collected_method), 0);
+				util_duplicate_string(collected_method),
+				config->node_id);
 
 			if (bytes_received > 0) {
 				if ((sip_message_parser(

@@ -44,6 +44,7 @@ struct sentrypeer_config {
 	bool bgp_agent_mode;
 	bool p2p_dht_mode;
 	bool p2p_lan_mode;
+	char *node_id;
 	char *db_file;
 	char *json_log_file;
 	struct MHD_Daemon *http_daemon;

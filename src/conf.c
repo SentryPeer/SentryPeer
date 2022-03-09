@@ -32,10 +32,15 @@ sentrypeer_config *sentrypeer_config_new(void)
 	sentrypeer_config *self = malloc(sizeof(sentrypeer_config));
 	assert(self);
 
+	char *uuid_string = malloc(UTILS_UUID_STRING_LEN);
+	assert(uuid_string);
+
+	self->node_id = util_uuid_generate_string(uuid_string);
 	self->syslog_mode = false;
 	self->json_log_mode = false;
 	self->verbose_mode = false;
 	self->debug_mode = false;
+	self->sip_mode = true; // Default on
 	self->sip_responsive_mode = false;
 	self->api_mode = false;
 	self->web_gui_mode = false;
@@ -66,6 +71,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 
 		// Modern C by Manning, Takeaway 6.19
 		// "6.19 Initialization or assignment with 0 makes a pointer null."
+		if (self->node_id != 0) {
+			free(self->node_id);
+			self->node_id = 0;
+		}
+
 		if (self->db_file != 0) {
 			free(self->db_file);
 			self->db_file = 0;
@@ -126,16 +136,6 @@ void print_version(void)
 int process_cli(sentrypeer_config *config, int argc, char **argv)
 {
 	int cli_option;
-	config->api_mode = false;
-	config->debug_mode = false;
-	config->sip_mode = true; // Default on
-	config->sip_responsive_mode = false;
-	config->json_log_mode = false;
-	config->syslog_mode = false;
-	config->verbose_mode = false;
-	config->web_gui_mode = false;
-	config->p2p_dht_mode = false;
-	config->p2p_lan_mode = false;
 
 	// Check env vars first
 	process_env_vars(config);
@@ -201,6 +201,11 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "SentryPeer node id: %s\n", config->node_id);
+	}
+
 	return EXIT_SUCCESS;
 }
 

@@ -168,10 +168,14 @@ void test_bad_actor(void **state)
 	bad_actor_destroy(&bad_actor_event4);
 	assert_null(bad_actor_event4);
 
-	const bad_actor *bad_actor_event5 = test_bad_actor_event_new();
-	const char *bad_actor_json =
+	bad_actor *bad_actor_event5 = test_bad_actor_event_new();
+	char *bad_actor_json =
 		bad_actor_to_json(config, bad_actor_event5);
 	assert_non_null(bad_actor_json);
+	free(bad_actor_json);
+
+	bad_actor_destroy(&bad_actor_event5);
+	assert_null(bad_actor_event5);
 
 	sentrypeer_config_destroy(&config);
 	assert_null(config);
