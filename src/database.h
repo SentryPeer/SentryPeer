@@ -30,6 +30,10 @@ int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
 			      bad_actor **bad_actor,
 			      sentrypeer_config const *config);
 
+#define BAD_ACTOR_EXISTS "SELECT EXISTS(SELECT 1 FROM honey WHERE event_uuid = ?);"
+bool db_bad_actor_exists(const char *bad_actor_event_uuid,
+			 sentrypeer_config const *config);
+
 #define GET_ROWS_DISTINCT_SOURCE_IP_COUNT                                      \
 	"SELECT COUNT(DISTINCT source_ip) from honey;"
 #define GET_ROWS_DISTINCT_SOURCE_IP_WITH_COUNT_AND_DATE                        \

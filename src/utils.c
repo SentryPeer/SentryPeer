@@ -21,6 +21,8 @@
 #include <uuid/uuid.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <jansson.h>
+#include <stdbool.h>
 
 char *event_timestamp(char *event_timestamp)
 {
@@ -126,4 +128,23 @@ char *util_addr_string(const struct sockaddr *addr)
 		break;
 	}
 	return s;
+}
+
+bool is_valid_json_key(json_t *json, const char *key) {
+	json_t *value = json_object_get(json, key);
+	if (value == NULL) {
+		return false;
+	}
+	if (!json_is_string(value)) {
+		return false;
+	}
+	return true;
+}
+
+bool is_valid_uuid(const char *uuid_to_check) {
+	uuid_t uuid;
+	if (uuid_parse(uuid_to_check, uuid) != 0) {
+		return false;
+	}
+	return true;
 }

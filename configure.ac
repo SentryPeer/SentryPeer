@@ -99,9 +99,18 @@ AX_PTHREAD([
 [AC_MSG_ERROR([POSIX threads support is required])])
 
 PKG_CHECK_MODULES([OPENDHT_C], [opendht-c], [
-   AC_DEFINE([HAVE_OPENDHT_C], [1], [Define if OpenDHT is available])
-   LIBS="$OPENDHT_C_LIBS $LIBS"
-   CFLAGS="$CFLAGS $OPENDHT_C_CFLAGS"
+   AC_MSG_CHECKING([we have opendht-c >= 2.3.5])
+   PKG_CHECK_EXISTS(opendht-c >= 2.3.5, [
+      AC_MSG_RESULT([yes])
+      AC_DEFINE([HAVE_OPENDHT_C], [1], [Define if OpenDHT is available])
+      LIBS="$OPENDHT_C_LIBS $LIBS"
+      CFLAGS="$CFLAGS $OPENDHT_C_CFLAGS"
+   ],
+   [
+      AC_MSG_RESULT([no])
+      AC_MSG_ERROR([We need at least version 2.3.5 of OpenDHT-C.
+Use --disable-opendht if you don't want Peer to Peer support.])
+   ])
 ],
 [AC_MSG_WARN([OpenDHT-c is not detected via pkg-config. Please install it manually.])])
 AM_CONDITIONAL([HAVE_OPENDHT_C], [test "$HAVE_OPENDHT_C" = "1"])
@@ -144,6 +153,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
 ])
 
 AC_MSG_CHECKING(for IP_RECVDSTADDR)
+AC_MSG_RESULT([yes])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   int opt = IP_RECVDSTADDR;
 ]])],[
@@ -197,7 +207,7 @@ if test -z "$DOXYGEN";
 fi
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 
-# CMOCKA unit tests check lib
+# CMOCKA unit tests
 PKG_CHECK_EXISTS(cmocka >= 1.1.5,
 		[AC_CHECK_HEADERS([stdarg.h stddef.h setjmp.h],
 			[], dnl We are only interested in action-if-not-found

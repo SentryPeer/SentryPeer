@@ -26,7 +26,8 @@
 #include <string.h>
 
 #define TEST_DB_FILE "test_sentrypeer.db"
-#define BAD_ACTOR_EVENT_UUID "f1f83c62-4fd9-11ec-a6bb-d05099894ba66"
+#define BAD_ACTOR_EVENT_UUID "2ceba0a8-3ac1-426f-9d45-8ecc3f00c21e"
+#define NODE_ID "1f45cc1c-4fd4-11ec-89f0-d05099894ba6"
 #define BAD_ACTOR_SOURCE_IP "104.149.141.214"
 
 // https://api.cmocka.org/group__cmocka__exec.html#ga7c62fd0acf2235ce98268c28ee262a57
@@ -71,6 +72,9 @@ int test_setup_sqlite_db(void **state)
 	const char create_called_number_index[] =
 		"CREATE INDEX IF NOT EXISTS called_number_index ON honey (called_number);";
 
+	const char create_event_uuid_index[] =
+		"CREATE INDEX IF NOT EXISTS event_uuid_index ON honey (event_uuid);";
+
 	const char insert_bad_actor[] =
 		"INSERT INTO honey (event_timestamp,"
 		"   event_uuid, collected_method, source_ip,"
@@ -103,6 +107,13 @@ int test_setup_sqlite_db(void **state)
 			 SQLITE_OK);
 	fprintf(stderr,
 		"Created index on called_number successfully using: %s at line number %d in file %s\n",
+		create_table_sql, __LINE__ - 1, __FILE__);
+
+	assert_int_equal(sqlite3_exec(db, create_event_uuid_index, NULL, NULL,
+				      NULL),
+			 SQLITE_OK);
+	fprintf(stderr,
+		"Created index on event_uuid successfully using: %s at line number %d in file %s\n",
 		create_table_sql, __LINE__ - 1, __FILE__);
 
 	assert_int_equal(sqlite3_prepare_v2(db, insert_bad_actor, -1,
@@ -157,11 +168,9 @@ int test_setup_sqlite_db(void **state)
 			-1, SQLITE_STATIC),
 		SQLITE_OK);
 
-	assert_int_equal(
-		sqlite3_bind_text(insert_bad_actor_stmt, 10,
-				  "1f45cc1c-4fd4-11ec-89f0-d05099894ba6", -1,
-				  SQLITE_STATIC),
-		SQLITE_OK);
+	assert_int_equal(sqlite3_bind_text(insert_bad_actor_stmt, 10, NODE_ID,
+					   -1, SQLITE_STATIC),
+			 SQLITE_OK);
 
 	fprintf(stderr,
 		"Bound bad actor values for insert at line number %d in file %s\n",
@@ -265,10 +274,33 @@ void test_db_insert_bad_actor(void **state)
 	assert_null(bad_actor_event);
 }
 
-// TODO: Complete
-void test_db_select_bad_actor_by_ip(void **state)
+void test_db_select_bad_actor(void **state)
 {
-	(void)state; /* unused */
+	sentrypeer_config *config = *state;
+	assert_non_null(config);
+
+	// Find by IP address - should succeed
+	bad_actor *bad_actor_found = 0;
+	assert_int_equal(db_select_bad_actor_by_ip(BAD_ACTOR_SOURCE_IP,
+						   &bad_actor_found, config),
+			 EXIT_SUCCESS);
+	assert_non_null(bad_actor_found);
+	bad_actor_destroy(&bad_actor_found);
+	assert_null(bad_actor_found);
+
+	// Find by IP address - should fail
+	bad_actor *bad_actor_not_found = 0;
+	assert_int_equal(db_select_bad_actor_by_ip(
+				 "127.0.0.1", &bad_actor_not_found, config),
+			 EXIT_FAILURE);
+	bad_actor_destroy(&bad_actor_not_found);
+	assert_null(bad_actor_not_found);
+
+	// Find by event_uuid
+	assert_true(db_bad_actor_exists(BAD_ACTOR_EVENT_UUID, config));
+	assert_false(db_bad_actor_exists("", config)); // invalid UUID
+	assert_false(db_bad_actor_exists(NULL, config)); // invalid UUID
+	assert_false(db_bad_actor_exists("85794cd7-f874-4346-a549-424898a0e224", config)); // UUID does not exist
 }
 
 void test_db_select_bad_actors(void **state)

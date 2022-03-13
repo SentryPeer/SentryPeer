@@ -45,6 +45,9 @@ const char create_source_ip_index[] =
 const char create_called_number_index[] =
 	"CREATE INDEX IF NOT EXISTS called_number_index ON honey (called_number);";
 
+const char create_event_uuid_index[] =
+	"CREATE INDEX IF NOT EXISTS event_uuid_index ON honey (event_uuid);";
+
 const char insert_bad_actor[] =
 	"INSERT INTO honey (event_timestamp,"
 	"   event_uuid, collected_method, source_ip,"
@@ -94,6 +97,13 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	if (sqlite3_exec(db, create_called_number_index, NULL, NULL, NULL) !=
 	    SQLITE_OK) {
 		fprintf(stderr, "Failed to create called_number_index\n");
+		sqlite3_close(db);
+		return EXIT_FAILURE;
+	}
+
+	if (sqlite3_exec(db, create_event_uuid_index, NULL, NULL, NULL) !=
+	    SQLITE_OK) {
+		fprintf(stderr, "Failed to create event_uuid_index\n");
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
@@ -207,6 +217,93 @@ int db_insert_bad_actor(bad_actor const *bad_actor_event,
 	return EXIT_SUCCESS;
 }
 
+bool db_bad_actor_exists(const char *bad_actor_event_uuid,
+			 sentrypeer_config const *config)
+{
+	if (bad_actor_event_uuid == NULL) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Event UUID is NULL.\n");
+		}
+		return false;
+	}
+
+	if (is_valid_uuid(bad_actor_event_uuid)) {
+		sqlite3 *db;
+		assert(config->db_file);
+
+		if (sqlite3_open(config->db_file, &db) != SQLITE_OK) {
+			fprintf(stderr, "Failed to open database: %s\n",
+				sqlite3_errmsg(db));
+			sqlite3_close(db);
+			return false;
+		}
+
+		sqlite3_stmt *find_bad_actor_stmt = 0;
+		if (sqlite3_prepare_v2(db, BAD_ACTOR_EXISTS, -1,
+				       &find_bad_actor_stmt,
+				       NULL) != SQLITE_OK) {
+			fprintf(stderr, "Failed to prepare statement: %s\n",
+				sqlite3_errmsg(db));
+			sqlite3_close(db);
+			return false;
+		}
+
+		if (sqlite3_bind_text(find_bad_actor_stmt, 1,
+				      bad_actor_event_uuid, -1,
+				      SQLITE_STATIC) != SQLITE_OK) {
+			fprintf(stderr, "Failed to bind event_uuid: %s\n",
+				sqlite3_errmsg(db));
+			sqlite3_close(db);
+			return false;
+		}
+
+		if (sqlite3_step(find_bad_actor_stmt) != SQLITE_ROW) {
+			sqlite3_finalize(find_bad_actor_stmt);
+			sqlite3_close(db);
+			return false;
+		}
+
+		// 1 found (true), 0 not found (false) - SELECT EXISTS returns int 1 or 0
+		int32_t found = sqlite3_column_int(find_bad_actor_stmt, 0);
+
+		if (sqlite3_finalize(find_bad_actor_stmt) != SQLITE_OK) {
+			fprintf(stderr, "Error finalizing statement: %s\n",
+				sqlite3_errmsg(db));
+			sqlite3_close(db);
+			return false;
+		}
+
+		if (sqlite3_close(db) != SQLITE_OK) {
+			fprintf(stderr, "Failed to close database\n");
+			return false;
+		}
+
+		// Found
+		if (found) {
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"Found event_uuid in honey table: %s\n",
+					bad_actor_event_uuid);
+			}
+			return true;
+		} else {
+			// Not Found
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"Event UUID does not exist in honey table: %s\n",
+					bad_actor_event_uuid);
+			}
+			return false;
+		}
+	} else {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Event UUID is not a valid UUID: %s\n",
+				bad_actor_event_uuid);
+		}
+		return false;
+	}
+}
+
 int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
 			      bad_actor **bad_actor_to_find,
 			      sentrypeer_config const *config)
@@ -312,7 +409,7 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr,
 			"Distinct source_ip row count in honey table is: %" PRId64
-			"n",
+			"\n",
 			*row_count);
 	}
 
@@ -540,7 +637,8 @@ int db_select_phone_number(const char *phone_number,
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
-	bad_actor *phone_number_found = bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+	bad_actor *phone_number_found =
+		bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, 0);
 	assert(phone_number_found);
 
 	if (sqlite3_bind_text(find_phone_number_stmt, 1, phone_number, -1,

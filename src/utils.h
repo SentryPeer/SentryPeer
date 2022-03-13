@@ -19,6 +19,9 @@
 
 #include <stddef.h>
 #include <sys/socket.h>
+#include <jansson.h>
+#include <stdbool.h>
+#include <uuid/uuid.h>
 
 /**
  * Get the current time suitable for event logging
@@ -69,5 +72,22 @@ int valid_ip_address_format(const char *ip_address_to_check);
  * @return The IP address in string format.
  */
 char *util_addr_string(const struct sockaddr *addr);
+
+/**
+ * Return true or false depending on whether the key string is in the json object.
+ *
+ * @param json The json object to check.
+ * @param key The key to check for.
+ * @return True if the key is in the json object, false otherwise.
+ */
+bool is_valid_json_key(json_t *json, const char *key);
+
+/**
+ * Return true or false depending on whether the uuid is valid.
+ *
+ * @param uuid_to_check The uuid to check.
+ * @return True if the uuid is valid, false otherwise.
+ */
+bool is_valid_uuid(const char *uuid_to_check);
 
 #endif //SENTRYPEER_UTILS_H

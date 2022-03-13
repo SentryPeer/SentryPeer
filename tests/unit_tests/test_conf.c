@@ -22,6 +22,7 @@
 #include "../../src/conf.h"
 
 #include <stdlib.h>
+#include <uuid/uuid.h>
 
 void test_conf(void **state)
 {
@@ -30,6 +31,13 @@ void test_conf(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
+
+	// Check uuid_parse always works as we rely on this when validating
+	// bad_actors received on the DHT.
+	uuid_t node_id;
+	char too_short_uuid[] = "baa3db34-1670-441b-baff-32445081509";
+	assert_int_equal(uuid_parse(config->node_id, node_id), EXIT_SUCCESS);
+	assert_int_equal(uuid_parse(too_short_uuid, node_id), -1);
 
 	// Test that we reject this db file location
 	char cli_db_file_location_wrong[] =

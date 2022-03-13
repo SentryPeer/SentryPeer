@@ -79,4 +79,25 @@ void test_utils(void **state)
 			 EXIT_SUCCESS);
 	assert_int_equal(valid_ip_address_format("NOT_AN_IP_ADDRESS"),
 			 EXIT_FAILURE);
+
+	// JSON utils
+	json_t *json = json_object();
+	assert_non_null(json);
+
+	json_object_set_new(json, "key", json_string("value"));
+
+	assert_false(is_valid_json_key(NULL, NULL));
+	assert_false(is_valid_json_key(json, NULL));
+	assert_false(is_valid_json_key(NULL, ""));
+	assert_false(is_valid_json_key(json, ""));
+	assert_false(is_valid_json_key(json, "key_does_not_exist"));
+	assert_true(is_valid_json_key(json, "key"));
+
+	json_decref(json);
+
+	// UUID utils
+	char uuid_valid[] = "00000000-0000-0000-0000-000000000000";
+	char uuid_invalid[] = "0000000000-054564654654000-0000-000000000000123";
+	assert_true(is_valid_uuid(uuid_valid));
+	assert_false(is_valid_uuid(uuid_invalid));
 }

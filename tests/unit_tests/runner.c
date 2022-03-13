@@ -32,7 +32,7 @@
 #include "test_sip_message.h"
 #include "test_sip_daemon.h"
 
-#if HAVE_ZYRE !=0
+#if HAVE_ZYRE != 0
 #include "test_peer_to_peer_lan.h"
 #endif
 
@@ -64,7 +64,9 @@ int main(void)
 		cmocka_unit_test_setup_teardown(test_db_insert_bad_actor,
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
-		cmocka_unit_test(test_db_select_bad_actor_by_ip),
+		cmocka_unit_test_setup_teardown(test_db_select_bad_actor,
+						test_setup_sqlite_db,
+						test_teardown_sqlite_db),
 		cmocka_unit_test_setup_teardown(test_db_select_bad_actors,
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
@@ -80,7 +82,7 @@ int main(void)
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
 
-#if HAVE_ZYRE !=0
+#if HAVE_ZYRE != 0
 		cmocka_unit_test(test_peer_to_peer_lan),
 #endif
 

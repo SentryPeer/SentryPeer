@@ -19,7 +19,7 @@ int test_teardown_sqlite_db(void **state);
 
 void test_open_select_close_sqlite_db(void **state);
 void test_db_insert_bad_actor(void **state);
-void test_db_select_bad_actor_by_ip(void **state);
+void test_db_select_bad_actor(void **state);
 void test_db_select_bad_actors(void **state);
 
 #endif //SENTRYPEER_TEST_DATABASE_H
