@@ -130,8 +130,9 @@ char *util_addr_string(const struct sockaddr *addr)
 	return s;
 }
 
-bool is_valid_json_key(json_t *json, const char *key) {
-	json_t *value = json_object_get(json, key);
+bool is_valid_json_key(const json_t *json, const char *key)
+{
+	const json_t *value = json_object_get(json, key);
 	if (value == NULL) {
 		return false;
 	}
@@ -141,7 +142,8 @@ bool is_valid_json_key(json_t *json, const char *key) {
 	return true;
 }
 
-bool is_valid_uuid(const char *uuid_to_check) {
+bool is_valid_uuid(const char *uuid_to_check)
+{
 	uuid_t uuid;
 	if (uuid_parse(uuid_to_check, uuid) != 0) {
 		return false;

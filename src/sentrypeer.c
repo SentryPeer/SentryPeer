@@ -135,10 +135,8 @@ int main(int argc, char **argv)
 	}
 #endif // HAVE_ZYRE
 
-	if (!config->p2p_lan_mode) {
-		while (cleanup_flag == 0) {
-			sleep(1);
-		}
+	while (cleanup_flag == 0) {
+		sleep(1);
 	}
 
 	if (config->debug_mode || config->verbose_mode) {

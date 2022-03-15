@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generate a SentryPeer node ID at startup to be used in all `bad_actor` events
 - Stop the SIP daemon thread correctly on shutdown
 - If OpenDHT-C is detected, check it is at least version 2.3.5. If Peer to Peer mode is not needed, you can 
-  use `--disable-opendht`
+  use `--disable-opendht` to disable it
 
 ### Tests
 - More configuration CLI options tested
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UUID parsing tests
 - JSON parsing tests
 - Additional SQLite3 database select tests
-- bad_actor_exists tests
+- `bad_actor_exists` tests
 
 ## [1.2.0] - 2022-02-25
 - Add signal handlers to gracefully shut down the SIP, P2P and HTTP daemons

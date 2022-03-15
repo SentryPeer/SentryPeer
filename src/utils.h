@@ -80,7 +80,7 @@ char *util_addr_string(const struct sockaddr *addr);
  * @param key The key to check for.
  * @return True if the key is in the json object, false otherwise.
  */
-bool is_valid_json_key(json_t *json, const char *key);
+bool is_valid_json_key(const json_t *json, const char *key);
 
 /**
  * Return true or false depending on whether the uuid is valid.

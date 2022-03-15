@@ -16,6 +16,7 @@
 
 #include "json_logger.h"
 #include "config.h"
+#include <assert.h>
 
 char *bad_actor_to_json(const sentrypeer_config *config,
 			const bad_actor *bad_actor_to_convert)

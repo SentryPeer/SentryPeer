@@ -16,11 +16,18 @@
 #if HAVE_OPENDHT_C != 0
 
 #include <opendht/opendht_c.h>
+#include <string.h>
+#include <assert.h>
+#include <syslog.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "conf.h"
 #include "utils.h"
 #include "jansson.h"
 #include "json_logger.h"
 #include "database.h"
+
 
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
