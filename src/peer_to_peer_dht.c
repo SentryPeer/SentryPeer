@@ -28,7 +28,6 @@
 #include "json_logger.h"
 #include "database.h"
 
-
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 #define DHT_BAD_ACTORS_KEY "bad_actors"
@@ -368,6 +367,13 @@ int peer_to_peer_dht_save(sentrypeer_config const *config,
 	assert(config->dht_node);
 
 	char *bad_actor_json = bad_actor_to_json(config, bad_actor_event);
+	// We don't assert here, because we want to continue even if it fails
+	if (bad_actor_json == NULL) {
+		fprintf(stderr, "Failed to convert bad actor to json.\n");
+		free(bad_actor_json);
+		free(ctx);
+		return EXIT_FAILURE;
+	}
 
 	dht_value *val = dht_value_new_from_string(bad_actor_json);
 	if (val) {
