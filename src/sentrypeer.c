@@ -26,10 +26,6 @@
 #include "sip_daemon.h"
 #include "http_daemon.h"
 
-#if HAVE_ZYRE != 0
-#include "peer_to_peer_lan.h"
-#endif // HAVE_ZYRE
-
 #if HAVE_OPENDHT_C != 0
 #include "peer_to_peer_dht.h"
 #endif // HAVE_OPENDHT_C
@@ -113,28 +109,6 @@ int main(int argc, char **argv)
 	}
 #endif // HAVE_OPENDHT_C
 
-#if HAVE_ZYRE != 0
-	if (config->p2p_lan_mode) {
-		if (config->debug_mode || config->verbose_mode) {
-			fprintf(stderr, "Peer to Peer LAN mode enabled...\n");
-		}
-
-		if (peer_to_peer_lan_run(config) != EXIT_SUCCESS) {
-			fprintf(stderr, "Failed to start peer to peer LAN.\n");
-			perror("peer_to_peer_lan_run");
-			if (config->syslog_mode) {
-				syslog(LOG_ERR,
-				       "Failed to start peer to peer LAN\n");
-			}
-			exit(EXIT_FAILURE);
-		}
-
-		while (cleanup_flag == 0 && zsys_interrupted == 0) {
-			sleep(1);
-		}
-	}
-#endif // HAVE_ZYRE
-
 	while (cleanup_flag == 0) {
 		sleep(1);
 	}
@@ -153,13 +127,6 @@ int main(int argc, char **argv)
 	if (sip_daemon_stop(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Issue cleanly stopping sip_daemon.\n");
 	}
-
-#if HAVE_ZYRE != 0
-	if (config->p2p_lan_mode &&
-	    peer_to_peer_lan_stop(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Issue cleanly stopping peer_to_peer_lan.\n");
-	}
-#endif // HAVE_ZYRE
 
 #if HAVE_OPENDHT_C != 0
 	if (config->p2p_dht_mode &&

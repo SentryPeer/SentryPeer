@@ -115,29 +115,6 @@ Use --disable-opendht if you don't want Peer to Peer support.])
 [AC_MSG_WARN([OpenDHT-c is not detected via pkg-config. Please install it manually.])])
 AM_CONDITIONAL([HAVE_OPENDHT_C], [test "$HAVE_OPENDHT_C" = "1"])
 
-PKG_CHECK_MODULES([ZYRE], [libzyre], [
-   AC_DEFINE([HAVE_ZYRE], [1], [Define if zyre is available])
-   LIBS="$ZYRE_LIBS $LIBS"
-   CFLAGS="$CFLAGS $ZYRE_CFLAGS"
-],
-[AC_MSG_WARN([zyre is not detected via pkg-config. Please install it manually.])])
-AM_CONDITIONAL([HAVE_ZYRE], [test "$HAVE_ZYRE" = "1"])
-
-# These should both be there as libzyre needs them
-PKG_CHECK_MODULES([CZMQ], [libczmq], [
-   LIBS="$CZMQ_LIBS $LIBS"
-   CFLAGS="$CFLAGS $CZMQ_CFLAGS"
-],
-[AC_MSG_WARN([libczmq is not detected via pkg-config. Please install it manually if you'd like Peer to Peer mode.])])
-AM_CONDITIONAL([HAVE_CZMQ], [test "$HAVE_CZMQ" = "1"])
-
-PKG_CHECK_MODULES([ZMQ], [libzmq], [
-   LIBS="$ZMQ_LIBS $LIBS"
-   CFLAGS="$CFLAGS $ZMQ_CFLAGS"
-],
-[AC_MSG_WARN([libzmq is not detected via pkg-config. Please install it manually if you'd like Peer to Peer mode.])])
-AM_CONDITIONAL([HAVE_ZMQ], [test "$HAVE_ZMQ" = "1"])
-
 AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
@@ -163,7 +140,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   AC_MSG_RESULT(no)
 ])
 
-# Allow a user to disable OpenDHT and Zyre, i.e. the Peer to Peer elements of SentryPeer for a
+# Allow a user to disable OpenDHT, i.e. the Peer to Peer elements of SentryPeer for a
 # full standalone node (we've reversed logic so the default is to have these enabled)
 AC_MSG_CHECKING(if you'd like to disable OpenDHT support)
 AC_ARG_ENABLE([opendht],
@@ -176,18 +153,6 @@ if test "$disable_opendht" = "yes"; then
   AC_MSG_WARN([OpenDHT support is disabled. Distributed Hash Tables will not be available])
 fi
 AM_CONDITIONAL([DISABLE_OPENDHT], [test x$disable_opendht = xyes])
-
-AC_MSG_CHECKING(if you'd like to disable Zyre support)
-AC_ARG_ENABLE([zyre],
-    AS_HELP_STRING([--disable-zyre], [Do not build with Zyre support]),
-    [disable_zyre="yes"],
-    [disable_zyre="no"])
-AC_MSG_RESULT($disable_zyre)
-if test "$disable_zyre" = "yes"; then
-  AC_DEFINE([HAVE_ZYRE], [0], [Disable Zyre support])
-  AC_MSG_WARN([Zyre support is disabled. Peer to Peer WAN and LAN mode will not be available])
-fi
-AM_CONDITIONAL([DISABLE_ZYRE], [test x$disable_zyre = xyes])
 
 if [[ ! -z "${GIT}" ]]; then
 	REVISION=`git rev-parse --short HEAD`

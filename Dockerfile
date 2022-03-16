@@ -27,7 +27,7 @@ RUN git clone https://github.com/SentryPeer/SentryPeer.git
 WORKDIR /SentryPeer
 #
 RUN ./bootstrap.sh
-RUN ./configure --disable-opendht --disable-zyre
+RUN ./configure --disable-opendht
 RUN make
 RUN make check
 RUN make install

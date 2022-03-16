@@ -45,12 +45,6 @@ sentrypeer_SOURCES= \
     src/database.c \
     src/database.h
 
-if !DISABLE_ZYRE
-    sentrypeer_SOURCES+= \
-    src/peer_to_peer_lan.c \
-    src/peer_to_peer_lan.h
-endif
-
 if !DISABLE_OPENDHT
     sentrypeer_SOURCES+= \
     src/peer_to_peer_dht.c \
@@ -109,12 +103,6 @@ unit_test_sources = \
     tests/unit_tests/test_sip_daemon.c \
     tests/unit_tests/test_sip_daemon.h
 
-if !DISABLE_ZYRE
-unit_test_sources += \
-    tests/unit_tests/test_peer_to_peer_lan.c \
-    tests/unit_tests/test_peer_to_peer_lan.h
-endif
-
 if !DISABLE_OPENDHT
 unit_test_sources += \
     src/peer_to_peer_dht.c \
@@ -162,12 +150,10 @@ bootstrap:
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 #
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-# Removing -Wredundant-decls as czmq is failing with it. Reported it
-# here - https://github.com/zeromq/czmq/issues/2205
 AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
-          -Wnested-externs -Wmissing-include-dirs \
+          -Wnested-externs -Wmissing-include-dirs -Wredundant-decls \
           -std=c18 -D_FORTIFY_SOURCE=2 -fpie -fpic -g3 -O2 \
           -fstack-protector-strong -grecord-gcc-switches \
           -Werror=format-security -Werror=implicit-function-declaration \

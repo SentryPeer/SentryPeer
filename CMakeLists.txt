@@ -34,7 +34,6 @@ add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/peer_to_peer_dht.c
-        ${CMAKE_SOURCE_DIR}/src/peer_to_peer_lan.c
         ${CMAKE_SOURCE_DIR}/src/utils.c
         ${CMAKE_SOURCE_DIR}/src/bad_actor.c
         ${CMAKE_SOURCE_DIR}/src/database.c
@@ -55,9 +54,6 @@ target_link_libraries(sentrypeer -luuid)
 target_link_libraries(sentrypeer -lmicrohttpd)
 target_link_libraries(sentrypeer -ljansson)
 target_link_libraries(sentrypeer -lcurl)
-target_link_libraries(sentrypeer -lzyre)
-target_link_libraries(sentrypeer -lzmq)
-target_link_libraries(sentrypeer -lczmq)
 target_link_libraries(sentrypeer -lopendht-c)
 
 # configure header file

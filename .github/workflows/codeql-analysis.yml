@@ -49,7 +49,6 @@ jobs:
         sudo add-apt-repository ppa:savoury1/utilities -y
         sudo apt-get update
         sudo apt-get install libmicrohttpd-dev -y
-        brew install --build-from-source zyre
     - run: |
         set -x
         ./bootstrap.sh

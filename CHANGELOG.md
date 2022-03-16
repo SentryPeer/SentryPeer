@@ -14,7 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generate a SentryPeer node ID at startup to be used in all `bad_actor` events
 - Stop the SIP daemon thread correctly on shutdown
 - If OpenDHT-C is detected, check it is at least version 2.3.5. If Peer to Peer mode is not needed, you can 
-  use `--disable-opendht` to disable it
+  use `--disable-opendht`
+- Remove the [Zyre](https://github.com/zeromq/zyre) library dependency as it is not needed anymore
+
+### Breaking changes
+- `--disable-zyre` option has now been removed, so `./configure` will now fail if you try to build with that option
 
 ### Tests
 - More configuration CLI options tested

@@ -37,7 +37,6 @@ jobs:
             libcurl4-openssl-dev \
             libpcre2-dev -y
             brew install cmocka
-            brew install --build-from-source zyre
             sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
             sudo apt-get install libmicrohttpd-dev -y
@@ -52,7 +51,6 @@ jobs:
             brew install curl
             brew install cmocka
             brew install pcre2
-            brew install --build-from-source zyre
           fi
       - name: Build and Clean
         run: |
