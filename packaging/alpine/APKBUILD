@@ -7,7 +7,17 @@ pkgdesc="Honeypot for a distributed p2p list of bad actor IP addresses and phone
 url="https://sentrypeer.org/"
 arch="all"
 license="GPL-2.0-only GPL-3.0-only"
-makedepends="autoconf autoconf-archive automake pkgconfig sqlite-dev opendht-dev jansson-dev libmicrohttpd-dev libosip2-dev pcre2-dev util-linux-dev"
+makedepends="
+        autoconf
+        autoconf-archive
+        automake
+        jansson-dev
+        libmicrohttpd-dev
+        libosip2-dev
+        opendht-dev
+        pcre2-dev
+        sqlite-dev
+        util-linux-dev"
 checkdepends="cmocka-dev curl-dev"
 subpackages="$pkgname-doc"
 source="$pkgname-$pkgver.tar.gz::https://github.com/SentryPeer/SentryPeer/archive/refs/tags/v$pkgver.tar.gz"
