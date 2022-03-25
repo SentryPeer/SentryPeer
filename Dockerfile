@@ -71,7 +71,7 @@ USER sentrypeer:sentrypeer
 WORKDIR /opt/sentrypeer/
 #
 # SIP Port 5060, RESTful API and OpenDHT
-EXPOSE 5060 8082 4222
+EXPOSE 5060/udp 8082 4222/udp
  #
  # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
  # ENV SENTRYPEER_API=1
