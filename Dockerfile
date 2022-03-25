@@ -59,7 +59,7 @@ RUN apk -U add --no-cache \
     mkdir -p /var/log/sentrypeer && \
     addgroup -g 2000 sentrypeer && \
     adduser -S -H -s /bin/ash -u 2000 -D -g 2000 sentrypeer && \
-    chown -R sentrypeer:sentrypeer /opt/sentrypeer && \
+    chown -R sentrypeer:sentrypeer /opt/sentrypeer /var/lib/sentrypeer /var/log/sentrypeer && \
 #
 # Clean up
     rm -rf /root/* && \
