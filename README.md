@@ -92,7 +92,7 @@ You can run the latest version of SentryPeer with [Docker](https://www.docker.co
 Or build yourself:
 
     sudo docker build -t sentrypeer .
-    sudo docker run -d -p 5060:5060 -p 8082:8082 sentrypeer:latest
+    sudo docker run -d -p 5060:5060 -p 8082:8082 -p 4222:4222 sentrypeer:latest
 
 Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:5060/health-check` to see if it's running.
 
