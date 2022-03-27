@@ -30,6 +30,8 @@ jobs:
             sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
             sudo apt-get install libmicrohttpd-dev -y
+            brew update
+            brew upgrade          
             brew install opendht
       - name: Download Coverity Build Tool
         run: |

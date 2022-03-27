@@ -36,6 +36,8 @@ jobs:
             libjansson-dev \
             libcurl4-openssl-dev \
             libpcre2-dev -y
+            brew update
+            brew upgrade
             brew install cmocka
             brew install opendht
             sudo add-apt-repository ppa:savoury1/utilities -y
