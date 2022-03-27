@@ -68,6 +68,8 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 
 		// Turn back into JSON
 		json_error_t error;
+		// Maybe switch to json_loadb() instead of json_loads() if needed:
+		// https://github.com/savoirfairelinux/opendht/issues/596#issuecomment-1079957048
 		json_t *json = json_loads(received_value_str, 0, &error);
 
 		if (!json_is_object(json)) {
@@ -305,6 +307,11 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	dht_runner_config dht_config;
 	dht_runner_config_default(&dht_config);
 
+	dht_config.dht_config.node_config.is_bootstrap = true;
+	dht_config.dht_config.node_config.maintain_storage = true;
+
+	// If set, the dht will load its state from this file on start and save its state in this file on shutdown
+	dht_config.dht_config.node_config.persist_path = "/tmp/sentrypeer.bin";
 	dht_config.peer_discovery = true; // Look for other peers on the network
 	dht_config.peer_publish = true; // Publish our own peer info
 
@@ -312,7 +319,6 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	assert(runner);
 
 	dht_runner_run_config(runner, DHT_PORT, &dht_config);
-
 	config->dht_node = runner;
 
 	if (config->debug_mode || config->verbose_mode) {
@@ -323,7 +329,7 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	dht_infohash h;
 	dht_infohash_get_from_string(&h, DHT_BAD_ACTORS_KEY);
 
-	if (config->debug_mode) {
+	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "DHT InfoHash for key '%s' is: %s\n",
 			DHT_BAD_ACTORS_KEY, dht_infohash_print(&h));
 	}
@@ -334,20 +340,22 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	ctx->runner = runner;
 	ctx->config = config;
 
-	// Should we dht_runner_get() with dht_get_callback() here to check if
-	// the value exists?
+	// Join the DHT network *before* we listen:
+	// https://github.com/savoirfairelinux/opendht/issues/596#issuecomment-1079957048
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Bootstrapping the DHT\n");
+	}
+	dht_runner_bootstrap(runner, DHT_BOOTSTRAP_NODE, NULL);
 
 	// Listen for data changes on the DHT_PEERS_KEY key
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr,
+			"Listening for changes to the bad_actors DHT key\n");
+	}
 	dht_op_token *token = dht_runner_listen(runner, &h, dht_value_callback,
 						op_context_free, ctx);
 	assert(token);
 	config->dht_op_token = token; // Save for clean up
-
-	// Join the DHT and get our Public IP address
-	dht_runner_bootstrap(runner, DHT_BOOTSTRAP_NODE, NULL);
-
-	// Needed? It's in the example code from dhtcnode.c
-	sleep(2);
 
 	return EXIT_SUCCESS;
 }
@@ -377,8 +385,10 @@ int peer_to_peer_dht_save(sentrypeer_config const *config,
 
 	dht_value *val = dht_value_new_from_string(bad_actor_json);
 	if (val) {
+		// Make these permanent:
+		// https://github.com/savoirfairelinux/opendht/issues/596#issuecomment-1079957048
 		dht_runner_put(config->dht_node, config->dht_info_hash, val,
-			       dht_done_callback, ctx, false);
+			       dht_done_callback, ctx, true);
 		dht_value_unref(val);
 		free(bad_actor_json);
 	} else {
@@ -401,6 +411,7 @@ int peer_to_peer_dht_stop(sentrypeer_config *config)
 
 	dht_runner_cancel_listen(config->dht_node, config->dht_info_hash,
 				 config->dht_op_token);
+	dht_runner_shutdown(config->dht_node, NULL, NULL);
 	dht_op_token_delete(config->dht_op_token);
 	dht_runner_delete(config->dht_node);
 
