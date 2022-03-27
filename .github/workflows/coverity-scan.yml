@@ -30,7 +30,7 @@ jobs:
             sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
             sudo apt-get install libmicrohttpd-dev -y
-
+            brew install opendht
       - name: Download Coverity Build Tool
         run: |
           wget -q https://scan.coverity.com/download/linux64 --post-data "token=$TOKEN&project=SentryPeer%2FSentryPeer" -O cov-analysis-linux64.tar.gz

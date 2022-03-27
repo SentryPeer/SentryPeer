@@ -32,6 +32,7 @@ jobs:
           sudo add-apt-repository ppa:savoury1/utilities -y
           sudo apt-get update
           sudo apt-get install libmicrohttpd-dev -y
+          brew install opendht
       - run: |
           set -x
           cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/
