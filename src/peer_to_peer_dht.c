@@ -29,6 +29,7 @@
 #include "database.h"
 
 #define DHT_PORT 4222
+#define DHT_BOOTSTRAP_WAIT_TIME 5
 #define DHT_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 #define DHT_BAD_ACTORS_KEY "bad_actors"
 
@@ -281,6 +282,8 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 static void dht_done_callback(bool ok, void *user_data)
 {
 	op_context *ctx = user_data;
+	assert(ctx);
+
 	const sentrypeer_config *config = ctx->config;
 	//dht_runner *runner = ctx->runner;
 
@@ -307,11 +310,6 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	dht_runner_config dht_config;
 	dht_runner_config_default(&dht_config);
 
-	dht_config.dht_config.node_config.is_bootstrap = true;
-	dht_config.dht_config.node_config.maintain_storage = true;
-
-	// If set, the dht will load its state from this file on start and save its state in this file on shutdown
-	dht_config.dht_config.node_config.persist_path = "/tmp/sentrypeer.bin";
 	dht_config.peer_discovery = true; // Look for other peers on the network
 	dht_config.peer_publish = true; // Publish our own peer info
 
@@ -347,6 +345,12 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	}
 	dht_runner_bootstrap(runner, DHT_BOOTSTRAP_NODE, NULL);
 
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Waiting %d seconds for bootstrapping...\n",
+			DHT_BOOTSTRAP_WAIT_TIME);
+	}
+	sleep(DHT_BOOTSTRAP_WAIT_TIME);
+
 	// Listen for data changes on the DHT_PEERS_KEY key
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr,
@@ -364,7 +368,7 @@ int peer_to_peer_dht_save(sentrypeer_config const *config,
 			  bad_actor const *bad_actor_event)
 {
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Saving bad actor to the DHT...\n");
+		fprintf(stderr, "Saving bad actor on the DHT...\n");
 	}
 
 	struct op_context *ctx = malloc(sizeof(struct op_context));
@@ -391,6 +395,10 @@ int peer_to_peer_dht_save(sentrypeer_config const *config,
 			       dht_done_callback, ctx, true);
 		dht_value_unref(val);
 		free(bad_actor_json);
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr,
+				"bad actor permanently saved on the DHT...\n");
+		}
 	} else {
 		fprintf(stderr, "Failed to create DHT value from string: %s\n",
 			bad_actor_json);
