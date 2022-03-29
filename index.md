@@ -91,10 +91,10 @@ I started this because I wanted to do [C network programming](https://github.com
 You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
 Or build yourself:
 
-    sudo docker build -t sentrypeer .
-    sudo docker run -d -p 5060:5060 -p 8082:8082 sentrypeer:latest
+    sudo docker build --no-cache -t sentrypeer .
+    sudo docker run -d -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
 
-Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:5060/health-check` to see if it's running.
+Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:8082/health-check` to see if it's running.
 
 #### Environment Variables
 
