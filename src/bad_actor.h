@@ -15,6 +15,7 @@
 #define SENTRYPEER_BAD_ACTOR_H 1
 
 #include "utils.h"
+#include "conf.h"
 #include <stdint.h>
 
 // Modern C - Manning. Chapter 6, Section 6.4:
@@ -47,6 +48,10 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 			 char *destination_ip, char *called_number,
 			 char *method, char *transport_type, char *user_agent,
 			 char *collected_method, char *created_by_node_id);
+
+// Log our bad actor to various places
+int bad_actor_log(const sentrypeer_config *config,
+		  const bad_actor *bad_actor_event);
 
 //  Destructors
 void bad_actor_destroy(bad_actor **self_ptr);

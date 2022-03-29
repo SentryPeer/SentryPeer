@@ -33,11 +33,16 @@ bad_actor *test_bad_actor_event_new(void)
 	char test_transport_type[] = "UDP";
 	char test_collected_method[] = "passive";
 
+	sentrypeer_config *config = sentrypeer_config_new();
+	assert_non_null(config);
+	config->debug_mode = true;
+
 	bad_actor *bad_actor_event =
 		bad_actor_new(0, util_duplicate_string(test_source_ip),
 			      util_duplicate_string(test_destination_ip), 0, 0,
 			      util_duplicate_string(test_transport_type), 0,
-			      util_duplicate_string(test_collected_method), 0);
+			      util_duplicate_string(test_collected_method),
+			      config->node_id);
 	assert_non_null(bad_actor_event);
 	assert_string_equal(bad_actor_event->source_ip, test_source_ip);
 	assert_string_equal(bad_actor_event->destination_ip,
@@ -50,6 +55,9 @@ bad_actor *test_bad_actor_event_new(void)
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
+
+	sentrypeer_config_destroy(&config);
+	assert_null(config);
 
 	return bad_actor_event;
 }
@@ -169,10 +177,11 @@ void test_bad_actor(void **state)
 	assert_null(bad_actor_event4);
 
 	bad_actor *bad_actor_event5 = test_bad_actor_event_new();
-	char *bad_actor_json =
-		bad_actor_to_json(config, bad_actor_event5);
+	char *bad_actor_json = bad_actor_to_json(config, bad_actor_event5);
 	assert_non_null(bad_actor_json);
 	free(bad_actor_json);
+
+	assert_int_equal(bad_actor_log(config, bad_actor_event5), EXIT_SUCCESS);
 
 	bad_actor_destroy(&bad_actor_event5);
 	assert_null(bad_actor_event5);
@@ -185,6 +194,10 @@ void test_bad_actors(void **state)
 {
 	(void)state; /* unused */
 
+	sentrypeer_config *config = sentrypeer_config_new();
+	assert_non_null(config);
+	config->debug_mode = true;
+
 	int64_t row_count = 100;
 	bad_actor **bad_actors = calloc(row_count, sizeof(*bad_actors));
 	assert_non_null(bad_actors);
@@ -193,7 +206,7 @@ void test_bad_actors(void **state)
 	while (row_num < row_count) {
 		bad_actors[row_num] =
 			bad_actor_new(0, util_duplicate_string("127.0.0.1"), 0,
-				      0, 0, 0, 0, 0, 0);
+				      0, 0, 0, 0, 0, config->node_id);
 		row_num++;
 	}
 
@@ -202,4 +215,7 @@ void test_bad_actors(void **state)
 	free(bad_actors);
 	bad_actors = 0;
 	assert_null(bad_actors);
+
+	sentrypeer_config_destroy(&config);
+	assert_null(config);
 }

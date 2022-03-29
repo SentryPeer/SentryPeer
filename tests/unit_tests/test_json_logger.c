@@ -27,13 +27,27 @@ void test_json_logger(void **state)
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
 
-	bad_actor *bad_actor_to_log = test_bad_actor_event_new();
+	// Set up
+	bad_actor *bad_actor_event = test_bad_actor_event_new();
+	assert_non_null(bad_actor_event);
 
-	assert_int_equal(json_log_bad_actor(config, bad_actor_to_log),
+	// Log JSON to the log file
+	assert_int_equal(json_log_bad_actor(config, bad_actor_event),
 			 EXIT_SUCCESS);
 
-	bad_actor_destroy(&bad_actor_to_log);
-	assert_null(bad_actor_to_log);
+	// Conversion tests
+	char *json_string = bad_actor_to_json(config, bad_actor_event);
+	assert_non_null(json_string);
+
+	bad_actor *bad_actor_from_json = json_to_bad_actor(config, json_string);
+	assert_non_null(bad_actor_from_json);
+
+	// Clean up
+	bad_actor_destroy(&bad_actor_event);
+	assert_null(bad_actor_event);
+	bad_actor_destroy(&bad_actor_from_json);
+	assert_null(bad_actor_from_json);
+	free(json_string);
 
 	assert_int_equal(remove(config->json_log_file), EXIT_SUCCESS);
 }

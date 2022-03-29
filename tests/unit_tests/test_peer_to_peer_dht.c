@@ -128,15 +128,15 @@ void test_peer_to_peer_dht(void **state)
 	ctx->runner = runner;
 	ctx->d = 42;
 
-	dht_op_token *token = dht_runner_listen(runner, &h, dht_value_callback,
-						op_context_free, ctx);
-	assert_non_null(token);
-
 	sleep(1);
 
 	dht_runner_bootstrap(runner, DHT_BOOTSTRAP_NODE, NULL);
 
 	sleep(2);
+
+	dht_op_token *token = dht_runner_listen(runner, &h, dht_value_callback,
+						op_context_free, ctx);
+	assert_non_null(token);
 
 	struct sockaddr **addrs = dht_runner_get_public_address(runner);
 	assert_non_null(addrs);
@@ -151,8 +151,8 @@ void test_peer_to_peer_dht(void **state)
 	free(addrs);
 
 	dht_runner_cancel_listen(runner, &h, token);
+	dht_runner_shutdown(runner, NULL, NULL);
 	dht_op_token_delete(token);
-
 	dht_runner_delete(runner);
 }
 #else

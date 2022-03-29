@@ -21,6 +21,8 @@
 
 char *bad_actor_to_json(const sentrypeer_config *config,
 			const bad_actor *bad_actor_to_convert);
+bad_actor *json_to_bad_actor(const sentrypeer_config *config,
+			     const char *json_to_convert);
 int json_log_bad_actor(const sentrypeer_config *config,
 		       const bad_actor *bad_actor);
 

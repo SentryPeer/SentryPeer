@@ -258,7 +258,8 @@ void test_db_insert_bad_actor(void **state)
 	bad_actor *bad_actor_event =
 		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0, 0,
 			      util_duplicate_string(test_transport_type), 0,
-			      util_duplicate_string(test_collected_method), 0);
+			      util_duplicate_string(test_collected_method),
+			      config->node_id);
 	fprintf(stderr,
 		"New bad actor event created at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
@@ -300,7 +301,8 @@ void test_db_select_bad_actor(void **state)
 	assert_true(db_bad_actor_exists(BAD_ACTOR_EVENT_UUID, config));
 	assert_false(db_bad_actor_exists("", config)); // invalid UUID
 	assert_false(db_bad_actor_exists(NULL, config)); // invalid UUID
-	assert_false(db_bad_actor_exists("85794cd7-f874-4346-a549-424898a0e224", config)); // UUID does not exist
+	assert_false(db_bad_actor_exists("85794cd7-f874-4346-a549-424898a0e224",
+					 config)); // UUID does not exist
 }
 
 void test_db_select_bad_actors(void **state)

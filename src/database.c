@@ -326,7 +326,8 @@ int db_select_bad_actor_by_ip(const char *bad_actor_ip_address,
 		sqlite3_close(db);
 		return EXIT_FAILURE;
 	}
-	bad_actor *bad_actor_found = bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+	bad_actor *bad_actor_found =
+		bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, config->node_id);
 	assert(bad_actor_found);
 
 	if (sqlite3_bind_text(find_bad_actor_stmt, 1, bad_actor_ip_address, -1,
@@ -464,7 +465,7 @@ int db_select_bad_actors(bad_actor ***bad_actors, int64_t *row_count,
 
 		bad_actors_array[row_num] = bad_actor_new(
 			0, util_duplicate_string((const char *)source_ip), 0, 0,
-			0, 0, 0, 0, 0);
+			0, 0, 0, 0, config->node_id);
 
 		bad_actors_array[row_num]->seen_last =
 			util_duplicate_string((const char *)seen_last);
@@ -585,7 +586,7 @@ int db_select_called_numbers(bad_actor ***phone_numbers, int64_t *row_count,
 		phone_numbers_array[row_num] = bad_actor_new(
 			0, 0, 0,
 			util_duplicate_string((const char *)called_number), 0,
-			0, 0, 0, 0);
+			0, 0, 0, config->node_id);
 
 		phone_numbers_array[row_num]->seen_last =
 			util_duplicate_string((const char *)seen_last);
@@ -638,7 +639,7 @@ int db_select_phone_number(const char *phone_number,
 		return EXIT_FAILURE;
 	}
 	bad_actor *phone_number_found =
-		bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+		bad_actor_new(0, 0, 0, 0, 0, 0, 0, 0, config->node_id);
 	assert(phone_number_found);
 
 	if (sqlite3_bind_text(find_phone_number_stmt, 1, phone_number, -1,

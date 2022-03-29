@@ -19,7 +19,10 @@
 // libosip2 needs these
 #include <sys/time.h>
 #include <osip2/osip.h>
+#include <syslog.h>
 
+#include "database.h"
+#include "json_logger.h"
 #include "utils.h"
 
 //  A Bad Actor class.
@@ -75,18 +78,35 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 	self->transport_type = transport_type;
 	self->user_agent = user_agent;
 	self->collected_method = collected_method;
+	self->created_by_node_id = util_duplicate_string(created_by_node_id);
 	self->seen_last = 0;
 	self->seen_count = 0;
 
-	if (created_by_node_id) {
-		self->created_by_node_id = created_by_node_id;
-	} else {
-		// TODO: If not set, use the node id of the node that created the event
-		// For now, just set it to the event_uuid
-		self->created_by_node_id = uuid_string;
+	return self;
+}
+
+int bad_actor_log(const sentrypeer_config *config,
+		  const bad_actor *bad_actor_event)
+{
+	if (config->syslog_mode) {
+		syslog(LOG_NOTICE, "Source IP: %s, Method: %s, Agent: %s\n",
+		       bad_actor_event->source_ip, bad_actor_event->method,
+		       bad_actor_event->user_agent);
 	}
 
-	return self;
+	if (config->json_log_mode &&
+	    (json_log_bad_actor(config, bad_actor_event) != EXIT_SUCCESS)) {
+		fprintf(stderr, "Saving bad_actor json to %s failed.\n",
+			config->json_log_file);
+		return EXIT_FAILURE;
+	}
+
+	if (db_insert_bad_actor(bad_actor_event, config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Saving bad actor to db failed\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }
 
 //  Destructor
@@ -156,6 +176,11 @@ void bad_actor_destroy(bad_actor **self_ptr)
 		if (self->seen_count != 0) {
 			free(self->seen_count);
 			self->seen_count = 0;
+		}
+
+		if (self->created_by_node_id != 0) {
+			free(self->created_by_node_id);
+			self->created_by_node_id = 0;
 		}
 
 		free(self);

@@ -38,8 +38,7 @@ jobs:
             libpcre2-dev -y
             brew update
             brew upgrade
-            brew install cmocka
-            brew install opendht
+            brew install cmocka opendht libosip
             sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
             sudo apt-get install libmicrohttpd-dev -y

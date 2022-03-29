@@ -91,7 +91,7 @@ int sip_daemon_stop(sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	if(pthread_join(config->sip_daemon_thread, NULL) != EXIT_SUCCESS) {
+	if (pthread_join(config->sip_daemon_thread, NULL) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to join SIP daemon thread.\n");
 		return EXIT_FAILURE;
 	}
@@ -369,26 +369,9 @@ int sip_daemon_init(sentrypeer_config const *config)
 				}
 			}
 
-			if (config->syslog_mode) {
-				syslog(LOG_NOTICE,
-				       "Source IP: %s, Method: %s, Agent: %s\n",
-				       bad_actor_event->source_ip,
-				       bad_actor_event->method,
-				       bad_actor_event->user_agent);
-			}
-
-			if (config->json_log_mode &&
-			    (json_log_bad_actor(config, bad_actor_event) !=
-			     EXIT_SUCCESS)) {
-				fprintf(stderr,
-					"Saving bad_actor json to %s failed.\n",
-					config->json_log_file);
-			}
-
-			if (db_insert_bad_actor(bad_actor_event, config) !=
+			if (bad_actor_log(config, bad_actor_event) !=
 			    EXIT_SUCCESS) {
-				fprintf(stderr,
-					"Saving bad actor to db failed\n");
+				fprintf(stderr, "Logging bad_actor failed.\n");
 			}
 
 			if (config->sip_responsive_mode) {

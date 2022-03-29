@@ -67,7 +67,7 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 		memcpy(received_value_str, data.data, data.size);
 		received_value_str[data.size] = '\0';
 
-		// Turn back into JSON
+		// Turn back into JSON string
 		json_error_t error;
 		// Maybe switch to json_loadb() instead of json_loads() if needed:
 		// https://github.com/savoirfairelinux/opendht/issues/596#issuecomment-1079957048
@@ -85,7 +85,8 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 			return true;
 		}
 
-		json_t *node_id = json_object_get(json, "created_by_node_id");
+		const json_t *node_id =
+			json_object_get(json, "created_by_node_id");
 		if (!node_id) {
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
@@ -140,7 +141,7 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 
 		// TODO: Validate event_uuid and check our database to see if we already have this bad_actor
 		// by using the event_uuid
-		json_t *event_uuid = json_object_get(json, "event_uuid");
+		const json_t *event_uuid = json_object_get(json, "event_uuid");
 		if (!event_uuid) {
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
@@ -180,31 +181,10 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 				node_id_str);
 		}
 
-		// Check rest of bad_actor keys
-		// TODO: Use bad_actor type instead of hard coding here
-		const char *bad_actor_keys[] = {
-			"event_timestamp", "collected_method", "sip_message",
-			"source_ip",	   "destination_ip",   "called_number",
-			"method",	   "transport_type"
-		};
-
-		int loop_control = 0;
-		while (loop_control <= 7) {
-			json_t *json_value = json_object_get(
-				json, bad_actor_keys[loop_control]);
-			if (!json_value) {
-				if (config->debug_mode ||
-				    config->verbose_mode) {
-					fprintf(stderr,
-						"JSON from DHT is not valid.\n");
-					fprintf(stderr,
-						"No '%s' key in JSON.\n",
-						bad_actor_keys[loop_control]);
-				}
-				json_decref(json);
-				free(received_value_str);
-				return true;
-			}
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr,
+				"Checking we haven't seen this event_uuid before in our db: %s\n",
+				event_uuid_str);
 		}
 
 		if (!db_bad_actor_exists(event_uuid_str, config)) {
@@ -216,49 +196,20 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 					node_id_str);
 			}
 
-			bad_actor *bad_actor_event = bad_actor_new(
-				util_duplicate_string(json_string_value(
-					json_object_get(json, "sip_message"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json, "source_ip"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json,
-							"destination_ip"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json, "called_number"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json, "method"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json,
-							"transport_type"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json, "user_agent"))),
-				util_duplicate_string(json_string_value(
-					json_object_get(json,
-							"collected_method"))),
-				(char *)node_id_str);
-
-			// TODO: This is the same as sip_daemon.c line 372. Move to a save_bad_actor function
-			if (config->syslog_mode) {
-				syslog(LOG_NOTICE,
-				       "Source IP: %s, Method: %s, Agent: %s\n",
-				       bad_actor_event->source_ip,
-				       bad_actor_event->method,
-				       bad_actor_event->user_agent);
-			}
-
-			if (config->json_log_mode &&
-			    (json_log_bad_actor(config, bad_actor_event) !=
-			     EXIT_SUCCESS)) {
+			// Ready to convert JSON to a bad_actor
+			bad_actor *bad_actor_event =
+				json_to_bad_actor(config, received_value_str);
+			if (!bad_actor_event) {
 				fprintf(stderr,
-					"Saving bad_actor json to %s failed.\n",
-					config->json_log_file);
+					"Converting JSON to a bad_actor failed.\n");
+				json_decref(json);
+				free(received_value_str);
+				return true;
 			}
 
-			if (db_insert_bad_actor(bad_actor_event, config) !=
+			if (bad_actor_log(config, bad_actor_event) !=
 			    EXIT_SUCCESS) {
-				fprintf(stderr,
-					"Saving bad actor to db failed\n");
+				fprintf(stderr, "Logging bad_actor failed.\n");
 			}
 
 			json_decref(json);
