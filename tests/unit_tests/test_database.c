@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TEST_DB_FILE "test_sentrypeer.db"
 #define BAD_ACTOR_EVENT_UUID "2ceba0a8-3ac1-426f-9d45-8ecc3f00c21e"
 #define NODE_ID "1f45cc1c-4fd4-11ec-89f0-d05099894ba6"
 #define BAD_ACTOR_SOURCE_IP "104.149.141.214"

@@ -14,6 +14,8 @@
 #ifndef SENTRYPEER_TEST_DATABASE_H
 #define SENTRYPEER_TEST_DATABASE_H 1
 
+#define TEST_DB_FILE "test_sentrypeer.db"
+
 int test_setup_sqlite_db(void **state);
 int test_teardown_sqlite_db(void **state);
 

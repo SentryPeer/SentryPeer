@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include "test_bad_actor.h"
-#include "../../src/bad_actor.h"
+#include "test_database.h"
 #include "../../src/sip_parser.h"
 #include "../../src/json_logger.h"
 
@@ -120,6 +120,9 @@ void test_bad_actor(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
+
+	strncpy(config->db_file, TEST_DB_FILE, SENTRYPEER_PATH_MAX);
+	assert_non_null(config->db_file);
 
 	fprintf(stderr, "debug_mode set to true at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
