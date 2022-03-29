@@ -40,8 +40,8 @@ Here's a mockup of the web UI which is subject to change.
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
 - [x] User _owns their_ data
-- [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
-- [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
+- [x] User can submit their own data if they want to (you need to enable p2p mode - `-p`) 
+- [x] User gets other users' data **ONLY IF** they opt in to submit their data to the pool
 - [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
 - [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
 - [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
@@ -50,7 +50,6 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] TCP transport
 - [ ] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
-- [ ] Data is max 7(?) days old as useless otherwise
 - [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
   not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
