@@ -40,8 +40,8 @@ Here's a mockup of the web UI which is subject to change.
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
 - [x] User _owns their_ data
-- [ ] User can submit their own data if they want to - _opt out_ (default is to submit data)
-- [ ] User gets other users' data ([Tit for tat?](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing)) **ONLY IF** they opt in to submit their data to the pool ([DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)? - need to do a [PoC](https://en.wikipedia.org/wiki/Proof_of_concept))
+- [x] User can submit their own data if they want to (you need to enable p2p mode - `-p`) 
+- [x] User gets other users' data **ONLY IF** they opt in to submit their data to the pool
 - [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
 - [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
 - [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
@@ -50,7 +50,6 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] TCP transport
 - [ ] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
-- [ ] Data is max 7(?) days old as useless otherwise
 - [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
   not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
@@ -85,6 +84,8 @@ I started this because I wanted to do [C network programming](https://github.com
 
 - TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/ 
 - CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+- ClueCon Weekly 2022 - [To be published](https://www.youtube.com/c/FreeSWITCH/videos) 
+- UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/ 
 
 ### Docker
 
@@ -190,16 +191,24 @@ We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew
 Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
 the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
-    ./sentrypeer -draws
+    ./sentrypeer -drawps
+    SentryPeer node id: 8ae32230-d9d8-4a04-9f83-9bb00f16735f
     Starting sentrypeer...
     API mode enabled, starting http daemon...
     Web GUI mode enabled...
     SIP mode enabled...
+    Peer to Peer DHT mode enabled...
+    Starting peer to peer DHT mode...
     Configuring local address...
     Creating socket...
     Binding socket to local address...
     Listening for incoming connections...
     SIP responsive mode enabled. Will reply to SIP probes...
+    Peer to peer DHT mode started.
+    DHT InfoHash for key 'bad_actors' is: 14d30143330e2e0e922ed4028a60ff96a59800ad
+    Bootstrapping the DHT
+    Waiting 5 seconds for bootstrapping...
+    Listening for changes to the bad_actors DHT key
 
 when you get a probe request, you can see something like the following in the terminal:
 
