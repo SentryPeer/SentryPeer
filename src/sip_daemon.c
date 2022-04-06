@@ -31,7 +31,6 @@
 #include <string.h>
 #include <time.h>
 #include <syslog.h>
-#include <config.h>
 
 #include "conf.h"
 #include "sip_daemon.h"
@@ -142,7 +141,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Creating socket...\n");
+		fprintf(stderr, "Creating UDP socket...\n");
 	}
 	SOCKET socket_listen;
 	socket_listen =

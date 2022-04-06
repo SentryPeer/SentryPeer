@@ -18,7 +18,7 @@ project(sentrypeer
 
 set(CMAKE_C_STANDARD 17)
 
-add_executable(sentrypeer
+add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
         ${CMAKE_SOURCE_DIR}/src/signal_handler.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
