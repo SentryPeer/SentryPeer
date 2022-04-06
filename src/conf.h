@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 
-#include "config.h"
+#include "../config.h"
 
 #if HAVE_ZYRE !=0
 #include <zyre.h>

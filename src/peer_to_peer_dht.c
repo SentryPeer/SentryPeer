@@ -11,7 +11,7 @@
                              |___/
 */
 
-#include <config.h>
+#include "conf.h"
 
 #if HAVE_OPENDHT_C != 0
 
@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "conf.h"
 #include "utils.h"
 #include "jansson.h"
 #include "json_logger.h"

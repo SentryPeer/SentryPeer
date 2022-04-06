@@ -11,7 +11,7 @@
                              |___/
 */
 
-#include <config.h>
+#include "../config.h"
 
 #if HAVE_OPENDHT_C != 0
 

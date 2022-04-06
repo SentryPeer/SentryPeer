@@ -10,13 +10,13 @@
 #                              __/ |
 #                             |___/
 #
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.22)
 project(sentrypeer
         VERSION 1.4.1
         HOMEPAGE_URL https://github.com/SentryPeer/SentryPeer
         LANGUAGES C)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 17)
 
 add_executable(sentrypeer
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
@@ -48,13 +48,14 @@ include(${CMAKE_SOURCE_DIR}/cmake/git_revision.cmake)
 set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
-target_link_libraries(sentrypeer -losipparser2)
-target_link_libraries(sentrypeer -lsqlite3)
-target_link_libraries(sentrypeer -luuid)
-target_link_libraries(sentrypeer -lmicrohttpd)
-target_link_libraries(sentrypeer -ljansson)
-target_link_libraries(sentrypeer -lcurl)
-target_link_libraries(sentrypeer -lopendht-c)
+target_link_libraries(${CMAKE_PROJECT_NAME} -losipparser2)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lsqlite3)
+target_link_libraries(${CMAKE_PROJECT_NAME} -luuid)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lmicrohttpd)
+target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
 
 # configure header file
 configure_file(
