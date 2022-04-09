@@ -45,6 +45,7 @@ Here's a mockup of the web UI which is subject to change.
 - [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
 - [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
 - [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
+- [x] Set your own DHT bootstrap node (`-b` cli option)
 - [x] Multithreaded
 - [x] UDP transport
 - [ ] TCP transport

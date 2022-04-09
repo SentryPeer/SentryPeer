@@ -29,7 +29,6 @@
 
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_WAIT_TIME 5
-#define DHT_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 #define DHT_BAD_ACTORS_KEY "bad_actors"
 
 struct op_context {
@@ -293,11 +292,12 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Bootstrapping the DHT\n");
 	}
-	dht_runner_bootstrap(runner, DHT_BOOTSTRAP_NODE, NULL);
+	dht_runner_bootstrap(runner, config->p2p_bootstrap_node, NULL);
 
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Waiting %d seconds for bootstrapping...\n",
-			DHT_BOOTSTRAP_WAIT_TIME);
+		fprintf(stderr,
+			"Waiting %d seconds for bootstrapping to %s...\n",
+			DHT_BOOTSTRAP_WAIT_TIME, config->p2p_bootstrap_node);
 	}
 	sleep(DHT_BOOTSTRAP_WAIT_TIME);
 

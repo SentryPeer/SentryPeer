@@ -35,19 +35,18 @@ sentrypeer_config *sentrypeer_config_new(void)
 	char *uuid_string = malloc(UTILS_UUID_STRING_LEN);
 	assert(uuid_string);
 
-	self->node_id = util_uuid_generate_string(uuid_string);
-	self->syslog_mode = false;
-	self->json_log_mode = false;
-	self->verbose_mode = false;
+	self->api_mode = false;
+	self->bgp_agent_mode = false;
 	self->debug_mode = false;
+	self->json_log_mode = false;
+	self->node_id = util_uuid_generate_string(uuid_string);
+	self->p2p_dht_mode = false;
+	self->sip_agent_mode = false;
 	self->sip_mode = true; // Default on
 	self->sip_responsive_mode = false;
-	self->api_mode = false;
+	self->syslog_mode = false;
+	self->verbose_mode = false;
 	self->web_gui_mode = false;
-	self->sip_agent_mode = false;
-	self->bgp_agent_mode = false;
-	self->p2p_dht_mode = false;
-	self->p2p_lan_mode = false;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
@@ -58,6 +57,11 @@ sentrypeer_config *sentrypeer_config_new(void)
 	assert(self->json_log_file);
 	util_copy_string(self->json_log_file, DEFAULT_JSON_LOG_FILE_NAME,
 			 SENTRYPEER_PATH_MAX);
+
+	self->p2p_bootstrap_node = calloc(DNS_MAX_LENGTH +1, sizeof(char));
+	assert(self->p2p_bootstrap_node);
+	util_copy_string(self->p2p_bootstrap_node, SENTRYPEER_BOOTSTRAP_NODE,
+			 DNS_MAX_LENGTH);
 
 	return self;
 }
@@ -74,6 +78,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 		if (self->node_id != 0) {
 			free(self->node_id);
 			self->node_id = 0;
+		}
+
+		if (self->p2p_bootstrap_node != 0) {
+			free(self->p2p_bootstrap_node);
+			self->p2p_bootstrap_node = 0;
 		}
 
 		if (self->db_file != 0) {
@@ -93,7 +102,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-w] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -105,6 +114,8 @@ void print_usage(void)
 		"  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env\n");
 	fprintf(stderr,
 		"  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env\n");
+	fprintf(stderr,
+		"  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env\n");
 	fprintf(stderr,
 		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
 	fprintf(stderr,
@@ -140,7 +151,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:jpdrRaws")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:b:jpdrRaws")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -148,12 +159,16 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 		case 'V':
 			print_version();
 			exit(EXIT_SUCCESS);
+		case 'b':
+			util_copy_string(config->p2p_bootstrap_node,
+					 optarg,
+					 DNS_MAX_LENGTH);
+			break;
 		case 'f':
 			if (set_db_file_location(config, optarg) !=
 			    EXIT_SUCCESS) {
 				fprintf(stderr,
 					"Error: Failed to set db file location\n");
-				perror("db file location");
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -162,7 +177,6 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			    EXIT_SUCCESS) {
 				fprintf(stderr,
 					"Error: Failed to set json log file location\n");
-				perror("json log file location");
 				exit(EXIT_FAILURE);
 			}
 			config->json_log_mode = true;
@@ -184,7 +198,6 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'p':
 			config->p2p_dht_mode = true;
-			config->p2p_lan_mode = true; // Split into own mode?
 			break;
 		case 's':
 			config->syslog_mode = true;
@@ -221,6 +234,11 @@ int process_env_vars(sentrypeer_config *config)
 				 SENTRYPEER_PATH_MAX);
 		config->json_log_mode = true;
 	}
+	if (getenv("SENTRYPEER_BOOTSTRAP_NODE")) {
+		util_copy_string(config->p2p_bootstrap_node,
+				 getenv("SENTRYPEER_BOOTSTRAP_NODE"),
+				 DNS_MAX_LENGTH);
+	}
 	if (getenv("SENTRYPEER_API")) {
 		config->api_mode = true;
 	}
@@ -242,7 +260,6 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_PEER_TO_PEER")) {
 		config->p2p_dht_mode = true;
-		config->p2p_lan_mode = true;
 	}
 	if (getenv("SENTRYPEER_VERBOSE")) {
 		config->verbose_mode = true;

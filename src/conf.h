@@ -29,26 +29,28 @@
 #endif
 
 #define SENTRYPEER_PATH_MAX 4096
+#define DNS_MAX_LENGTH 256
+#define SENTRYPEER_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 
 typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {
-	bool syslog_mode;
-	bool json_log_mode;
-	bool verbose_mode;
+	bool api_mode;
+	bool bgp_agent_mode;
 	bool debug_mode;
+	bool json_log_mode;
+	bool p2p_dht_mode;
+	bool sip_agent_mode;
 	bool sip_mode;
 	bool sip_responsive_mode;
-	bool api_mode;
+	bool syslog_mode;
+	bool verbose_mode;
 	bool web_gui_mode;
-	bool sip_agent_mode;
-	bool bgp_agent_mode;
-	bool p2p_dht_mode;
-	bool p2p_lan_mode;
-	char *node_id;
 	char *db_file;
 	char *json_log_file;
-	struct MHD_Daemon *http_daemon;
+	char *node_id;
+	char *p2p_bootstrap_node;
 	pthread_t sip_daemon_thread;
+	struct MHD_Daemon *http_daemon;
 
 #if HAVE_ZYRE !=0
 	zyre_t *p2p_node;
