@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <uuid/uuid.h>
+#include <stdio.h>
 
 void test_conf(void **state)
 {
@@ -130,6 +131,17 @@ void test_conf(void **state)
 	assert_true(config->p2p_dht_mode);
 
 	// Check default bootstrap node is set
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->p2p_bootstrap_node,
+			    SENTRYPEER_BOOTSTRAP_NODE);
+
+	// Check that we revert to default bootstrap node if DNS name is too long
+	char boostrap_node_too_big[300];
+	sprintf(boostrap_node_too_big, "%*s", 299, SENTRYPEER_BOOTSTRAP_NODE);
+
+	assert_int_equal(setenv("SENTRYPEER_BOOTSTRAP_NODE",
+				boostrap_node_too_big, 1),
+			 EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_string_equal(config->p2p_bootstrap_node,
 			    SENTRYPEER_BOOTSTRAP_NODE);
