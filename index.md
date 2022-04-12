@@ -19,11 +19,43 @@ A distributed list of bad actor IP addresses and phone numbers collected via a S
 
 ### Introduction
 
-This is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and number they tried to call. Those details are then used to block them at the service providers network and the next time a user/customer tries to call a collected number, it's blocked.
+SentryPeer is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and 
+number they tried to call. Those details can then be used to raise notifications at the service providers network and the next 
+time a user/customer tries to call a collected number, you can act anyway you see fit.
+
+For example:
+
+Let's say you are running your own VoIP PBX on site. What SentryPeer will allow you to do in this context, 
+is dip into the list of phone numbers (using the RESTful API) when your users are making outbound calls. If you get a hit, 
+you'll get a heads-up that potentially a device within your network is trying to call known probing phone numbers that 
+have either been:
+
+1. Numbers collected by SentryPeer nodes you are running yourself
+2. Numbers seen by other SentryPeer nodes which have been replicated to your node via the peer to peer network
+
+This would allow you to generate a notification from your monitoring systems before you rack 
+up any expensive calls or something worse happens.
+
+What would lead to this scenario?
+
+1. Potential voicemail fraud. This can happen if you allow calling an
+   inbound number (your DID/DDI) to get to your voicemail system, then
+   prompt for a PIN. This PIN is weak and the voicemail system allows you
+   to press '*' to call back the Caller ID that left a voicemail. The
+   attacker has left a voicemail, and they then guess your PIN and call it
+   back. The CLI is a known number that SentryPeer has seen. You can alert on it.
+2. A device has been hijacked and/or a softphone or similar is using
+   the credentials they stole off the phone's GUI and is trying to
+   register to your system and make calls to a number seen by SentryPeer.
+3. An innocent user is calling a phishing number or known expensive
+   number etc. that SentryPeer has seen before.
 
 Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
-The sharing part...you only get other users' data if you [share yours](https://en.wikipedia.org/wiki/Tit_for_tat#Peer-to-peer_file_sharing). That's the key. It could be used (the sharing of data logic/feature) in many projects too if I get it right :-)
+### Adoption
+
+* [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
+* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0)
 
 ![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
@@ -48,7 +80,7 @@ Here's a mockup of the web UI which is subject to change.
 - [x] Set your own DHT bootstrap node (`-b` cli option)
 - [x] Multithreaded
 - [x] UDP transport
-- [ ] TCP transport
+- [x] TCP transport
 - [ ] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
 - [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
@@ -74,8 +106,6 @@ Here's a mockup of the web UI which is subject to change.
 - [ ] SIP agent to return 404 or default destination for SIP redirects
 
 ### Design
-
-TBD :-)
 
 I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
 [Asterisk](https://www.asterisk.org/) etc. See
@@ -125,6 +155,7 @@ Debian or Fedora packages are always available from the release page for the cur
 You can install SentryPeer from [our Ubuntu PPD](https://launchpad.net/~gavinhenry/+archive/ubuntu/sentrypeer) which
 is currently for Ubuntu 20 LTS (Focal Fossa):
 
+    sudo apt install software-properties-common
     sudo add-apt-repository ppa:gavinhenry/sentrypeer
     sudo apt-get update
 
