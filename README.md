@@ -125,6 +125,7 @@ Debian or Fedora packages are always available from the release page for the cur
 You can install SentryPeer from [our Ubuntu PPD](https://launchpad.net/~gavinhenry/+archive/ubuntu/sentrypeer) which
 is currently for Ubuntu 20 LTS (Focal Fossa):
 
+    sudo apt install software-properties-common
     sudo add-apt-repository ppa:gavinhenry/sentrypeer
     sudo apt-get update
 
