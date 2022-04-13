@@ -22,7 +22,7 @@ Vcs-Git: https://github.com/SentryPeer/SentryPeer.git
 Rules-Requires-Root: no
 
 Package: sentrypeer
-Architecture: any
+Architecture: amd64 arm64
 Depends: adduser, ${misc:Depends}, ${shlibs:Depends}
 Description: SIP peer to peer honeypot for VoIP
  SentryPeer is a distributed list of bad IP addresses and phone numbers

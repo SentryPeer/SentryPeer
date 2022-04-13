@@ -1,3 +1,22 @@
+sentrypeer (1.4.0-1) UNRELEASED; urgency=medium
+
+  * Peer to Peer mode with CLI (`-p`) and ENV options to enable,
+    added for DHT node using the OpenDHT library
+  * Added `-R` flag to completely disable SIP mode. You can then
+    run SentryPeer in API mode or DHT mode only etc. i.e. not as a
+    honeypot, but to serve local data
+  * Added Peer to Peer bad_actor sharing (data replication), e.g.
+    it gets saved on the DHT and consumed by other peers
+  * RESTful API numbers resource (`/numbers`) now only returns numbers
+    like +441234567890 or 441234567890
+  * RESTful API number resource (`/numbers/{number}`) now only accepts
+    +441234567890 or 441234567890 formats
+  * Generate a SentryPeer node ID at startup to be used in all
+    `bad_actor` events
+  * Stop the SIP daemon thread correctly on shutdown
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Thu, 31 Mar 2022 17:35:00 +0000
+
 sentrypeer (1.2.0-1) UNRELEASED; urgency=medium
 
   * Add JSON logging to log bad actor events and various other improvements
