@@ -115,7 +115,7 @@ I started this because I wanted to do [C network programming](https://github.com
 
 - TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/ 
 - CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
-- ClueCon Weekly 2022 - [To be published](https://www.youtube.com/c/FreeSWITCH/videos) 
+- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
 - UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/ 
 
 ### Docker
