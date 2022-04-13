@@ -52,6 +52,14 @@ What would lead to this scenario?
 
 Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
+### Talks
+
+- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/
+- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
+- UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/
+
+
 ### Adoption
 
 * [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
@@ -60,6 +68,12 @@ Traditionally this data is shipped to a central place, so you don't own the data
 ![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
 [![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
+
+### Design
+
+I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
+[Asterisk](https://www.asterisk.org/) etc. See
+[Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
 ### Screenshots
 
@@ -104,19 +118,6 @@ Here's a mockup of the web UI which is subject to change.
 - [x] Container on [Docker Hub for latest build](https://hub.docker.com/r/sentrypeer/sentrypeer)
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
-
-### Design
-
-I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
-[Asterisk](https://www.asterisk.org/) etc. See
-[Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
-
-### Talks
-
-- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/ 
-- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
-- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
-- UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/ 
 
 ### Docker
 
