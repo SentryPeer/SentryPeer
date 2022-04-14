@@ -63,7 +63,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 ### Adoption
 
 * [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
-* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0)
+* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0) onwards 
 
 ![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
