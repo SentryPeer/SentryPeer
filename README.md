@@ -151,6 +151,19 @@ Debian or Fedora packages are always available from the release page for the cur
 
    https://github.com/SentryPeer/SentryPeer/releases
 
+#### Homebrew (macOS or Linux):
+
+We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
+
+    brew tap sentrypeer/sentrypeer
+    brew install sentrypeer
+
+#### Alpine Linux:
+
+SentryPeer is in [testing on Alpine Linux](https://gitlab.alpinelinux.org/alpine/aports/-/tree/master/testing/sentrypeer), so you can install it with the following command:
+
+    apk -U add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing sentrypeer
+
 #### Ubuntu Package
 
 You can install SentryPeer from [our Ubuntu PPD](https://launchpad.net/~gavinhenry/+archive/ubuntu/sentrypeer) which
@@ -211,13 +224,6 @@ then (make check is highly recommended):
     make
     make check
     make install
-
-Homebrew (macOS or Linux):
-
-We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
-
-    brew tap sentrypeer/sentrypeer
-    brew install sentrypeer
 
 ### Running SentryPeer
 
@@ -316,11 +322,11 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 > 
 * Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Date: Mon, 24 Jan 2022 11:16:25 GMT
+< Date: Mon, 24 Apr 2022 11:16:25 GMT
 < Content-Type: application/json
 < Access-Control-Allow-Origin: *
 < X-Powered-By: SentryPeer
-< X-SentryPeer-Version: 1.0.0
+< X-SentryPeer-Version: 1.4.0
 < Content-Length: 81
 < 
 {
@@ -444,7 +450,7 @@ plus other metadata (set a custom log file location with `-l`):
 ```json
 {
    "app_name":"sentrypeer",
-   "app_version":"v1.0.1",
+   "app_version":"v1.4.0",
    "event_timestamp":"2022-02-22 11:19:15.848934346",
    "event_uuid":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
    "created_by_node_id":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
@@ -463,7 +469,7 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
 
 Options:
   -h,      Print this help
@@ -471,6 +477,7 @@ Options:
   -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
   -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
   -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
   -a,      Enable RESTful API mode or use SENTRYPEER_API env
   -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
   -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
@@ -522,7 +529,7 @@ https://sentrypeer.org
 
 New issues can be raised at:
 
-https://github.com/ghenry/SentryPeer/issues
+https://github.com/SentryPeer/SentryPeer/issues
 
 It's okay to raise an issue to ask a question.
 

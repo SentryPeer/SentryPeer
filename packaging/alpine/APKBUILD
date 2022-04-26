@@ -1,12 +1,12 @@
 # Contributor: Gavin Henry <ghenry@sentrypeer.org>
 # Maintainer: Gavin Henry <ghenry@sentrypeer.org>
 pkgname=sentrypeer
-pkgver=1.2.0
+pkgver=1.4.0
 pkgrel=0
 pkgdesc="Honeypot for a distributed p2p list of bad actor IP addresses and phone numbers"
 url="https://sentrypeer.org/"
-arch="all"
-license="GPL-2.0-only GPL-3.0-only"
+arch="all !x86 !armhf !armv7"
+license="GPL-2.0-only OR GPL-3.0-only"
 makedepends="
         autoconf
         autoconf-archive
@@ -45,6 +45,7 @@ package() {
 	make DESTDIR="$pkgdir" install
 }
 
+
 sha512sums="
-53d06405139828c7d78521db6c9c254952b3596281e115b68e9f7363d67cc39d214effb165296f1c5e9b4f01cd91e3a7e218dd645d51859d05ab2b51d44a7129  sentrypeer-1.2.0.tar.gz
+6ca0b3fba3beaf1262cf18e246acd5fc0d5bd0f04b6007a69aa24197ecb607baf21fade03e4b3e7a67301da0dd33c36d80cc31d06a58befab7e9c272c925cfdc  sentrypeer-1.4.0.tar.gz
 "
