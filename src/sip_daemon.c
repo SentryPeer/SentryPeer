@@ -100,7 +100,7 @@ int sip_daemon_stop(sentrypeer_config const *config)
 	return EXIT_SUCCESS;
 }
 
-int sip_log_event(sentrypeer_config const *config, sip_message_event *sip_event)
+int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_event)
 {
 	char collected_method[11] = "passive"; // size is responsive + 1
 	if (config->sip_responsive_mode == true)
@@ -363,8 +363,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 			return EXIT_FAILURE;
 		}
 
-		SOCKET i;
-		for (i = 1; i <= max_socket; ++i) {
+		for (SOCKET i = 1; i <= max_socket; ++i) {
 			if (FD_ISSET(i, &reads)) {
 				char tcp_client_ip_address_buffer[100];
 				if (i == socket_listen_tcp) {
@@ -442,10 +441,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 							bytes_received,
 							bytes_received,
 							read_packet_buf);
-					}
 
-					if (config->debug_mode ||
-					    config->verbose_mode) {
 						fprintf(stderr,
 							"Received TCP packet from %s\n",
 							tcp_client_ip_address_buffer);

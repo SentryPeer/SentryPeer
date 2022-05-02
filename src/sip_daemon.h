@@ -27,8 +27,8 @@
 #define GETSOCKETERRNO() (errno)
 #define SIP_DAEMON_PORT "5060"
 
-int sip_log_event(sentrypeer_config const *config, sip_message_event *sip_event);
-int sip_send_reply(sentrypeer_config const *config, sip_message_event *sip_event);
+int sip_log_event(sentrypeer_config const *config, sip_message_event const *sip_event);
+int sip_send_reply(sentrypeer_config const *config, sip_message_event const *sip_event);
 int sip_daemon_init(sentrypeer_config const *config);
 int sip_daemon_run(sentrypeer_config *config);
 int sip_daemon_stop(sentrypeer_config const *config);
