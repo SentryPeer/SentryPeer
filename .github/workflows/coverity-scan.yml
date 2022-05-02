@@ -32,7 +32,7 @@ jobs:
             sudo apt-get install libmicrohttpd-dev -y
             brew update
             brew upgrade          
-            brew install opendht libosip
+            brew install libosip
       - name: Download Coverity Build Tool
         run: |
           wget -q https://scan.coverity.com/download/linux64 --post-data "token=$TOKEN&project=SentryPeer%2FSentryPeer" -O cov-analysis-linux64.tar.gz

@@ -34,7 +34,7 @@ jobs:
           sudo apt-get install libmicrohttpd-dev -y
           brew update
           brew upgrade          
-          brew install opendht libosip
+          brew install libosip
       - run: |
           set -x
           cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/

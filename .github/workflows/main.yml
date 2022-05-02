@@ -38,7 +38,7 @@ jobs:
             libpcre2-dev -y
             brew update
             brew upgrade
-            brew install cmocka opendht libosip
+            brew install cmocka libosip
             sudo add-apt-repository ppa:savoury1/utilities -y
             sudo apt-get update
             sudo apt-get install libmicrohttpd-dev -y
@@ -54,7 +54,6 @@ jobs:
             brew install libmicrohttpd
             brew install curl
             brew install cmocka
-            brew install opendht
             brew install pcre2
           fi
       - name: Build and Clean
