@@ -31,6 +31,7 @@ add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/src/http_called_numbers_route.c
         ${CMAKE_SOURCE_DIR}/src/http_called_number_route.c
         ${CMAKE_SOURCE_DIR}/src/regex_match.c
+        ${CMAKE_SOURCE_DIR}/src/sip_message_event.c
         ${CMAKE_SOURCE_DIR}/src/sip_daemon.c
         ${CMAKE_SOURCE_DIR}/src/sip_parser.c
         ${CMAKE_SOURCE_DIR}/src/peer_to_peer_dht.c

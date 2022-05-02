@@ -101,7 +101,9 @@ AX_PTHREAD([
 PKG_CHECK_MODULES([OPENDHT_C], [opendht-c], [
    AC_MSG_CHECKING([we have opendht-c >= 2.3.5])
    PKG_CHECK_EXISTS(opendht-c >= 2.3.5, [
-      AC_MSG_RESULT([yes])
+      opendht_c_version=`pkg-config --modversion opendht-c`
+      AC_DEFINE_UNQUOTED([OPENDHT_C_VERSION], ["$opendht_c_version"], [Define the OpenDHT version])
+      AC_MSG_RESULT([yes, version $opendht_c_version])
       AC_DEFINE([HAVE_OPENDHT_C], [1], [Define if OpenDHT is available])
       LIBS="$OPENDHT_C_LIBS $LIBS"
       CFLAGS="$CFLAGS $OPENDHT_C_CFLAGS"
@@ -130,7 +132,6 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
 ])
 
 AC_MSG_CHECKING(for IP_RECVDSTADDR)
-AC_MSG_RESULT([yes])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   int opt = IP_RECVDSTADDR;
 ]])],[

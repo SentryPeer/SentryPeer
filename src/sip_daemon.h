@@ -18,13 +18,17 @@
 #define SENTRYPEER_SIP_DAEMON_H 1
 
 #include "conf.h"
+#include "bad_actor.h"
+#include "sip_message_event.h"
 
 #define ISVALIDSOCKET(s) ((s) >= 0)
 #define CLOSESOCKET(s) close(s)
-#define SOCKET int
+
 #define GETSOCKETERRNO() (errno)
 #define SIP_DAEMON_PORT "5060"
 
+int sip_log_event(sentrypeer_config const *config, sip_message_event *sip_event);
+int sip_send_reply(sentrypeer_config const *config, sip_message_event *sip_event);
 int sip_daemon_init(sentrypeer_config const *config);
 int sip_daemon_run(sentrypeer_config *config);
 int sip_daemon_stop(sentrypeer_config const *config);

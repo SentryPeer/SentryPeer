@@ -11,9 +11,9 @@
                              |___/
 */
 
-#ifndef SENTRYPEER_TEST_SIP_MESSAGE_H
-#define SENTRYPEER_TEST_SIP_MESSAGE_H 1
+#ifndef SENTRYPEER_TEST_SIP_MESSAGE_EVENT_H
+#define SENTRYPEER_TEST_SIP_MESSAGE_EVENT_H 1
 
-void test_sip_message(void **state);
+void test_sip_message_event(void **state);
 
-#endif //SENTRYPEER_TEST_SIP_MESSAGE_H
+#endif //SENTRYPEER_TEST_SIP_MESSAGE_EVENT_H

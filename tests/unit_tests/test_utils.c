@@ -100,4 +100,7 @@ void test_utils(void **state)
 	char uuid_invalid[] = "0000000000-054564654654000-0000-000000000000123";
 	assert_true(is_valid_uuid(uuid_valid));
 	assert_false(is_valid_uuid(uuid_invalid));
+
+	// max_int
+	assert_int_equal(max_int(1, 2), 2);
 }

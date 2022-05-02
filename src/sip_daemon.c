@@ -31,9 +31,11 @@
 #include <string.h>
 #include <time.h>
 #include <syslog.h>
+#include <assert.h>
 
 #include "conf.h"
 #include "sip_daemon.h"
+#include "sip_message_event.h"
 #include "sip_parser.h"
 #include "database.h"
 #include "json_logger.h"
@@ -98,6 +100,90 @@ int sip_daemon_stop(sentrypeer_config const *config)
 	return EXIT_SUCCESS;
 }
 
+int sip_log_event(sentrypeer_config const *config, sip_message_event *sip_event)
+{
+	char collected_method[11] = "passive"; // size is responsive + 1
+	if (config->sip_responsive_mode == true)
+		strcpy(collected_method, "responsive");
+
+	bad_actor *bad_actor_event = bad_actor_new(
+		0, util_duplicate_string(sip_event->client_ip_addr_str),
+		util_duplicate_string(sip_event->dest_ip_addr_str), 0, 0,
+		util_duplicate_string(sip_event->transport_type), 0,
+		util_duplicate_string(collected_method), config->node_id);
+	assert(bad_actor_event);
+
+	if (sip_event->packet_len > 0) {
+		if ((sip_message_parser(sip_event->packet,
+					sip_event->packet_len, bad_actor_event,
+					config)) != EXIT_SUCCESS) {
+			if (config->debug_mode || config->verbose_mode) {
+				fprintf(stderr,
+					"Parsing this SIP packet failed.\n");
+			}
+			return EXIT_FAILURE;
+		}
+	}
+
+	if (bad_actor_log(config, bad_actor_event) != EXIT_SUCCESS) {
+		fprintf(stderr, "Logging bad_actor failed.\n");
+		return EXIT_FAILURE;
+	}
+
+// Put on DHT last
+#if HAVE_OPENDHT_C != 0
+	if (config->p2p_dht_mode &&
+	    peer_to_peer_dht_save(config, bad_actor_event) != EXIT_SUCCESS) {
+		fprintf(stderr,
+			"Error saving bad_actor to peer_to_peer_dht.\n");
+		return EXIT_FAILURE;
+	}
+#endif // HAVE_OPENDHT_C
+
+	bad_actor_destroy(&bad_actor_event);
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "SIP packet logged.\n");
+	}
+
+	return EXIT_SUCCESS;
+}
+
+int sip_send_reply(sentrypeer_config const *config,
+		   sip_message_event *sip_event)
+{
+	// TODO Create reply headers with libosip2. Bad
+	// Actors don't seem to care we're always replying
+	// with 200 OK/non-compliant SIP :-)
+	char SIP_200_OK[] =
+		"SIP/2.0 200 OK\n"
+		"Via: SIP/2.0/UDP 127.0.0.1:56940\n"
+		"Call-ID: 1179563087@127.0.0.1\n"
+		"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\n"
+		"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\n"
+		"CSeq: 1 OPTIONS\n"
+		"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\n"
+		"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\n"
+		"Supported: 100rel, timer, replaces, norefersub\n"
+		"Accept-Encoding: text/plain\n"
+		"Accept-Language: en\n"
+		"Server: FPBX-14.0.16.11(14.7.8)\n"
+		"Content-Length:  0";
+
+	long bytes_sent =
+		sendto(sip_event->socket, SIP_200_OK, sizeof(SIP_200_OK), 0,
+		       sip_event->client_ip_addr, sip_event->client_addr_len);
+	if (bytes_sent < 1) {
+		if (config->debug_mode || config->verbose_mode) {
+			perror("sendto() failed.");
+			return EXIT_FAILURE;
+		}
+	}
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "SIP reply sent.\n");
+	}
+	return EXIT_SUCCESS;
+}
+
 /*
  * Hands-On Network Programming with C, page 117
  * UDP Server (move to libevent and/or 0MQ Routers/zproto/zproject/Zyre:
@@ -132,23 +218,42 @@ int sip_daemon_init(sentrypeer_config const *config)
 	gai_hints.ai_socktype = SOCK_DGRAM; // UDP
 	gai_hints.ai_flags = AI_PASSIVE;
 
-	struct addrinfo *bind_address;
+	struct addrinfo *bind_address = 0;
 	int gai = getaddrinfo(0, SIP_DAEMON_PORT, &gai_hints, &bind_address);
-	if (gai != 0) {
+	if (gai != EXIT_SUCCESS) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Creating UDP socket...\n");
+		fprintf(stderr, "Creating sockets...\n");
 	}
-	SOCKET socket_listen;
-	socket_listen =
+	SOCKET socket_listen_udp;
+	socket_listen_udp =
 		socket(bind_address->ai_family, bind_address->ai_socktype,
 		       bind_address->ai_protocol);
-	if (!ISVALIDSOCKET(socket_listen)) {
-		perror("socket() failed.");
+	if (!ISVALIDSOCKET(socket_listen_udp)) {
+		perror("UDP socket() failed.");
+		freeaddrinfo(bind_address);
+		return EXIT_FAILURE;
+	}
+	freeaddrinfo(bind_address);
+
+	gai_hints.ai_socktype = SOCK_STREAM; // TCP
+	gai = getaddrinfo(0, SIP_DAEMON_PORT, &gai_hints, &bind_address);
+	if (gai != EXIT_SUCCESS) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
+		freeaddrinfo(bind_address);
+		return EXIT_FAILURE;
+	}
+
+	SOCKET socket_listen_tcp;
+	socket_listen_tcp =
+		socket(bind_address->ai_family, bind_address->ai_socktype,
+		       bind_address->ai_protocol);
+	if (!ISVALIDSOCKET(socket_listen_tcp)) {
+		perror("TCP socket() failed.");
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
@@ -164,10 +269,19 @@ int sip_daemon_init(sentrypeer_config const *config)
 	 *
 	 */
 	int enable = 1;
-	if (setsockopt(socket_listen, SOL_SOCKET, SO_REUSEADDR, (void *)&enable,
-		       sizeof(enable)) < 0) {
-		perror("setsockopt() failed.");
-		CLOSESOCKET(socket_listen);
+	if (setsockopt(socket_listen_udp, SOL_SOCKET, SO_REUSEADDR,
+		       (void *)&enable, sizeof(enable)) != EXIT_SUCCESS) {
+		perror("UDP setsockopt() failed.");
+		CLOSESOCKET(socket_listen_udp);
+		freeaddrinfo(bind_address);
+		return EXIT_FAILURE;
+	}
+
+	enable = 1;
+	if (setsockopt(socket_listen_tcp, SOL_SOCKET, SO_REUSEADDR,
+		       (void *)&enable, sizeof(enable)) != EXIT_SUCCESS) {
+		perror("TCP setsockopt() failed.");
+		CLOSESOCKET(socket_listen_tcp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
@@ -187,33 +301,27 @@ int sip_daemon_init(sentrypeer_config const *config)
 
 	// TODO: move to a function if a new setsockopt() is needed
 	enable = 1;
-	if (setsockopt(socket_listen, protocol, optname, &enable,
-		       sizeof(enable)) < 0) {
-		perror("setsockopt() failed.");
-		CLOSESOCKET(socket_listen);
+	if (setsockopt(socket_listen_udp, protocol, optname, &enable,
+		       sizeof(enable)) != EXIT_SUCCESS) {
+		perror("UDP setsockopt() failed.");
+		CLOSESOCKET(socket_listen_udp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
 
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Binding socket to local address...\n");
+		fprintf(stderr, "Binding sockets to local address...\n");
 	}
-	if (bind(socket_listen, bind_address->ai_addr,
-		 bind_address->ai_addrlen)) {
-		perror("bind() failed");
-		CLOSESOCKET(socket_listen);
+	if (bind(socket_listen_udp, bind_address->ai_addr,
+		 bind_address->ai_addrlen) != EXIT_SUCCESS) {
+		perror("UDP bind() failed");
+		CLOSESOCKET(socket_listen_udp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
-	freeaddrinfo(bind_address); // Not needed anymore
-
-	fd_set master;
-	FD_ZERO(&master);
-	FD_SET(socket_listen, &master);
-	SOCKET max_socket = socket_listen;
 
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Listening for incoming connections...\n");
+		fprintf(stderr, "Listening for incoming UDP connections...\n");
 
 		if (config->sip_responsive_mode) {
 			fprintf(stderr,
@@ -221,202 +329,372 @@ int sip_daemon_init(sentrypeer_config const *config)
 		}
 	}
 
+	if (bind(socket_listen_tcp, bind_address->ai_addr,
+		 bind_address->ai_addrlen) != EXIT_SUCCESS) {
+		perror("TCP bind() failed");
+		CLOSESOCKET(socket_listen_tcp);
+		freeaddrinfo(bind_address);
+		return EXIT_FAILURE;
+	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Listening for incoming TCP connections...\n");
+	}
+	if (listen(socket_listen_tcp, 10) != EXIT_SUCCESS) {
+		perror("TCP listen() failed");
+		CLOSESOCKET(socket_listen_tcp);
+		return EXIT_FAILURE;
+	}
+	freeaddrinfo(bind_address);
+
+	fd_set master;
+	FD_ZERO(&master);
+	FD_SET(socket_listen_udp, &master);
+	FD_SET(socket_listen_tcp, &master);
+	SOCKET max_socket = max_int(socket_listen_tcp, socket_listen_udp);
+
 	// TODO: Switch to libevent/0MQ/epoll etc. later if needed
 	while (1) {
 		fd_set reads;
 		reads = master;
-		if (select(max_socket + 1, &reads, 0, 0, 0) < 0) {
+		char *dest_ip_address_buffer = 0;
+		if (select(max_socket + 1, &reads, 0, 0, 0) < EXIT_SUCCESS) {
 			perror("select() failed.");
 			return EXIT_FAILURE;
 		}
 
-		if (FD_ISSET(socket_listen, &reads)) {
-			struct sockaddr_storage client_address;
-			socklen_t client_len = sizeof(client_address);
+		SOCKET i;
+		for (i = 1; i <= max_socket; ++i) {
+			if (FD_ISSET(i, &reads)) {
+				char tcp_client_ip_address_buffer[100];
+				if (i == socket_listen_tcp) {
+					struct sockaddr_storage
+						tcp_client_address;
+					socklen_t tcp_client_len =
+						sizeof(tcp_client_address);
 
-			char read_packet_buf[PACKET_BUFFER_SIZE] = { 0 };
-			char cmbuf[0x100];
+					SOCKET tcp_socket_client = accept(
+						socket_listen_tcp,
+						(struct sockaddr
+							 *)&tcp_client_address,
+						&tcp_client_len);
+					if (!ISVALIDSOCKET(tcp_socket_client)) {
+						perror("TCP accept() failed.");
+						CLOSESOCKET(tcp_socket_client);
+						continue;
+					}
 
-			struct msghdr msg_hdr = {
-				.msg_name = &client_address,
-				.msg_namelen = sizeof(client_address),
-				.msg_control = cmbuf,
-				.msg_controllen = sizeof(cmbuf),
-			};
+					FD_SET(tcp_socket_client, &master);
+					if (tcp_socket_client > max_socket) {
+						max_socket = tcp_socket_client;
+					}
 
-			struct iovec iov = {
-				.iov_base = read_packet_buf,
-				.iov_len = sizeof(read_packet_buf),
-			};
+					char client_send_port_buffer[100];
+					if (getnameinfo(
+						    ((struct sockaddr
+							      *)&tcp_client_address),
+						    tcp_client_len,
+						    tcp_client_ip_address_buffer,
+						    sizeof(tcp_client_ip_address_buffer),
+						    client_send_port_buffer,
+						    sizeof(client_send_port_buffer),
+						    NI_NUMERICHOST |
+							    NI_NUMERICSERV) !=
+					    EXIT_SUCCESS) {
+						perror("getnameinfo() failed.");
+						return EXIT_FAILURE;
+					}
 
-			msg_hdr.msg_iov = &iov;
-			msg_hdr.msg_iovlen = 1;
-
-			int bytes_received =
-				recvmsg(socket_listen, &msg_hdr, 0);
-
-			if (bytes_received < 1) {
-				if (config->debug_mode ||
-				    config->verbose_mode) {
-					fprintf(stderr,
-						"Empty packet received.\n");
-				}
-			}
-
-			// TODO: Clean up
-			char *dest_ip_address_buffer = 0;
-#ifdef HAVE_IP_PKTINFO
-			for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg_hdr);
-			     cmsg != NULL; cmsg = CMSG_NXTHDR(&msg_hdr, cmsg)) {
-				if (cmsg->cmsg_level != IPPROTO_IP ||
-				    cmsg->cmsg_type != IP_PKTINFO) {
-					continue;
-				}
-				struct in_pktinfo const *pi =
-					(struct in_pktinfo *)CMSG_DATA(cmsg);
-
-				dest_ip_address_buffer = util_duplicate_string(
-					inet_ntoa(pi->ipi_spec_dst));
-
-				if (config->debug_mode ||
-				    config->verbose_mode) {
-					fprintf(stderr,
-						"Destination IP address of UDP packet is: %s\n",
-						inet_ntoa(pi->ipi_spec_dst));
-				}
-			}
-#elif defined(HAVE_IP_RECVDSTADDR)
-			for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg_hdr);
-			     cmsg != NULL; cmsg = CMSG_NXTHDR(&msg_hdr, cmsg)) {
-				if (cmsg->cmsg_level != IPPROTO_IP ||
-				    cmsg->cmsg_type != IP_RECVDSTADDR) {
-					continue;
-				}
-				struct in_addr *in =
-					(struct in_addr *)CMSG_DATA(cmsg);
-				if (config->debug_mode ||
-				    config->verbose_mode) {
-					fprintf(stderr,
-						"Destination IP address of UDP packet is: %s\n",
-						inet_ntoa(in->ipi_spec_dst));
-				}
-			}
-#endif
-			// Format timestamp like ngrep does
-			// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
-			if (config->debug_mode || config->verbose_mode) {
-				time_t timestamp;
-				time(&timestamp);
-				fprintf(stderr,
-					"epochtime: %ld\nReceived (%d bytes): %.*s\n",
-					timestamp, bytes_received,
-					bytes_received, read_packet_buf);
-			}
-
-			char client_ip_address_buffer[100];
-			char client_send_port_buffer[100];
-			if (getnameinfo(((struct sockaddr *)&client_address),
-					client_len, client_ip_address_buffer,
-					sizeof(client_ip_address_buffer),
-					client_send_port_buffer,
-					sizeof(client_send_port_buffer),
-					NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
-				perror("getnameinfo() failed.");
-				return EXIT_FAILURE;
-			}
-
-			if (config->debug_mode || config->verbose_mode) {
-#if INTPTR_MAX == INT64_MAX
-				fprintf(stderr,
-					"read_packet_buf size is: %lu: \n",
-					sizeof(read_packet_buf));
-				fprintf(stderr,
-					"read_packet_buf length is: %lu: \n",
-					strnlen(read_packet_buf,
-						PACKET_BUFFER_SIZE));
-#endif
-				fprintf(stderr,
-					"bytes_received size is: %d: \n\n",
-					bytes_received);
-			}
-
-			// TODO: update once with have TCP and TLS
-			char transport_type[] = "UDP";
-			char collected_method[11] =
-				"passive"; // size is responsive + 1
-			if (config->sip_responsive_mode == true)
-				strcpy(collected_method, "responsive");
-
-			bad_actor *bad_actor_event = bad_actor_new(
-				0,
-				util_duplicate_string(client_ip_address_buffer),
-				dest_ip_address_buffer, 0, 0,
-				util_duplicate_string(transport_type), 0,
-				util_duplicate_string(collected_method),
-				config->node_id);
-
-			if (bytes_received > 0) {
-				if ((sip_message_parser(
-					    read_packet_buf, bytes_received,
-					    bad_actor_event, config)) !=
-				    EXIT_SUCCESS) {
 					if (config->debug_mode ||
 					    config->verbose_mode) {
 						fprintf(stderr,
-							"Parsing this SIP packet failed.\n");
+							"Accepted TCP connection from %s\n",
+							tcp_client_ip_address_buffer);
 					}
 				}
-			}
 
-			if (bad_actor_log(config, bad_actor_event) !=
-			    EXIT_SUCCESS) {
-				fprintf(stderr, "Logging bad_actor failed.\n");
-			}
+				// Process a connected TCP client
+				if ((i != socket_listen_udp) &&
+				    (i != socket_listen_tcp)) {
+					char read_packet_buf
+						[PACKET_BUFFER_SIZE] = { 0 };
+					int bytes_received =
+						recv(i, read_packet_buf,
+						     PACKET_BUFFER_SIZE, 0);
+					if (bytes_received < 1) {
+						if (config->debug_mode ||
+						    config->verbose_mode) {
+							fprintf(stderr,
+								"Empty TCP packet received.\n");
+						}
+						FD_CLR(i, &master);
+						CLOSESOCKET(i);
+						continue;
+					}
 
-			if (config->sip_responsive_mode) {
-				// TODO Create reply headers with libosip2. Bad
-				// Actors don't see to care we're always replying
-				// with 200 OK/non-compliant SIP :-)
-				char SIP_200_OK[] =
-					"SIP/2.0 200 OK\n"
-					"Via: SIP/2.0/UDP 127.0.0.1:56940\n"
-					"Call-ID: 1179563087@127.0.0.1\n"
-					"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\n"
-					"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\n"
-					"CSeq: 1 OPTIONS\n"
-					"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\n"
-					"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\n"
-					"Supported: 100rel, timer, replaces, norefersub\n"
-					"Accept-Encoding: text/plain\n"
-					"Accept-Language: en\n"
-					"Server: FPBX-14.0.16.11(14.7.8)\n"
-					"Content-Length:  0";
-
-				long bytes_sent = sendto(
-					socket_listen, SIP_200_OK,
-					sizeof(SIP_200_OK), 0,
-					(struct sockaddr *)&client_address,
-					client_len);
-				if (bytes_sent < 1) {
 					if (config->debug_mode ||
 					    config->verbose_mode) {
-						perror("sendto() failed.");
+						time_t timestamp;
+						time(&timestamp);
+						fprintf(stderr,
+							"epochtime: %ld\nReceived (%d bytes): %.*s\n",
+							timestamp,
+							bytes_received,
+							bytes_received,
+							read_packet_buf);
 					}
+
+					if (config->debug_mode ||
+					    config->verbose_mode) {
+						fprintf(stderr,
+							"Received TCP packet from %s\n",
+							tcp_client_ip_address_buffer);
+					}
+
+#ifndef SO_ORIGINAL_DST
+#define SO_ORIGINAL_DST 80
+#endif
+
+					struct sockaddr_in destination_address;
+					socklen_t destination_address_len =
+						sizeof(destination_address);
+					memset(&destination_address, 0,
+					       destination_address_len);
+					destination_address.sin_family =
+						AF_INET;
+					if (getsockopt(
+						    i, SOL_IP, SO_ORIGINAL_DST,
+						    &destination_address,
+						    &destination_address_len) ==
+					    EXIT_SUCCESS) {
+						dest_ip_address_buffer =
+							util_duplicate_string(inet_ntoa(
+								destination_address
+									.sin_addr));
+
+						if (config->debug_mode ||
+						    config->verbose_mode) {
+							fprintf(stderr,
+								"Destination IP address of TCP packet is: %s\n",
+								inet_ntoa(
+									destination_address
+										.sin_addr));
+						}
+					}
+
+					socklen_t tcp_client_len = sizeof(i);
+
+					char transport_type[] = "TCP";
+					sip_message_event *sip_event = sip_message_event_new(
+
+						util_duplicate_string(
+							read_packet_buf),
+						bytes_received, i,
+						util_duplicate_string(
+							transport_type),
+						(struct sockaddr *)&i,
+						util_duplicate_string(
+							tcp_client_ip_address_buffer),
+
+						tcp_client_len,
+
+						dest_ip_address_buffer);
+					assert(sip_event);
+					if (sip_log_event(config, sip_event) !=
+					    EXIT_SUCCESS) {
+						fprintf(stderr,
+							"Failed to log SIP TCP event.\n");
+						continue;
+					}
+
+					if (config->sip_responsive_mode) {
+						if (sip_send_reply(config,
+								   sip_event) !=
+						    EXIT_SUCCESS) {
+							fprintf(stderr,
+								"Error sending SIP reply.\n");
+							continue;
+						}
+					}
+					sip_message_event_destroy(&sip_event);
+				}
+
+				if (FD_ISSET(socket_listen_udp, &reads)) {
+					struct sockaddr_storage client_address;
+					socklen_t client_len =
+						sizeof(client_address);
+
+					char read_packet_buf
+						[PACKET_BUFFER_SIZE] = { 0 };
+					char cmbuf[0x100];
+
+					struct msghdr msg_hdr = {
+						.msg_name = &client_address,
+						.msg_namelen =
+							sizeof(client_address),
+						.msg_control = cmbuf,
+						.msg_controllen = sizeof(cmbuf),
+					};
+
+					struct iovec iov = {
+						.iov_base = read_packet_buf,
+						.iov_len =
+							sizeof(read_packet_buf),
+					};
+
+					msg_hdr.msg_iov = &iov;
+					msg_hdr.msg_iovlen = 1;
+
+					int bytes_received = recvmsg(
+						socket_listen_udp, &msg_hdr, 0);
+
+					if (bytes_received < 1) {
+						if (config->debug_mode ||
+						    config->verbose_mode) {
+							fprintf(stderr,
+								"Empty UDP packet received.\n");
+						}
+					}
+
+					// TODO: Clean up
+#ifdef HAVE_IP_PKTINFO
+					for (struct cmsghdr *cmsg =
+						     CMSG_FIRSTHDR(&msg_hdr);
+					     cmsg != NULL;
+					     cmsg = CMSG_NXTHDR(&msg_hdr,
+								cmsg)) {
+						if (cmsg->cmsg_level !=
+							    IPPROTO_IP ||
+						    cmsg->cmsg_type !=
+							    IP_PKTINFO) {
+							continue;
+						}
+						struct in_pktinfo const *pi =
+							(struct in_pktinfo *)
+								CMSG_DATA(cmsg);
+
+						dest_ip_address_buffer =
+							util_duplicate_string(inet_ntoa(
+								pi->ipi_spec_dst));
+
+						if (config->debug_mode ||
+						    config->verbose_mode) {
+							fprintf(stderr,
+								"Destination IP address of UDP packet is: %s\n",
+								inet_ntoa(
+									pi->ipi_spec_dst));
+						}
+					}
+#elif defined(HAVE_IP_RECVDSTADDR)
+					for (struct cmsghdr *cmsg =
+						     CMSG_FIRSTHDR(&msg_hdr);
+					     cmsg != NULL;
+					     cmsg = CMSG_NXTHDR(&msg_hdr,
+								cmsg)) {
+						if (cmsg->cmsg_level !=
+							    IPPROTO_IP ||
+						    cmsg->cmsg_type !=
+							    IP_RECVDSTADDR) {
+							continue;
+						}
+						struct in_addr *in =
+							(struct in_addr *)
+								CMSG_DATA(cmsg);
+						if (config->debug_mode ||
+						    config->verbose_mode) {
+							fprintf(stderr,
+								"Destination IP address of UDP packet is: %s\n",
+								inet_ntoa(
+									in->ipi_spec_dst));
+						}
+					}
+#endif
+					// Format timestamp like ngrep does
+					// https://github.com/jpr5/ngrep/blob/2a9603bc67dface9606a658da45e1f5c65170444/ngrep.c#L1247
+					if (config->debug_mode ||
+					    config->verbose_mode) {
+						time_t timestamp;
+						time(&timestamp);
+						fprintf(stderr,
+							"epochtime: %ld\nReceived (%d bytes): %.*s\n",
+							timestamp,
+							bytes_received,
+							bytes_received,
+							read_packet_buf);
+					}
+
+					char udp_client_ip_address_buffer[100];
+					char udp_client_send_port_buffer[100];
+					if (getnameinfo(
+						    ((struct sockaddr
+							      *)&client_address),
+						    client_len,
+						    udp_client_ip_address_buffer,
+						    sizeof(udp_client_ip_address_buffer),
+						    udp_client_send_port_buffer,
+						    sizeof(udp_client_send_port_buffer),
+						    NI_NUMERICHOST |
+							    NI_NUMERICSERV) !=
+					    EXIT_SUCCESS) {
+						perror("getnameinfo() failed.");
+						return EXIT_FAILURE;
+					}
+
+					if (config->debug_mode ||
+					    config->verbose_mode) {
+#if INTPTR_MAX == INT64_MAX
+						fprintf(stderr,
+							"read_packet_buf size is: %lu: \n",
+							sizeof(read_packet_buf));
+						fprintf(stderr,
+							"read_packet_buf length is: %lu: \n",
+							strnlen(read_packet_buf,
+								PACKET_BUFFER_SIZE));
+#endif
+						fprintf(stderr,
+							"bytes_received size is: %d: \n\n",
+							bytes_received);
+					}
+					char transport_type[] = "UDP";
+
+					sip_message_event *sip_event = sip_message_event_new(
+						util_duplicate_string(
+							read_packet_buf),
+						bytes_received,
+						socket_listen_udp,
+						util_duplicate_string(
+							transport_type),
+						(struct sockaddr
+							 *)&client_address,
+
+						util_duplicate_string(
+							udp_client_ip_address_buffer),
+						client_len,
+
+						dest_ip_address_buffer);
+					assert(sip_event);
+
+					if (sip_log_event(config, sip_event) !=
+					    EXIT_SUCCESS) {
+						fprintf(stderr,
+							"Failed to log SIP UDP event.\n");
+						continue;
+					}
+
+					if (config->sip_responsive_mode) {
+						if (sip_send_reply(config,
+								   sip_event) !=
+						    EXIT_SUCCESS) {
+							fprintf(stderr,
+								"Error sending SIP reply.\n");
+							continue;
+						}
+					}
+					sip_message_event_destroy(&sip_event);
 				}
 			}
-
-			// Put on DHT last
-#if HAVE_OPENDHT_C != 0
-			if (config->p2p_dht_mode &&
-			    peer_to_peer_dht_save(config, bad_actor_event) !=
-				    EXIT_SUCCESS) {
-				fprintf(stderr,
-					"Error saving bad_actor to peer_to_peer_dht.\n");
-			}
-#endif // HAVE_OPENDHT_C
-
-			bad_actor_destroy(&bad_actor_event);
 		}
 	}
-	CLOSESOCKET(socket_listen);
+	CLOSESOCKET(socket_listen_udp);
+	CLOSESOCKET(socket_listen_tcp);
 }

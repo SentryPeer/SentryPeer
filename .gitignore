@@ -93,6 +93,7 @@ docs
 # tests
 !tests/tools/Makefile
 tests/tools/udp_client
+tests/tools/tcp_client
 tests/tools/pcre2demo
 test-suite.log
 tests/unit_tests/.deps/

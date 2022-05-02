@@ -176,7 +176,7 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "event_uuid from DHT value is: %s\n",
-				node_id_str);
+				event_uuid_str);
 		}
 
 		if (config->debug_mode || config->verbose_mode) {
@@ -252,7 +252,7 @@ static void op_context_free(void *user_data)
 int peer_to_peer_dht_run(sentrypeer_config *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Starting peer to peer DHT mode...\n");
+		fprintf(stderr, "Starting peer to peer DHT mode using OpenDHT-C lib version '%s'...\n", OPENDHT_C_VERSION);
 	}
 
 	// https://github.com/savoirfairelinux/opendht/issues/590#issuecomment-1063158916

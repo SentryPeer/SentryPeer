@@ -58,7 +58,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	util_copy_string(self->json_log_file, DEFAULT_JSON_LOG_FILE_NAME,
 			 SENTRYPEER_PATH_MAX);
 
-	self->p2p_bootstrap_node = calloc(DNS_MAX_LENGTH +1, sizeof(char));
+	self->p2p_bootstrap_node = calloc(DNS_MAX_LENGTH + 1, sizeof(char));
 	assert(self->p2p_bootstrap_node);
 	util_copy_string(self->p2p_bootstrap_node, SENTRYPEER_BOOTSTRAP_NODE,
 			 DNS_MAX_LENGTH);
@@ -160,8 +160,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			print_version();
 			exit(EXIT_SUCCESS);
 		case 'b':
-			util_copy_string(config->p2p_bootstrap_node,
-					 optarg,
+			util_copy_string(config->p2p_bootstrap_node, optarg,
 					 DNS_MAX_LENGTH);
 			break;
 		case 'f':
@@ -197,8 +196,14 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			config->json_log_mode = true;
 			break;
 		case 'p':
+#if HAVE_OPENDHT_C != 0
 			config->p2p_dht_mode = true;
 			break;
+#else
+			fprintf(stderr,
+				"Error: Peer to Peer mode unavailable. OpenDHT support not compiled in.\n");
+			exit(EXIT_FAILURE);
+#endif
 		case 's':
 			config->syslog_mode = true;
 			break;

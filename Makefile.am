@@ -32,6 +32,8 @@ sentrypeer_SOURCES= \
     src/http_called_number_route.c \
     src/regex_match.c \
     src/regex_match.h \
+    src/sip_message_event.c \
+    src/sip_message_event.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/sip_parser.c \
@@ -52,6 +54,8 @@ if !DISABLE_OPENDHT
 endif
 
 unit_test_sources = \
+    src/sip_message_event.c \
+    src/sip_message_event.h \
     src/sip_daemon.c \
     src/sip_daemon.h \
     src/http_common.c \
@@ -98,8 +102,8 @@ unit_test_sources = \
     tests/unit_tests/test_http_route_check.h \
     tests/unit_tests/test_ip_address_regex.c \
     tests/unit_tests/test_ip_address_regex.h \
-    tests/unit_tests/test_sip_message.c \
-    tests/unit_tests/test_sip_message.h \
+    tests/unit_tests/test_sip_message_event.c \
+    tests/unit_tests/test_sip_message_event.h \
     tests/unit_tests/test_sip_daemon.c \
     tests/unit_tests/test_sip_daemon.h
 

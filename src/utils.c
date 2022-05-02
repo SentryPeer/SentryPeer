@@ -150,3 +150,12 @@ bool is_valid_uuid(const char *uuid_to_check)
 	}
 	return true;
 }
+
+int max_int(const int x, const int y)
+{
+	if (x > y) {
+		return x;
+	} else {
+		return y;
+	}
+}

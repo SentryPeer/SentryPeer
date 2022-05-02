@@ -5,7 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- New `-b` flag to set your own DHT bootstrap node (default: `bootstrap.sentrypeer.org:4222`) 
+- SIP TCP mode first version
+- New `-b` flag to set your own DHT bootstrap node (default: `bootstrap.sentrypeer.org:4222`)
+- Error handing for `-p` flag if OpenDHT support is not compiled in
+- Debug mode now shows what OpenDHT-C library version we're using
+- Debug mode for p2p now shows the correct `event_uuid` when checking for duplicate events
+
+### Tests
+- New tests for `sip_message_event` type and related functions
 
 ## [1.4.0] - 2022-03-29
 - Peer to Peer mode with CLI (`-p`) and ENV options to enable, added for DHT node using the OpenDHT library

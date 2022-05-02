@@ -29,7 +29,7 @@
 #include "test_http_api.h"
 #include "test_http_route_check.h"
 #include "test_ip_address_regex.h"
-#include "test_sip_message.h"
+#include "test_sip_message_event.h"
 #include "test_sip_daemon.h"
 
 #if HAVE_OPENDHT_C != 0
@@ -72,7 +72,7 @@ int main(void)
 		cmocka_unit_test(test_http_route_check),
 		cmocka_unit_test(test_ip_address_regex),
 		cmocka_unit_test(test_route_regex_check),
-		cmocka_unit_test(test_sip_message),
+		cmocka_unit_test(test_sip_message_event),
 		cmocka_unit_test(test_sip_daemon),
 		cmocka_unit_test_setup_teardown(test_json_logger,
 						test_setup_sqlite_db,

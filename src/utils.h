@@ -90,4 +90,13 @@ bool is_valid_json_key(const json_t *json, const char *key);
  */
 bool is_valid_uuid(const char *uuid_to_check);
 
+/**
+ * Return max of two integers.
+ *
+ * @param x The first integer.
+ * @param y The second integer.
+ * @return The max of the two integers.
+ */
+int max_int(int x, int y);
+
 #endif //SENTRYPEER_UTILS_H
