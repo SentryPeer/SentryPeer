@@ -149,7 +149,7 @@ int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_
 }
 
 int sip_send_reply(sentrypeer_config const *config,
-		   sip_message_event *sip_event)
+		   sip_message_event const *sip_event)
 {
 	// TODO Create reply headers with libosip2. Bad
 	// Actors don't seem to care we're always replying
