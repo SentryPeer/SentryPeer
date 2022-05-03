@@ -127,6 +127,7 @@ int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_
 
 	if (bad_actor_log(config, bad_actor_event) != EXIT_SUCCESS) {
 		fprintf(stderr, "Logging bad_actor failed.\n");
+		bad_actor_destroy(&bad_actor_event);
 		return EXIT_FAILURE;
 	}
 
@@ -244,7 +245,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 	gai = getaddrinfo(0, SIP_DAEMON_PORT, &gai_hints, &bind_address);
 	if (gai != EXIT_SUCCESS) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai));
-		freeaddrinfo(bind_address);
+		CLOSESOCKET(socket_listen_udp);
 		return EXIT_FAILURE;
 	}
 
@@ -316,6 +317,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 		 bind_address->ai_addrlen) != EXIT_SUCCESS) {
 		perror("UDP bind() failed");
 		CLOSESOCKET(socket_listen_udp);
+		CLOSESOCKET(socket_listen_tcp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
@@ -343,6 +345,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 	if (listen(socket_listen_tcp, 10) != EXIT_SUCCESS) {
 		perror("TCP listen() failed");
 		CLOSESOCKET(socket_listen_tcp);
+		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
 	freeaddrinfo(bind_address);
