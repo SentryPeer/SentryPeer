@@ -121,6 +121,7 @@ int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_
 				fprintf(stderr,
 					"Parsing this SIP packet failed.\n");
 			}
+			bad_actor_destroy(&bad_actor_event);
 			return EXIT_FAILURE;
 		}
 	}
@@ -255,6 +256,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 		       bind_address->ai_protocol);
 	if (!ISVALIDSOCKET(socket_listen_tcp)) {
 		perror("TCP socket() failed.");
+		CLOSESOCKET(socket_listen_udp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
@@ -306,6 +308,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 		       sizeof(enable)) != EXIT_SUCCESS) {
 		perror("UDP setsockopt() failed.");
 		CLOSESOCKET(socket_listen_udp);
+		CLOSESOCKET(socket_listen_tcp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}
