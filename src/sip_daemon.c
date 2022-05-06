@@ -338,6 +338,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 	if (bind(socket_listen_tcp, bind_address->ai_addr,
 		 bind_address->ai_addrlen) != EXIT_SUCCESS) {
 		perror("TCP bind() failed");
+		CLOSESOCKET(socket_listen_udp);
 		CLOSESOCKET(socket_listen_tcp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
