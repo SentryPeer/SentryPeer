@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.4.1] - 2020-05-08
 - SIP TCP mode first version
 - New `-b` flag to set your own DHT bootstrap node (default: `bootstrap.sentrypeer.org:4222`)
 - Error handing for `-p` flag if OpenDHT support is not compiled in
