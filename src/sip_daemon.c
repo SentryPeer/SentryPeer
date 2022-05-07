@@ -461,6 +461,13 @@ int sip_daemon_init(sentrypeer_config const *config)
 #define SO_ORIGINAL_DST 80
 #endif
 
+// Only on Linux - https://man7.org/linux/man-pages/man7/ip.7.html
+// Using the SOL_IP socket options level isn't portable; BSD-based
+// stacks use the IPPROTO_IP level.
+#ifndef SOL_IP
+#define SOL_IP IPPROTO_IP
+#endif
+
 					struct sockaddr_in destination_address;
 					socklen_t destination_address_len =
 						sizeof(destination_address);
