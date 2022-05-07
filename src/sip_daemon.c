@@ -286,6 +286,7 @@ int sip_daemon_init(sentrypeer_config const *config)
 		       (void *)&enable, sizeof(enable)) != EXIT_SUCCESS) {
 		perror("TCP setsockopt() failed.");
 		CLOSESOCKET(socket_listen_tcp);
+		CLOSESOCKET(socket_listen_udp);
 		freeaddrinfo(bind_address);
 		return EXIT_FAILURE;
 	}

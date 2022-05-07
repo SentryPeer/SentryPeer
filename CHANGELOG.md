@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error handing for `-p` flag if OpenDHT support is not compiled in
 - Debug mode now shows what OpenDHT-C library version we're using
 - Debug mode for p2p now shows the correct `event_uuid` when checking for duplicate events
+- Coverity scan fixes
 
 ### Tests
 - New tests for `sip_message_event` type and related functions
