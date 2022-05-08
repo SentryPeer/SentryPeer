@@ -1,3 +1,17 @@
+sentrypeer (1.4.1-1) UNRELEASED; urgency=medium
+
+  * New SIP TCP mode
+  * New -b flag to set your own DHT bootstrap node 
+    (default: bootstrap.sentrypeer.org:4222)
+  * Error handing for -p flag if OpenDHT support is not compiled in
+  * Debug mode now shows what OpenDHT-C library version we're using
+  * Debug mode for p2p now shows the correct event_uuid when checking 
+    for duplicate events
+  * Coverity scan fixes
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Sun, 8 May 2022 22:00:00 +0000
+
+
 sentrypeer (1.4.0-1) UNRELEASED; urgency=medium
 
   * Peer to Peer mode with CLI (`-p`) and ENV options to enable,
