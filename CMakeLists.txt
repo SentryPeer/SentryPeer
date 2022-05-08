@@ -12,7 +12,7 @@
 #
 cmake_minimum_required(VERSION 3.22)
 project(sentrypeer
-        VERSION 1.4.1
+        VERSION 1.4.2
         HOMEPAGE_URL https://github.com/SentryPeer/SentryPeer
         LANGUAGES C)
 
