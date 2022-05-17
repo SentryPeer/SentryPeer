@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 - 2022 Gavin Henry <ghenry@sentrypeer.org>
+
+image: openbsd/7.0
+
+packages:
+  - gcc-11.2.0p0
+  - cmake
+  - gmake
+  - cmocka
+  - libtool
+  - automake-1.16.3
+  - pkgconf
+  - autoconf-2.69p3
+  - autoconf-archive
+  - curl
+  - uuid
+  - jansson
+  - libosip2
+  - libmicrohttpd
+  - libpcre2
+  - sqlite3
+
+sources:
+  - https://github.com/SentryPeer/SentryPeer.git
+
+environment:
+  LANG: en_GB.UTF-8
+
+tasks:
+  - build: |
+      export AUTOCONF_VERSION=2.69
+      export AUTOMAKE_VERSION=1.16
+  
+      ./bootstrap.sh
+      ./configure
+      make
+      make check
+      ./sentrypeer -V 
+      make clean
