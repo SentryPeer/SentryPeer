@@ -9,4 +9,3 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
 override_dh_auto_configure:
 	dh_auto_configure -- --disable-opendht
-
