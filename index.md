@@ -63,7 +63,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 ### Adoption
 
 * [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
-* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0)
+* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0) onwards 
 
 ![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
 [![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
@@ -138,6 +138,7 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
     ENV SENTRYPEER_PEER_TO_PEER=1
+    ENV SENTRYPEER_BOOTSTRAP_NODE=mybootstrapnode.com
     ENV SENTRYPEER_JSON_LOG=1
     ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
     ENV SENTRYPEER_VERBOSE=1
@@ -150,6 +151,19 @@ Either set these in the Dockerfile or in your `Dockerfile.env` file or docker ru
 Debian or Fedora packages are always available from the release page for the current version of SentryPeer:
 
    https://github.com/SentryPeer/SentryPeer/releases
+
+#### Homebrew (macOS or Linux):
+
+We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
+
+    brew tap sentrypeer/sentrypeer
+    brew install sentrypeer
+
+#### Alpine Linux:
+
+SentryPeer is in [testing on Alpine Linux](https://gitlab.alpinelinux.org/alpine/aports/-/tree/master/testing/sentrypeer), so you can install it with the following command:
+
+    apk -U add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing sentrypeer
 
 #### Ubuntu Package
 
@@ -212,36 +226,31 @@ then (make check is highly recommended):
     make check
     make install
 
-Homebrew (macOS or Linux):
-
-We have a [Homebrew Tap for this project](https://github.com/SentryPeer/homebrew-sentrypeer) (until we get more popular):
-
-    brew tap sentrypeer/sentrypeer
-    brew install sentrypeer
-
 ### Running SentryPeer
 
 Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
 the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
     ./sentrypeer -drawps
-    SentryPeer node id: 8ae32230-d9d8-4a04-9f83-9bb00f16735f
+    SentryPeer node id: e5ac3a88-3d52-4e84-b70c-b2ce83992d02
     Starting sentrypeer...
     API mode enabled, starting http daemon...
     Web GUI mode enabled...
     SIP mode enabled...
     Peer to Peer DHT mode enabled...
-    Starting peer to peer DHT mode...
+    Starting peer to peer DHT mode using OpenDHT-C lib version '2.4.0'...
     Configuring local address...
-    Creating socket...
-    Binding socket to local address...
-    Listening for incoming connections...
+    Creating sockets...
+    Binding sockets to local address...
+    Listening for incoming UDP connections...
     SIP responsive mode enabled. Will reply to SIP probes...
+    Listening for incoming TCP connections...
     Peer to peer DHT mode started.
     DHT InfoHash for key 'bad_actors' is: 14d30143330e2e0e922ed4028a60ff96a59800ad
     Bootstrapping the DHT
-    Waiting 5 seconds for bootstrapping...
+    Waiting 5 seconds for bootstrapping to bootstrap.sentrypeer.org...
     Listening for changes to the bad_actors DHT key
+
 
 when you get a probe request, you can see something like the following in the terminal:
 
@@ -316,11 +325,11 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/health-check
 > 
 * Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
-< Date: Mon, 24 Jan 2022 11:16:25 GMT
+< Date: Mon, 24 Apr 2022 11:16:25 GMT
 < Content-Type: application/json
 < Access-Control-Allow-Origin: *
 < X-Powered-By: SentryPeer
-< X-SentryPeer-Version: 1.0.0
+< X-SentryPeer-Version: 1.4.0
 < Content-Length: 81
 < 
 {
@@ -444,7 +453,7 @@ plus other metadata (set a custom log file location with `-l`):
 ```json
 {
    "app_name":"sentrypeer",
-   "app_version":"v1.0.1",
+   "app_version":"v1.4.0",
    "event_timestamp":"2022-02-22 11:19:15.848934346",
    "event_uuid":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
    "created_by_node_id":"4503cc92-26cb-4b3e-bb33-69a83fa09321",
@@ -463,7 +472,7 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
 
 Options:
   -h,      Print this help
@@ -471,6 +480,7 @@ Options:
   -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
   -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
   -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
   -a,      Enable RESTful API mode or use SENTRYPEER_API env
   -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
   -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
@@ -522,7 +532,7 @@ https://sentrypeer.org
 
 New issues can be raised at:
 
-https://github.com/ghenry/SentryPeer/issues
+https://github.com/SentryPeer/SentryPeer/issues
 
 It's okay to raise an issue to ask a question.
 
