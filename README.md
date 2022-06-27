@@ -540,6 +540,7 @@ It's okay to raise an issue to ask a question.
 
 Special thanks to:
 
+  - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the SentryPeer Web GUI
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
   - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
   - [@joejag](https://github.com/joejag) for the [Pull Request](https://github.com/SentryPeer/SentryPeer/pull/19) for the start of [Terraform recipes to launch SentryPeer on different cloud providers #12](https://github.com/SentryPeer/SentryPeer/issues/12)
