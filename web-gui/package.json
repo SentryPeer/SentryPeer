@@ -19,7 +19,7 @@
   "dependencies": {
     "core-js": "^3.22.8",
     "dayjs": "^1.10.7",
-    "vue": "^3.2.35",
+    "vue": "^3.2.37",
     "vue-meta": "^2.4.0",
     "vue-router": "^4.0.15",
     "vue-toastification": "^2.0.0-rc.5"
