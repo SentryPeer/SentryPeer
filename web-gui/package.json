@@ -17,7 +17,7 @@
     "lint": "vue-cli-service lint --fix"
   },
   "dependencies": {
-    "core-js": "^3.23.2",
+    "core-js": "^3.23.3",
     "dayjs": "^1.10.7",
     "vue": "^3.2.37",
     "vue-meta": "^2.4.0",
