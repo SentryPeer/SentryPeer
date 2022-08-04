@@ -1,8 +1,6 @@
-## SentryPeer<sup>&reg;</sup>
+## Protect your SIP Servers from bad actors
 
-<img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
-
-Protect your SIP Servers from bad actors.
+<img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100">
 
 [![Stability: Active](https://masterminds.github.io/stability/active.svg)](https://masterminds.github.io/stability/active.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
@@ -16,9 +14,11 @@ Protect your SIP Servers from bad actors.
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/SentryPeer/SentryPeer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SentryPeer/SentryPeer/context:javascript)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
+_Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
+
 ### Introduction
 
-SentryPeer is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and 
+SentryPeer<sup>&reg;</sup> is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and 
 number they tried to call. Those details can then be used to raise notifications at the service providers network and the next 
 time a user/customer tries to call a collected number, you can act anyway you see fit.
 
