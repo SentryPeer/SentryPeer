@@ -2,12 +2,11 @@
 
 <img alt="SentryPeer Logo" src="https://raw.githubusercontent.com/SentryPeer/SentryPeer/main/web-gui-theme/src/assets/logo.svg" width="100" height="100"> 
 
-A distributed list of bad actor IP addresses and phone numbers collected via a SIP Honeypot.
+Protect your SIP Servers from bad actors.
 
 [![Stability: Active](https://masterminds.github.io/stability/active.svg)](https://masterminds.github.io/stability/active.html)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sentrypeer/sentrypeer?sort=semver)](https://github.com/SentryPeer/SentryPeer/releases)
 [![Docker Hub](https://img.shields.io/badge/docker-hub-brightgreen.svg)](https://hub.docker.com/r/sentrypeer/sentrypeer)
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ghenry/SentryPeer/package/sentrypeer/)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/23969/badge.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
@@ -52,36 +51,7 @@ What would lead to this scenario?
 
 Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
-### Talks
-
-- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/
-- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
-- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
-- UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/
-
-
-### Adoption
-
-* [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
-* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0) onwards 
-
-![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
-[![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
-[![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
-
-### Design
-
-I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
-[Asterisk](https://www.asterisk.org/) etc. See
-[Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
-
-### Screenshots
-
-Here's a mockup of the web UI which is subject to change.
-
-[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
-
-### Goals
+### Features
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
@@ -118,6 +88,34 @@ Here's a mockup of the web UI which is subject to change.
 - [x] Container on [Docker Hub for latest build](https://hub.docker.com/r/sentrypeer/sentrypeer)
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
+
+### Talks
+
+- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/
+- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
+- UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/
+
+### Adoption
+
+* [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
+* Deutsche Telekom [T-Pot - The All In One Honeypot Platform](https://github.com/telekom-security/tpotce) [v22](https://github.com/telekom-security/tpotce/releases/tag/22.04.0) onwards 
+
+![Matrix](https://img.shields.io/matrix/sentrypeer:matrix.org?label=matrix&logo=matrix)
+[![slack](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/sentrypeer/shared_invite/zt-zxsmfdo7-iE0odNT2XyKLP9pt0lgbcw)
+[![SentryPeer on Twitter](https://img.shields.io/badge/follow-twitter-blue)](https://twitter.com/SentryPeer)
+
+### Design
+
+I started this because I wanted to do [C network programming](https://github.com/codeplea/Hands-On-Network-Programming-with-C) as all the projects I use daily are in C like [PostgreSQL](https://www.postgresql.org/), [OpenLDAP](https://www.openldap.org/), [FreeSWITCH](https://freeswitch.com/), [OpenSIPS](https://opensips.org/),
+[Asterisk](https://www.asterisk.org/) etc. See
+[Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
+
+### Screenshots
+
+Here's a mockup of the web UI which is subject to change.
+
+[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
 
 ### Docker
 
