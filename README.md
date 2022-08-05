@@ -16,6 +16,36 @@
 
 _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
 
+## Table of Contents
+* [Introduction](#introduction)
+* [Features](#features)
+* [Talks](#talks)
+* [Adoption](#adoption)
+* [Design](#design)
+* [Screenshots](#screenshots)
+* [Docker](#docker)
+  * [Environment Variables](#environment-variables)
+* [Installation](#installation)
+  * [Homebrew (macOS or Linux)](#homebrew-macos-or-linux)
+  * [Alpine Linux](#alpine-linux)
+  * [Ubuntu Package](#ubuntu-package)
+  * [Building from source](#building-from-source)
+* [Running SentryPeer](#running-sentrypeer)
+* [RESTful API](#restful-api)
+  * [Endpoint /health-check](#endpoint-health-check)
+  * [Endpoint /ip-addresses](#endpoint-ip-addresses)
+  * [Endpoint /ip-address/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
+* [Syslog and Fail2ban](#syslog-and-fail2ban)
+* [Command Line Options](#command-line-options)
+* [IPv6 Multicast Address](#ipv6-multicast-address)
+* [License](#license)
+* [Contributing](#contributing)
+* [Project Website](#project-website)
+* [Trademark](#trademark)
+* [Questions, Bug reports, Feature Requests](#questions-bug-reports-feature-requests)
+* [Special Thanks](#special-thanks)
+
 ### Introduction
 
 SentryPeer<sup>&reg;</sup> is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and 
@@ -537,6 +567,7 @@ It's okay to raise an issue to ask a question.
 ### Special Thanks
 
 Special thanks to:
+  - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
   - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the upcoming SentryPeer HQ web app on their infrastructure
   - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the SentryPeer HQ web app
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
