@@ -268,6 +268,9 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, SENTRYPEER_USERAGENT);
 
+	// Enables TLSv1.2 / TLSv1.3 version only
+	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+
 	// Complete within 2 seconds
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 2L);
 
