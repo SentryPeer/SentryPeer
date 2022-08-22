@@ -85,5 +85,5 @@ EXPOSE 5060/udp 8082 4222/udp
  # ENV SENTRYPEER_VERBOSE=1
  # ENV SENTRYPEER_DEBUG=1
  #
-CMD ["./sentrypeer", "-rawps", "-f", "/var/lib/sentrypeer/sentrypeer.db", "-l", "/var/log/sentrypeer/sentrypeer.json"]
+CMD ["./sentrypeer", "-raps", "-f", "/var/lib/sentrypeer/sentrypeer.db", "-l", "/var/log/sentrypeer/sentrypeer.json"]
 
