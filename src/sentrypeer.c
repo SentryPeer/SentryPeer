@@ -67,9 +67,9 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (config->web_gui_mode &&
+	if (config->webhook_mode &&
 	    (config->debug_mode || config->verbose_mode)) {
-		fprintf(stderr, "Web GUI mode enabled...\n");
+		fprintf(stderr, "WebHook enabled...\n");
 	}
 
 	if (config->sip_mode) {

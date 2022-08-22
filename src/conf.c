@@ -46,7 +46,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->sip_responsive_mode = false;
 	self->syslog_mode = false;
 	self->verbose_mode = false;
-	self->web_gui_mode = false;
+	self->webhook_mode = false;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
@@ -61,6 +61,11 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->p2p_bootstrap_node = calloc(DNS_MAX_LENGTH + 1, sizeof(char));
 	assert(self->p2p_bootstrap_node);
 	util_copy_string(self->p2p_bootstrap_node, SENTRYPEER_BOOTSTRAP_NODE,
+			 DNS_MAX_LENGTH);
+
+	self->webhook_url = calloc(DNS_MAX_LENGTH + 1, sizeof(char));
+	assert(self->webhook_url);
+	util_copy_string(self->webhook_url, SENTRYPEER_WEBHOOK_URL,
 			 DNS_MAX_LENGTH);
 
 	return self;
@@ -85,6 +90,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 			self->p2p_bootstrap_node = 0;
 		}
 
+		if (self->webhook_url != 0) {
+			free(self->webhook_url);
+			self->webhook_url = 0;
+		}
+
 		if (self->db_file != 0) {
 			free(self->db_file);
 			self->db_file = 0;
@@ -102,7 +112,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-w] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -119,7 +129,7 @@ void print_usage(void)
 	fprintf(stderr,
 		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
 	fprintf(stderr,
-		"  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env\n");
+		"  -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env\n");
 	fprintf(stderr,
 		"  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env\n");
 	fprintf(stderr,
@@ -151,7 +161,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:b:jpdrRaws")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:b:w:jpdrRas")) != -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -211,8 +221,9 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			config->verbose_mode = true;
 			break;
 		case 'w':
-			config->web_gui_mode = true;
-			config->api_mode = true;
+			config->webhook_mode = true;
+			util_copy_string(config->webhook_url, optarg,
+					 DNS_MAX_LENGTH);
 			break;
 		default:
 			print_usage();
@@ -247,9 +258,11 @@ int process_env_vars(sentrypeer_config *config)
 	if (getenv("SENTRYPEER_API")) {
 		config->api_mode = true;
 	}
-	if (getenv("SENTRYPEER_WEB_GUI")) {
-		config->web_gui_mode = true;
-		config->api_mode = true;
+	if (getenv("SENTRYPEER_WEBHOOK_URL")) {
+		util_copy_string(config->webhook_url,
+				 getenv("SENTRYPEER_WEBHOOK_URL"),
+				 DNS_MAX_LENGTH);
+		config->webhook_mode = true;
 	}
 	if (getenv("SENTRYPEER_SIP_RESPONSIVE")) {
 		config->sip_responsive_mode = true;

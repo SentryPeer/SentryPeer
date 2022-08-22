@@ -25,5 +25,7 @@ bad_actor *json_to_bad_actor(const sentrypeer_config *config,
 			     const char *json_to_convert);
 int json_log_bad_actor(const sentrypeer_config *config,
 		       const bad_actor *bad_actor);
+int json_http_post_bad_actor(const sentrypeer_config *config,
+			     const bad_actor *bad_actor);
 
 #endif //SENTRYPEER_JSON_LOGGER_H

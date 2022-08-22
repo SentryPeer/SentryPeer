@@ -31,6 +31,7 @@
 #define SENTRYPEER_PATH_MAX 4096
 #define DNS_MAX_LENGTH 256
 #define SENTRYPEER_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
+#define SENTRYPEER_WEBHOOK_URL "http://localhost:4000/events"
 
 typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {
@@ -44,7 +45,8 @@ struct sentrypeer_config {
 	bool sip_responsive_mode;
 	bool syslog_mode;
 	bool verbose_mode;
-	bool web_gui_mode;
+	bool webhook_mode;
+	char *webhook_url;
 	char *db_file;
 	char *json_log_file;
 	char *node_id;

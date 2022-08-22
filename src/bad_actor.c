@@ -106,6 +106,15 @@ int bad_actor_log(const sentrypeer_config *config,
 		return EXIT_FAILURE;
 	}
 
+	if (config->webhook_mode &&
+	    (json_http_post_bad_actor(config, bad_actor_event) !=
+	     EXIT_SUCCESS)) {
+		fprintf(stderr, "POSTing bad_actor json to URL '%s' failed.\n",
+			config->webhook_url);
+		// Just log failing WebHook POSTs
+		return EXIT_SUCCESS;
+	}
+
 	return EXIT_SUCCESS;
 }
 

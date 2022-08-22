@@ -113,10 +113,6 @@ void test_conf(void **state)
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->api_mode);
 
-	assert_int_equal(setenv("SENTRYPEER_WEB_GUI", "1", 1), EXIT_SUCCESS);
-	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
-	assert_true(config->web_gui_mode);
-
 	assert_int_equal(setenv("SENTRYPEER_SYSLOG", "1", 1), EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_true(config->syslog_mode);
@@ -152,6 +148,21 @@ void test_conf(void **state)
 			 EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_string_equal(config->p2p_bootstrap_node, bootstrap_node);
+
+	// Check default webhook URL is set (dev URL), but we only actually use it
+	// if a user set via -w as config->webhook_mode gets enabled then.
+	// Nothing sneaky here.
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->webhook_url,
+			    SENTRYPEER_WEBHOOK_URL);
+
+	// Set our own WebHook URL
+	char webhook_url[] = "https://webhook.example.com/events";
+	assert_int_equal(setenv("SENTRYPEER_WEBHOOK_URL", webhook_url, 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->webhook_url, webhook_url);
+	assert_true(config->webhook_mode);
 
 	sentrypeer_config_destroy(&config);
 	assert_null(config);

@@ -22,7 +22,6 @@ _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_
 * [Talks](#talks)
 * [Adoption](#adoption)
 * [Design](#design)
-* [Screenshots](#screenshots)
 * [Docker](#docker)
   * [Environment Variables](#environment-variables)
 * [Installation](#installation)
@@ -102,7 +101,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
-- [x] **Local** Web GUI for **fast access** - cli / env flag
+- [x] WebHook for POSTing bad actor json to a central location - cli / env flag
 - [x] Query API for IP addresses of bad actors
 - [ ] Query API for IPSET of bad actors
 - [x] Query API for a particular IP address of a bad actor
@@ -141,12 +140,6 @@ I started this because I wanted to do [C network programming](https://github.com
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
-### Screenshots
-
-Here's a mockup of the web UI which is subject to change.
-
-[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
-
 ### Docker
 
 You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
@@ -161,7 +154,7 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
-    ENV SENTRYPEER_WEB_GUI=1
+    ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
@@ -256,14 +249,13 @@ then (make check is highly recommended):
 
 ### Running SentryPeer
 
-Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
-the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
+Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, 
+enable WebHooks and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
-    ./sentrypeer -drawps
+    ./sentrypeer -draps
     SentryPeer node id: e5ac3a88-3d52-4e84-b70c-b2ce83992d02
     Starting sentrypeer...
     API mode enabled, starting http daemon...
-    Web GUI mode enabled...
     SIP mode enabled...
     Peer to Peer DHT mode enabled...
     Starting peer to peer DHT mode using OpenDHT-C lib version '2.4.0'...
@@ -335,7 +327,7 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 ### RESTful API 
 
-The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+The RESTful API is complete for the current use cases. Please click the Watch button to be notified when more things come out :-)
 
 #### Endpoint /health-check
 
@@ -510,7 +502,7 @@ Options:
   -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
   -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
   -a,      Enable RESTful API mode or use SENTRYPEER_API env
-  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
+  -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
   -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
   -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
   -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env

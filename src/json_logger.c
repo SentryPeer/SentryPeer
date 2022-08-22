@@ -18,9 +18,11 @@
 #include "json_logger.h"
 #include "config.h"
 #include <assert.h>
+#include <curl/curl.h>
 
 #define BAD_ACTOR_JSON_FMT                                                     \
 	"{s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}"
+#define SENTRYPEER_USERAGENT "SentryPeer/1.0"
 
 char *bad_actor_to_json(const sentrypeer_config *config,
 			const bad_actor *bad_actor_to_convert)
@@ -31,47 +33,47 @@ char *bad_actor_to_json(const sentrypeer_config *config,
 			  "app_version", PACKAGE_VERSION, "event_timestamp",
 			  bad_actor_to_convert->event_timestamp ?
 				  bad_actor_to_convert->event_timestamp :
-					"",
+				  "",
 			  "event_uuid",
 			  bad_actor_to_convert->event_uuid ?
 				  bad_actor_to_convert->event_uuid :
-					"",
+				  "",
 			  "created_by_node_id",
 			  bad_actor_to_convert->created_by_node_id ?
 				  bad_actor_to_convert->created_by_node_id :
-					"",
+				  "",
 			  "collected_method",
 			  bad_actor_to_convert->collected_method ?
 				  bad_actor_to_convert->collected_method :
-					"",
+				  "",
 			  "transport_type",
 			  bad_actor_to_convert->transport_type ?
 				  bad_actor_to_convert->transport_type :
-					"",
+				  "",
 			  "source_ip",
 			  bad_actor_to_convert->source_ip ?
 				  bad_actor_to_convert->source_ip :
-					"",
+				  "",
 			  "destination_ip",
 			  bad_actor_to_convert->destination_ip ?
 				  bad_actor_to_convert->destination_ip :
-					"",
+				  "",
 			  "called_number",
 			  bad_actor_to_convert->called_number ?
 				  bad_actor_to_convert->called_number :
-					"",
+				  "",
 			  "sip_method",
 			  bad_actor_to_convert->method ?
 				  bad_actor_to_convert->method :
-					"",
+				  "",
 			  "sip_user_agent",
 			  bad_actor_to_convert->user_agent ?
 				  bad_actor_to_convert->user_agent :
-					"",
+				  "",
 			  "sip_message",
 			  bad_actor_to_convert->sip_message ?
 				  bad_actor_to_convert->sip_message :
-					"",
+				  "",
 			  &error);
 	if (!json_bad_actor) {
 		fprintf(stderr, "Error creating json log object: %s\n",
@@ -231,5 +233,60 @@ int json_log_bad_actor(const sentrypeer_config *config,
 			config->json_log_file);
 		return EXIT_FAILURE;
 	}
+	return EXIT_SUCCESS;
+}
+
+int json_http_post_bad_actor(const sentrypeer_config *config,
+			     const bad_actor *bad_actor_to_log)
+{
+	CURL *curl;
+	CURLcode res;
+
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+
+	if (!curl) {
+		fprintf(stderr, "curl_easy_init() failed\n");
+		return EXIT_FAILURE;
+	}
+
+	char *json_string =
+		bad_actor_to_json(config,
+				  bad_actor_to_log); // Caller must free
+	if (json_string == NULL) {
+		fprintf(stderr, "Failed to convert bad actor to json.\n");
+		free(json_string);
+		return EXIT_FAILURE;
+	}
+
+	curl_easy_setopt(curl, CURLOPT_URL, config->webhook_url);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
+
+	struct curl_slist *headers = 0;
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, SENTRYPEER_USERAGENT);
+
+	// Complete within 2 seconds
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 2L);
+
+	// Send the json :-)
+	res = curl_easy_perform(curl);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "WebHook POSTing failed: %s\n",
+			curl_easy_strerror(res));
+		return EXIT_FAILURE;
+	}
+
+	free(json_string);
+
+	// Cleanup curl stuff
+	curl_easy_cleanup(curl);
+	curl_slist_free_all(headers);
+
+	// We are done with libcurl, so clean it up
+	curl_global_cleanup();
+
 	return EXIT_SUCCESS;
 }

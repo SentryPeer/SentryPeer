@@ -18,6 +18,7 @@
 
 #define CONTENT_TYPE_HTML "text/html"
 #define CONTENT_TYPE_JSON "application/json"
+#define STATUS_OK_JSON "{\"status\": \"OK\"}"
 #define NOT_FOUND_ERROR_JSON                                                   \
 	"{\"error\": \"The requested resource could not be found.\"}"
 #define BAD_DATA_JSON "{\"error\": \"The request data was invalid\"}"
@@ -25,7 +26,6 @@
 #define NOT_FOUND_BAD_ACTORS_JSON "{\"message\": \"No bad actors found\"}"
 #define NOT_FOUND_PHONE_NUMBER_JSON "{\"message\": \"No phone number found\"}"
 #define NOT_FOUND_PHONE_NUMBERS_JSON "{\"message\": \"No phone numbers found\"}"
-
 
 void log_http_client_ip(const char *url, struct MHD_Connection *connection);
 bool json_is_requested(struct MHD_Connection *connection);

@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Removed local incomplete web gui. This will be replaced by a new FL/OSS project called [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ)
+- Added optional `-w https://my_sentrypeerhq_onprem_or_cloud_url/events` WebHook cli/env var to set URL for bad actor 
+  JSON to be sent to SentryPeerHQ for the dashboard and other services
+
+### Tests
+- Added tests for new WebHook feature
+
 ## [1.4.1] - 2020-05-08
 - SIP TCP mode first version
 - New `-b` flag to set your own DHT bootstrap node (default: `bootstrap.sentrypeer.org:4222`)
@@ -13,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Debug mode now shows what OpenDHT-C library version we're using
 - Debug mode for p2p now shows the correct `event_uuid` when checking for duplicate events
 - Coverity scan fixes
+
+### Packaging
+- Remove `-w` flag from deb and rpm packaging defaults
 
 ### Tests
 - New tests for `sip_message_event` type and related functions
