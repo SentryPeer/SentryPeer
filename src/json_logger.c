@@ -256,23 +256,70 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 	if (json_string == NULL) {
 		fprintf(stderr, "Failed to convert bad actor to json.\n");
 		free(json_string);
+
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+
 		return EXIT_FAILURE;
 	}
 
-	curl_easy_setopt(curl, CURLOPT_URL, config->webhook_url);
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
+	res = curl_easy_setopt(curl, CURLOPT_URL, config->webhook_url);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
+	res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
 
 	struct curl_slist *headers = 0;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
 
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, SENTRYPEER_USERAGENT);
+	res = curl_easy_setopt(curl, CURLOPT_USERAGENT, SENTRYPEER_USERAGENT);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
 
 	// Enables TLSv1.2 / TLSv1.3 version only
-	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+	res = curl_easy_setopt(curl, CURLOPT_SSLVERSION,
+			       CURL_SSLVERSION_TLSv1_2);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
 
 	// Complete within 2 seconds
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 2L);
+	res = curl_easy_setopt(curl, CURLOPT_TIMEOUT, 2L);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		curl_global_cleanup();
+		return EXIT_FAILURE;
+	}
 
 	// Send the json :-)
 	res = curl_easy_perform(curl);
