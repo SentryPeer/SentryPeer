@@ -36,6 +36,7 @@ _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_
   * [Endpoint /ip-address/{ip-address}](#endpoint-ip-addressip-address)
   * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
 * [Syslog and Fail2ban](#syslog-and-fail2ban)
+* [JSON Log Format](#json-log-format) 
 * [Command Line Options](#command-line-options)
 * [IPv6 Multicast Address](#ipv6-multicast-address)
 * [License](#license)
