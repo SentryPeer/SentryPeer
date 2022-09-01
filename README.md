@@ -30,6 +30,7 @@ _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_
   * [Ubuntu Package](#ubuntu-package)
   * [Building from source](#building-from-source)
 * [Running SentryPeer](#running-sentrypeer)
+* [WebHook](#webhook)
 * [RESTful API](#restful-api)
   * [Endpoint /health-check](#endpoint-health-check)
   * [Endpoint /ip-addresses](#endpoint-ip-addresses)
@@ -325,6 +326,12 @@ You can see the data in the sqlite3 database called `sentrypeer.db` using [sqlit
 Here's a screenshot of the database opened using [sqlitebrowser](https://sqlitebrowser.org/) (it's big, so I'll just link to the image):
 
 [sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
+
+### WebHook
+
+There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ) or
+your own WebHook endpoint.  The WebHook is **not** enabled by default. You can configure the WebHook URL via `-w` or set 
+the `SENTRYPEER_WEBHOOK_URL` env variable.
 
 ### RESTful API 
 
