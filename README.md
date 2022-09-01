@@ -148,7 +148,7 @@ You can run the latest version of SentryPeer with [Docker](https://www.docker.co
 Or build yourself:
 
     sudo docker build --no-cache -t sentrypeer .
-    sudo docker run -d -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
+    sudo docker run -d -p 5050:5060/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
 
 Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:8082/health-check` to see if it's running.
 
