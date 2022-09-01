@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added optional `-w https://my_sentrypeerhq_onprem_or_cloud_url/events` WebHook cli/env var to set URL for bad actor 
   JSON to be sent to SentryPeerHQ for the dashboard and other services
 
+### Breaking Changes
+- `-w` now requires a URL to be set as it is used for the WebHook to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ). 
+  Before it enabled the local Web UI which has been removed.
+
 ### Tests
 - Added tests for new WebHook feature
 
