@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-09-01
+
 - Removed local incomplete web gui. This will be replaced by a new FL/OSS project called [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ)
 - Added optional `-w https://my_sentrypeerhq_onprem_or_cloud_url/events` WebHook cli/env var to set URL for bad actor 
   JSON to be sent to SentryPeerHQ for the dashboard and other services
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Tests
 - Added tests for new WebHook feature
 
-## [1.4.1] - 2020-05-08
+## [1.4.1] - 2022-05-08
 - SIP TCP mode first version
 - New `-b` flag to set your own DHT bootstrap node (default: `bootstrap.sentrypeer.org:4222`)
 - Error handing for `-p` flag if OpenDHT support is not compiled in
