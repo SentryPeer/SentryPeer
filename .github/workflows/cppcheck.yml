@@ -13,9 +13,10 @@ on:
 jobs:
   clang-analyzer:
     name: Cppcheck Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
+      # The only thing really needed is cppcheck, but I'm installing everything anyway
       - run: |
           sudo apt-get update
           sudo apt-get install \
@@ -29,12 +30,9 @@ jobs:
           libpcre2-dev \
           libcurl4-openssl-dev \
           cppcheck -y
-          sudo add-apt-repository ppa:savoury1/utilities -y
-          sudo apt-get update
-          sudo apt-get install libmicrohttpd-dev -y
           brew update
           brew upgrade          
-          brew install libosip
+          brew install libosip opendht
       - run: |
           set -x
           cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/

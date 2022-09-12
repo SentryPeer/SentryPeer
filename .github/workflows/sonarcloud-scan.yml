@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       SONAR_SCANNER_VERSION: 4.6.1.2450 # Find the latest version in the "Linux" link on this page:
       # https://sonarcloud.io/documentation/analysis/scan/sonarscanner/
@@ -53,12 +53,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install autoconf-archive libosip2-dev libcmocka-dev uuid-dev \
           libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev libpcre2-dev -y
-          sudo add-apt-repository ppa:savoury1/utilities -y
-          sudo apt-get update
-          sudo apt-get install libmicrohttpd-dev -y
           brew update
           brew upgrade
-          brew install libosip
+          brew install libosip opendht
           ./bootstrap.sh
           ./configure
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make clean all

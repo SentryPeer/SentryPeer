@@ -15,7 +15,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       actions: read
       contents: read
@@ -46,12 +46,9 @@ jobs:
         libcurl4-openssl-dev \
         libpcre2-dev \
         autoconf-archive -y
-        sudo add-apt-repository ppa:savoury1/utilities -y
-        sudo apt-get update
-        sudo apt-get install libmicrohttpd-dev -y
         brew update
         brew upgrade        
-        brew install libosip
+        brew install libosip opendht
     - run: |
         set -x
         ./bootstrap.sh

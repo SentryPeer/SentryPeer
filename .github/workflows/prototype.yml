@@ -11,7 +11,7 @@ on:
   pull_request:
 jobs:
   build_and_test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: perl:5.34
     steps:
