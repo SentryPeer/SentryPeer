@@ -33,6 +33,7 @@ jobs:
             libosip2-dev \
             libcmocka-dev \
             uuid-dev \
+            libmicrohttpd-dev \
             libjansson-dev \
             libcurl4-openssl-dev \
             libpcre2-dev -y
