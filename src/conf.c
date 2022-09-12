@@ -23,6 +23,10 @@
 #include "database.h"
 #include "json_logger.h"
 
+#if HAVE_OPENDHT_C != 0
+#include <opendht/opendht_c.h>
+#endif
+
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
 
@@ -68,6 +72,13 @@ sentrypeer_config *sentrypeer_config_new(void)
 	util_copy_string(self->webhook_url, SENTRYPEER_WEBHOOK_URL,
 			 DNS_MAX_LENGTH);
 
+#if HAVE_OPENDHT_C !=0
+	// Generate our InfoHash from our key name
+	dht_infohash *h = malloc(sizeof(dht_infohash));
+	dht_infohash_get_from_string(h, DHT_BAD_ACTORS_KEY);
+	self->dht_info_hash = h;
+#endif
+
 	return self;
 }
 
@@ -83,6 +94,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 		if (self->node_id != 0) {
 			free(self->node_id);
 			self->node_id = 0;
+		}
+
+		if (self->dht_info_hash != 0) {
+			free(self->dht_info_hash);
+			self->dht_info_hash = 0;
 		}
 
 		if (self->p2p_bootstrap_node != 0) {

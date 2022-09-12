@@ -45,6 +45,7 @@ int route_check(const char *url, const char *route,
 enum MHD_Result route_handler(void *cls, struct MHD_Connection *connection,
 			      const char *url, const char *method,
 			      const char *version, const char *upload_data,
+			      // cppcheck-suppress constParameter
 			      size_t *upload_data_size, void **ptr)
 {
 	static int dummy;

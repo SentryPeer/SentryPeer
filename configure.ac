@@ -14,7 +14,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sentrypeer],[2.0.0],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
+AC_INIT([sentrypeer],[2.0.1],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 # Some weird issue with AX_PTHREAD macro that needs this to be called first:
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])

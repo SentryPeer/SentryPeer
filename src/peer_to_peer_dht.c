@@ -18,7 +18,6 @@
 #include <opendht/opendht_c.h>
 #include <string.h>
 #include <assert.h>
-#include <syslog.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -29,7 +28,6 @@
 
 #define DHT_PORT 4222
 #define DHT_BOOTSTRAP_WAIT_TIME 5
-#define DHT_BAD_ACTORS_KEY "bad_actors"
 
 struct op_context {
 	dht_runner *runner;
@@ -252,7 +250,9 @@ static void op_context_free(void *user_data)
 int peer_to_peer_dht_run(sentrypeer_config *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Starting peer to peer DHT mode using OpenDHT-C lib version '%s'...\n", OPENDHT_C_VERSION);
+		fprintf(stderr,
+			"Starting peer to peer DHT mode using OpenDHT-C lib version '%s'...\n",
+			OPENDHT_C_VERSION);
 	}
 
 	// https://github.com/savoirfairelinux/opendht/issues/590#issuecomment-1063158916
@@ -272,15 +272,11 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 		fprintf(stderr, "Peer to peer DHT mode started.\n");
 	}
 
-	// Generate our InfoHash from our key name
-	dht_infohash h;
-	dht_infohash_get_from_string(&h, DHT_BAD_ACTORS_KEY);
-
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "DHT InfoHash for key '%s' is: %s\n",
-			DHT_BAD_ACTORS_KEY, dht_infohash_print(&h));
+			DHT_BAD_ACTORS_KEY,
+			dht_infohash_print(config->dht_info_hash));
 	}
-	config->dht_info_hash = &h; // Save for clean up
 
 	struct op_context *ctx = malloc(sizeof(struct op_context));
 	assert(ctx);
@@ -306,8 +302,9 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 		fprintf(stderr,
 			"Listening for changes to the bad_actors DHT key\n");
 	}
-	dht_op_token *token = dht_runner_listen(runner, &h, dht_value_callback,
-						op_context_free, ctx);
+	dht_op_token *token =
+		dht_runner_listen(runner, config->dht_info_hash,
+				  dht_value_callback, op_context_free, ctx);
 	assert(token);
 	config->dht_op_token = token; // Save for clean up
 

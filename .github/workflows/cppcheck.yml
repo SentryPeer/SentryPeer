@@ -35,5 +35,5 @@ jobs:
           brew install libosip opendht
       - run: |
           set -x
-          cppcheck --enable=warning,performance,portability,style --error-exitcode=1 src/
-          cppcheck --enable=warning,performance,portability,style --error-exitcode=1 tests/
+          cppcheck --inline-suppr --enable=warning,performance,portability,style --error-exitcode=1 src/
+          cppcheck --inline-suppr --enable=warning,performance,portability,style --error-exitcode=1 tests/

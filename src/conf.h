@@ -32,6 +32,7 @@
 #define DNS_MAX_LENGTH 256
 #define SENTRYPEER_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 #define SENTRYPEER_WEBHOOK_URL "http://localhost:4000/events"
+#define DHT_BAD_ACTORS_KEY "bad_actors"
 
 typedef struct sentrypeer_config sentrypeer_config;
 struct sentrypeer_config {
