@@ -54,6 +54,7 @@ static long curl_get_url(const char *url)
 	return http_response_code;
 }
 
+// cppcheck-suppress constParameter
 void test_http_api_get(void **state)
 {
 	sentrypeer_config *config = *state;

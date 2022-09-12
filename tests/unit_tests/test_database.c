@@ -193,6 +193,7 @@ int test_setup_sqlite_db(void **state)
 	return EXIT_SUCCESS;
 }
 
+// cppcheck-suppress constParameter
 int test_teardown_sqlite_db(void **state)
 {
 	sentrypeer_config *config = *state;
@@ -207,6 +208,7 @@ int test_teardown_sqlite_db(void **state)
 	return EXIT_SUCCESS;
 }
 
+// cppcheck-suppress constParameter
 void test_open_select_close_sqlite_db(void **state)
 {
 	sentrypeer_config *config = *state;
@@ -246,6 +248,7 @@ void test_open_select_close_sqlite_db(void **state)
 		__LINE__ - 1, __FILE__);
 }
 
+// cppcheck-suppress constParameter
 void test_db_insert_bad_actor(void **state)
 {
 	sentrypeer_config *config = *state;
@@ -274,6 +277,7 @@ void test_db_insert_bad_actor(void **state)
 	assert_null(bad_actor_event);
 }
 
+// cppcheck-suppress constParameter
 void test_db_select_bad_actor(void **state)
 {
 	sentrypeer_config *config = *state;
@@ -304,6 +308,7 @@ void test_db_select_bad_actor(void **state)
 					 config)); // UUID does not exist
 }
 
+// cppcheck-suppress constParameter
 void test_db_select_bad_actors(void **state)
 {
 	sentrypeer_config *config = *state;

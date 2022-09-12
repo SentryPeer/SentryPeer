@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Re-work dht memory usage
+- cppcheck work in tests
 
 ## [2.0.0] - 2022-09-01
 

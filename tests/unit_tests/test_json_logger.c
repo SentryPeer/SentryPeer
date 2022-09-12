@@ -22,6 +22,7 @@
 #include "../../src/json_logger.h"
 #include "test_bad_actor.h"
 
+// cppcheck-suppress constParameter
 void test_json_logger(void **state)
 {
 	sentrypeer_config *config = *state;
