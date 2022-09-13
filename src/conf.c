@@ -74,9 +74,9 @@ sentrypeer_config *sentrypeer_config_new(void)
 
 #if HAVE_OPENDHT_C !=0
 	// Generate our InfoHash from our key name
-	dht_infohash *h = malloc(sizeof(dht_infohash));
-	dht_infohash_get_from_string(h, DHT_BAD_ACTORS_KEY);
-	self->dht_info_hash = h;
+	self->dht_info_hash = malloc(sizeof(dht_infohash));
+	assert(self->dht_info_hash);
+	dht_infohash_get_from_string(self->dht_info_hash, DHT_BAD_ACTORS_KEY);	 ;
 #endif
 
 	return self;
