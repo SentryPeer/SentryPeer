@@ -100,7 +100,8 @@ int sip_daemon_stop(sentrypeer_config const *config)
 	return EXIT_SUCCESS;
 }
 
-int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_event)
+int sip_log_event(sentrypeer_config const *config,
+		  const sip_message_event *sip_event)
 {
 	char collected_method[11] = "passive"; // size is responsive + 1
 	if (config->sip_responsive_mode == true)
@@ -138,6 +139,7 @@ int sip_log_event(sentrypeer_config const *config, const sip_message_event *sip_
 	    peer_to_peer_dht_save(config, bad_actor_event) != EXIT_SUCCESS) {
 		fprintf(stderr,
 			"Error saving bad_actor to peer_to_peer_dht.\n");
+		bad_actor_destroy(&bad_actor_event);
 		return EXIT_FAILURE;
 	}
 #endif // HAVE_OPENDHT_C
