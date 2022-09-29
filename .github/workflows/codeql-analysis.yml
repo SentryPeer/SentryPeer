@@ -29,6 +29,12 @@ jobs:
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
     steps:
+    - name: Add Homebrew to $PATH
+      run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+    
+    - name: Test brew call
+      run: brew search hello
+      
     - name: Checkout repository
       uses: actions/checkout@v2
 
