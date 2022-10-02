@@ -16,6 +16,37 @@
 
 _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
 
+## Table of Contents
+* [Introduction](#introduction)
+* [Features](#features)
+* [Talks](#talks)
+* [Adoption](#adoption)
+* [Design](#design)
+* [Docker](#docker)
+  * [Environment Variables](#environment-variables)
+* [Installation](#installation)
+  * [Homebrew (macOS or Linux)](#homebrew-macos-or-linux)
+  * [Alpine Linux](#alpine-linux)
+  * [Ubuntu Package](#ubuntu-package)
+  * [Building from source](#building-from-source)
+* [Running SentryPeer](#running-sentrypeer)
+* [WebHook](#webhook)
+* [RESTful API](#restful-api)
+  * [Endpoint /health-check](#endpoint-health-check)
+  * [Endpoint /ip-addresses](#endpoint-ip-addresses)
+  * [Endpoint /ip-address/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
+* [Syslog and Fail2ban](#syslog-and-fail2ban)
+* [JSON Log Format](#json-log-format) 
+* [Command Line Options](#command-line-options)
+* [IPv6 Multicast Address](#ipv6-multicast-address)
+* [License](#license)
+* [Contributing](#contributing)
+* [Project Website](#project-website)
+* [Trademark](#trademark)
+* [Questions, Bug reports, Feature Requests](#questions-bug-reports-feature-requests)
+* [Special Thanks](#special-thanks)
+
 ### Introduction
 
 SentryPeer<sup>&reg;</sup> is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came from and 
@@ -72,7 +103,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] SIP responsive mode can be enabled to collect data - cli / env flag   
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
-- [x] **Local** Web GUI for **fast access** - cli / env flag
+- [x] WebHook for POSTing bad actor json to a central location - cli / env flag
 - [x] Query API for IP addresses of bad actors
 - [ ] Query API for IPSET of bad actors
 - [x] Query API for a particular IP address of a bad actor
@@ -111,19 +142,13 @@ I started this because I wanted to do [C network programming](https://github.com
 [Asterisk](https://www.asterisk.org/) etc. See
 [Episode 414: Jens Gustedt on Modern C](https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c/) for why [C](https://en.wikipedia.org/wiki/C_(programming_language)) is a good choice.  For those interested, see my full podcast show list (https://www.se-radio.net/team/gavin-henry/) for [Software Engineering Radio](https://www.se-radio.net/)
 
-### Screenshots
-
-Here's a mockup of the web UI which is subject to change.
-
-[![SentryPeer Web GUI mock up](./screenshots/SentryPeer-Web-GUI-screenshot.png)](./screenshots/SentryPeer-Web-GUI-screenshot.png)
-
 ### Docker
 
 You can run the latest version of SentryPeer with [Docker](https://www.docker.com/). The latest version is available from [Docker Hub](https://hub.docker.com/r/sentrypeer/sentrypeer/).
 Or build yourself:
 
     sudo docker build --no-cache -t sentrypeer .
-    sudo docker run -d -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
+    sudo docker run -d -p 5050:5060/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
 
 Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:8082/health-check` to see if it's running.
 
@@ -131,7 +156,7 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
-    ENV SENTRYPEER_WEB_GUI=1
+    ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
@@ -205,7 +230,7 @@ If you are going to build from this repository, you will need to have the follow
 Debian/Ubuntu:
 
     sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev \
-    libcmocka-dev uuid-dev libcurl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
+    libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
 
 Fedora:
 
@@ -226,14 +251,13 @@ then (make check is highly recommended):
 
 ### Running SentryPeer
 
-Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, enable
-the Web GUI SPA and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
+Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, 
+enable WebHooks and enable syslog logging ([use a package](https://github.com/SentryPeer/SentryPeer/releases) if you want [systemd](https://www.freedesktop.org/wiki/Software/systemd/)):
 
-    ./sentrypeer -drawps
+    ./sentrypeer -draps
     SentryPeer node id: e5ac3a88-3d52-4e84-b70c-b2ce83992d02
     Starting sentrypeer...
     API mode enabled, starting http daemon...
-    Web GUI mode enabled...
     SIP mode enabled...
     Peer to Peer DHT mode enabled...
     Starting peer to peer DHT mode using OpenDHT-C lib version '2.4.0'...
@@ -303,9 +327,15 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 [sqlitebrowser exploring the sentrypeer.db](./screenshots/SentryPeer-sqlitebrowser.png)
 
+### WebHook
+
+There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ) or
+your own WebHook endpoint.  The WebHook is **not** enabled by default. You can configure the WebHook URL via `-w` or set 
+the `SENTRYPEER_WEBHOOK_URL` env variable.
+
 ### RESTful API 
 
-The RESTful API is almost complete and the web UI is coming soon. Please click the Watch button to be notified when they are ready and hit Like to follow the development :-)
+The RESTful API is complete for the current use cases. Please click the Watch button to be notified when more things come out :-)
 
 #### Endpoint /health-check
 
@@ -480,7 +510,7 @@ Options:
   -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
   -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
   -a,      Enable RESTful API mode or use SENTRYPEER_API env
-  -w,      Enable Web GUI mode or use SENTRYPEER_WEB_GUI env
+  -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
   -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
   -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
   -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
@@ -537,6 +567,7 @@ It's okay to raise an issue to ask a question.
 ### Special Thanks
 
 Special thanks to:
+  - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
   - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the upcoming SentryPeer HQ web app on their infrastructure
   - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the SentryPeer HQ web app
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
