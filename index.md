@@ -90,8 +90,8 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] User can submit their own data if they want to (you need to enable p2p mode - `-p`) 
 - [x] User gets other users' data **ONLY IF** they opt in to submit their data to the pool
 - [x] Embedded Distributed Hash Table (DHT) node using [OpenDHT](https://github.com/savoirfairelinux/opendht/wiki/Running-a-node-in-your-program) (`-p` cli option)
-- [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
-- [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default on)
+- [x] Peer to Peer **sharing** of collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default off)
+- [x] Peer to Peer data replication to **receive** collected bad_actors using [OpenDHT](https://github.com/savoirfairelinux/opendht) (default off)
 - [x] Set your own DHT bootstrap node (`-b` cli option)
 - [x] Multithreaded
 - [x] UDP transport
@@ -168,6 +168,8 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_DEBUG=1
 
 Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
+
+Settings any of these to `0` will also _enable_ the feature. We _don't care_ what you set it to, just that it's set.
 
 ### Installation
  
