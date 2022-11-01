@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Re-work dht memory usage
 - cppcheck work in tests
+- Clearly state that Peer to Peer mode is off by default in the docs and that setting an environment variable to 
+  anything, e.g. `0` will enable that particular mode. We _don't care_ what you set it to, just that it's set.
 
 ## [2.0.0] - 2022-09-01
 
