@@ -72,7 +72,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	util_copy_string(self->webhook_url, SENTRYPEER_WEBHOOK_URL,
 			 DNS_MAX_LENGTH);
 
-#if HAVE_OPENDHT_C !=0
+#if HAVE_OPENDHT_C != 0
 	// Generate our InfoHash from our key name
 	self->dht_info_hash = malloc(sizeof(dht_infohash));
 	assert(self->dht_info_hash);
@@ -96,10 +96,12 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 			self->node_id = 0;
 		}
 
+#if HAVE_OPENDHT_C != 0
 		if (self->dht_info_hash != 0) {
 			free(self->dht_info_hash);
 			self->dht_info_hash = 0;
 		}
+#endif
 
 		if (self->p2p_bootstrap_node != 0) {
 			free(self->p2p_bootstrap_node);
