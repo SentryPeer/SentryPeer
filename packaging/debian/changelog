@@ -9,11 +9,11 @@ sentrypeer (2.0.1-1) UNRELEASED; urgency=medium
 sentrypeer (1.4.1-1) UNRELEASED; urgency=medium
 
   * New SIP TCP mode
-  * New -b flag to set your own DHT bootstrap node 
+  * New -b flag to set your own DHT bootstrap node
     (default: bootstrap.sentrypeer.org:4222)
   * Error handing for -p flag if OpenDHT support is not compiled in
   * Debug mode now shows what OpenDHT-C library version we're using
-  * Debug mode for p2p now shows the correct event_uuid when checking 
+  * Debug mode for p2p now shows the correct event_uuid when checking
     for duplicate events
   * Coverity scan fixes
 
@@ -59,7 +59,7 @@ sentrypeer (0.0.6-1) UNRELEASED; urgency=medium
 
 sentrypeer (0.0.5-1) UNRELEASED; urgency=medium
 
-  * Switched from 404 to Error 400 on invalid request data at 
+  * Switched from 404 to Error 400 on invalid request data at
     /ip-addresses/{blah}
   * Handle packets sent that are 0 bytes (discovered by nmap probing port 5060)
   * Only parse SIP packets if UDP packet payload is > 0 bytes
@@ -69,20 +69,20 @@ sentrypeer (0.0.5-1) UNRELEASED; urgency=medium
   * Remove duplicate uuid_generate call in bad_actor structure
   * Add CORS header to all API responses
   * Add more header checks to configure.ac
-  * Switch to recvmsg for receiving UDP packets, so we can save the destination 
+  * Switch to recvmsg for receiving UDP packets, so we can save the destination
     IP address of probes
-  * SIP responsive mode can be enabled to reply to SIP probes. This will prompt 
-    INVITE's from bad actors for phone call attempts, so you can collect the 
+  * SIP responsive mode can be enabled to reply to SIP probes. This will prompt
+    INVITE's from bad actors for phone call attempts, so you can collect the
     phone numbers
-  * API mode can be set to enable replies to RESTful API requests. Depending 
+  * API mode can be set to enable replies to RESTful API requests. Depending
     on your node deployment type, you may not want to enable this
-  * Web GUI mode can be set to enable the Vue.js SPA. Depending on your node 
+  * Web GUI mode can be set to enable the Vue.js SPA. Depending on your node
     deployment type, you might not want this
-  * Add seen_last and seen_count bad_actor data structure for use in 
+  * Add seen_last and seen_count bad_actor data structure for use in
     ip_addresses RESTful API resource
   * ip_addresses RESTful API resource results sorted by seen_last descending
   * Add AC_USE_SYSTEM_EXTENSIONS to configure.ac
-  * Web GUI mode needs the API to be enabled, so if you don't set API mode, we 
+  * Web GUI mode needs the API to be enabled, so if you don't set API mode, we
     automatically set it
   * Clean up test RESTful API code to fix test suite crashes on macOS
   * Highly recommend v5+ of libosip2 via ./configure

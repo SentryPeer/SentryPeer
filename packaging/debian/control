@@ -15,7 +15,7 @@ Build-Depends: autoconf,
                libsqlite3-dev,
                pkg-config,
                uuid-dev
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1.0
 Homepage: https://sentrypeer.org
 Vcs-Browser: https://github.com/SentryPeer/SentryPeer
 Vcs-Git: https://github.com/SentryPeer/SentryPeer.git
