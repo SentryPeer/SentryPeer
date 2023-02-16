@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	1.2.0
+Version:	2.0.1
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,9 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Thu Feb 16 2023 Gavin Henry <ghenry@sentrypeer.org> 2.0.1-1
+- Fix config trying to free an OpenDHT member that isn't present if not built with OpenDHT
+- Re-work dht memory usage
 * Fri Feb 25 2022 Gavin Henry <ghenry@sentrypeer.org> 1.2.0-1
 - Add JSON logging to log bad actor events and various other improvements
 * Mon Jan 24 2022 Gavin Henry <ghenry@sentrypeer.org> 1.0.0-1

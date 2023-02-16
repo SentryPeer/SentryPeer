@@ -1,7 +1,7 @@
 # Contributor: Gavin Henry <ghenry@sentrypeer.org>
 # Maintainer: Gavin Henry <ghenry@sentrypeer.org>
 pkgname=sentrypeer
-pkgver=1.4.1
+pkgver=2.0.1
 pkgrel=0
 pkgdesc="Honeypot for a distributed p2p list of bad actor IP addresses and phone numbers"
 url="https://sentrypeer.org/"

@@ -63,6 +63,7 @@ config.sub~
 ltmain.sh
 libtool
 configure
+configure~
 depcomp
 install-sh
 missing

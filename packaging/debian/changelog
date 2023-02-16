@@ -1,3 +1,11 @@
+sentrypeer (2.0.1-1) UNRELEASED; urgency=medium
+
+  * Fix config trying to free an OpenDHT member that isn't
+    present if not built with OpenDHT
+  * Re-work dht memory usage
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Thu, 16 Feb 2023 10:00:00 +0000
+
 sentrypeer (1.4.1-1) UNRELEASED; urgency=medium
 
   * New SIP TCP mode
@@ -10,7 +18,6 @@ sentrypeer (1.4.1-1) UNRELEASED; urgency=medium
   * Coverity scan fixes
 
  -- Gavin Henry <ghenry@sentrypeer.org>  Sun, 8 May 2022 22:00:00 +0000
-
 
 sentrypeer (1.4.0-1) UNRELEASED; urgency=medium
 
