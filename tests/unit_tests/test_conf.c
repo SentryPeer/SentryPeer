@@ -153,8 +153,7 @@ void test_conf(void **state)
 	// if a user set via -w as config->webhook_mode gets enabled then.
 	// Nothing sneaky here.
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
-	assert_string_equal(config->webhook_url,
-			    SENTRYPEER_WEBHOOK_URL);
+	assert_string_equal(config->webhook_url, SENTRYPEER_WEBHOOK_URL);
 
 	// Set our own WebHook URL
 	char webhook_url[] = "https://webhook.example.com/events";
@@ -163,6 +162,31 @@ void test_conf(void **state)
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
 	assert_string_equal(config->webhook_url, webhook_url);
 	assert_true(config->webhook_mode);
+
+	// Check default OAuth2 client ID and secret are set
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->oauth2_client_id,
+			    SENTRYPEER_OAUTH2_CLIENT_ID);
+	assert_string_equal(config->oauth2_client_secret,
+			    SENTRYPEER_OAUTH2_CLIENT_SECRET);
+
+	// Set OAuth2 client ID
+	char oauth2_client_id[] = "my-client-id";
+	assert_int_equal(setenv("SENTRYPEER_OAUTH2_CLIENT_ID", oauth2_client_id,
+				1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->oauth2_client_id, oauth2_client_id);
+	assert_true(config->oauth2_mode);
+
+	// Set OAuth2 client secret
+	char oauth2_client_secret[] = "my-client-secret";
+	assert_int_equal(setenv("SENTRYPEER_OAUTH2_CLIENT_SECRET",
+				oauth2_client_secret, 1),
+			 EXIT_SUCCESS);
+	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
+	assert_string_equal(config->oauth2_client_secret, oauth2_client_secret);
+	assert_true(config->oauth2_mode);
 
 	sentrypeer_config_destroy(&config);
 	assert_null(config);

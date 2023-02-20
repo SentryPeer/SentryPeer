@@ -31,7 +31,12 @@
 #define SENTRYPEER_PATH_MAX 4096
 #define DNS_MAX_LENGTH 256
 #define SENTRYPEER_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
-#define SENTRYPEER_WEBHOOK_URL "http://localhost:4000/events"
+#define SENTRYPEER_WEBHOOK_URL "http://localhost:4000/api/events"
+#define SENTRYPEER_OAUTH2_TOKEN_URL "https://dev-vtqcrudk2kakzqos.uk.auth0.com/oauth/token"
+#define SENTRYPEER_OAUTH2_GRANT_TYPE "client_credentials"
+#define SENTRYPEER_OAUTH2_AUDIENCE "https://sentrypeer.com/api"
+#define SENTRYPEER_OAUTH2_CLIENT_ID "YOUR_CLIENT_ID"
+#define SENTRYPEER_OAUTH2_CLIENT_SECRET "YOUR_CLIENT_SECRET"
 #define DHT_BAD_ACTORS_KEY "bad_actors"
 
 typedef struct sentrypeer_config sentrypeer_config;
@@ -48,6 +53,10 @@ struct sentrypeer_config {
 	bool verbose_mode;
 	bool webhook_mode;
 	char *webhook_url;
+	bool oauth2_mode;
+	char *oauth2_client_id;
+	char *oauth2_client_secret;
+	char *oauth2_access_token;
 	char *db_file;
 	char *json_log_file;
 	char *node_id;

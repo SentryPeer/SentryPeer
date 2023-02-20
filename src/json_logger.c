@@ -17,12 +17,219 @@
 
 #include "json_logger.h"
 #include "config.h"
+#include "http_common.h"
 #include <assert.h>
 #include <curl/curl.h>
 
 #define BAD_ACTOR_JSON_FMT                                                     \
 	"{s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}"
+#define AUTH0_CLIENT_CREDS_JSON_FMT "{s:s,s:s,s:s,s:s}"
+#define AUTH0_MAX_BEARER_TOKEN_LEN 4096
 #define SENTRYPEER_USERAGENT "SentryPeer/1.0"
+
+typedef struct memory_struct memory_struct;
+struct memory_struct {
+	char *memory;
+	size_t size;
+};
+
+static size_t ignore_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
+	return size * nmemb;
+}
+
+static size_t save_json_results(void *json, size_t size, size_t nmemb,
+				void *userp)
+{
+	size_t realsize = size * nmemb;
+	memory_struct *mem = (memory_struct *)userp;
+
+	char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+	assert(ptr); /* out of memory */
+
+	mem->memory = ptr;
+	memcpy(&(mem->memory[mem->size]), json, realsize);
+	mem->size += realsize;
+	mem->memory[mem->size] = 0;
+
+	return realsize;
+}
+
+static void http_cleanup_curl(CURL *curl, struct curl_slist *headers)
+{
+	curl_easy_cleanup(curl);
+	curl_slist_free_all(headers);
+
+	// We are done with libcurl, so clean it up
+	curl_global_cleanup();
+}
+
+static int request_oauth2_bearer_token(sentrypeer_config *config, CURL *curl)
+{
+	CURLcode res;
+	memory_struct chunk;
+
+	chunk.memory =
+		malloc(1); /* Will be grown as needed by the realloc above */
+	assert(chunk.memory);
+	chunk.size = 0; /* no data at this point */
+
+	/* Send all data to this function  */
+	res = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, save_json_results);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		free(chunk.memory);
+		return EXIT_FAILURE;
+	}
+
+	/* We pass our 'chunk' struct to the callback function */
+	res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		free(chunk.memory);
+		return EXIT_FAILURE;
+	}
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Requesting OAuth2 Bearer Token\n");
+	}
+
+	res = curl_easy_setopt(curl, CURLOPT_URL, SENTRYPEER_OAUTH2_TOKEN_URL);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		free(chunk.memory);
+		return EXIT_FAILURE;
+	}
+
+	json_error_t error;
+	json_t *json_client_creds =
+		json_pack(AUTH0_CLIENT_CREDS_JSON_FMT, "client_id",
+			  config->oauth2_client_id, "client_secret",
+			  config->oauth2_client_secret, "audience",
+			  SENTRYPEER_OAUTH2_AUDIENCE, "grant_type",
+			  SENTRYPEER_OAUTH2_GRANT_TYPE, &error);
+	if (!json_client_creds) {
+		fprintf(stderr,
+			"Error creating json client credentials object: %s\n",
+			error.text);
+		free(chunk.memory);
+
+		return EXIT_FAILURE;
+	}
+
+	char *json_string = json_dumps(json_client_creds, JSON_COMPACT);
+	json_decref(json_client_creds);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Client credentials in JSON format: %s\n",
+			json_string);
+	}
+
+	res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		free(json_string);
+		free(chunk.memory);
+		return EXIT_FAILURE;
+	}
+
+	res = curl_easy_perform(curl);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "OAuth2 Token Request POSTing failed: %s\n",
+			curl_easy_strerror(res));
+		free(json_string);
+		free(chunk.memory);
+		return EXIT_FAILURE;
+	}
+
+	json_t *json_obj = json_loadb(chunk.memory, chunk.size, 0, NULL);
+	assert(json_obj);
+
+	json_t *access_token = json_object_get(json_obj, "access_token");
+	assert(access_token);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Got access_token: %s\n",
+			json_string_value(access_token));
+	}
+
+	config->oauth2_access_token =
+		util_duplicate_string(json_string_value(access_token));
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr, "Retrieved access_token from config: %s\n",
+			config->oauth2_access_token);
+	}
+
+	json_decref(json_obj);
+	free(chunk.memory);
+	free(json_string);
+
+	return EXIT_SUCCESS;
+}
+
+static int set_oauth2_bearer_token_header(const sentrypeer_config *config,
+					  CURL *curl,
+					  struct curl_slist *headers)
+{
+	CURLcode res;
+
+	size_t oauth2_bearer_header_len = strlen("Authorization: Bearer ") +
+					  AUTH0_MAX_BEARER_TOKEN_LEN + 1;
+
+	char *oauth2_bearer_header = malloc(oauth2_bearer_header_len);
+
+	if (snprintf(oauth2_bearer_header, oauth2_bearer_header_len,
+		     "Authorization: Bearer %s",
+		     config->oauth2_access_token) < 0) {
+		perror("snprintf() failed.");
+
+		free(oauth2_bearer_header);
+		return EXIT_FAILURE;
+	}
+	assert(oauth2_bearer_header);
+
+	headers = curl_slist_append(
+		headers, util_duplicate_string(oauth2_bearer_header));
+	assert(headers);
+
+	// Set the new HTTP headers
+	res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+
+		free(oauth2_bearer_header);
+		http_cleanup_curl(curl, headers);
+
+		return EXIT_FAILURE;
+	}
+
+	free(oauth2_bearer_header);
+
+	return EXIT_SUCCESS;
+}
+
+static int get_and_set_oauth2_bearer_token(sentrypeer_config *config,
+					   CURL *curl,
+					   struct curl_slist *headers)
+{
+	if (request_oauth2_bearer_token(config, curl) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to get OAuth2 Bearer token.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (set_oauth2_bearer_token_header(config, curl, headers) !=
+	    EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to set OAuth2 Bearer token header.\n");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+}
 
 char *bad_actor_to_json(const sentrypeer_config *config,
 			const bad_actor *bad_actor_to_convert)
@@ -236,7 +443,7 @@ int json_log_bad_actor(const sentrypeer_config *config,
 	return EXIT_SUCCESS;
 }
 
-int json_http_post_bad_actor(const sentrypeer_config *config,
+int json_http_post_bad_actor(sentrypeer_config *config,
 			     const bad_actor *bad_actor_to_log)
 {
 	CURL *curl;
@@ -250,44 +457,18 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 		return EXIT_FAILURE;
 	}
 
+	struct curl_slist *headers = 0;
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+
 	char *json_string =
 		bad_actor_to_json(config,
 				  bad_actor_to_log); // Caller must free
 	if (json_string == NULL) {
 		fprintf(stderr, "Failed to convert bad actor to json.\n");
+
 		free(json_string);
+		http_cleanup_curl(curl, headers);
 
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-
-		return EXIT_FAILURE;
-	}
-
-	res = curl_easy_setopt(curl, CURLOPT_URL, config->webhook_url);
-	if (res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
-			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-		return EXIT_FAILURE;
-	}
-	res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
-	if (res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
-			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-		return EXIT_FAILURE;
-	}
-
-	struct curl_slist *headers = 0;
-	headers = curl_slist_append(headers, "Content-Type: application/json");
-	res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	if (res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
-			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
 		return EXIT_FAILURE;
 	}
 
@@ -295,8 +476,10 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 	if (res != CURLE_OK) {
 		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
 			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
 		return EXIT_FAILURE;
 	}
 
@@ -306,8 +489,10 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 	if (res != CURLE_OK) {
 		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
 			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
 		return EXIT_FAILURE;
 	}
 
@@ -316,27 +501,164 @@ int json_http_post_bad_actor(const sentrypeer_config *config,
 	if (res != CURLE_OK) {
 		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
 			curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
 		return EXIT_FAILURE;
 	}
 
-	// Send the json :-)
+	// We already have an access token, so we set it in our header
+	if (config->oauth2_mode) {
+		if (config->oauth2_access_token != 0) {
+			if (set_oauth2_bearer_token_header(
+				    config, curl, headers) != EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Failed to set OAuth2 Bearer token header.\n");
+
+				free(json_string);
+				http_cleanup_curl(curl, headers);
+
+				return EXIT_FAILURE;
+			}
+		} else {
+			// Set our normal headers
+			res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER,
+					       headers);
+			if (res != CURLE_OK) {
+				fprintf(stderr,
+					"curl_easy_setopt() failed: %s\n",
+					curl_easy_strerror(res));
+
+				free(json_string);
+				http_cleanup_curl(curl, headers);
+
+				return EXIT_FAILURE;
+			}
+		}
+	}
+
+	if (config->oauth2_mode) {
+		// Get once at startup
+		if (config->oauth2_access_token == 0) {
+			if (get_and_set_oauth2_bearer_token(
+				    config, curl, headers) != EXIT_SUCCESS) {
+				fprintf(stderr,
+					"Failed to get and set OAuth2 Bearer token.\n");
+
+				free(json_string);
+				http_cleanup_curl(curl, headers);
+
+				return EXIT_FAILURE;
+			}
+		}
+	}
+
+	// Reset the JSON payload as it might have been changed by get_and_set_oauth2_bearer_token
+	res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_string);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
+		return EXIT_FAILURE;
+	}
+
+	// Reset the URL as it might have been changed by get_and_set_oauth2_bearer_token
+	res = curl_easy_setopt(curl, CURLOPT_URL, config->webhook_url);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
+		return EXIT_FAILURE;
+	}
+
+	// Stop writing to stdout
+	res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, NULL);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
+		return EXIT_FAILURE;
+	}
+
+	res = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, ignore_data);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
+		return EXIT_FAILURE;
+	}
+
 	res = curl_easy_perform(curl);
 	if (res != CURLE_OK) {
-		fprintf(stderr, "WebHook POSTing failed: %s\n",
+		fprintf(stderr, "WebHook POSTing failed: %d, %s\n", res,
 			curl_easy_strerror(res));
+
+		free(json_string);
+		http_cleanup_curl(curl, headers);
+
 		return EXIT_FAILURE;
+	}
+
+	long http_response_code = 0;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
+	if (http_response_code != 200 && http_response_code != 201) {
+		if (config->oauth2_mode) {
+			if (http_response_code == 401) {
+				// The token has probably expired (lasts 86400 seconds - 1 day)
+				// Let's reset it and get a new one
+				if (config->oauth2_access_token != 0) {
+					free(config->oauth2_access_token);
+					config->oauth2_access_token = 0;
+				}
+				if (json_http_post_bad_actor(
+					    config, bad_actor_to_log)) {
+					fprintf(stderr,
+						"Failed to POST bad actor.\n");
+
+					return EXIT_FAILURE;
+				}
+			} else {
+				fprintf(stderr,
+					"WebHook POSTing failed: HTTP response code %ld\n",
+					http_response_code);
+
+				free(json_string);
+				http_cleanup_curl(curl, headers);
+
+				return EXIT_FAILURE;
+			}
+		} else {
+			fprintf(stderr,
+				"WebHook POSTing failed: HTTP response code %ld\n",
+				http_response_code);
+
+			free(json_string);
+			http_cleanup_curl(curl, headers);
+
+			return EXIT_FAILURE;
+		}
 	}
 
 	free(json_string);
+	http_cleanup_curl(curl, headers);
 
-	// Cleanup curl stuff
-	curl_easy_cleanup(curl);
-	curl_slist_free_all(headers);
-
-	// We are done with libcurl, so clean it up
-	curl_global_cleanup();
-
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr,
+			"WebHook POSTing succeeded: HTTP response code %ld\n",
+			http_response_code);
+	}
 	return EXIT_SUCCESS;
 }

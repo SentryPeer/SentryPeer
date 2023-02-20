@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+- OAuth2 support for sending events to the [SentryPeerHQ](https://sentrypeer.com) RESTful API (client_credentials grant type) with
+  a Bearer token in the Authorization header
+
+### Fixes
+- Clean up memory leaks in libcurl code when sending events to a WebHook url
+
 ## [2.0.1] - 2023-02-16
 
 - Re-work dht memory usage

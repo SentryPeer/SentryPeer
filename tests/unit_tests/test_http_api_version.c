@@ -75,8 +75,7 @@ int test_http_api_health_check_version(void)
 
 	/* Some servers do not like requests that are made without a user-agent
      	   field, so we provide one */
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT,
-			 "sentrypeer-agent/1.0");
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "SentryPeer/1.0");
 
 	/* Save version output for troubleshooting in test-suite.log if failures */
 	curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);

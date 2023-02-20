@@ -23,7 +23,7 @@
 
 int peer_to_peer_dht_run(sentrypeer_config *config);
 int peer_to_peer_dht_stop(sentrypeer_config *config);
-int peer_to_peer_dht_save(sentrypeer_config const *config,
+int peer_to_peer_dht_save(sentrypeer_config *config,
 		       bad_actor const *bad_actor_event);
 
 #endif //SENTRYPEER_PEER_TO_PEER_DHT_H

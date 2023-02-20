@@ -52,7 +52,7 @@ resource "aws_security_group" "web_sg" {
 
 output "health_check_url" {
   description = "URL for the health check"
-  value       = "http://${aws_instance.sentypeer_instance.public_ip}:5060/health-check"
+  value       = "http://${aws_instance.sentypeer_instance.public_ip}:8082/health-check"
 }
 
 output "ip_addresses_url" {

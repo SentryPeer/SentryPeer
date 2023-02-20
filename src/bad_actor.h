@@ -50,8 +50,7 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 			 char *collected_method, char *created_by_node_id);
 
 // Log our bad actor to various places
-int bad_actor_log(const sentrypeer_config *config,
-		  const bad_actor *bad_actor_event);
+int bad_actor_log(sentrypeer_config *config, const bad_actor *bad_actor_event);
 
 //  Destructors
 void bad_actor_destroy(bad_actor **self_ptr);

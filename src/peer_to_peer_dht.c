@@ -31,7 +31,7 @@
 
 struct op_context {
 	dht_runner *runner;
-	const sentrypeer_config *config;
+	sentrypeer_config *config;
 };
 typedef struct op_context op_context;
 
@@ -39,7 +39,7 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 			       void *user_data)
 {
 	op_context *ctx = user_data;
-	const sentrypeer_config *config = ctx->config;
+	sentrypeer_config *config = ctx->config;
 	//dht_runner *runner = ctx->runner;
 
 	dht_data_view data = dht_value_get_data(value);
@@ -175,9 +175,7 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "event_uuid from DHT value is: %s\n",
 				event_uuid_str);
-		}
 
-		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr,
 				"Checking we haven't seen this event_uuid before in our db: %s\n",
 				event_uuid_str);
@@ -270,9 +268,6 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Peer to peer DHT mode started.\n");
-	}
-
-	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "DHT InfoHash for key '%s' is: %s\n",
 			DHT_BAD_ACTORS_KEY,
 			dht_infohash_print(config->dht_info_hash));
@@ -311,7 +306,7 @@ int peer_to_peer_dht_run(sentrypeer_config *config)
 	return EXIT_SUCCESS;
 }
 
-int peer_to_peer_dht_save(sentrypeer_config const *config,
+int peer_to_peer_dht_save(sentrypeer_config *config,
 			  bad_actor const *bad_actor_event)
 {
 	if (config->debug_mode || config->verbose_mode) {

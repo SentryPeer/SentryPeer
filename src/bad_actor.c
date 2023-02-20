@@ -85,8 +85,7 @@ bad_actor *bad_actor_new(char *sip_message, char *source_ip,
 	return self;
 }
 
-int bad_actor_log(const sentrypeer_config *config,
-		  const bad_actor *bad_actor_event)
+int bad_actor_log(sentrypeer_config *config, const bad_actor *bad_actor_event)
 {
 	if (config->syslog_mode) {
 		syslog(LOG_NOTICE, "Source IP: %s, Method: %s, Agent: %s\n",
@@ -175,8 +174,7 @@ void bad_actor_destroy(bad_actor **self_ptr)
 		// As per osip_message_to_str();
 		if (self->sip_message != 0) {
 			// cppcheck-suppress unknownMacro
-			osip_free(self->sip_message)
-			self->sip_message = 0;
+			osip_free(self->sip_message) self->sip_message = 0;
 		}
 
 		if (self->seen_last != 0) {

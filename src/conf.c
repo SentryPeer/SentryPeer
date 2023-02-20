@@ -51,6 +51,11 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->syslog_mode = false;
 	self->verbose_mode = false;
 	self->webhook_mode = false;
+	self->oauth2_mode = false;
+
+	self->oauth2_client_id = 0;
+	self->oauth2_client_secret = 0;
+	self->oauth2_access_token = 0;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
@@ -71,6 +76,16 @@ sentrypeer_config *sentrypeer_config_new(void)
 	assert(self->webhook_url);
 	util_copy_string(self->webhook_url, SENTRYPEER_WEBHOOK_URL,
 			 DNS_MAX_LENGTH);
+
+	self->oauth2_client_id = calloc(DNS_MAX_LENGTH + 1, sizeof(char));
+	assert(self->oauth2_client_id);
+	util_copy_string(self->oauth2_client_id, SENTRYPEER_OAUTH2_CLIENT_ID,
+			 DNS_MAX_LENGTH);
+
+	self->oauth2_client_secret = calloc(DNS_MAX_LENGTH + 1, sizeof(char));
+	assert(self->oauth2_client_secret);
+	util_copy_string(self->oauth2_client_secret,
+			 SENTRYPEER_OAUTH2_CLIENT_SECRET, DNS_MAX_LENGTH);
 
 #if HAVE_OPENDHT_C != 0
 	// Generate our InfoHash from our key name
@@ -113,6 +128,21 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 			self->webhook_url = 0;
 		}
 
+		if (self->oauth2_client_id != 0) {
+			free(self->oauth2_client_id);
+			self->oauth2_client_id = 0;
+		}
+
+		if (self->oauth2_client_secret != 0) {
+			free(self->oauth2_client_secret);
+			self->oauth2_client_secret = 0;
+		}
+
+		if (self->oauth2_access_token != 0) {
+			free(self->oauth2_access_token);
+			self->oauth2_access_token = 0;
+		}
+
 		if (self->db_file != 0) {
 			free(self->db_file);
 			self->db_file = 0;
@@ -130,7 +160,7 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 void print_usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
+		"Usage: %s [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-i OAuth_2_Client_ID] [-c OAuth_2_Client_Secret] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]\n",
 		PACKAGE_NAME);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:\n");
@@ -144,6 +174,10 @@ void print_usage(void)
 		"  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env\n");
 	fprintf(stderr,
 		"  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env\n");
+	fprintf(stderr,
+		"  -i,      Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook\n");
+	fprintf(stderr,
+		"  -c,      Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook\n");
 	fprintf(stderr,
 		"  -a,      Enable RESTful API mode or use SENTRYPEER_API env\n");
 	fprintf(stderr,
@@ -179,7 +213,8 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	// Check env vars first
 	process_env_vars(config);
 
-	while ((cli_option = getopt(argc, argv, "hVvf:l:b:w:jpdrRas")) != -1) {
+	while ((cli_option = getopt(argc, argv, "hVvf:l:b:c:i:w:jpdrRas")) !=
+	       -1) {
 		switch (cli_option) {
 		case 'h':
 			print_usage();
@@ -211,6 +246,11 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 		case 'a':
 			config->api_mode = true;
 			break;
+		case 'c':
+			config->oauth2_mode = true;
+			util_copy_string(config->oauth2_client_secret, optarg,
+					 DNS_MAX_LENGTH);
+			break;
 		case 'd':
 			config->debug_mode = true;
 			break;
@@ -219,6 +259,11 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			break;
 		case 'R':
 			config->sip_mode = false;
+			break;
+		case 'i':
+			config->oauth2_mode = true;
+			util_copy_string(config->oauth2_client_id, optarg,
+					 DNS_MAX_LENGTH);
 			break;
 		case 'j':
 			config->json_log_mode = true;
@@ -275,6 +320,18 @@ int process_env_vars(sentrypeer_config *config)
 	}
 	if (getenv("SENTRYPEER_API")) {
 		config->api_mode = true;
+	}
+	if (getenv("SENTRYPEER_OAUTH2_CLIENT_ID")) {
+		util_copy_string(config->oauth2_client_id,
+				 getenv("SENTRYPEER_OAUTH2_CLIENT_ID"),
+				 DNS_MAX_LENGTH);
+		config->oauth2_mode = true;
+	}
+	if (getenv("SENTRYPEER_OAUTH2_CLIENT_SECRET")) {
+		util_copy_string(config->oauth2_client_secret,
+				 getenv("SENTRYPEER_OAUTH2_CLIENT_SECRET"),
+				 DNS_MAX_LENGTH);
+		config->oauth2_mode = true;
 	}
 	if (getenv("SENTRYPEER_WEBHOOK_URL")) {
 		util_copy_string(config->webhook_url,

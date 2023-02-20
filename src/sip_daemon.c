@@ -100,8 +100,7 @@ int sip_daemon_stop(sentrypeer_config const *config)
 	return EXIT_SUCCESS;
 }
 
-int sip_log_event(sentrypeer_config const *config,
-		  const sip_message_event *sip_event)
+int sip_log_event(sentrypeer_config *config, const sip_message_event *sip_event)
 {
 	char collected_method[11] = "passive"; // size is responsive + 1
 	if (config->sip_responsive_mode == true)
@@ -211,7 +210,7 @@ int sip_send_reply(sentrypeer_config const *config,
  * TODO: Implement proper logging? What do we need to log?
  */
 
-int sip_daemon_init(sentrypeer_config const *config)
+int sip_daemon_init(sentrypeer_config *config)
 {
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Configuring local address...\n");

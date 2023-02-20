@@ -67,6 +67,12 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
+	if (config->oauth2_mode &&
+	    (config->debug_mode || config->verbose_mode)) {
+		fprintf(stderr,
+			"OAuth 2 mode enabled. Will request and add Bearer token to WebHook...\n");
+	}
+
 	if (config->webhook_mode &&
 	    (config->debug_mode || config->verbose_mode)) {
 		fprintf(stderr, "WebHook enabled...\n");
