@@ -101,6 +101,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
 - [x] WebHook for POSTing bad actor json to a central location - cli / env flag
+- [x] Integration with [SentryPeerHQ](https://sentrypeer.com) via OAuth2 bearer token
 - [x] Query API for IP addresses of bad actors
 - [ ] Query API for IPSET of bad actors
 - [x] Query API for a particular IP address of a bad actor
@@ -154,6 +155,9 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
     ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
+    ENV SENTRYPEER_OAUTH2_CLIENT_ID=1234567890
+    ENV SENTRYPEER_OAUTH2_CLIENT_SECRET=1234567890
+    ENV SENTRYPEER_WEBHOOK=1
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
@@ -567,8 +571,8 @@ It's okay to raise an issue to ask a question.
 
 Special thanks to:
   - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
-  - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the upcoming SentryPeer HQ web app on their infrastructure
-  - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the SentryPeer HQ web app
+  - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the [SentryPeer HQ web app](https://sentrypeer.com) on their infrastructure
+  - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the [SentryPeer HQ web app](https://sentrypeer.com)
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
   - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
   - [@joejag](https://github.com/joejag) for the [Pull Request](https://github.com/SentryPeer/SentryPeer/pull/19) for the start of [Terraform recipes to launch SentryPeer on different cloud providers #12](https://github.com/SentryPeer/SentryPeer/issues/12)
