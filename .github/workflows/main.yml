@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-11]
+        os: [ubuntu-22.04, macos-12]
         cc: [gcc, clang]
     env:
       CC: ${{ matrix.cc }}
@@ -34,6 +34,7 @@ jobs:
             sudo apt-get update
             sudo apt-get -y upgrade
             sudo apt-get install \
+            pkg-config \
             autoconf-archive \
             libosip2-dev \
             libcmocka-dev \
@@ -50,6 +51,7 @@ jobs:
             set -x
             brew update
             brew upgrade || true
+            brew install pkg-config
             brew install automake
             brew install autoconf-archive
             brew install libosip

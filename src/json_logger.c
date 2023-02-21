@@ -204,7 +204,6 @@ static int set_oauth2_bearer_token_header(const sentrypeer_config *config,
 			curl_easy_strerror(res));
 
 		free(oauth2_bearer_header);
-		http_cleanup_curl(curl, headers);
 
 		return EXIT_FAILURE;
 	}
@@ -538,19 +537,16 @@ int json_http_post_bad_actor(sentrypeer_config *config,
 		}
 	}
 
-	if (config->oauth2_mode) {
-		// Get once at startup
-		if (config->oauth2_access_token == 0) {
-			if (get_and_set_oauth2_bearer_token(
-				    config, curl, headers) != EXIT_SUCCESS) {
-				fprintf(stderr,
-					"Failed to get and set OAuth2 Bearer token.\n");
+	if (config->oauth2_mode && config->oauth2_access_token == 0) {
+		if (get_and_set_oauth2_bearer_token(config, curl, headers) !=
+		    EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Failed to get and set OAuth2 Bearer token.\n");
 
-				free(json_string);
-				http_cleanup_curl(curl, headers);
+			free(json_string);
+			http_cleanup_curl(curl, headers);
 
-				return EXIT_FAILURE;
-			}
+			return EXIT_FAILURE;
 		}
 	}
 
