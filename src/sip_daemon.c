@@ -169,7 +169,7 @@ int sip_send_reply(sentrypeer_config const *config,
 		"Supported: 100rel, timer, replaces, norefersub\n"
 		"Accept-Encoding: text/plain\n"
 		"Accept-Language: en\n"
-		"Server: FPBX-14.0.16.11(14.7.8)\n"
+		"Server: FPBX-16.0.33(18.13.0)\n"
 		"Content-Length:  0";
 
 	long bytes_sent =

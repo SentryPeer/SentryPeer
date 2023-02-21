@@ -332,9 +332,12 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 ### WebHook
 
-There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ) or
+There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeerHQ) or
 your own WebHook endpoint.  The WebHook is **not** enabled by default. You can configure the WebHook URL via `-w` or set 
 the `SENTRYPEER_WEBHOOK_URL` env variable.
+
+If using [SentryPeer SaaS](https://sentrypeer.com) you need to get your client id and client secret from the 
+Dashboard and set the `SENTRYPEER_OAUTH2_CLIENT_ID` and `SENTRYPEER_OAUTH2_CLIENT_SECRET` env variables or use the `-i` and `-c` flags.
 
 ### RESTful API 
 
