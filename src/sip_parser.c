@@ -71,9 +71,21 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 
 	// Phone Number called
 	bad_actor_event->called_number = 0; // Clear the previous called number
-	if (parsed_sip_message->to->url->username != NULL) {
-		bad_actor_event->called_number = util_duplicate_string(
-			parsed_sip_message->to->url->username);
+	if (parsed_sip_message->to != NULL) {
+		if (parsed_sip_message->to->url != NULL) {
+			if (parsed_sip_message->to->url->username != NULL) {
+				bad_actor_event
+					->called_number = util_duplicate_string(
+					parsed_sip_message->to->url->username);
+			} else {
+				bad_actor_event->called_number =
+					util_duplicate_string(
+						BAD_ACTOR_NOT_FOUND);
+			}
+		} else {
+			bad_actor_event->called_number =
+				util_duplicate_string(BAD_ACTOR_NOT_FOUND);
+		}
 	} else {
 		bad_actor_event->called_number =
 			util_duplicate_string(BAD_ACTOR_NOT_FOUND);
