@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
 - Clean up memory leaks in libcurl code when sending events to a WebHook url
 - Fix segfault on parsing part of a 'To' SIP header that could be NULL
+- Fix failing sqlite test on macos 
 
 ## [2.0.1] - 2023-02-16
 
