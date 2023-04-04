@@ -71,8 +71,8 @@ STOPSIGNAL SIGKILL
 USER sentrypeer:sentrypeer
 WORKDIR /opt/sentrypeer/
 #
-# SIP Port 5060, RESTful API and OpenDHT
-EXPOSE 5060/tcp 5060/udp 8082 4222/udp
+# SIP Port 5060
+EXPOSE 5060/udp
  #
  # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
  # ENV SENTRYPEER_API=1
@@ -86,5 +86,5 @@ EXPOSE 5060/tcp 5060/udp 8082 4222/udp
  # ENV SENTRYPEER_VERBOSE=1
  # ENV SENTRYPEER_DEBUG=1
  #
-CMD ["./sentrypeer", "-raps", "-f", "/var/lib/sentrypeer/sentrypeer.db", "-l", "/var/log/sentrypeer/sentrypeer.json"]
+CMD ["./sentrypeer", "-rv", "-f", "/var/lib/sentrypeer/sentrypeer.db"]
 

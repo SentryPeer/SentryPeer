@@ -1,0 +1,20 @@
+# fly.toml file generated for sentrypeer-node on 2023-04-04T19:53:40+01:00
+
+app = "sentrypeer-node"
+kill_signal = "SIGINT"
+kill_timeout = 5
+primary_region = "den"
+processes = []
+
+[env]
+
+[experimental]
+  auto_rollback = true
+
+[[services]]
+  internal_port = 5060
+  processes = ["app"]
+  protocol = "udp"
+
+  [[services.ports]]
+    port = 5060

@@ -1,0 +1,161 @@
+# flyctl launch added from .gitignore
+# https://raw.githubusercontent.com/github/gitignore/master/C.gitignore
+# Prerequisites
+**/*.d
+
+# Object files
+**/*.o
+**/*.ko
+**/*.obj
+**/*.elf
+
+# Linker output
+**/*.ilk
+**/*.map
+**/*.exp
+
+# Precompiled Headers
+**/*.gch
+**/*.pch
+
+# Libraries
+**/*.lib
+**/*.a
+**/*.la
+**/*.lo
+
+# Shared objects (inc. Windows DLLs)
+**/*.dll
+**/*.so
+**/*.so.*
+**/*.dylib
+
+# Executables
+**/*.exe
+**/*.out
+**/*.app
+**/*.i*86
+**/*.x86_64
+**/*.hex
+**/sentrypeer
+
+# Debug files
+**/*.dSYM
+**/*.su
+**/*.idb
+**/*.pdb
+**/vgcore*
+
+# Autoconf and Automake outputs
+**/Makefile
+**/Makefile.in
+**/aclocal.m4
+**/autom4te.cache
+**/compile
+**/config.h
+**/config.h.in
+**/config.h.in~
+**/config.log
+**/config.status
+**/config.guess
+**/config.guess~
+**/config.sub
+**/config.sub~
+**/ltmain.sh
+**/libtool
+**/configure
+**/configure~
+**/depcomp
+**/install-sh
+**/missing
+**/src/.deps
+**/src/.dirstamp
+**/stamp-h1
+**/test-driver
+**/m4
+
+# CMake 
+**/build
+!**/cmake/config.h.in 
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+**/.idea
+
+# sqlite3 db
+**/sentrypeer.db
+
+# dist
+**/sentrypeer-*
+**/*.deb
+
+# Doxygen
+**/docs
+
+# tests
+!**/tests/tools/Makefile
+**/tests/tools/udp_client
+**/tests/tools/tcp_client
+**/tests/tools/pcre2demo
+**/test-suite.log
+**/tests/unit_tests/.deps
+**/tests/unit_tests/.dirstamp
+**/tests/unit_tests/runner
+**/tests/unit_tests/runner.log
+**/tests/unit_tests/runner.trs
+**/test_sentrypeer.db
+**/tests/unit_tests/test_sentrypeer.db-journal
+
+# SentryPeer json log
+**/sentrypeer_json.log
+
+# flyctl launch added from .idea/.gitignore
+# Default ignored files
+.idea/shelf
+.idea/workspace.xml
+# Datasource local storage ignored files
+.idea/dataSources
+.idea/dataSources.local.xml
+# Editor-based HTTP Client requests
+.idea/httpRequests
+
+# flyctl launch added from infrastructure/.gitignore
+# Local .terraform directories
+infrastructure/**/**/.terraform/*
+
+# .tfstate files
+infrastructure/**/*.tfstate
+infrastructure/**/*.tfstate.*
+
+# Crash log files
+infrastructure/**/crash.log
+infrastructure/**/crash.*.log
+
+# Exclude all .tfvars files, which are likely to contain sensitive data, such as
+# password, private keys, and other secrets. These should not be part of version 
+# control as they are data points which are potentially sensitive and subject 
+# to change depending on the environment.
+#
+infrastructure/**/*.tfvars
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+infrastructure/**/override.tf
+infrastructure/**/override.tf.json
+infrastructure/**/*_override.tf
+infrastructure/**/*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+#
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+# example: *tfplan*
+
+# Ignore CLI configuration files
+infrastructure/**/.terraformrc
+infrastructure/**/terraform.rc
+
+# flyctl launch added from web-gui-theme/.gitignore
+web-gui-theme/**/node_modules
+fly.toml
