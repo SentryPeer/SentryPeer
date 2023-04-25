@@ -32,7 +32,7 @@
 #define DNS_MAX_LENGTH 256
 #define SENTRYPEER_BOOTSTRAP_NODE "bootstrap.sentrypeer.org"
 #define SENTRYPEER_WEBHOOK_URL "http://localhost:4000/api/events"
-#define SENTRYPEER_OAUTH2_TOKEN_URL "https://dev-vtqcrudk2kakzqos.uk.auth0.com/oauth/token"
+#define SENTRYPEER_OAUTH2_TOKEN_URL "https://authz.sentrypeer.com/oauth/token"
 #define SENTRYPEER_OAUTH2_GRANT_TYPE "client_credentials"
 #define SENTRYPEER_OAUTH2_AUDIENCE "https://sentrypeer.com/api"
 #define SENTRYPEER_OAUTH2_CLIENT_ID "YOUR_CLIENT_ID"
