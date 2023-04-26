@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	2.0.1
+Version:	3.0.0
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -79,6 +79,12 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Wed Apr 26 2023 Gavin Henry <ghenry@sentrypeer.org> 3.0.0-1
+- OAuth2 support for sending events to the [SentryPeerHQ](https://sentrypeer.com) RESTful API (client_credentials grant type) with
+  a Bearer token in the Authorization header
+- Clean up memory leaks in libcurl code when sending events to a WebHook url
+- Fix segfault on parsing part of a 'To' SIP header that could be NULL
+- Fix failing sqlite test on macos
 * Thu Feb 16 2023 Gavin Henry <ghenry@sentrypeer.org> 2.0.1-1
 - Fix config trying to free an OpenDHT member that isn't present if not built with OpenDHT
 - Re-work dht memory usage

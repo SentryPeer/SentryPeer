@@ -1,3 +1,14 @@
+sentrypeer (3.0.0-1) UNRELEASED; urgency=medium
+
+  * OAuth2 support for sending events to https://sentrypeer.com
+    RESTful API (client_credentials grant type) with a Bearer token
+    in the Authorization header
+  * Clean up memory leaks in libcurl code when sending events to a WebHook url
+  * Fix segfault on parsing part of a 'To' SIP header that could be NULL
+  * Fix failing sqlite test on macos
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 26 Apr 2023 10:00:00 +0000
+
 sentrypeer (2.0.1-1) UNRELEASED; urgency=medium
 
   * Fix config trying to free an OpenDHT member that isn't
