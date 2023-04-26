@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2023-04-26
 - OAuth2 support for sending events to the [SentryPeerHQ](https://sentrypeer.com) RESTful API (client_credentials grant type) with
   a Bearer token in the Authorization header
 
@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix failing sqlite test on macos 
 
 ## [2.0.1] - 2023-02-16
-
 - Re-work dht memory usage
 - cppcheck work in tests
 - Clearly state that Peer to Peer mode is off by default in the docs and that setting an environment variable to 
@@ -24,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix config trying to free an OpenDHT member that isn't present if not built with OpenDHT
 
 ## [2.0.0] - 2022-09-01
-
 - Removed local incomplete web gui. This will be replaced by a new FL/OSS project called [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ)
 - Added optional `-w https://my_sentrypeerhq_onprem_or_cloud_url/events` WebHook cli/env var to set URL for bad actor 
   JSON to be sent to SentryPeerHQ for the dashboard and other services
