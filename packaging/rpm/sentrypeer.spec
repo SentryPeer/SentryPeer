@@ -21,6 +21,7 @@ URL:		https://sentrypeer.org
 Source0:	https://github.com/SentryPeer/SentryPeer/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/%{name}.options
 Source2:	https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/%{name}.service
+Patch0:	    https://raw.githubusercontent.com/SentryPeer/SentryPeer/v%{version}/packaging/rpm/remove-runpatch.patch
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -45,6 +46,7 @@ phone numbers collected via a SIP Honeypot.
 
 %prep
 %autosetup
+%patch0 -p1
 
 %build
 %configure

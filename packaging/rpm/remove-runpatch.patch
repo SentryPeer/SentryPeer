@@ -1,0 +1,23 @@
+From: Sophie Brun <sophie@offensive-security.com>
+Date: Tue, 5 Apr 2022 14:04:22 +0200
+Subject: Remove wrong and useless runpath
+
+---
+ Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3331621..16f93a3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -159,9 +159,6 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
+           -Werror=format-security -Werror=implicit-function-declaration \
+           -Wmisleading-indentation $(LIBASAN_FLAGS)
+ 
+-# Adding this for now:
+-# https://github.com/Homebrew/discussions/discussions/2587
+-AM_LDFLAGS=-Wl,-rpath,/home/linuxbrew/.linuxbrew/lib
+ ACLOCAL_AMFLAGS=-I m4
+ 
+ if HAVE_CMOCKA
+
