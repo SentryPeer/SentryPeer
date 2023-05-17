@@ -11,7 +11,8 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 10 * * *' # Daily at 10:00 UTC
-    
+  workflow_dispatch:
+
 jobs:
   analyze:
     name: Analyze

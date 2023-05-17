@@ -9,6 +9,8 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+  workflow_dispatch:
+
 jobs:
   build_and_test:
     runs-on: ubuntu-22.04

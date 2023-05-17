@@ -10,6 +10,8 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 9 * * *' # Daily at 10:00 UTC
+  workflow_dispatch:
+
 jobs:
   clang-analyzer:
     name: Cppcheck Static Analysis
