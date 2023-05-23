@@ -612,7 +612,8 @@ int json_http_post_bad_actor(sentrypeer_config *config,
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
 	if (http_response_code != 200 && http_response_code != 201) {
 		if (config->oauth2_mode) {
-			if (http_response_code == 401) {
+			if (http_response_code == 401 ||
+			    http_response_code == 403) {
 				// The token has probably expired (lasts 86400 seconds - 1 day)
 				// Let's reset it and get a new one
 				if (config->oauth2_access_token != 0) {
