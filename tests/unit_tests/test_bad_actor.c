@@ -117,6 +117,19 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
+	char test_valid_sip_message_to_parse_blank_user_agent[] =
+		"OPTIONS sip:100@23.148.145.71 SIP/2.0\r\n"
+		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\r\n"
+		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\r\n"
+		"To: \"sipvicious\" <sip:100@1.1.1.1>\r\n"
+		"Call-ID: 711444933874895842969934\r\n"
+		"CSeq: 1 OPTIONS\n"
+		"Contact: <sip:100@23.148.145.71:5084>\r\n"
+		"Accept: application/sdp\r\n"
+		"User-agent: \r\n"
+		"Max-forwards: 70\r\n"
+		"Content-Length: 0\r\n";
+
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
@@ -178,6 +191,17 @@ void test_bad_actor(void **state)
 	assert_string_equal(bad_actor_event4->user_agent, BAD_ACTOR_NOT_FOUND);
 	bad_actor_destroy(&bad_actor_event4);
 	assert_null(bad_actor_event4);
+
+	bad_actor *bad_actor_event4_1 = test_bad_actor_event_new();
+	assert_int_equal(
+		sip_message_parser(
+			test_valid_sip_message_to_parse_blank_user_agent,
+			strlen(test_valid_sip_message_to_parse_blank_user_agent),
+			bad_actor_event4_1, config),
+		EXIT_SUCCESS);
+	assert_string_equal(bad_actor_event4_1->user_agent, BAD_ACTOR_NOT_FOUND);
+	bad_actor_destroy(&bad_actor_event4_1);
+	assert_null(bad_actor_event4_1);
 
 	bad_actor *bad_actor_event5 = test_bad_actor_event_new();
 	char *bad_actor_json = bad_actor_to_json(config, bad_actor_event5);
