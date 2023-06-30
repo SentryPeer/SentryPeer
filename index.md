@@ -11,7 +11,9 @@
 [![Clang Static Analysis](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 
-_Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
+Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us! Very kind!
+
+_Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
 
 ## Table of Contents
 * [Introduction](#introduction)
