@@ -43,6 +43,7 @@ _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_
 * [Trademark](#trademark)
 * [Questions, Bug reports, Feature Requests](#questions-bug-reports-feature-requests)
 * [Special Thanks](#special-thanks)
+* [Sponsorship](#sponsorship)
 
 ### Introduction
 
