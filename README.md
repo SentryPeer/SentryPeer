@@ -576,6 +576,7 @@ It's okay to raise an issue to ask a question.
 ### Special Thanks
 
 Special thanks to:
+  - [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us!
   - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
   - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the [SentryPeer HQ web app](https://sentrypeer.com) on their infrastructure
   - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the [SentryPeer HQ web app](https://sentrypeer.com)
@@ -583,3 +584,6 @@ Special thanks to:
   - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
   - [@joejag](https://github.com/joejag) for the [Pull Request](https://github.com/SentryPeer/SentryPeer/pull/19) for the start of [Terraform recipes to launch SentryPeer on different cloud providers #12](https://github.com/SentryPeer/SentryPeer/issues/12)
 
+### Sponsorship
+
+Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us! Very kind!
