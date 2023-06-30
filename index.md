@@ -43,6 +43,7 @@ _Give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_
 * [Trademark](#trademark)
 * [Questions, Bug reports, Feature Requests](#questions-bug-reports-feature-requests)
 * [Special Thanks](#special-thanks)
+* [Sponsorship](#sponsorship)
 
 ### Introduction
 
@@ -101,6 +102,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] **Local** data copy for **fast access** - cli / env db location flag
 - [x] **Local** API for **fast access** - cli / env flag
 - [x] WebHook for POSTing bad actor json to a central location - cli / env flag
+- [x] Integration with [SentryPeerHQ](https://sentrypeer.com) via OAuth2 bearer token
 - [x] Query API for IP addresses of bad actors
 - [ ] Query API for IPSET of bad actors
 - [x] Query API for a particular IP address of a bad actor
@@ -119,11 +121,12 @@ Traditionally this data is shipped to a central place, so you don't own the data
 
 ### Talks
 
-- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/
-- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
-- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
+- ClueCon Weekly 2023 - https://www.youtube.com/watch?v=iuN_MtVfT6g
 - UKNOF49 2022 ([presentation slides](https://indico.uknof.org.uk/event/59/contributions/801/attachments/1033/1520/UKNOF-49-2022-SentryPeer.pdf)) - https://indico.uknof.org.uk/event/59/contributions/801/
-
+- ClueCon Weekly 2022 - https://youtu.be/DFxGHJI_0Wg
+- CommCon 2021 - https://2021.commcon.xyz/talks/sentrypeer-a-distributed-peer-to-peer-list-of-bad-ip-addresses-and-phone-numbers-collected-via-a-sip-honeypot
+- TADSummit 2021 - https://blog.tadsummit.com/2021/11/17/sentrypeer/
+-  
 ### Adoption
 
 * [Kali Linux](https://pkg.kali.org/pkg/sentrypeer)
@@ -154,6 +157,9 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
     ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
+    ENV SENTRYPEER_OAUTH2_CLIENT_ID=1234567890
+    ENV SENTRYPEER_OAUTH2_CLIENT_SECRET=1234567890
+    ENV SENTRYPEER_WEBHOOK=1
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
@@ -328,9 +334,12 @@ Here's a screenshot of the database opened using [sqlitebrowser](https://sqliteb
 
 ### WebHook
 
-There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeer_HQ) or
+There is a WebHook to POST a [JSON Log Format](#json-log-format) payload to [SentryPeerHQ](https://github.com/SentryPeer/SentryPeerHQ) or
 your own WebHook endpoint.  The WebHook is **not** enabled by default. You can configure the WebHook URL via `-w` or set 
 the `SENTRYPEER_WEBHOOK_URL` env variable.
+
+If using [SentryPeer SaaS](https://sentrypeer.com) you need to get your client id and client secret from the 
+Dashboard and set the `SENTRYPEER_OAUTH2_CLIENT_ID` and `SENTRYPEER_OAUTH2_CLIENT_SECRET` env variables or use the `-i` and `-c` flags.
 
 ### RESTful API 
 
@@ -499,7 +508,7 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-w] [-j] [-p] [-b bootstrap.example.com] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+Usage: sentrypeer [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-i OAuth_2_Client_ID] [-c OAuth_2_Client_Secret] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
 
 Options:
   -h,      Print this help
@@ -508,6 +517,8 @@ Options:
   -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
   -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
   -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
+  -i,      Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
+  -c,      Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
   -a,      Enable RESTful API mode or use SENTRYPEER_API env
   -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
   -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
@@ -566,10 +577,14 @@ It's okay to raise an issue to ask a question.
 ### Special Thanks
 
 Special thanks to:
+  - [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us!
   - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
-  - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the upcoming SentryPeer HQ web app on their infrastructure
-  - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the SentryPeer HQ web app
+  - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the [SentryPeer HQ web app](https://sentrypeer.com) on their infrastructure
+  - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the [SentryPeer HQ web app](https://sentrypeer.com)
   - [David Miller](http://davidmiller.io/) for the design of the SentryPeer [Web GUI theme](./web-gui-theme) and [logo](./web-gui-theme/src/assets/logo.svg). Very kind of you!
   - [@garymiller](https://github.com/garyemiller) for the feature request of syslog and Fail2ban as per [ Fail2ban Integration via syslog #6](https://github.com/SentryPeer/SentryPeer/issues/6) 
   - [@joejag](https://github.com/joejag) for the [Pull Request](https://github.com/SentryPeer/SentryPeer/pull/19) for the start of [Terraform recipes to launch SentryPeer on different cloud providers #12](https://github.com/SentryPeer/SentryPeer/issues/12)
 
+### Sponsorship
+
+Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us! Very kind!
