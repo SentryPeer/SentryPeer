@@ -458,7 +458,7 @@ int sip_daemon_init(sentrypeer_config *config)
 							tcp_client_ip_address_buffer);
 					}
 
-					struct sockaddr destination_address;
+					struct sockaddr_in destination_address;
 					socklen_t destination_address_len =
 						sizeof(destination_address);
 					memset(&destination_address, 0,
@@ -466,7 +466,9 @@ int sip_daemon_init(sentrypeer_config *config)
 					destination_address.sin_family =
 						AF_INET;
 					if (getsockname(
-						    i, &destination_address,
+						    i,
+						    (struct sockaddr
+							     *)&destination_address,
 						    &destination_address_len) ==
 					    EXIT_SUCCESS) {
 						dest_ip_address_buffer =

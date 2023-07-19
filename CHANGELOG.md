@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Add a check for a response code of 403 to trigger a new access token request for WebHooks in addition to a 401
 
+### Changes
+- `-pedantic-errors` is now enabled by default in `Makefile.am`
+
 ### Fixes
 - Switch to `getsockname()` to correctly get destination IP address for SIP TCP mode
 - Check for a blank `User-agent` SIP header and add a test case. Only a missing one was catered for before. 

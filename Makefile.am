@@ -154,7 +154,7 @@ bootstrap:
 # and some from https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 #
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic \
+AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors \
           -Wformat=2 -Wno-unused-parameter -Wshadow \
           -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \
           -Wnested-externs -Wmissing-include-dirs -Wredundant-decls \
