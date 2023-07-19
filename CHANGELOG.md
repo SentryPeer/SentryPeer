@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Add a test and fix for a blank `User-agent` SIP header. Only a missing one was catered for before
 - Add a check for a response code of 403 to trigger a new access token request for WebHooks in addition to a 401
+
+### Fixes
+- Switch to `getsockname()` to correctly get destination IP address for SIP TCP mode
+- Check for a blank `User-agent` SIP header and add a test case. Only a missing one was catered for before. 
 
 ## [3.0.0] - 2023-04-26
 - OAuth2 support for sending events to the [SentryPeerHQ](https://sentrypeer.com) RESTful API (client_credentials grant type) with

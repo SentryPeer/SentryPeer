@@ -458,17 +458,6 @@ int sip_daemon_init(sentrypeer_config *config)
 							tcp_client_ip_address_buffer);
 					}
 
-#ifndef SO_ORIGINAL_DST
-#define SO_ORIGINAL_DST 80
-#endif
-
-// Only on Linux - https://man7.org/linux/man-pages/man7/ip.7.html
-// Using the SOL_IP socket options level isn't portable; BSD-based
-// stacks use the IPPROTO_IP level.
-#ifndef SOL_IP
-#define SOL_IP IPPROTO_IP
-#endif
-
 					struct sockaddr_in destination_address;
 					socklen_t destination_address_len =
 						sizeof(destination_address);
@@ -476,9 +465,8 @@ int sip_daemon_init(sentrypeer_config *config)
 					       destination_address_len);
 					destination_address.sin_family =
 						AF_INET;
-					if (getsockopt(
-						    i, SOL_IP, SO_ORIGINAL_DST,
-						    &destination_address,
+					if (getsockname(
+						    i, &destination_address,
 						    &destination_address_len) ==
 					    EXIT_SUCCESS) {
 						dest_ip_address_buffer =
@@ -495,7 +483,7 @@ int sip_daemon_init(sentrypeer_config *config)
 										.sin_addr));
 						}
 					}
-
+					assert(dest_ip_address_buffer);
 					socklen_t tcp_client_len = sizeof(i);
 
 					char transport_type[] = "TCP";
