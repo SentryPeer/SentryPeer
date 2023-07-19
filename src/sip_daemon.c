@@ -458,7 +458,7 @@ int sip_daemon_init(sentrypeer_config *config)
 							tcp_client_ip_address_buffer);
 					}
 
-					struct sockaddr_in destination_address;
+					struct sockaddr destination_address;
 					socklen_t destination_address_len =
 						sizeof(destination_address);
 					memset(&destination_address, 0,
