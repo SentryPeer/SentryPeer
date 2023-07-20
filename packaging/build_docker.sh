@@ -16,5 +16,5 @@
 
 sudo docker build --no-cache -t sentrypeer/sentrypeer:latest .
 sudo docker push sentrypeer/sentrypeer:latest
-sudo docker build --no-cache -t sentrypeer/sentrypeer:$1 .
-sudo docker push sentrypeer/sentrypeer:$1
+sudo docker build --no-cache -t sentrypeer/sentrypeer:"$1" .
+sudo docker push sentrypeer/sentrypeer:"$1"
