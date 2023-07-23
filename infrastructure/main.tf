@@ -36,6 +36,13 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    from_port   = 5060
+    to_port     = 5060
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -53,6 +60,11 @@ resource "aws_security_group" "web_sg" {
 output "health_check_url" {
   description = "URL for the health check"
   value       = "http://${aws_instance.sentypeer_instance.public_ip}:8082/health-check"
+}
+
+output "phone_numbers_url" {
+  description = "URL for the phone numbers"
+  value       = "http://${aws_instance.sentypeer_instance.public_ip}:8082/phone-numbers"
 }
 
 output "ip_addresses_url" {

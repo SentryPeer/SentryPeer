@@ -17,6 +17,7 @@ Once you are finished you can destroy everything with `terraform destroy`
 Outputs:
 
 health_check_url = "http://44.202.90.183:8082/health-check"
+phone_numbers_url = "http://44.202.90.183:8082/phone-numbers"
 ip_addresses_url = "http://44.202.90.183:8082/ip-addresses"
 ssh_command = "ssh ubuntu@44.202.90.183"
 ```
