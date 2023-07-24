@@ -42,12 +42,14 @@ LABEL maintainer="Gavin Henry, ghenry@sentrypeer.org"
 #
 COPY --from=builder /SentryPeer/sentrypeer /opt/sentrypeer/
 #
-# Install packages
+# Install packages (for some reason I'm still looking into, we now need alpine-sdk or 
+# a lot of bins, not just sentrypeer, segfault. ldd looks good though 
 RUN apk -U add --no-cache \
     libcurl \
     jansson \
     libmicrohttpd \
     libuuid \
+    alpine-sdk \
     pcre2 \
     sqlite-libs && \
     apk -U add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
