@@ -73,6 +73,8 @@ WORKDIR /opt/sentrypeer/
 #
 # SIP Port 5060
 EXPOSE 5060/udp
+EXPOSE 5060/tcp
+EXPOSE 8082/tcp
  #
  # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
  # ENV SENTRYPEER_API=1
