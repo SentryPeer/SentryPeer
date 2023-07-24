@@ -3,16 +3,21 @@ provider "aws" {
 }
 
 variable "github_user" {
-  type = string
+  type        = string
   description = "Use this users public keys for ssh"
 }
 
+variable "management_ip" {
+  type       = string
+  description = "The IP address to allow SSH from"
+}
+
 resource "aws_instance" "sentypeer_instance" {
-  ami           = "ami-04169656fea786776"
+  ami           = "ami-0af9d24bd5539d7af" # Canonical, Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-07-19
   instance_type = "t2.nano"
-  user_data     = templatefile("install.sh", { github_user = var.github_user})
-  tags = {
-    Name  = "SentryPeer"
+  user_data     = templatefile("install.sh", { github_user = var.github_user })
+  tags          = {
+    Name   = "SentryPeer"
     Origin = "Terraform"
   }
 
@@ -22,6 +27,7 @@ resource "aws_instance" "sentypeer_instance" {
 resource "aws_security_group" "web_sg" {
   name = "sentrypeer-sg"
   ingress {
+    description = "Allow HTTP for API"
     from_port   = 8082
     to_port     = 8082
     protocol    = "tcp"
@@ -29,6 +35,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    description = "Allow SIP UDP"
     from_port   = 5060
     to_port     = 5060
     protocol    = "udp"
@@ -36,6 +43,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    description = "Allow SIP TCP"
     from_port   = 5060
     to_port     = 5060
     protocol    = "tcp"
@@ -43,10 +51,11 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
+    description = "Allow SSH from our management IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${{ secrets.MGMT_IP }}"]
+    cidr_blocks = ["${var.management_ip}/32"]
   }
 
   egress {
@@ -64,7 +73,7 @@ output "health_check_url" {
 
 output "phone_numbers_url" {
   description = "URL for the phone numbers"
-  value       = "http://${aws_instance.sentypeer_instance.public_ip}:8082/phone-numbers"
+  value       = "http://${aws_instance.sentypeer_instance.public_ip}:8082/numbers"
 }
 
 output "ip_addresses_url" {

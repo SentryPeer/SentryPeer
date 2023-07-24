@@ -34,7 +34,7 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
 * [RESTful API](#restful-api)
   * [Endpoint /health-check](#endpoint-health-check)
   * [Endpoint /ip-addresses](#endpoint-ip-addresses)
-  * [Endpoint /ip-address/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /ip-addressss/{ip-address}](#endpoint-ip-addressip-address)
   * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
 * [Syslog and Fail2ban](#syslog-and-fail2ban)
 * [JSON Log Format](#json-log-format) 
@@ -419,12 +419,12 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 }
 ```
 
-#### Endpoint /ip-address/{ip-address}
+#### Endpoint /ip-addresses/{ip-address}
 
 Query a single IP address:
 
 ```bash
-curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses/8.8.8.8
 
 * Connected to localhost (127.0.0.1) port 8082 (#0)
 > GET /ip-addresses/8.8.8.8 HTTP/1.1

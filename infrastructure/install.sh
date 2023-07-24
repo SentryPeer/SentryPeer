@@ -4,6 +4,7 @@ export PATH=/usr/local/bin:$PATH;
 curl https://github.com/${github_user}.keys >> /home/ubuntu/.ssh/authorized_keys
 
 apt-get update
+apt-get upgrade -y
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository \
