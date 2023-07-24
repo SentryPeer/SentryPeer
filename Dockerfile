@@ -80,15 +80,19 @@ EXPOSE 8082/tcp
  #
  # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
  # ENV SENTRYPEER_API=1
- # ENV SENTRYPEER_WEBHOOK_URL=http://localhost:8082/events
+ # ENV SENTRYPEER_WEBHOOK=1
+ # ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
+ # ENV SENTRYPEER_OAUTH2_CLIENT_ID=1234567890
+ # ENV SENTRYPEER_OAUTH2_CLIENT_SECRET=1234567890
  # ENV SENTRYPEER_SIP_RESPONSIVE=1
  # ENV SENTRYPEER_SIP_DISABLE=1
  # ENV SENTRYPEER_SYSLOG=1
  # ENV SENTRYPEER_PEER_TO_PEER=1
+ # ENV SENTRYPEER_BOOTSTRAP_NODE=mybootstrapnode.com
  # ENV SENTRYPEER_JSON_LOG=1
  # ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
  # ENV SENTRYPEER_VERBOSE=1
  # ENV SENTRYPEER_DEBUG=1
  #
-CMD ["./sentrypeer", "-rv", "-f", "/var/lib/sentrypeer/sentrypeer.db"]
+CMD ["./sentrypeer", "-rav", "-f", "/var/lib/sentrypeer/sentrypeer.db"]
 
