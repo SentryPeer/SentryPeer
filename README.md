@@ -18,6 +18,7 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
 
 ## Table of Contents
 * [Introduction](#introduction)
+* [Overview](#overview)
 * [Features](#features)
 * [Talks](#talks)
 * [Adoption](#adoption)
@@ -35,6 +36,7 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
   * [Endpoint /health-check](#endpoint-health-check)
   * [Endpoint /ip-addresses](#endpoint-ip-addresses)
   * [Endpoint /ip-addressss/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /numbers](#endpoint-numbers)
   * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
 * [Syslog and Fail2ban](#syslog-and-fail2ban)
 * [JSON Log Format](#json-log-format) 
@@ -81,7 +83,73 @@ What would lead to this scenario?
 3. An innocent user is calling a phishing number or known expensive
    number etc. that SentryPeer has seen before.
 
-Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
+Traditionally, this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
+
+### Overview
+
+#### SentryPeer Node
+
+```mermaid
+sequenceDiagram
+    actor A as Attacker
+    participant S as SentryPeer Node
+    participant DS as Data Store
+    participant W as Webook Node
+    Note over DS: sqlite/json log/syslog <br/>(if enabled)
+    Note over W: if enabled
+    A->>S: SIP probe OPTIONS/REGISTER/etc
+    S->>DS: Save event
+    S->>W: Send event
+    S->>A: 200 OK
+    A->>S: INVITE sip:00046500729221@
+```
+
+#### SentryPeer Node to SentryPeerHQ
+
+```mermaid
+sequenceDiagram
+    actor A as Attacker
+    participant S as SentryPeer Node
+    participant DS as Data Store
+    participant HQ as SentryPeerHQ
+    Note over DS: sqlite/json log/syslog (if enabled)
+    Note over HQ: OAuth2 creds required.<br/> if using https://sentrypeer.com
+    A->>S: SIP probe OPTIONS/REGISTER/etc
+    S->>DS: Save event
+    S->>HQ: Send event
+    S->>A: 200 OK
+    A->>S: INVITE sip:00046500729221@
+```
+
+#### Using the SentryPeer Node and SentryPeerHQ API
+
+```mermaid
+sequenceDiagram
+    Actor U as User
+    participant S as SentryPeer Node API
+    Note over S: if enabled
+    U->>S: GET /numbers
+    S->>U: 200 OK Return all Phone numbers seen in database
+```
+
+#### Integrating with your own systems
+
+```mermaid
+sequenceDiagram
+    participant D as Device
+    participant P as PBX/ITSP/Carrier
+    participant HQ as SentryPeerHQ or Node API
+    participant N as NOC
+    Note over P: Integration with <br/>SentryPeer needed
+    Note over N: Consumes alerts
+    Note over HQ: OAuth2 creds required<br/> if using SentryPeerHQ
+    D->>P: SIP INVITE
+    P->>HQ: Is the number we've seen attackers call in your database?
+    HQ->>P: Yes, this has been seen on SentryPeer Nodes
+    HQ->>N: WebHook/Email/Slack
+    Note over HQ,N: Only if using SentryPeerHQ
+    P->>D: I'm blocking this call. Sorry
+```
 
 ### Features
 
@@ -448,6 +516,48 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses/8
 }
 ```
 
+#### Endpoint /numbers 
+
+List all the called numbers that have been seen by SentryPeer:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/numbers
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /numbers HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/8.0.1
+> Accept: */*
+> Content-Type: application/json
+< Date: Thu, 27 Jul 2023 11:10:35 GMT
+< Content-Type: application/json
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 4.0.0
+< Content-Length: 31746258
+
+
+ {
+  "called_numbers_total": 244850,
+  "called_numbers": [
+    {
+      "called_number": "981046500729221",
+      "seen_last": "2023-07-27 12:06:59.388055505",
+      "seen_count": "451"
+    },
+    {
+      "called_number": "81046500729221",
+      "seen_last": "2023-07-27 12:05:19.206442003",
+      "seen_count": "453"
+    },
+    {
+      "called_number": "100",
+      "seen_last": "2023-07-27 11:59:57.679798597",
+      "seen_count": "17335"
+    },
+    ....
+```
+
 #### Endpoint /numbers/{phone-number}
 
 Query a phone number a bad actor tried to call with optional `+` prefix:
@@ -462,7 +572,6 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/878494
 > Accept: */*
 > Content-Type: application/json
 > 
-* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
 < Date: Mon, 24 Jan 2022 11:19:53 GMT
 < Content-Type: application/json
