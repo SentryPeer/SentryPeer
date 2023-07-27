@@ -89,17 +89,20 @@ Traditionally, this data is shipped to a central place, so you don't own the dat
 
 #### SentryPeer Node
 
+Here we are using [Mermaid Sequence diagrams](https://mermaid.js.org/syntax/sequenceDiagram.html) to show the flow of data from a SentryPeer node to SentryPeerHQ.
+
 ```mermaid
 sequenceDiagram
     actor A as Attacker
     participant S as SentryPeer Node
     participant DS as Data Store
-    participant W as Webook Node
+    participant W as WebHook <br/>Endpoint
     Note over DS: sqlite/json log/syslog <br/>(if enabled)
     Note over W: if enabled
     A->>S: SIP probe OPTIONS/REGISTER/etc
     S->>DS: Save event
     S->>W: Send event
+    W->>S: 200 OK
     S->>A: 200 OK
     A->>S: INVITE sip:00046500729221@
 ```
@@ -117,6 +120,7 @@ sequenceDiagram
     A->>S: SIP probe OPTIONS/REGISTER/etc
     S->>DS: Save event
     S->>HQ: Send event
+    HQ->>S: 201 Created
     S->>A: 200 OK
     A->>S: INVITE sip:00046500729221@
 ```
@@ -126,7 +130,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Actor U as User
-    participant S as SentryPeer Node API
+    participant S as SentryPeer Node/HQ API
     Note over S: if enabled
     U->>S: GET /numbers
     S->>U: 200 OK Return all Phone numbers seen in database
@@ -138,7 +142,7 @@ sequenceDiagram
 sequenceDiagram
     participant D as Device
     participant P as PBX/ITSP/Carrier
-    participant HQ as SentryPeerHQ or Node API
+    participant HQ as SentryPeer Node/HQ API
     participant N as NOC
     Note over P: Integration with <br/>SentryPeer needed
     Note over N: Consumes alerts
