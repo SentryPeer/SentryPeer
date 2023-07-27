@@ -147,8 +147,9 @@ sequenceDiagram
     Note over P: Integration with <br/>SentryPeer needed
     Note over N: Consumes alerts
     Note over HQ: OAuth2 creds required<br/> if using SentryPeerHQ
+    Note over P,HQ: API rate limiting if using SentryPeerHQ
     D->>P: SIP INVITE
-    P->>HQ: Is the number we've seen attackers call in your database?
+    P->>HQ: Have you seen attackers call this number?
     HQ->>P: Yes, this has been seen on SentryPeer Nodes
     HQ->>N: WebHook/Email/Slack
     Note over HQ,N: Only if using SentryPeerHQ
