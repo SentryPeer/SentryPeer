@@ -95,7 +95,7 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 	bad_actor_event->user_agent = 0; // Clear the previous SIP user agent
 	osip_header_t *user_agent_header = 0;
 	osip_message_get_user_agent(parsed_sip_message, 0, &user_agent_header);
-	if (user_agent_header != NULL &&
+	if (user_agent_header != NULL && user_agent_header->hvalue != NULL &&
 	    strcmp(user_agent_header->hvalue, "") == 0) {
 		bad_actor_event->user_agent =
 			util_duplicate_string(BAD_ACTOR_NOT_FOUND);
