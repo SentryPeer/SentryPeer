@@ -36,7 +36,7 @@
         "url": "https://github.com/StartBootstrap/startbootstrap-bare.git"
     },
     "dependencies": {
-        "bootstrap": "5.3.1"
+        "bootstrap": "5.3.2"
     },
     "devDependencies": {
         "autoprefixer": "10.3.7",
