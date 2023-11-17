@@ -12,7 +12,7 @@
 #
 
 Name:		sentrypeer
-Version:	3.0.0
+Version:	3.0.2
 Release:	1%{?dist}
 Summary:	SIP peer to peer honeypot for VoIP
 
@@ -81,6 +81,9 @@ systemctl enable %{name}.service
 %{_unitdir}/%{name}.service
 
 %changelog
+* Fri Nov 17 2023 Gavin Henry <ghenry@sentrypeer.org> 3.0.2-1
+- Check `user_agent_header->hvalue` is not NULL as you can
+  get a blank user-agent value in malformed SIP packets
 * Wed Apr 26 2023 Gavin Henry <ghenry@sentrypeer.org> 3.0.0-1
 - OAuth2 support for sending events to the [SentryPeerHQ](https://sentrypeer.com) RESTful API (client_credentials grant type) with
   a Bearer token in the Authorization header

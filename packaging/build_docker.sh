@@ -12,7 +12,7 @@
 #                             |___/
 #
 # cd ~/src/sentrypeer
-# ./packaging/build_docker.sh v3.0.1
+# ./packaging/build_docker.sh v3.0.2
 
 sudo docker build --no-cache -t sentrypeer/sentrypeer:latest .
 sudo docker push sentrypeer/sentrypeer:latest
