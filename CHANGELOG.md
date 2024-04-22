@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changes
+- We now look for `cargo` and `rustc`, as we are porting parts of SentryPeer to Rust. New features will
+  be written in Rust. 
+- `make check` now runs Rust tests
+- `--enable-debug` argument added to `./configure` to enable debug mode for Rust code. Default is `--release`
+- ` --enable-silent-rules` and `make V=1` honoured in Rust code build
+
 ## [3.0.2] - 2023-11-17
 ### Fixes
 - Check `user_agent_header->hvalue` is not NULL as you can get a blank user-agent value in malformed SIP packets

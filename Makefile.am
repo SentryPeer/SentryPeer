@@ -11,6 +11,26 @@
 #                             |___/
 #
 
+RUST_SENTRYPEER_DIR = sentrypeer_rust
+
+# https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
+if DEBUG_RELEASE
+    CARGO_RELEASE_ARGS=
+    CARGO_TARGET=debug
+else
+    CARGO_RELEASE_ARGS=--release
+    CARGO_TARGET=release
+endif
+
+RUST_SENTRYPEER_TARGET = $(RUST_SENTRYPEER_DIR)/target/$(CARGO_TARGET)
+
+# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+# https://www.gnu.org/software/automake/manual/html_node/Automake-Silent-Rules.html#index-AM_005fDEFAULT_005fVERBOSITY
+CARGO_VERBOSE = $(cargo_verbose_@AM_V@)
+cargo_verbose_ = $(cargo_verbose_@AM_DEFAULT_V@)
+cargo_verbose_0 =
+cargo_verbose_1 = --verbose
+
 bin_PROGRAMS=sentrypeer
 sentrypeer_SOURCES= \
     src/sentrypeer.c \
@@ -105,7 +125,9 @@ unit_test_sources = \
     tests/unit_tests/test_sip_message_event.c \
     tests/unit_tests/test_sip_message_event.h \
     tests/unit_tests/test_sip_daemon.c \
-    tests/unit_tests/test_sip_daemon.h
+    tests/unit_tests/test_sip_daemon.h \
+    tests/unit_tests/test_sentrypeer_rust.c \
+    tests/unit_tests/test_sentrypeer_rust.h
 
 if !DISABLE_OPENDHT
 unit_test_sources += \
@@ -124,6 +146,11 @@ EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
 
 #########
 # Clean
+
+# https://ljones.dev/blog/gsoc-2/
+# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+clean-local:
+	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); $(CARGO) clean
 
 MAINTAINERCLEANFILES=configure aclocal.m4 compile \
                      install-sh missing Makefile.in depcomp \
@@ -173,8 +200,18 @@ TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
-tests_unit_tests_runner_LDADD = -lcmocka
+tests_unit_tests_runner_LDADD = -lcmocka $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
 endif
+
+# https://ljones.dev/blog/gsoc-2/ (don't forget tabs!!!)
+$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
+	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
+	$(CARGO) build $(CARGO_VERBOSE) $(CARGO_RELEASE_ARGS)
+
+# Rust tests
+check-local: $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
+	$(CARGO) test
 
 if HAVE_DOXYGEN
 # Doxygen

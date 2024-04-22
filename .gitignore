@@ -107,3 +107,6 @@ tests/unit_tests/test_sentrypeer.db-journal
 
 # SentryPeer json log
 sentrypeer_json.log
+
+# Rust
+sentrypeer_rust/target/

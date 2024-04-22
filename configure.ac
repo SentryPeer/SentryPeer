@@ -121,6 +121,20 @@ AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
 
+# For our Rust code
+# https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
+# https://ljones.dev/blog/gsoc-2/
+# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+AC_PATH_PROG([CARGO], [cargo], [notfound])
+AS_IF(test "$CARGO" = "notfound",
+    AC_MSG_ERROR([cargo is required.  Please install the Rust toolchain from https://www.rust-lang.org/])
+)
+
+AC_PATH_PROG([RUSTC], [rustc], [notfound])
+AS_IF(test "$RUSTC" = "notfound",
+    AC_MSG_ERROR([rustc is required.  Please install the Rust toolchain from https://www.rust-lang.org/])
+)
+
 AC_MSG_CHECKING(for IP_PKTINFO)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
   int opt = IP_PKTINFO;
@@ -163,6 +177,25 @@ fi
 
 AC_DEFINE_UNQUOTED(REVISION, "$REVISION", [Git revision])
 AC_SUBST(REVISION)
+
+# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+AC_MSG_CHECKING(whether to build Rust code with debugging information)
+AC_ARG_ENABLE([debug],
+    AS_HELP_STRING([--enable-debug],
+    [Build Rust code with debugging information [default=no]]),
+    [debug_release=$enableval],
+    [debug_release=no])
+
+if test "x$debug_release" = "xyes" ; then
+    AC_MSG_RESULT(yes)
+    RUST_TARGET_SUBDIR=debug
+else
+    AC_MSG_RESULT(no)
+    RUST_TARGET_SUBDIR=release
+fi
+AM_CONDITIONAL([DEBUG_RELEASE], [test "x$debug_release" = "xyes"])
+
+AC_SUBST([RUST_TARGET_SUBDIR])
 
 # Ideas taken from https://github.com/staskobzar/libamip/blob/master/configure.ac
 #
