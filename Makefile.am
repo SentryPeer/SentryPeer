@@ -14,7 +14,7 @@
 RUST_SENTRYPEER_DIR = sentrypeer_rust
 
 # https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
-if DEBUG_RELEASE
+if RUST_DEBUG_RELEASE
     CARGO_RELEASE_ARGS=
     CARGO_TARGET=debug
 else
@@ -125,9 +125,15 @@ unit_test_sources = \
     tests/unit_tests/test_sip_message_event.c \
     tests/unit_tests/test_sip_message_event.h \
     tests/unit_tests/test_sip_daemon.c \
-    tests/unit_tests/test_sip_daemon.h \
+    tests/unit_tests/test_sip_daemon.h
+
+if !DISABLE_RUST
+if HAVE_RUST
+ unit_test_sources += \
     tests/unit_tests/test_sentrypeer_rust.c \
     tests/unit_tests/test_sentrypeer_rust.h
+endif
+endif
 
 if !DISABLE_OPENDHT
 unit_test_sources += \
@@ -144,13 +150,25 @@ EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            LICENSE.GPL-3.0-only CMakeLists.txt \
            cmake/git_revision.cmake cmake/config.h.in
 
+if !DISABLE_RUST
+if HAVE_RUST
+EXTRA_DIST+= sentrypeer_rust/Cargo.toml \
+            sentrypeer_rust/Cargo.lock \
+            sentrypeer_rust/src/lib.rs
+endif
+endif
+
 #########
 # Clean
 
 # https://ljones.dev/blog/gsoc-2/
 # https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+if !DISABLE_RUST
+if HAVE_RUST
 clean-local:
 	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); $(CARGO) clean
+endif
+endif
 
 MAINTAINERCLEANFILES=configure aclocal.m4 compile \
                      install-sh missing Makefile.in depcomp \
@@ -200,9 +218,18 @@ TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
 tests_unit_tests_runner_SOURCES = $(unit_test_sources)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
-tests_unit_tests_runner_LDADD = -lcmocka $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+tests_unit_tests_runner_LDADD = -lcmocka
+
+if !DISABLE_RUST
+if HAVE_RUST
+tests_unit_tests_runner_LDADD += $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+endif
 endif
 
+endif
+
+if !DISABLE_RUST
+if HAVE_RUST
 # https://ljones.dev/blog/gsoc-2/ (don't forget tabs!!!)
 $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
 	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
@@ -212,6 +239,8 @@ $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
 check-local: $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
 	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
 	$(CARGO) test
+endif
+endif
 
 if HAVE_DOXYGEN
 # Doxygen

@@ -31,7 +31,10 @@
 #include "test_ip_address_regex.h"
 #include "test_sip_message_event.h"
 #include "test_sip_daemon.h"
+
+#if HAVE_RUST != 0
 #include "test_sentrypeer_rust.h"
+#endif
 
 #if HAVE_OPENDHT_C != 0
 #include "test_peer_to_peer_dht.h"
@@ -50,7 +53,6 @@ int main(void)
 	cmocka_set_message_output(CM_OUTPUT_XML);
 
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(test_sentrypeer_rust),
 		cmocka_unit_test(null_test_success),
 		cmocka_unit_test(test_conf),
 		cmocka_unit_test(test_utils),
@@ -79,6 +81,9 @@ int main(void)
 		cmocka_unit_test_setup_teardown(test_json_logger,
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),
+#if HAVE_RUST != 0
+		cmocka_unit_test(test_sentrypeer_rust),
+#endif
 
 #if HAVE_OPENDHT_C != 0
 		cmocka_unit_test(test_peer_to_peer_dht),

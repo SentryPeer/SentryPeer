@@ -121,20 +121,6 @@ AC_CHECK_PROG(GIT, git, 1.7.0, [
  AC_MSG_ERROR([unable to find the git program. git installed?])
 ])
 
-# For our Rust code
-# https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
-# https://ljones.dev/blog/gsoc-2/
-# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
-AC_PATH_PROG([CARGO], [cargo], [notfound])
-AS_IF(test "$CARGO" = "notfound",
-    AC_MSG_ERROR([cargo is required.  Please install the Rust toolchain from https://www.rust-lang.org/])
-)
-
-AC_PATH_PROG([RUSTC], [rustc], [notfound])
-AS_IF(test "$RUSTC" = "notfound",
-    AC_MSG_ERROR([rustc is required.  Please install the Rust toolchain from https://www.rust-lang.org/])
-)
-
 AC_MSG_CHECKING(for IP_PKTINFO)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
   int opt = IP_PKTINFO;
@@ -178,24 +164,56 @@ fi
 AC_DEFINE_UNQUOTED(REVISION, "$REVISION", [Git revision])
 AC_SUBST(REVISION)
 
+### For our Rust parts
+# https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
+# https://ljones.dev/blog/gsoc-2/
 # https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
-AC_MSG_CHECKING(whether to build Rust code with debugging information)
-AC_ARG_ENABLE([debug],
-    AS_HELP_STRING([--enable-debug],
-    [Build Rust code with debugging information [default=no]]),
-    [debug_release=$enableval],
-    [debug_release=no])
+AC_PATH_PROG([CARGO], [cargo], [notfound])
+AS_IF(test "$CARGO" = "notfound",
+    AC_DEFINE([HAVE_RUST], [0], [Rust not found])
+    AC_MSG_WARN([cargo is required for Rust parts. Please install the Rust toolchain from https://www.rust-lang.org/])
+)
+AM_CONDITIONAL([HAVE_RUST], [test x$CARGO != xnotfound])
 
-if test "x$debug_release" = "xyes" ; then
+AC_PATH_PROG([RUSTC], [rustc], [notfound])
+AS_IF(test "$RUSTC" = "notfound",
+    AC_DEFINE([HAVE_RUST], [0], [Rust not found])
+    AC_MSG_WARN([rustc is required for Rust parts. Please install the Rust toolchain from https://www.rust-lang.org/])
+)
+AM_CONDITIONAL([HAVE_RUST], [test x$CARGO != xnotfound])
+
+# Allow a user to disable Rust parts
+AC_MSG_CHECKING(if you'd like to disable Rust parts)
+AC_ARG_ENABLE([rust],
+    AS_HELP_STRING([--disable-rust], [Do not build Rust parts]),
+    [disable_rust="yes"],
+    [disable_rust="no"])
+AC_MSG_RESULT($disable_rust)
+if test "$disable_rust" = "yes"; then
+  AC_DEFINE([HAVE_RUST], [0], [Disable Rust parts])
+  AC_MSG_WARN([Rust parts are disabled. Certain features will not be available])
+fi
+AM_CONDITIONAL([DISABLE_RUST], [test x$disable_rust = xyes])
+
+# https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
+AC_MSG_CHECKING(whether to build Rust parts with debugging information)
+AC_ARG_ENABLE([rust_debug],
+    AS_HELP_STRING([--enable-rust-debug],
+    [Build Rust code with debugging information [default=no]]),
+    [rust_debug_release=$enableval],
+    [rust_debug_release=no])
+
+if test "x$rust_debug_release" = "xyes" ; then
     AC_MSG_RESULT(yes)
     RUST_TARGET_SUBDIR=debug
 else
     AC_MSG_RESULT(no)
     RUST_TARGET_SUBDIR=release
 fi
-AM_CONDITIONAL([DEBUG_RELEASE], [test "x$debug_release" = "xyes"])
+AM_CONDITIONAL([RUST_DEBUG_RELEASE], [test "x$rust_debug_release" = "xyes"])
 
 AC_SUBST([RUST_TARGET_SUBDIR])
+### End Rust parts
 
 # Ideas taken from https://github.com/staskobzar/libamip/blob/master/configure.ac
 #

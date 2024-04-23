@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `make check` now runs Rust tests
 - `--enable-debug` argument added to `./configure` to enable debug mode for Rust code. Default is `--release`
 - ` --enable-silent-rules` and `make V=1` honoured in Rust code build
+- `--disable-rust` argument added to `./configure` so you can disable Rust code build
 
 ## [3.0.2] - 2023-11-17
 ### Fixes
