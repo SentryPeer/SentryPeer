@@ -16,13 +16,11 @@ RUST_SENTRYPEER_DIR = sentrypeer_rust
 # https://www.figuiere.net/hub/blog/?2016/10/07/862-rust-and-automake
 if RUST_DEBUG_RELEASE
     CARGO_RELEASE_ARGS=
-    CARGO_TARGET=debug
 else
     CARGO_RELEASE_ARGS=--release
-    CARGO_TARGET=release
 endif
 
-RUST_SENTRYPEER_TARGET = $(RUST_SENTRYPEER_DIR)/target/$(CARGO_TARGET)
+RUST_SENTRYPEER_TARGET = $(RUST_SENTRYPEER_DIR)/target/@RUST_TARGET_SUBDIR@
 
 # https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html
 # https://www.gnu.org/software/automake/manual/html_node/Automake-Silent-Rules.html#index-AM_005fDEFAULT_005fVERBOSITY
@@ -222,7 +220,7 @@ tests_unit_tests_runner_LDADD = -lcmocka
 
 if !DISABLE_RUST
 if HAVE_RUST
-tests_unit_tests_runner_LDADD += $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+tests_unit_tests_runner_LDADD += @abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
 endif
 endif
 
@@ -231,14 +229,14 @@ endif
 if !DISABLE_RUST
 if HAVE_RUST
 # https://ljones.dev/blog/gsoc-2/ (don't forget tabs!!!)
-$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
-	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
-	$(CARGO) build $(CARGO_VERBOSE) $(CARGO_RELEASE_ARGS)
+@abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
+	cd $(top_srcdir)/$(RUST_SENTRYPEER_DIR); \
+	CARGO_TARGET_DIR=@abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target $(CARGO) build $(CARGO_VERBOSE) $(CARGO_RELEASE_ARGS)
 
 # Rust tests
-check-local: $(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
-	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); \
-	$(CARGO) test
+check-local: @abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+	cd $(top_srcdir)/$(RUST_SENTRYPEER_DIR); \
+	CARGO_TARGET_DIR=@abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target $(CARGO) test
 endif
 endif
 
