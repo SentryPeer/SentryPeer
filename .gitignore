@@ -72,6 +72,7 @@ src/.dirstamp
 stamp-h1
 test-driver
 m4
+install-sh~
 
 # CMake 
 build

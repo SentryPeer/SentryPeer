@@ -165,6 +165,10 @@ if !DISABLE_RUST
 if HAVE_RUST
 clean-local:
 	cd $(srcdir)/$(RUST_SENTRYPEER_DIR); $(CARGO) clean
+
+
+distclean-local:
+	-rm -rf @abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target
 endif
 endif
 
@@ -228,7 +232,13 @@ endif
 
 if !DISABLE_RUST
 if HAVE_RUST
-# https://ljones.dev/blog/gsoc-2/ (don't forget tabs!!!)
+
+#  https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html shows us CARGO_TARGET_DIR 
+# which is needed for make distcheck etc. - https://doc.rust-lang.org/cargo/commands/cargo-build.html
+#
+# also:
+#
+#  https://ljones.dev/blog/gsoc-2/ (don't forget tabs!!!)
 @abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a:
 	cd $(top_srcdir)/$(RUST_SENTRYPEER_DIR); \
 	CARGO_TARGET_DIR=@abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target $(CARGO) build $(CARGO_VERBOSE) $(CARGO_RELEASE_ARGS)
