@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_test:
+  test-autotools:
     name: Autotools build on ${{matrix.os}} using ${{matrix.cc}} ${{matrix.posix}}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -76,16 +76,62 @@ jobs:
           make distcheck
           make clean
 
-# TODO: cmake
-# https://github.com/maxmind/libmaxminddb/blob/main/.github/workflows/test.yml
-#  cmake_build_and_test:
-#    strategy:
-#      matrix:
-#        os: [ubuntu-latest, macos-latest]
-#    name: CMake build on ${{matrix.os}}
-#    runs-on: ${{ matrix.os }}
-#    steps:
-#      - uses: actions/checkout@v2
-#      - run: cmake -DBUILD_TESTING=ON .
-#      - run: cmake --build .
-#      - run: ctest -V .
+  test-cmake:
+    name: CMake build on ${{matrix.os}} using ${{matrix.cc}} ${{matrix.posix}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, macos-12 ]
+        cc: [ gcc, clang ]
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - name: Add Homebrew to $PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+
+      - name: Test brew call
+        run: brew search hello
+      - uses: actions/checkout@v2
+      - name: Fetch Dependencies
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            set -x
+            sudo apt-get update
+            sudo echo RESET grub-efi/install_devices | sudo debconf-communicate grub-pc
+            sudo apt-get -y upgrade
+            sudo apt-get install \
+            pkg-config \
+            autoconf-archive \
+            libosip2-dev \
+            libcmocka-dev \
+            uuid-dev \
+            libmicrohttpd-dev \
+            libjansson-dev \
+            libcurl4-openssl-dev \
+            libpcre2-dev -y
+            brew update
+            brew upgrade
+            brew install cmocka libosip opendht
+          fi
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            set -x
+            brew update
+            brew upgrade || true
+            brew install pkg-config
+            brew install automake
+            brew install autoconf-archive
+            brew install libosip
+            brew install jansson
+            brew install libmicrohttpd
+            brew install curl
+            brew install cmocka
+            brew install pcre2
+            brew install opendht
+          fi
+      - name: Build and Clean
+        run: |
+          set -x
+          cmake -S . -B build -DUNIT_TESTING=ON
+          cmake --build build
+          ctest --test-dir build
