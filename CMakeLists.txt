@@ -16,7 +16,31 @@ project(sentrypeer
         HOMEPAGE_URL https://github.com/SentryPeer/SentryPeer
         LANGUAGES C)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 23)
+
+include(CMakePackageConfigHelpers)
+include(CMakeDependentOption)
+include(FindPkgConfig)
+
+option (UNIT_TESTING "Enable unit testing" OFF)
+option (DISABLE_OPENDHT "Disable OpenDHT support" OFF)
+option (DISABLE_RUST "Disable Rust parts" OFF)
+option (RUST_DEBUG_RELEASE "Rust debug or release" OFF)
+
+if (DISABLE_OPENDHT)
+        add_definitions(-DHAVE_OPENDHT=0)
+        message(STATUS "OpenDHT support disabled")
+endif()
+
+if (DISABLE_RUST)
+        add_definitions(-DHAVE_RUST=0)
+        message(STATUS "Rust support disabled")
+endif()
+
+if (RUST_DEBUG_RELEASE)
+        add_definitions(-DRUST_DEBUG_RELEASE=1)
+        message(STATUS "Rust debug release enabled")
+endif()
 
 add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
@@ -45,9 +69,51 @@ add_executable(${CMAKE_PROJECT_NAME}
 # get git hash
 include(${CMAKE_SOURCE_DIR}/cmake/git_revision.cmake)
 
+pkg_search_module(OSIP2 REQUIRED libosip2)
+pkg_search_module(SQLITE3 REQUIRED sqlite3)
+pkg_search_module(UUID REQUIRED uuid)
+pkg_search_module(MICROHTTPD REQUIRED libmicrohttpd)
+pkg_search_module(JANSSON REQUIRED jansson)
+pkg_search_module(CURL REQUIRED libcurl)
+pkg_search_module(PCRE2 REQUIRED libpcre2-8)
+
+if (NOT DISABLE_OPENDHT)
+        pkg_search_module(OPENDHT REQUIRED opendht-c)
+        message(STATUS "OpenDHT support not disabled")
+endif()
+
+if (OPENDHT_FOUND)
+        add_definitions(-DHAVE_OPENDHT_C=1)
+endif()
+
+include_directories(${OSIP2_INCLUDE_DIRS})
+include_directories(${SQLITE3_INCLUDE_DIRS})
+include_directories(${UUID_INCLUDE_DIRS})
+include_directories(${MICROHTTPD_INCLUDE_DIRS})
+include_directories(${JANSSON_INCLUDE_DIRS})
+include_directories(${CURL_INCLUDE_DIRS})
+include_directories(${PCRE2_INCLUDE_DIRS})
+include_directories(${OPENDHT_INCLUDE_DIRS})
+
 # project version
 set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
+
+# For our Rust code
+# See https://github.com/corrosion-rs/corrosion
+if (NOT DISABLE_RUST)
+include(FetchContent)
+
+FetchContent_Declare(
+        Corrosion
+        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+)
+FetchContent_MakeAvailable(Corrosion)
+
+# Import targets defined in a package or workspace manifest `Cargo.toml` file
+corrosion_import_crate(MANIFEST_PATH sentrypeer_rust/Cargo.toml)
+message(STATUS "Rust support enabled")
+endif ()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} -losipparser2)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lsqlite3)
@@ -56,10 +122,26 @@ target_link_libraries(${CMAKE_PROJECT_NAME} -lmicrohttpd)
 target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
-target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
+
+if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
+        target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
+        message(STATUS "Linking with OpenDHT")
+endif()
+
+if (NOT DISABLE_RUST)
+target_link_libraries(${CMAKE_PROJECT_NAME} sentrypeer_rust)
+message(STATUS "Linking with Rust parts")
+endif()
 
 # configure header file
 configure_file(
         ${CMAKE_SOURCE_DIR}/cmake/config.h.in
         ${CMAKE_SOURCE_DIR}/src/config.h
 )
+
+if (UNIT_TESTING)
+        include(CTest)
+        find_package(cmocka 1.1.5 REQUIRED)
+        add_subdirectory(tests/unit_tests)
+        message(STATUS "Unit testing enabled")
+endif()

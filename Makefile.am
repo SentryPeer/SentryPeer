@@ -71,7 +71,7 @@ if !DISABLE_OPENDHT
     src/peer_to_peer_dht.h
 endif
 
-unit_test_sources = \
+unit_test_SOURCES = \
     src/sip_message_event.c \
     src/sip_message_event.h \
     src/sip_daemon.c \
@@ -127,21 +127,21 @@ unit_test_sources = \
 
 if !DISABLE_RUST
 if HAVE_RUST
- unit_test_sources += \
+ unit_test_SOURCES += \
     tests/unit_tests/test_sentrypeer_rust.c \
     tests/unit_tests/test_sentrypeer_rust.h
 endif
 endif
 
 if !DISABLE_OPENDHT
-unit_test_sources += \
+unit_test_SOURCES += \
     src/peer_to_peer_dht.c \
     src/peer_to_peer_dht.h \
     tests/unit_tests/test_peer_to_peer_dht.c \
     tests/unit_tests/test_peer_to_peer_dht.h
 endif
 
-unit_test_sources += tests/unit_tests/runner.c
+unit_test_SOURCES += tests/unit_tests/runner.c
 
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
@@ -218,7 +218,7 @@ ACLOCAL_AMFLAGS=-I m4
 if HAVE_CMOCKA
 TESTS=tests/unit_tests/runner
 check_PROGRAMS = tests/unit_tests/runner
-tests_unit_tests_runner_SOURCES = $(unit_test_sources)
+tests_unit_tests_runner_SOURCES = $(unit_test_SOURCES)
 tests_unit_tests_runner_CFLAGS = $(AM_CFLAGS)
 tests_unit_tests_runner_LDADD = -lcmocka
 

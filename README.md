@@ -330,6 +330,13 @@ then (make check is highly recommended):
     make check
     make install
 
+CMake:
+
+    cmake -S . -B build -DUNIT_TESTING=ON
+    cmake --build build
+    ctest --test-dir build
+    cmake --install build
+
 ### Running SentryPeer
 
 Once built, you can run like so to start in **debug mode**, **respond** to SIP probes, enable the **RESTful API**, 
