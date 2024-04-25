@@ -78,7 +78,7 @@ pkg_search_module(CURL REQUIRED libcurl)
 pkg_search_module(PCRE2 REQUIRED libpcre2-8)
 
 if (NOT DISABLE_OPENDHT)
-        pkg_search_module(OPENDHT REQUIRED opendht-c)
+        pkg_search_module(OPENDHT REQUIRED opendht)
         message(STATUS "OpenDHT support not disabled")
 endif()
 
