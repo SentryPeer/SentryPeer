@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
 # Copyright (c) 2021 - 2024 Gavin Henry <ghenry@sentrypeer.org>
 
-name: Build and Test
+name: CMake Build and Test
 on:
   push:
     branches:
@@ -12,13 +12,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-autotools:
-    name: Autotools build on ${{matrix.os}} using ${{matrix.cc}} ${{matrix.posix}}
+  test-cmake:
+    name: CMake build on ${{matrix.os}} using ${{matrix.cc}} ${{matrix.posix}}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-12 ]
+        os: [ ubuntu-22.04, macos-14]
         cc: [ gcc, clang ]
     env:
       CC: ${{ matrix.cc }}
@@ -68,11 +68,6 @@ jobs:
       - name: Build and Clean
         run: |
           set -x
-          ./bootstrap.sh
-          ./configure
-          make
-          make check || (cat ./test-suite.log; false)
-          ./sentrypeer -V
-          make distcheck
-          make clean
-          make distclean
+          cmake -S . -B build -DUNIT_TESTING=ON
+          cmake --build build
+          ctest --test-dir build
