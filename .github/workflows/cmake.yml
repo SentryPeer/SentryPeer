@@ -49,6 +49,8 @@ jobs:
             brew update
             brew upgrade
             brew install cmocka libosip opendht
+            brew uninstall guile
+            brew uninstall pkg-config
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             set -x
@@ -71,3 +73,4 @@ jobs:
           cmake -S . -B build -DUNIT_TESTING=ON
           cmake --build build
           ctest --test-dir build
+

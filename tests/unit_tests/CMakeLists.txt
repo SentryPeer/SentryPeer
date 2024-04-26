@@ -1,8 +1,10 @@
 if (UNIT_TESTING)
     set(TEST_RUNNER_NAME runner)
 
-    # Find opendht_c
-    find_library(OPENDHT_C opendht-c)
+    if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
+    	# Find opendht_c
+    	find_library(OPENDHT_C opendht-c)
+    endif()		
 
     # configure header file
     configure_file(
@@ -55,7 +57,12 @@ if (UNIT_TESTING)
     target_link_libraries(${TEST_RUNNER_NAME} -ljansson)
     target_link_libraries(${TEST_RUNNER_NAME} -lcurl)
     target_link_libraries(${TEST_RUNNER_NAME} -lpcre2-8)
-    target_link_libraries(${TEST_RUNNER_NAME} -lopendht-c)
+
+
+    if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
+    	target_link_libraries(${TEST_RUNNER_NAME} -lopendht-c)
+    endif()	
+
     target_link_libraries(${TEST_RUNNER_NAME} sentrypeer_rust)
     target_link_libraries(${TEST_RUNNER_NAME} -lcmocka)
 
@@ -67,3 +74,4 @@ if (UNIT_TESTING)
     )
 
 endif()
+

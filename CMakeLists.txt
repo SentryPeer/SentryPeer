@@ -78,7 +78,7 @@ pkg_search_module(CURL REQUIRED libcurl)
 pkg_search_module(PCRE2 REQUIRED libpcre2-8)
 
 if (NOT DISABLE_OPENDHT)
-        pkg_search_module(OPENDHT REQUIRED opendht)
+        pkg_search_module(OPENDHT opendht)
         message(STATUS "OpenDHT support not disabled")
 endif()
 
@@ -145,3 +145,4 @@ if (UNIT_TESTING)
         add_subdirectory(tests/unit_tests)
         message(STATUS "Unit testing enabled")
 endif()
+
