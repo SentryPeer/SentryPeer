@@ -49,7 +49,6 @@ jobs:
             brew update
             brew upgrade
             brew install cmocka libosip opendht
-            brew uninstall pkg-config
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
             set -x
