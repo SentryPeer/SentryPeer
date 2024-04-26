@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   be written in Rust. 
 - `make check` now runs Rust tests
 - `--enable-debug` argument added to `./configure` to enable debug mode for Rust code. Default is `--release`
-- ` --enable-silent-rules` and `make V=1` honoured in Rust code build
+- `--enable-silent-rules` and `make V=1` honoured in Rust code build
 - `--disable-rust` argument added to `./configure` so you can disable Rust code build
 - CMakeLists.txt updated to build Rust code and run all tests.
   We're using https://github.com/corrosion-rs/corrosion for this
