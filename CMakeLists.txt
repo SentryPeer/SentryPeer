@@ -69,6 +69,8 @@ add_executable(${CMAKE_PROJECT_NAME}
 # get git hash
 include(${CMAKE_SOURCE_DIR}/cmake/git_revision.cmake)
 
+find_package(PkgConfig REQUIRED)
+
 pkg_search_module(OSIP2 REQUIRED libosip2)
 pkg_search_module(SQLITE3 REQUIRED sqlite3)
 pkg_search_module(UUID REQUIRED uuid)
@@ -84,6 +86,8 @@ endif()
 
 if (OPENDHT_FOUND)
         add_definitions(-DHAVE_OPENDHT_C=1)
+	message(STATUS "OPENDHT_C_VERSION: ${OPENDHT_VERSION}")
+	add_definitions(-DOPENDHT_C_VERSION="${OPENDHT_VERISON}")
 endif()
 
 include_directories(${OSIP2_INCLUDE_DIRS})
@@ -134,6 +138,11 @@ message(STATUS "Linking with Rust parts")
 endif()
 
 # configure header file
+configure_file(
+        ${CMAKE_SOURCE_DIR}/cmake/config.h.in
+        ${CMAKE_SOURCE_DIR}/config.h
+)
+
 configure_file(
         ${CMAKE_SOURCE_DIR}/cmake/config.h.in
         ${CMAKE_SOURCE_DIR}/src/config.h
