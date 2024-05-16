@@ -13,8 +13,9 @@
 # https://github.com/mozilla/cbindgen/blob/master/docs.md#cbindgentoml
 # https://github.com/rustls/rustls-ffi/blob/main/cbindgen.toml
 #
-# Manually:
-# cbindgen -c cbindgen.toml -o sentrypeer_rust.h
+# Manually (but put in build.rs soon) run this to generate the header file:
+# cd sentrypeer_rust
+# cbindgen -c cbindgen.toml -o ../src/sentrypeer_rust.h
 
 header = '''
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */

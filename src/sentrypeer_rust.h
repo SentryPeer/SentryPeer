@@ -26,6 +26,11 @@
 #include <stdlib.h>
 
 /**
+ * Return libc::EXIT_SUCCESS or libc::EXIT_FAILURE depending on the function argument
+ */
+int32_t return_exit_status(bool success);
+
+/**
  * The simplest function used to confirm that calling our Rust library from C is working
  */
 void display_rust(void);
