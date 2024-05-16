@@ -50,6 +50,16 @@ pub fn listen_tls() -> Result<(), Box<dyn StdError>> {
     Ok(())
 }
 
+/// Return libc::EXIT_SUCCESS or libc::EXIT_FAILURE depending on the function argument
+#[no_mangle]
+pub extern "C" fn return_exit_status(success: bool) -> i32 {
+    if success {
+        libc::EXIT_SUCCESS
+    } else {
+        libc::EXIT_FAILURE
+    }
+}
+
 /// The simplest function used to confirm that calling our Rust library from C is working
 #[no_mangle]
 pub extern "C" fn display_rust() {
@@ -63,6 +73,12 @@ mod tests {
     #[test]
     fn it_works() {
         display_rust();
+    }
+    
+    #[test]
+    fn test_return_exit_status() {
+        assert_eq!(return_exit_status(true), libc::EXIT_SUCCESS);
+        assert_eq!(return_exit_status(false), libc::EXIT_FAILURE);
     }
     
     // #[test]

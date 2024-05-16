@@ -173,6 +173,13 @@ AS_IF(test "$CARGO" = "notfound",
     AC_DEFINE([HAVE_RUST], [0], [Rust not found])
     AC_MSG_WARN([cargo is required for Rust parts. Please install the Rust toolchain from https://www.rust-lang.org/])
 )
+AS_IF(test "$CARGO" != "notfound",
+    AC_MSG_CHECKING([for Cargo version])
+    CARGO_VERSION=`$CARGO --version | awk '{print $2}'`
+    AC_MSG_RESULT($CARGO_VERSION)
+    AC_DEFINE_UNQUOTED([CARGO_VERSION], ["$CARGO_VERSION"], [Define the Cargo version])
+    AC_DEFINE([HAVE_RUST], [1], [Cargo found])
+)
 AM_CONDITIONAL([HAVE_RUST], [test x$CARGO != xnotfound])
 
 AC_PATH_PROG([RUSTC], [rustc], [notfound])
@@ -180,7 +187,14 @@ AS_IF(test "$RUSTC" = "notfound",
     AC_DEFINE([HAVE_RUST], [0], [Rust not found])
     AC_MSG_WARN([rustc is required for Rust parts. Please install the Rust toolchain from https://www.rust-lang.org/])
 )
-AM_CONDITIONAL([HAVE_RUST], [test x$CARGO != xnotfound])
+AS_IF(test "$RUSTC" != "notfound",
+    AC_MSG_CHECKING([for Rust compiler version])
+    RUSTC_VERSION=`$RUSTC --version | awk '{print $2}'`
+    AC_MSG_RESULT($RUSTC_VERSION)
+    AC_DEFINE_UNQUOTED([RUSTC_VERSION], ["$RUSTC_VERSION"], [Define the Rust compiler version])
+    AC_DEFINE([HAVE_RUST], [1], [Rust found])
+)
+AM_CONDITIONAL([HAVE_RUST], [test x$RUSTC != xnotfound])
 
 # Allow a user to disable Rust parts
 AC_MSG_CHECKING(if you'd like to disable Rust parts)
@@ -189,10 +203,10 @@ AC_ARG_ENABLE([rust],
     [disable_rust="yes"],
     [disable_rust="no"])
 AC_MSG_RESULT($disable_rust)
-if test "$disable_rust" = "yes"; then
+AS_IF(test "$disable_rust" = "yes",
   AC_DEFINE([HAVE_RUST], [0], [Disable Rust parts])
   AC_MSG_WARN([Rust parts are disabled. Certain features will not be available])
-fi
+)
 AM_CONDITIONAL([DISABLE_RUST], [test x$disable_rust = xyes])
 
 # https://viruta.org/librsvgs-build-infrastructure-autotools-and-rust.html

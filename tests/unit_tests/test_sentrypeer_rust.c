@@ -29,4 +29,7 @@ void test_sentrypeer_rust(void **state)
 	fprintf(stderr, "Greetings from Rust at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 	display_rust();
+
+	assert_int_equal(return_exit_status(true), EXIT_SUCCESS);
+	assert_int_equal(return_exit_status(false), EXIT_FAILURE);
 }
