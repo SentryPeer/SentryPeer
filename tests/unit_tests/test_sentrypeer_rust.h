@@ -18,6 +18,6 @@
 
 void test_sentrypeer_rust(void **state);
 void display_rust(void);
-int return_exit_status(bool success);
+int32_t return_exit_status(bool success);
 
 #endif //SENTRYPEER_TEST_SENTRYPEER_RUST_H

@@ -97,14 +97,19 @@ docs
 tests/tools/udp_client
 tests/tools/tcp_client
 tests/tools/pcre2demo
-test-suite.log
+tests/tools/hey
+tests/tools/sip_message.txt
+tests/tools/sipexer
+
 tests/unit_tests/.deps/
 tests/unit_tests/.dirstamp
 tests/unit_tests/runner
 tests/unit_tests/runner.log
 tests/unit_tests/runner.trs
-test_sentrypeer.db
 tests/unit_tests/test_sentrypeer.db-journal
+
+test-suite.log
+test_sentrypeer.db
 Testing/
 
 # SentryPeer json log
