@@ -19,5 +19,7 @@
 void test_sentrypeer_rust(void **state);
 void display_rust(void);
 int32_t return_exit_status(bool success);
+const char *return_string(void);
+void free_string(char *s);
 
 #endif //SENTRYPEER_TEST_SENTRYPEER_RUST_H

@@ -21,7 +21,6 @@ use std::sync::Arc;
 // #[no_mangle]
 // pub extern "C" fn listen_tls() -> Result<(), Box<dyn StdError>> {
 pub fn listen() -> Result<(), Box<dyn StdError>> {
-
     let cert_file = "../tests/tools/127.0.0.1.pem";
     let private_key_file = "../tests/tools/127.0.0.1-key.pem";
 
@@ -40,8 +39,7 @@ pub fn listen() -> Result<(), Box<dyn StdError>> {
     let mut conn = rustls::ServerConnection::new(Arc::new(config))?;
     conn.complete_io(&mut stream)?;
 
-    conn.writer()
-        .write_all(b"Hello from the server")?;
+    conn.writer().write_all(b"Hello from the server")?;
     conn.complete_io(&mut stream)?;
     let mut buf = [0; 64];
     let len = conn.reader().read(&mut buf)?;

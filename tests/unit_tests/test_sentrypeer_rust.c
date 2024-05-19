@@ -32,4 +32,7 @@ void test_sentrypeer_rust(void **state)
 
 	assert_int_equal(return_exit_status(true), EXIT_SUCCESS);
 	assert_int_equal(return_exit_status(false), EXIT_FAILURE);
+
+	const char *s = return_string();
+	assert_string_equal(s, "Greetings from Rust");
 }
