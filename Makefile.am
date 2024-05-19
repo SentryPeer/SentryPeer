@@ -152,7 +152,8 @@ if !DISABLE_RUST
 if HAVE_RUST
 EXTRA_DIST+= sentrypeer_rust/Cargo.toml \
             sentrypeer_rust/Cargo.lock \
-            sentrypeer_rust/src/lib.rs
+            sentrypeer_rust/src/lib.rs \
+            sentrypeer_rust/src/tls.rs
 endif
 endif
 
