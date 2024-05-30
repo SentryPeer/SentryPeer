@@ -45,7 +45,7 @@
         "concurrently": "6.3.0",
         "postcss": "8.4.31",
         "prettier": "2.4.1",
-        "pug": "3.0.2",
+        "pug": "3.0.3",
         "sass": "1.43.2",
         "shelljs": "0.8.5",
         "upath": "2.0.1"
