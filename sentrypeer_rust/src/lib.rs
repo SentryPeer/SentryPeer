@@ -14,7 +14,7 @@
 use libc::c_char;
 use std::ffi::CString;
 
-pub mod tls;
+//pub mod tls;
 
 /// The simplest function used to confirm that calling our Rust library from C is working
 #[no_mangle]
@@ -33,9 +33,9 @@ pub extern "C" fn return_exit_status(success: bool) -> i32 {
 }
 
 /// # Safety
-/// 
+///
 /// Return a string
-/// 
+///
 /// The caller is responsible for freeing the string. Generally, the caller
 /// from the C FFI side.
 #[no_mangle]
@@ -45,7 +45,7 @@ pub extern "C" fn return_string() -> *mut c_char {
 }
 
 /// # Safety
-/// 
+///
 /// Free the string allocated by into_raw from return_string
 #[no_mangle]
 pub unsafe extern "C" fn free_string(ptr_s: *mut c_char) {
