@@ -15,11 +15,17 @@
 #define SENTRYPEER_TEST_SENTRYPEER_RUST_H 1
 
 #include <stdbool.h>
+#include "test_bad_actor.h"
 
 void test_sentrypeer_rust(void **state);
 void display_rust(void);
 int32_t return_exit_status(bool success);
 char *return_string(void);
 void free_string(char *s);
+bad_actor *return_bad_actor_new(const char *sip_message, const char *source_ip,
+				const char *destination_ip, const char *called_number,
+				const char *method, const char *transport_type,
+				const char *user_agent, const char *collected_method,
+				const char *created_by_node_id);
 
 #endif //SENTRYPEER_TEST_SENTRYPEER_RUST_H

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "test_sentrypeer_rust.h"
+#include "test_bad_actor.h"
 
 void test_sentrypeer_rust(void **state)
 {
@@ -37,4 +38,25 @@ void test_sentrypeer_rust(void **state)
 	assert_string_equal(s, "Greetings from Rust");
 	free_string(s);
 	assert_non_null(s);
+
+	bad_actor *ba = return_bad_actor_new("INVITE blah", "127.0.0.1", "127.0.0.1",
+					     "123456", "INVITE", "UDP", "SIPp", "passive", "12345");
+	assert_non_null(ba);
+
+	fprintf(stderr, "bad_actor: %s %s %s %s %s %s %s %s %s %s %s\n",
+		ba->collected_method, ba->created_by_node_id, ba->sip_message, ba->source_ip,
+		ba->destination_ip, ba->called_number, ba->method, ba->transport_type,
+		ba->user_agent, ba->seen_last, ba->seen_count);
+
+	assert_string_equal(ba->sip_message, "INVITE blah");
+	assert_string_equal(ba->source_ip, "127.0.0.1");
+	assert_string_equal(ba->destination_ip, "127.0.0.1");
+	assert_string_equal(ba->called_number, "123456");
+	assert_string_equal(ba->method, "INVITE");
+	assert_string_equal(ba->transport_type, "UDP");
+	assert_string_equal(ba->user_agent, "SIPp");
+	assert_string_equal(ba->collected_method, "passive");
+	assert_string_equal(ba->created_by_node_id, "12345");
+	assert_null(ba->seen_last);
+	assert_null(ba->seen_count);
 }
