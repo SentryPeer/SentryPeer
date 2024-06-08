@@ -95,6 +95,11 @@ pub extern "C" fn return_bad_actor_new(
     )))
 }
 
+/// # Safety
+///
+/// This function is unsafe because it dereferences a raw pointer for
+/// the whole BadActor struct and its CString fields (from_raw).
+///
 /// Destroy a BadActor struct
 #[no_mangle]
 pub unsafe extern "C" fn bad_actor_free(bad_actor: *mut BadActor) {
