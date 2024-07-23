@@ -23,6 +23,16 @@
 #include "test_sentrypeer_rust.h"
 #include "test_bad_actor.h"
 
+// So it's defined here, and we don't use the return_exit_status Rust version
+int32_t return_exit_status_c(bool success)
+{
+	if (success) {
+		return EXIT_SUCCESS;
+	} else {
+		return EXIT_FAILURE;
+	}
+}
+
 void test_sentrypeer_rust(void **state)
 {
 	(void)state; /* unused */
@@ -33,20 +43,24 @@ void test_sentrypeer_rust(void **state)
 
 	assert_int_equal(return_exit_status(true), EXIT_SUCCESS);
 	assert_int_equal(return_exit_status(false), EXIT_FAILURE);
+	assert_int_equal(callback_from_c(return_exit_status_c, true),
+			 EXIT_SUCCESS);
 
 	char *s = return_string();
 	assert_string_equal(s, "Greetings from Rust");
 	free_string(s);
 	assert_non_null(s);
 
-	bad_actor *ba = return_bad_actor_new("INVITE blah", "127.0.0.1", "127.0.0.1",
-					     "123456", "INVITE", "UDP", "SIPp", "passive", "12345");
+	bad_actor *ba = return_bad_actor_new("INVITE blah", "127.0.0.1",
+					     "127.0.0.1", "123456", "INVITE",
+					     "UDP", "SIPp", "passive", "12345");
 	assert_non_null(ba);
 
 	fprintf(stderr, "bad_actor: %s %s %s %s %s %s %s %s %s %s %s\n",
-		ba->collected_method, ba->created_by_node_id, ba->sip_message, ba->source_ip,
-		ba->destination_ip, ba->called_number, ba->method, ba->transport_type,
-		ba->user_agent, ba->seen_last, ba->seen_count);
+		ba->collected_method, ba->created_by_node_id, ba->sip_message,
+		ba->source_ip, ba->destination_ip, ba->called_number,
+		ba->method, ba->transport_type, ba->user_agent, ba->seen_last,
+		ba->seen_count);
 
 	assert_string_equal(ba->sip_message, "INVITE blah");
 	assert_string_equal(ba->source_ip, "127.0.0.1");

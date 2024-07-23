@@ -19,7 +19,16 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
-libc = "0.2.154"
+libc = "0.2.155"
+# START_HIGHLIGHT
+tokio-rustls = "0.26.0"
+rustls-pemfile = "2.1.2"
+tokio = { version = "1.38.0", features = ["full"] }
+pki-types = { package = "rustls-pki-types", version = "1" }
+dotenvy = "0.15.7"
+envy = "0.4.2"
+serde = { version = "1.0.204", features = ["derive"] }
+anyhow = "1.0.86" # We're building a binary here, but Rust is our lib, so maybe move to thiserror?
 
 [dependencies.uuid]
 version = "1.8.0"
