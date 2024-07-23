@@ -123,7 +123,6 @@ mod tests {
 
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
-    #[ignore = "not yet implemented"]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
         assert_eq!(config.cert, PathBuf::from("./cert.pem"));
