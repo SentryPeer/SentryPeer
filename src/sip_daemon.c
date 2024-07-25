@@ -158,19 +158,19 @@ int sip_send_reply(sentrypeer_config const *config,
 	// Actors don't seem to care we're always replying
 	// with 200 OK/non-compliant SIP :-)
 	char SIP_200_OK[] =
-		"SIP/2.0 200 OK\n"
-		"Via: SIP/2.0/UDP 127.0.0.1:56940\n"
-		"Call-ID: 1179563087@127.0.0.1\n"
-		"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\n"
-		"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\n"
-		"CSeq: 1 OPTIONS\n"
-		"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\n"
-		"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\n"
-		"Supported: 100rel, timer, replaces, norefersub\n"
-		"Accept-Encoding: text/plain\n"
-		"Accept-Language: en\n"
-		"Server: FPBX-16.0.33(18.13.0)\n"
-		"Content-Length:  0";
+		"SIP/2.0 200 OK\r\n"
+		"Via: SIP/2.0/UDP 127.0.0.1:56940\r\n"
+		"Call-ID: 1179563087@127.0.0.1\r\n"
+		"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n"
+		"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r\n"
+		"CSeq: 1 OPTIONS\r\n"
+		"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n"
+		"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n"
+		"Supported: 100rel, timer, replaces, norefersub\r\n"
+		"Accept-Encoding: text/plain\r\n"
+		"Accept-Language: en\r\n"
+		"Server: FPBX-16.0.33(18.13.0)\r\n"
+		"Content-Length:  0\r\n";
 
 	long bytes_sent =
 		sendto(sip_event->socket, SIP_200_OK, sizeof(SIP_200_OK), 0,
