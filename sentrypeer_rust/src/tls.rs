@@ -27,7 +27,7 @@ use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use sentrypeer_sip_daemon::{sip_log_event, sip_send_reply};
+use sentrypeer_sip_daemon::{sentrypeer_config, sip_log_event, sip_message_event, sip_send_reply};
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -62,7 +62,9 @@ fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
 }
 
 #[tokio::main]
-pub(crate) async fn listen(config: &sentrypeer_config) -> Result<Config, Box<dyn std::error::Error>> {
+pub(crate) async fn listen(
+    config: *mut sentrypeer_config,
+) -> Result<Config, Box<dyn std::error::Error>> {
     let config = config_from_env()?;
 
     let addr = config

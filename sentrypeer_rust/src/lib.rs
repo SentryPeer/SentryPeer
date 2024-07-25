@@ -20,8 +20,8 @@ use libc::c_char;
 use std::ffi::CString;
 use uuid::Uuid;
 
-pub mod tls;
 pub mod sentrypeer_sip_daemon;
+pub mod tls;
 
 /// A manually created struct to represent a BadActor from bad_actor.h
 #[repr(C)]
@@ -215,7 +215,10 @@ pub unsafe extern "C" fn free_string(ptr_s: *mut c_char) {
 /// This function takes a function pointer as an argument and calls it, so we can pass them
 /// in from C and call it from Rust - a callback inside a thread or loop.
 #[no_mangle]
-pub unsafe extern "C" fn callback_from_c(callback: extern "C" fn(bool) -> i32, success: bool) -> i32 {
+pub unsafe extern "C" fn callback_from_c(
+    callback: extern "C" fn(bool) -> i32,
+    success: bool,
+) -> i32 {
     callback(success) // Call the function pointer
 }
 
@@ -238,7 +241,12 @@ mod tests {
     #[test]
     fn test_callback_from_c() {
         // Note we just pass the function name as the argument, no parenthesis or arguments
-        unsafe { assert_eq!(callback_from_c(return_exit_status, true), libc::EXIT_SUCCESS) };
+        unsafe {
+            assert_eq!(
+                callback_from_c(return_exit_status, true),
+                libc::EXIT_SUCCESS
+            )
+        };
     }
 
     #[test]
