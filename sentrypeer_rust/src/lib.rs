@@ -11,12 +11,17 @@
                              |___/
 */
 
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+
 use chrono::Utc;
 use libc::c_char;
 use std::ffi::CString;
 use uuid::Uuid;
 
 pub mod tls;
+pub mod sentrypeer_sip_daemon;
 
 /// A manually created struct to represent a BadActor from bad_actor.h
 #[repr(C)]

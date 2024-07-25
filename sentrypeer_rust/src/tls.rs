@@ -11,10 +11,6 @@
                              |___/
 */
 
-// #[no_mangle]
-// pub extern "C" fn listen_tls() -> Result<(), Box<dyn StdError>> {
-// }
-
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind};
 use std::net::ToSocketAddrs;
@@ -29,6 +25,9 @@ use serde::Deserialize;
 use tokio::io::{copy, sink, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
+
+// Our C FFI functions
+use sentrypeer_sip_daemon::{sip_log_event, sip_send_reply};
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -62,10 +61,8 @@ fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
         ))?)
 }
 
-// We want to take a pointer to like
-// listen(bad_actor: *mut BadActor) -> i32 {
 #[tokio::main]
-pub(crate) async fn listen() -> Result<Config, Box<dyn std::error::Error>> {
+pub(crate) async fn listen(config: &sentrypeer_config) -> Result<Config, Box<dyn std::error::Error>> {
     let config = config_from_env()?;
 
     let addr = config
@@ -95,11 +92,19 @@ pub(crate) async fn listen() -> Result<Config, Box<dyn std::error::Error>> {
             let mut output = sink(); // What is this?
             stream
                 .write_all(
-                    &b"SIP/2.0 200 OK\r\n\
-                    Connection: close\r\n\
-                    Content-length: 12\r\n\
-                    \r\n\
-                    Hello world!"[..],
+                    &b"SIP/2.0 200 OK\r\n
+                    Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
+		            Call-ID: 1179563087@127.0.0.1\r\n
+		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
+		            To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r\n
+		            CSeq: 1 OPTIONS\r\n
+		            Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n
+		            Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n
+		            Supported: 100rel, timer, replaces, norefersub\r\n
+		            Accept-Encoding: text/plain\r\n
+		            Accept-Language: en\r\n
+		            Server: FPBX-16.0.33(18.13.0)\r\n
+		            Content-Length:  0\r\n"[..],
                 )
                 .await?;
             stream.shutdown().await?;
