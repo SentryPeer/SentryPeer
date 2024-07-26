@@ -27,7 +27,8 @@ use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use sentrypeer_sip_daemon::{sentrypeer_config, sip_log_event, sip_message_event, sip_send_reply};
+use crate::sentrypeer_c::sip_daemon::*;
+use crate::sentrypeer_c::sip_message_event::*;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -63,7 +64,7 @@ fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
 
 #[tokio::main]
 pub(crate) async fn listen(
-    config: *mut sentrypeer_config,
+    sentrypeer_c_config: *mut sentrypeer_config,
 ) -> Result<Config, Box<dyn std::error::Error>> {
     let config = config_from_env()?;
 
@@ -83,18 +84,37 @@ pub(crate) async fn listen(
 
     let listener = TcpListener::bind(&addr).await?;
 
+    unsafe {
+        if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
+            eprintln!("Listening for incoming UDP connections...");
+
+            if (*sentrypeer_c_config).sip_responsive_mode {
+                eprintln!(
+                    "SIP responsive mode enabled. Will reply to SIP probes...");
+            }
+        }
+    }
+
     loop {
         let (stream, peer_addr) = listener.accept().await?;
         let acceptor = acceptor.clone();
 
-        let fut = async move {
-            let mut stream = acceptor.accept(stream).await?;
+        unsafe {
+            if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
+                eprintln!("Accepted TLS connection from: {}", peer_addr);
+            }
+        }
 
-            // How to I log this from with Rust? Call my C functions or pass in a callback?
-            let mut output = sink(); // What is this?
-            stream
-                .write_all(
-                    &b"SIP/2.0 200 OK\r\n
+        unsafe {
+            if (*sentrypeer_c_config).sip_responsive_mode {
+                let fut = async move {
+                    let mut stream = acceptor.accept(stream).await?;
+
+                    // How to I log this from with Rust? Call my C functions or pass in a callback?
+                    let mut output = sink(); // What is this?
+                    stream
+                        .write_all(
+                            &b"SIP/2.0 200 OK\r\n
                     Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
 		            Call-ID: 1179563087@127.0.0.1\r\n
 		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
@@ -107,20 +127,22 @@ pub(crate) async fn listen(
 		            Accept-Language: en\r\n
 		            Server: FPBX-16.0.33(18.13.0)\r\n
 		            Content-Length:  0\r\n"[..],
-                )
-                .await?;
-            stream.shutdown().await?;
-            copy(&mut stream, &mut output).await?;
-            println!("Hello: {}", peer_addr);
+                        )
+                        .await?;
+                    stream.shutdown().await?;
+                    copy(&mut stream, &mut output).await?;
+                    println!("Hello: {}", peer_addr);
 
-            Ok(()) as io::Result<()>
-        };
+                    Ok(()) as io::Result<()>
+                };
 
-        tokio::spawn(async move {
-            if let Err(err) = fut.await {
-                eprintln!("{:?}", err);
+                tokio::spawn(async move {
+                    if let Err(err) = fut.await {
+                        eprintln!("{:?}", err);
+                    }
+                });
             }
-        });
+        }
     }
 }
 
@@ -147,10 +169,10 @@ mod tests {
         assert_eq!(certs.len(), 1);
     }
 
-    #[test]
-    #[ignore = "not yet implemented"]
-    fn test_listen() {
-        let result = listen();
-        assert!(result.is_ok());
-    }
+    // #[test]
+    // #[ignore = "not yet implemented"]
+    // fn test_listen() {
+    //     let result = listen();
+    //     assert!(result.is_ok());
+    // }
 }

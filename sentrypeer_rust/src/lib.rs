@@ -20,7 +20,7 @@ use libc::c_char;
 use std::ffi::CString;
 use uuid::Uuid;
 
-pub mod sentrypeer_sip_daemon;
+pub mod sentrypeer_c;
 pub mod tls;
 
 /// A manually created struct to represent a BadActor from bad_actor.h

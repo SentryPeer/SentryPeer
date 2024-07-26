@@ -490,12 +490,6 @@ extern "C" {
         sip_event: *const sip_message_event,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
-    pub fn sip_send_reply(
-        config: *const sentrypeer_config,
-        sip_event: *const sip_message_event,
-    ) -> ::std::os::raw::c_int;
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct MHD_Daemon {
