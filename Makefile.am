@@ -157,6 +157,17 @@ EXTRA_DIST+= sentrypeer_rust/Cargo.toml \
 endif
 endif
 
+# https://www.gnu.org/software/automake/manual/html_node/Objects-created-both-with-libtool-and-without.html
+sentrypeer_CFLAGS = $(AM_CFLAGS)
+
+# Create a library for our Rust code to link against
+# Note the noinst_ prefix which creates the library, but doesn't install it.
+# https://www.gnu.org/software/automake/manual/html_node/A-Library.html
+noinst_LTLIBRARIES = libsentrypeer.la
+libsentrypeer_la_SOURCES = $(sentrypeer_SOURCES)
+libsentrypeer_la_LDFLAGS = -version-info 0:0:0
+sentrypeer_LDADD = libsentrypeer.la
+
 #########
 # Clean
 

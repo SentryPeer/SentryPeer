@@ -26,6 +26,10 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
 #AM_SILENT_RULES([yes])
+# For Rust to call sentrypeer functions etc.
+AM_PROG_AR
+LT_INIT
+
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
@@ -33,7 +37,6 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # Check for libraries.
 PKG_CHECK_MODULES(libosip2, libosip2 >= 5.0, [], [

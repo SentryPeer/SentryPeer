@@ -27,8 +27,13 @@ use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use crate::sentrypeer_c::sip_daemon::*;
-use crate::sentrypeer_c::sip_message_event::*;
+use crate::sentrypeer_c::config::{
+    sentrypeer_config, sentrypeer_config_destroy, sentrypeer_config_new,
+};
+use crate::sentrypeer_c::sip_daemon::sip_log_event;
+use crate::sentrypeer_c::sip_message_event::{
+    sip_message_event, sip_message_event_destroy, sip_message_event_new,
+};
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -89,8 +94,7 @@ pub(crate) async fn listen(
             eprintln!("Listening for incoming UDP connections...");
 
             if (*sentrypeer_c_config).sip_responsive_mode {
-                eprintln!(
-                    "SIP responsive mode enabled. Will reply to SIP probes...");
+                eprintln!("SIP responsive mode enabled. Will reply to SIP probes...");
             }
         }
     }
@@ -169,10 +173,22 @@ mod tests {
         assert_eq!(certs.len(), 1);
     }
 
-    // #[test]
-    // #[ignore = "not yet implemented"]
-    // fn test_listen() {
-    //     let result = listen();
-    //     assert!(result.is_ok());
-    // }
+    #[test]
+    fn test_listen() {
+        unsafe {
+            let sentrypeer_c_config = sentrypeer_config_new();
+            (*sentrypeer_c_config).debug_mode = true;
+            (*sentrypeer_c_config).verbose_mode = true;
+            (*sentrypeer_c_config).sip_responsive_mode = true;
+
+            assert_ne!(sentrypeer_c_config, std::ptr::null_mut());
+            assert_eq!((*sentrypeer_c_config).debug_mode, true);
+            assert_eq!((*sentrypeer_c_config).verbose_mode, true);
+            assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
+
+            // let result = listen(sentrypeer_c_config);
+            //
+            // assert!(result.is_ok());
+        }
+    }
 }

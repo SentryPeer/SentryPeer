@@ -11,6 +11,12 @@
                              |___/
 */
 
-pub mod config;
-pub mod sip_daemon;
-pub mod sip_message_event;
+fn main() {
+    // Tell cargo to tell rustc to link the sentrypeer
+    // shared library.
+    println!("cargo:rustc-link-search=../.libs");
+    println!("cargo:rustc-link-lib=sentrypeer");
+    println!("cargo:rustc-link-lib=opendht-c");
+    println!("cargo:rustc-link-lib=jansson");
+    println!("cargo:rustc-link-lib=uuid");
+}

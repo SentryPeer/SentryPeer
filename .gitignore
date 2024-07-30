@@ -73,6 +73,7 @@ stamp-h1
 test-driver
 m4
 install-sh~
+ar-lib
 
 # CMake 
 build
