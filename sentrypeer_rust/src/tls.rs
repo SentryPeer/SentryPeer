@@ -158,8 +158,8 @@ mod tests {
     #[test]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
-        assert_eq!(config.cert, PathBuf::from("./cert.pem"));
-        assert_eq!(config.key, PathBuf::from("./key.pem"));
+        assert_eq!(config.cert, PathBuf::from("../tests/tools/127.0.0.1.pem"));
+        assert_eq!(config.key, PathBuf::from("../tests/tools/127.0.0.1-key.pem"));
         assert_eq!(config.listen_address, "127.0.0.1:8088");
     }
 
@@ -186,9 +186,9 @@ mod tests {
             assert_eq!((*sentrypeer_c_config).verbose_mode, true);
             assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
 
-            // let result = listen(sentrypeer_c_config);
-            //
-            // assert!(result.is_ok());
+            let result = listen(sentrypeer_c_config);
+            
+            assert!(result.is_ok());
         }
     }
 }
