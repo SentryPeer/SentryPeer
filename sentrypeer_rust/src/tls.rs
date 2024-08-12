@@ -71,6 +71,9 @@ fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
 pub(crate) async fn listen(
     sentrypeer_c_config: *mut sentrypeer_config,
 ) -> Result<Config, Box<dyn std::error::Error>> {
+    // Assert we're not getting a null pointer
+    assert!(!sentrypeer_c_config.is_null());
+    
     let config = config_from_env()?;
 
     let addr = config
