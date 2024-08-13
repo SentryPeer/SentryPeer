@@ -191,7 +191,7 @@ mod tests {
 
             let result = listen(sentrypeer_c_config);
             
-            assert!(result.is_ok());
+            result.unwrap();
         }
     }
 }
