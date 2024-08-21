@@ -41,7 +41,7 @@ sip_message_event *sip_message_event_new(char *packet, size_t packet_len,
 					 SOCKET socket, char *transport_type,
 					 struct sockaddr *client_ip_addr,
 					 char *client_ip_addr_str,
-					 size_t client_addr_len,
+					 size_t client_ip_addr_len,
 					 char *dest_ip_addr_str);
 
 //  Destructors

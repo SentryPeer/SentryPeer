@@ -22,18 +22,14 @@ use dotenvy::dotenv;
 use pki_types::{CertificateDer, PrivateKeyDer};
 use rustls_pemfile::{certs, private_key};
 use serde::Deserialize;
-use tokio::io::{copy, sink, AsyncWriteExt};
+use tokio::io::{copy, sink, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use crate::sentrypeer_c::config::{
-    sentrypeer_config, sentrypeer_config_destroy, sentrypeer_config_new,
-};
+use crate::sentrypeer_c::config::sentrypeer_config;
 use crate::sentrypeer_c::sip_daemon::sip_log_event;
-use crate::sentrypeer_c::sip_message_event::{
-    sip_message_event, sip_message_event_destroy, sip_message_event_new,
-};
+use crate::sentrypeer_c::sip_message_event::{sip_message_event_destroy, sip_message_event_new};
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -73,7 +69,7 @@ pub(crate) async fn listen(
 ) -> Result<Config, Box<dyn std::error::Error>> {
     // Assert we're not getting a null pointer
     assert!(!sentrypeer_c_config.is_null());
-    
+
     let config = config_from_env()?;
 
     let addr = config
@@ -102,8 +98,9 @@ pub(crate) async fn listen(
         }
     }
 
+    let mut buf = [0; 1024];
     loop {
-        let (stream, peer_addr) = listener.accept().await?;
+        let (mut stream, peer_addr) = listener.accept().await?;
         let acceptor = acceptor.clone();
 
         unsafe {
@@ -112,16 +109,46 @@ pub(crate) async fn listen(
             }
         }
 
-        unsafe {
-            if (*sentrypeer_c_config).sip_responsive_mode {
-                let fut = async move {
-                    let mut stream = acceptor.accept(stream).await?;
+        let fut = async move {
+            let mut stream = acceptor.accept(stream).await?;
 
-                    // How to I log this from with Rust? Call my C functions or pass in a callback?
-                    let mut output = sink(); // What is this?
+            let bytes_read = stream.read(&mut buf).await?;
+
+            unsafe {
+                // https://doc.rust-lang.org/std/primitive.pointer.html
+                let mut sip_message = sip_message_event_new(
+                    // packet from stream
+                    buf,
+                    // packet length
+                    bytes_read,
+                    // socket (can be anything)
+
+                    // transport_type
+
+                    // client_ip_addr
+                    // client_ip_addr_str
+                    // client_ip_addr_len
+                    // dest_ip_addr_str
+                );
+
+                if sip_log_event(sentrypeer_c_config, sip_message) != libc::EXIT_SUCCESS {
+                    eprintln!("Failed to log SIP message event");
+
+                    // Clean up
+                    sip_message_event_destroy(&mut sip_message);
+                }
+
+                // Clean up
+                sip_message_event_destroy(&mut sip_message);
+
+                if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
+                    eprintln!("Received: {:?}", buf);
+                }
+
+                if (*sentrypeer_c_config).sip_responsive_mode {
                     stream
-                        .write_all(
-                            &b"SIP/2.0 200 OK\r\n
+                            .write_all(
+                                &b"SIP/2.0 200 OK\r\n
                     Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
 		            Call-ID: 1179563087@127.0.0.1\r\n
 		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
@@ -134,35 +161,43 @@ pub(crate) async fn listen(
 		            Accept-Language: en\r\n
 		            Server: FPBX-16.0.33(18.13.0)\r\n
 		            Content-Length:  0\r\n"[..],
-                        )
-                        .await?;
-                    stream.shutdown().await?;
-                    copy(&mut stream, &mut output).await?;
-                    println!("Hello: {}", peer_addr);
-
-                    Ok(()) as io::Result<()>
-                };
-
-                tokio::spawn(async move {
-                    if let Err(err) = fut.await {
-                        eprintln!("{:?}", err);
-                    }
-                });
+                            )
+                            .await?;
+                }
             }
-        }
+
+            stream.shutdown().await?;
+
+            let mut output = sink();
+            copy(&mut stream, &mut output).await?;
+            eprintln!("Hello: {}", peer_addr);
+
+            Ok(()) as io::Result<()>
+        };
+
+        // This runs the future on the tokio runtime
+        tokio::spawn(async move {
+            if let Err(err) = fut.await {
+                eprintln!("{:?}", err);
+            }
+        });
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sentrypeer_c::config::{sentrypeer_config_destroy, sentrypeer_config_new};
 
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
         assert_eq!(config.cert, PathBuf::from("../tests/tools/127.0.0.1.pem"));
-        assert_eq!(config.key, PathBuf::from("../tests/tools/127.0.0.1-key.pem"));
+        assert_eq!(
+            config.key,
+            PathBuf::from("../tests/tools/127.0.0.1-key.pem")
+        );
         assert_eq!(config.listen_address, "127.0.0.1:8088");
     }
 
@@ -179,7 +214,7 @@ mod tests {
     #[test]
     fn test_listen() {
         unsafe {
-            let sentrypeer_c_config = sentrypeer_config_new();
+            let mut sentrypeer_c_config = sentrypeer_config_new();
             (*sentrypeer_c_config).debug_mode = true;
             (*sentrypeer_c_config).verbose_mode = true;
             (*sentrypeer_c_config).sip_responsive_mode = true;
@@ -190,8 +225,10 @@ mod tests {
             assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
 
             let result = listen(sentrypeer_c_config);
-            
+
             result.unwrap();
+
+            sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }
     }
 }
