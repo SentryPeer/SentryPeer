@@ -11,16 +11,20 @@
                              |___/
 */
 
+// Ignore Rust's style conventions for our C FFI bindings
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+
+// Use the include! macro to dump our generated bindings right into our crate's main entry point, 
+// src/lib.rs:
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 use chrono::Utc;
 use libc::c_char;
 use std::ffi::CString;
 use uuid::Uuid;
 
-pub mod sentrypeer_c;
 pub mod tls;
 
 /// A manually created struct to represent a BadActor from bad_actor.h

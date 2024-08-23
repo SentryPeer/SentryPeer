@@ -29,6 +29,7 @@ dotenvy = "0.15.7"
 envy = "0.4.2"
 serde = { version = "1.0.204", features = ["derive"] }
 anyhow = "1.0.86" # We're building a binary here, but Rust is our lib, so maybe move to thiserror?
+os_socketaddr = "0.2.5"
 
 [dependencies.uuid]
 version = "1.8.0"
@@ -37,6 +38,9 @@ features = [
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
     "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
 ]
+
+[build-dependencies]
+bindgen = "0.70.1"
 
 [lib]
 crate-type = ["staticlib", "cdylib"]

@@ -10,7 +10,7 @@
                               __/ |
                              |___/
 */
-
+use std::ffi::CString;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind};
 use std::net::ToSocketAddrs;
@@ -19,17 +19,18 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use dotenvy::dotenv;
+use libc::c_int;
 use pki_types::{CertificateDer, PrivateKeyDer};
 use rustls_pemfile::{certs, private_key};
 use serde::Deserialize;
-use tokio::io::{copy, sink, AsyncReadExt, AsyncWriteExt};
+use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
+use os_socketaddr::OsSocketAddr;
+use crate::sockaddr;
 
 // Our C FFI functions
-use crate::sentrypeer_c::config::sentrypeer_config;
-use crate::sentrypeer_c::sip_daemon::sip_log_event;
-use crate::sentrypeer_c::sip_message_event::{sip_message_event_destroy, sip_message_event_new};
+use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -88,13 +89,15 @@ pub(crate) async fn listen(
 
     let listener = TcpListener::bind(&addr).await?;
 
-    unsafe {
-        if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
-            eprintln!("Listening for incoming UDP connections...");
+    let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
+    let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
+    let sip_responsive_mode = (unsafe { *sentrypeer_c_config }).sip_responsive_mode;
 
-            if (*sentrypeer_c_config).sip_responsive_mode {
-                eprintln!("SIP responsive mode enabled. Will reply to SIP probes...");
-            }
+    if debug_mode || verbose_mode {
+        println!("Listening for incoming TLS connections...");
+
+        if sip_responsive_mode {
+            println!("SIP responsive mode enabled. Will reply to SIP probes...");
         }
     }
 
@@ -103,32 +106,37 @@ pub(crate) async fn listen(
         let (mut stream, peer_addr) = listener.accept().await?;
         let acceptor = acceptor.clone();
 
-        unsafe {
-            if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
-                eprintln!("Accepted TLS connection from: {}", peer_addr);
-            }
+        if debug_mode || verbose_mode {
+            println!("Accepted TLS connection from: {}", peer_addr);
         }
 
         let fut = async move {
-            let mut stream = acceptor.accept(stream).await?;
+            let stream = acceptor.accept(stream).await?;
 
-            let bytes_read = stream.read(&mut buf).await?;
+            let (mut reader, mut writer) = split(stream);
+            let bytes_read = reader.read(&mut buf).await?;
 
+            let peer_addr_c: OsSocketAddr = peer_addr.into();
+            
             unsafe {
                 // https://doc.rust-lang.org/std/primitive.pointer.html
                 let mut sip_message = sip_message_event_new(
                     // packet from stream
-                    buf,
+                    CString::new(buf.to_vec()).unwrap().into_raw(),
                     // packet length
                     bytes_read,
                     // socket (can be anything)
-
+                    c_int::from(0),
                     // transport_type
-
+                    CString::new("TLS").unwrap().into_raw(),
                     // client_ip_addr
+                    peer_addr_c.as_mut_ptr() as *mut sockaddr,
                     // client_ip_addr_str
+                    CString::new(peer_addr.to_string()).unwrap().into_raw(),
                     // client_ip_addr_len
+                    peer_addr_c.len().try_into().unwrap(),
                     // dest_ip_addr_str
+                    CString::new(addr.to_string()).unwrap().into_raw(),
                 );
 
                 if sip_log_event(sentrypeer_c_config, sip_message) != libc::EXIT_SUCCESS {
@@ -140,13 +148,17 @@ pub(crate) async fn listen(
 
                 // Clean up
                 sip_message_event_destroy(&mut sip_message);
+            }
 
-                if (*sentrypeer_c_config).debug_mode || (*sentrypeer_c_config).verbose_mode {
-                    eprintln!("Received: {:?}", buf);
-                }
+            if debug_mode || verbose_mode {
+                println!(
+                    "Received: {:?}",
+                    String::from_utf8_lossy(&buf[..bytes_read])
+                );
+            }
 
-                if (*sentrypeer_c_config).sip_responsive_mode {
-                    stream
+            if sip_responsive_mode {
+                writer
                             .write_all(
                                 &b"SIP/2.0 200 OK\r\n
                     Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
@@ -163,18 +175,14 @@ pub(crate) async fn listen(
 		            Content-Length:  0\r\n"[..],
                             )
                             .await?;
-                }
             }
-
-            stream.shutdown().await?;
-
-            let mut output = sink();
-            copy(&mut stream, &mut output).await?;
-            eprintln!("Hello: {}", peer_addr);
 
             Ok(()) as io::Result<()>
         };
 
+        // Error
+        // https://tokio.rs/tokio/tutorial/spawning#send-bound
+        // future cannot be sent between threads safely future created by async block is not `Send` Help: within `{async block@src/ tls. rs:180:22: 184:10}`, the trait `std::marker::Send` is not implemented for `*mut sentrypeer_c::config::sentrypeer_config`, which is required by `{async block@src/ tls. rs:180:22: 184:10}: std::marker::Send` Note: captured value is not `Send` Note: required by a bound in `tokio::spawn`
         // This runs the future on the tokio runtime
         tokio::spawn(async move {
             if let Err(err) = fut.await {
@@ -187,7 +195,7 @@ pub(crate) async fn listen(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sentrypeer_c::config::{sentrypeer_config_destroy, sentrypeer_config_new};
+    use crate::{sentrypeer_config_destroy, sentrypeer_config_new};
 
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
