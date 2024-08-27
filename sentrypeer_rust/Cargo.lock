@@ -737,6 +737,7 @@ dependencies = [
  "dotenvy",
  "envy",
  "libc",
+ "log",
  "os_socketaddr",
  "rustls-pemfile",
  "rustls-pki-types",

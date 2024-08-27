@@ -17,20 +17,26 @@ use std::net::ToSocketAddrs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::sockaddr;
 use anyhow::Context;
 use dotenvy::dotenv;
 use libc::c_int;
+use os_socketaddr::OsSocketAddr;
 use pki_types::{CertificateDer, PrivateKeyDer};
 use rustls_pemfile::{certs, private_key};
 use serde::Deserialize;
 use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio_rustls::{rustls, TlsAcceptor};
-use os_socketaddr::OsSocketAddr;
-use crate::sockaddr;
 
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
+
+struct SentryPeerConfig {
+    p: *mut sentrypeer_config,
+}
+unsafe impl Send for SentryPeerConfig {}
+unsafe impl Sync for SentryPeerConfig {}
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -62,6 +68,55 @@ fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
             ErrorKind::Other,
             "no private key found".to_string(),
         ))?)
+}
+
+fn log_sip_packet(
+    sentrypeer_c_config: SentryPeerConfig,
+    buf: Vec<u8>,
+    bytes_read: usize,
+    peer_addr: std::net::SocketAddr,
+    listen_addr: std::net::SocketAddr,
+) -> i32 {
+    let mut peer_addr_c: OsSocketAddr = peer_addr.into();
+    let sentrypeer_c_config = sentrypeer_c_config.p;
+
+    unsafe {
+        // https://doc.rust-lang.org/std/primitive.pointer.html
+        let mut sip_message = sip_message_event_new(
+            // packet from stream
+            CString::new(String::from_utf8_lossy(&buf[..bytes_read]).to_string())
+                .unwrap()
+                .into_raw(),
+            // packet length
+            bytes_read,
+            // socket (can be anything)
+            c_int::from(0),
+            // transport_type
+            CString::new("TLS").unwrap().into_raw(),
+            // client_ip_addr
+            peer_addr_c.as_mut_ptr() as *mut sockaddr,
+            // client_ip_addr_str
+            CString::new(peer_addr.to_string()).unwrap().into_raw(),
+            // client_ip_addr_len
+            peer_addr_c.len().try_into().unwrap(),
+            // dest_ip_addr_str
+            CString::new(listen_addr.to_string()).unwrap().into_raw(),
+        );
+
+        if sip_log_event(sentrypeer_c_config, sip_message) != libc::EXIT_SUCCESS {
+            eprintln!("Failed to log SIP message event");
+
+            // Clean up
+            sip_message_event_destroy(&mut sip_message);
+
+            return libc::EXIT_FAILURE;
+        }
+
+        // Clean up
+        sip_message_event_destroy(&mut sip_message);
+
+        libc::EXIT_SUCCESS
+    }
 }
 
 #[tokio::main]
@@ -103,12 +158,16 @@ pub(crate) async fn listen(
 
     let mut buf = [0; 1024];
     loop {
-        let (mut stream, peer_addr) = listener.accept().await?;
+        let (stream, peer_addr) = listener.accept().await?;
         let acceptor = acceptor.clone();
 
         if debug_mode || verbose_mode {
             println!("Accepted TLS connection from: {}", peer_addr);
         }
+
+        let sentrypeer_config = SentryPeerConfig {
+            p: sentrypeer_c_config,
+        };
 
         let fut = async move {
             let stream = acceptor.accept(stream).await?;
@@ -116,38 +175,10 @@ pub(crate) async fn listen(
             let (mut reader, mut writer) = split(stream);
             let bytes_read = reader.read(&mut buf).await?;
 
-            let peer_addr_c: OsSocketAddr = peer_addr.into();
-            
-            unsafe {
-                // https://doc.rust-lang.org/std/primitive.pointer.html
-                let mut sip_message = sip_message_event_new(
-                    // packet from stream
-                    CString::new(buf.to_vec()).unwrap().into_raw(),
-                    // packet length
-                    bytes_read,
-                    // socket (can be anything)
-                    c_int::from(0),
-                    // transport_type
-                    CString::new("TLS").unwrap().into_raw(),
-                    // client_ip_addr
-                    peer_addr_c.as_mut_ptr() as *mut sockaddr,
-                    // client_ip_addr_str
-                    CString::new(peer_addr.to_string()).unwrap().into_raw(),
-                    // client_ip_addr_len
-                    peer_addr_c.len().try_into().unwrap(),
-                    // dest_ip_addr_str
-                    CString::new(addr.to_string()).unwrap().into_raw(),
-                );
-
-                if sip_log_event(sentrypeer_c_config, sip_message) != libc::EXIT_SUCCESS {
-                    eprintln!("Failed to log SIP message event");
-
-                    // Clean up
-                    sip_message_event_destroy(&mut sip_message);
-                }
-
-                // Clean up
-                sip_message_event_destroy(&mut sip_message);
+            if log_sip_packet(sentrypeer_config, buf.to_vec(), bytes_read, peer_addr, addr)
+                != libc::EXIT_SUCCESS
+            {
+                eprintln!("Failed to log SIP packet");
             }
 
             if debug_mode || verbose_mode {
