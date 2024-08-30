@@ -63,12 +63,10 @@ fn load_certs(path: &Path) -> io::Result<Vec<CertificateDer<'static>>> {
 }
 
 fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
-    Ok(private_key(&mut BufReader::new(File::open(path)?))
-        .unwrap()
-        .ok_or(io::Error::new(
-            ErrorKind::Other,
-            "no private key found".to_string(),
-        ))?)
+    private_key(&mut BufReader::new(File::open(path)?))?.ok_or(io::Error::new(
+        ErrorKind::Other,
+        "no private key found".to_string(),
+    ))
 }
 
 fn log_sip_packet(
