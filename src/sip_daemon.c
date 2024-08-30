@@ -82,11 +82,13 @@ int sip_daemon_run(sentrypeer_config *config)
 #endif
 	config->sip_daemon_thread = sip_daemon_thread;
 
+#if HAVE_RUST != 0
 	// Run our Rust listen_tls() function
 	if (listen_tls(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to run listen_tls().\n");
 		return EXIT_FAILURE;
 	}
+#endif // HAVE_RUST
 
 	return EXIT_SUCCESS;
 }
