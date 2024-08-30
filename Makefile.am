@@ -65,6 +65,13 @@ sentrypeer_SOURCES= \
     src/database.c \
     src/database.h
 
+if !DISABLE_RUST
+if HAVE_RUST
+ sentrypeer_SOURCES += \
+    src/sentrypeer_rust.h
+endif
+endif
+
 if !DISABLE_OPENDHT
     sentrypeer_SOURCES+= \
     src/peer_to_peer_dht.c \
@@ -167,6 +174,12 @@ noinst_LTLIBRARIES = libsentrypeer.la
 libsentrypeer_la_SOURCES = $(sentrypeer_SOURCES)
 libsentrypeer_la_LDFLAGS = -version-info 0:0:0
 sentrypeer_LDADD = libsentrypeer.la
+
+if !DISABLE_RUST
+if HAVE_RUST
+sentrypeer_LDADD += @abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
+endif
+endif
 
 #########
 # Clean

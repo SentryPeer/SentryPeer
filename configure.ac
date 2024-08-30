@@ -75,6 +75,10 @@ AC_SEARCH_LIBS(pthread_create, pthread, [], [
   AC_MSG_ERROR([pthread_create() is not available.])
 ])
 
+AC_SEARCH_LIBS(ceil, m, [], [
+  AC_MSG_ERROR([ceil() is not available.])
+])
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
 
