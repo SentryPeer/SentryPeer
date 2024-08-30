@@ -44,6 +44,10 @@
 #include "peer_to_peer_dht.h"
 #endif // HAVE_OPENDHT_C
 
+#if HAVE_RUST != 0
+#include "sentrypeer_rust.h"
+#endif // HAVE_RUST
+
 #define PACKET_BUFFER_SIZE 1024
 
 void *sip_daemon_thread_start(void *arg)
@@ -77,6 +81,12 @@ int sip_daemon_run(sentrypeer_config *config)
 	}
 #endif
 	config->sip_daemon_thread = sip_daemon_thread;
+
+	// Run our Rust listen_tls() function
+	if (listen_tls(config) != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to run listen_tls().\n");
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }
