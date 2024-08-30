@@ -43,7 +43,7 @@ unsafe impl Sync for SentryPeerConfig {}
 pub struct Config {
     pub cert: PathBuf,
     pub key: PathBuf,
-    pub listen_address: String,
+    pub tls_listen_address: String,
 }
 
 fn config_from_env() -> Result<Config, Box<dyn std::error::Error>> {
@@ -52,7 +52,7 @@ fn config_from_env() -> Result<Config, Box<dyn std::error::Error>> {
     dotenv().ok();
 
     let config = envy::prefixed("SENTRYPEER_").from_env::<Config>().with_context(|| {
-        "Please set SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_LISTEN_ADDRESS in your .env file or environment."
+        "Please set SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_TLS_LISTEN_ADDRESS in your .env file or environment."
     })?;
 
     Ok(config)
@@ -161,7 +161,7 @@ pub(crate) async extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_c
     let config = config_from_env().unwrap();
 
     let addr = config
-        .listen_address
+        .tls_listen_address
         .to_socket_addrs()
         .unwrap()
         .next()
@@ -269,7 +269,7 @@ mod tests {
             config.key,
             PathBuf::from("../tests/tools/127.0.0.1-key.pem")
         );
-        assert_eq!(config.listen_address, "127.0.0.1:8088");
+        assert_eq!(config.tls_listen_address, "127.0.0.1:8088");
     }
 
     #[test]
