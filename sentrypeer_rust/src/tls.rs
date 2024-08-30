@@ -149,50 +149,52 @@ unsafe fn clean_up_sip_message(
     let _ = CString::from_raw(dest_ip_addr_ptr);
 }
 
+/// # Safety
+///
+/// Nothing is done with the `sentrypeer_config` pointer, it's treated read-only.
+#[no_mangle]
 #[tokio::main]
-pub(crate) async fn listen(
-    sentrypeer_c_config: *mut sentrypeer_config,
-) -> Result<Config, Box<dyn std::error::Error>> {
+pub(crate) async extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config) -> i32 {
     // Assert we're not getting a null pointer
     assert!(!sentrypeer_c_config.is_null());
 
-    let config = config_from_env()?;
+    let config = config_from_env().unwrap();
 
     let addr = config
         .listen_address
-        .to_socket_addrs()?
+        .to_socket_addrs().unwrap()
         .next()
-        .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable))?;
-    let certs = load_certs(&config.cert)?;
-    let key = load_key(&config.key)?;
+        .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable)).unwrap();
+    let certs = load_certs(&config.cert).unwrap();
+    let key = load_key(&config.key).unwrap();
 
     let config = rustls::ServerConfig::builder()
         .with_no_client_auth()
         .with_single_cert(certs, key)
-        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err))?;
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err)).unwrap();
     let acceptor = TlsAcceptor::from(Arc::new(config));
 
-    let listener = TcpListener::bind(&addr).await?;
+    let listener = TcpListener::bind(&addr).await.unwrap();
 
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
     let sip_responsive_mode = (unsafe { *sentrypeer_c_config }).sip_responsive_mode;
 
     if debug_mode || verbose_mode {
-        println!("Listening for incoming TLS connections...");
+        eprintln!("Listening for incoming TLS connections...");
 
         if sip_responsive_mode {
-            println!("SIP responsive mode enabled. Will reply to SIP probes...");
+            eprintln!("SIP responsive mode enabled. Will reply to SIP probes...");
         }
     }
 
     let mut buf = [0; 1024];
     loop {
-        let (stream, peer_addr) = listener.accept().await?;
+        let (stream, peer_addr) = listener.accept().await.unwrap();
         let acceptor = acceptor.clone();
 
         if debug_mode || verbose_mode {
-            println!("Accepted TLS connection from: {}", peer_addr);
+            eprintln!("Accepted TLS connection from: {}", peer_addr);
         }
 
         let sentrypeer_config = SentryPeerConfig {
@@ -200,10 +202,10 @@ pub(crate) async fn listen(
         };
 
         let fut = async move {
-            let stream = acceptor.accept(stream).await?;
+            let stream = acceptor.accept(stream).await.unwrap();
 
             let (mut reader, mut writer) = split(stream);
-            let bytes_read = reader.read(&mut buf).await?;
+            let bytes_read = reader.read(&mut buf).await.unwrap();
 
             if log_sip_packet(sentrypeer_config, buf.to_vec(), bytes_read, peer_addr, addr)
                 != libc::EXIT_SUCCESS
@@ -212,7 +214,7 @@ pub(crate) async fn listen(
             }
 
             if debug_mode || verbose_mode {
-                println!(
+                eprintln!(
                     "Received: {:?}",
                     String::from_utf8_lossy(&buf[..bytes_read])
                 );
@@ -220,8 +222,8 @@ pub(crate) async fn listen(
 
             if sip_responsive_mode {
                 writer
-                            .write_all(
-                                &b"SIP/2.0 200 OK\r\n
+                    .write_all(
+                        &b"SIP/2.0 200 OK\r\n
                     Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
 		            Call-ID: 1179563087@127.0.0.1\r\n
 		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
@@ -234,20 +236,17 @@ pub(crate) async fn listen(
 		            Accept-Language: en\r\n
 		            Server: FPBX-16.0.33(18.13.0)\r\n
 		            Content-Length:  0\r\n"[..],
-                            )
-                            .await?;
+                    )
+                    .await.unwrap();
             }
 
-            Ok(()) as io::Result<()>
+            libc::EXIT_SUCCESS
         };
-
-        // Error
-        // https://tokio.rs/tokio/tutorial/spawning#send-bound
-        // future cannot be sent between threads safely future created by async block is not `Send` Help: within `{async block@src/ tls. rs:180:22: 184:10}`, the trait `std::marker::Send` is not implemented for `*mut sentrypeer_c::config::sentrypeer_config`, which is required by `{async block@src/ tls. rs:180:22: 184:10}: std::marker::Send` Note: captured value is not `Send` Note: required by a bound in `tokio::spawn`
+        
         // This runs the future on the tokio runtime
         tokio::spawn(async move {
-            if let Err(err) = fut.await {
-                eprintln!("{:?}", err);
+            if fut.await != libc::EXIT_SUCCESS {
+                eprintln!("Failed to handle TLS connection");
             }
         });
     }
@@ -293,9 +292,9 @@ mod tests {
             assert_eq!((*sentrypeer_c_config).verbose_mode, true);
             assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
 
-            let result = listen(sentrypeer_c_config);
-
-            result.unwrap();
+           if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+                eprintln!("Failed to listen for TLS connections");
+           }           
 
             sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }

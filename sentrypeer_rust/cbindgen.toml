@@ -13,7 +13,7 @@
 # https://github.com/mozilla/cbindgen/blob/master/docs.md#cbindgentoml
 # https://github.com/rustls/rustls-ffi/blob/main/cbindgen.toml
 #
-# Manually (but put in build.rs soon) run this to generate the header file:
+# Automated via build.rs now, but if you need to run manually:
 # cd sentrypeer_rust
 # cbindgen -c cbindgen.toml -o ../src/sentrypeer_rust.h
 
@@ -33,6 +33,7 @@ header = '''
 '''
 
 include_guard = "SENTRYPEER_RUST_H"
+includes = ["conf.h"]
 language = "C"
 
 include_version = true

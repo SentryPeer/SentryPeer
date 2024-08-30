@@ -10,10 +10,13 @@
                               __/ |
                              |___/
 */
+use cbindgen;
 use std::env;
 use std::path::PathBuf;
 
 fn main() {
+    // Deal with the SentryPeer C library
+    //
     // Tell cargo to tell rustc to link the sentrypeer
     // shared library and how to find it
     println!("cargo:rustc-link-search=../.libs");
@@ -50,5 +53,12 @@ fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
         .write_to_file(out_path.join("bindings.rs"))
-        .expect("Couldn't write bindings!");
+        .expect("Couldn't write bindings.rs, so can't use SentryPeer C lib!");
+
+    // Generate our C header file for our Rust code
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    cbindgen::generate(crate_dir)
+        .expect("Unable to generate our cbindings, so no C header file")
+        .write_to_file("../src/sentrypeer_rust.h");
 }
