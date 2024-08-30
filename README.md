@@ -170,7 +170,7 @@ sequenceDiagram
 - [x] Multithreaded
 - [x] UDP transport
 - [x] TCP transport
-- [ ] TLS transport
+- [x] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
 - [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
   not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
