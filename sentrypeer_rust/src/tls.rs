@@ -162,16 +162,19 @@ pub(crate) async extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_c
 
     let addr = config
         .listen_address
-        .to_socket_addrs().unwrap()
+        .to_socket_addrs()
+        .unwrap()
         .next()
-        .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable)).unwrap();
+        .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable))
+        .unwrap();
     let certs = load_certs(&config.cert).unwrap();
     let key = load_key(&config.key).unwrap();
 
     let config = rustls::ServerConfig::builder()
         .with_no_client_auth()
         .with_single_cert(certs, key)
-        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err)).unwrap();
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err))
+        .unwrap();
     let acceptor = TlsAcceptor::from(Arc::new(config));
 
     let listener = TcpListener::bind(&addr).await.unwrap();
@@ -242,7 +245,7 @@ pub(crate) async extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_c
 
             libc::EXIT_SUCCESS
         };
-        
+
         // This runs the future on the tokio runtime
         tokio::spawn(async move {
             if fut.await != libc::EXIT_SUCCESS {
@@ -292,9 +295,9 @@ mod tests {
             assert_eq!((*sentrypeer_c_config).verbose_mode, true);
             assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
 
-           if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+            if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
                 eprintln!("Failed to listen for TLS connections");
-           }           
+            }
 
             sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }
