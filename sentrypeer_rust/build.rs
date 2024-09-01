@@ -23,12 +23,17 @@ fn main() {
     println!("cargo:rustc-link-lib=sentrypeer");
 
     // Our other SentryPeer dependencies
-    println!("cargo:rustc-link-lib=opendht-c");
     println!("cargo:rustc-link-lib=jansson");
     println!("cargo:rustc-link-lib=uuid");
     println!("cargo:rustc-link-lib=curl");
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=osipparser2");
+    
+    // Check to see if OpenDHT is wanted in config.h
+    let opendht = std::fs::read_to_string("../config.h").unwrap();
+    if opendht.contains("HAVE_OPENDHT_C") {
+        println!("cargo:rustc-link-lib=opendht");
+    }
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
