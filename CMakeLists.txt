@@ -42,8 +42,7 @@ if (RUST_DEBUG_RELEASE)
         message(STATUS "Rust debug release enabled")
 endif()
 
-add_executable(${CMAKE_PROJECT_NAME}
-        ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
+set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
         ${CMAKE_SOURCE_DIR}/src/signal_handler.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
         ${CMAKE_SOURCE_DIR}/src/http_common.c
@@ -63,7 +62,21 @@ add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/src/bad_actor.c
         ${CMAKE_SOURCE_DIR}/src/database.c
         ${CMAKE_SOURCE_DIR}/src/json_logger.c
-        )
+)
+
+# Build a SentryPeer library for use in our Rust code FIRST as,
+# our Rust code depends on it in our executable
+add_library(${CMAKE_PROJECT_NAME}_lib SHARED
+        ${SRC_FILES}
+)
+
+# Make the library have the same name as the project
+# https://discourse.cmake.org/t/how-to-use-the-same-name-for-a-target-and-a-library/5044/2
+set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
+
+add_executable(${CMAKE_PROJECT_NAME}
+        ${SRC_FILES}
+)
 
 # See https://github.com/bast/cmake-example/blob/master/CMakeLists.txt
 # get git hash

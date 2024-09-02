@@ -19,7 +19,8 @@ fn main() {
     //
     // Tell cargo to tell rustc to link the sentrypeer
     // shared library and how to find it
-    println!("cargo:rustc-link-search=../.libs");
+    println!("cargo:rustc-link-search=../.libs"); // Autotools
+    println!("cargo:rustc-link-search=../build"); // CMake
     println!("cargo:rustc-link-lib=sentrypeer");
 
     // Our other SentryPeer dependencies
