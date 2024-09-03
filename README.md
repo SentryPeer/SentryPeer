@@ -310,8 +310,8 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev \
-    libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
+    sudo apt-get install git build-essential autoconf-archive autoconf automake libtool libosip2-dev \ 
+    libsqlite3-dev libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
 
 Fedora:
 
