@@ -299,7 +299,7 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 If you are going to build from this repository, you will need to have the following installed:
 
   - `git`, `autoconf`, `automake` and `autoconf-archive` (Debian/Ubuntu)
-  - `libtool`, `rustc` and `cargo` (Debian/Ubuntu/Fedora)
+  - `libtool`, `rustc` and `cargo` (Fedora)
   - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
@@ -311,19 +311,23 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential autoconf-archive autoconf automake libtool rustc cargo \ 
+    sudo apt-get install git build-essential clang autoconf-archive autoconf automake libtool \ 
     libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev \
     libmicrohttpd-dev 
 
 Fedora:
 
-    sudo dnf install git autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
+    sudo dnf install git clang autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
     libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install git rustc cargo libtool autoconf automake autoconf-archive libosip cmocka \
+    brew install git clang libtool autoconf automake autoconf-archive libosip cmocka \
     libmicrohttpd jansson curl pcre2
+
+Rust:
+
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 then (make check is highly recommended):
 
