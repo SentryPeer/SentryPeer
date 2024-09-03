@@ -310,17 +310,19 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential autoconf-archive autoconf automake libtool libosip2-dev \ 
-    libsqlite3-dev libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
+    sudo apt-get install git build-essential autoconf-archive autoconf automake libtool rustc cargo \ 
+    libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev \
+    libmicrohttpd-dev 
 
 Fedora:
 
-    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel \
-    libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
+    libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
-    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson curl pcre2
+    brew install git rustc cargo libtool autoconf automake autoconf-archive libosip cmocka \
+    libmicrohttpd jansson curl pcre2
 
 then (make check is highly recommended):
 
