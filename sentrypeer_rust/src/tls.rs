@@ -17,7 +17,6 @@ use std::net::ToSocketAddrs;
 use std::os::raw::c_char;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
 use crate::sockaddr;
 use anyhow::Context;
 use dotenvy::dotenv;
@@ -28,6 +27,7 @@ use rustls_pemfile::{certs, private_key};
 use serde::Deserialize;
 use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
+use tokio::signal;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
@@ -189,6 +189,20 @@ pub(crate) async extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_c
         }
     }
 
+    // Make sure we shutdown correctly.
+    // https://tokio.rs/tokio/topics/shutdown#figuring-out-when-to-shut-down
+    match signal::ctrl_c().await {
+        Ok(_) => {
+            if debug_mode || verbose_mode {
+                eprintln!("Ctrl-C received, shutting down");
+            }
+            return libc::EXIT_SUCCESS;
+        }
+        Err(e) => {
+            eprintln!("Error: {:?}", e);
+        }
+    }
+
     let mut buf = [0; 1024];
     loop {
         let (stream, peer_addr) = listener.accept().await.unwrap();
@@ -280,24 +294,24 @@ mod tests {
         assert_eq!(certs.len(), 1);
     }
 
-    // #[test]
-    // fn test_listen() {
-    //     unsafe {
-    //         let mut sentrypeer_c_config = sentrypeer_config_new();
-    //         (*sentrypeer_c_config).debug_mode = true;
-    //         (*sentrypeer_c_config).verbose_mode = true;
-    //         (*sentrypeer_c_config).sip_responsive_mode = true;
-    // 
-    //         assert_ne!(sentrypeer_c_config, std::ptr::null_mut());
-    //         assert_eq!((*sentrypeer_c_config).debug_mode, true);
-    //         assert_eq!((*sentrypeer_c_config).verbose_mode, true);
-    //         assert_eq!((*sentrypeer_c_config).sip_responsive_mode, true);
-    // 
-    //         if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
-    //             eprintln!("Failed to listen for TLS connections");
-    //         }
-    // 
-    //         sentrypeer_config_destroy(&mut sentrypeer_c_config);
-    //     }
-    // }
+    #[test]
+    fn test_listen() {
+        unsafe {
+            let mut sentrypeer_c_config = sentrypeer_config_new();
+            (*sentrypeer_c_config).debug_mode = true;
+            (*sentrypeer_c_config).verbose_mode = true;
+            (*sentrypeer_c_config).sip_responsive_mode = true;
+
+            assert_ne!(sentrypeer_c_config, std::ptr::null_mut());
+            assert!((*sentrypeer_c_config).debug_mode);
+            assert!((*sentrypeer_c_config).verbose_mode);
+            assert!((*sentrypeer_c_config).sip_responsive_mode);
+
+            if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+                eprintln!("Failed to listen for TLS connections");
+            }
+
+            sentrypeer_config_destroy(&mut sentrypeer_c_config);
+        }
+    }
 }

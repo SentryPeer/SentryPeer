@@ -29,8 +29,9 @@ fn main() {
     println!("cargo:rustc-link-lib=curl");
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=osipparser2");
-    
-    // Check to see if OpenDHT-C is wanted in config.h and is not != 0
+
+    // Check to see if OpenDHT-C is wanted in config.h and is not != 0 - only works via
+    // autotools at the moment. Need to figure out CMake vars.
     let opendht = std::fs::read_to_string("../config.h").unwrap();
     if opendht.contains("#define HAVE_OPENDHT_C 1") {
         println!("cargo:rustc-link-lib=opendht-c");
