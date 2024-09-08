@@ -22,7 +22,7 @@
 #include "conf.h"
 
 int regex_match(const char *string, const char *regex, char **matched_string,
-		      sentrypeer_config const *config)
+		sentrypeer_config const *config)
 {
 	// Basically all from https://www.pcre.org/current/doc/html/pcre2demo.html
 	pcre2_code *re;

@@ -56,6 +56,9 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->oauth2_client_id = 0;
 	self->oauth2_client_secret = 0;
 	self->oauth2_access_token = 0;
+	
+	self->sip_daemon_thread = 0;
+	self->sip_tls_handle = 0;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);

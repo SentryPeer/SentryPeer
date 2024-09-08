@@ -34,7 +34,7 @@ void log_http_client_ip(const char *url, struct MHD_Connection *connection)
 			  addr->sa_family == AF_INET ?
 				  (void *)&(((struct sockaddr_in *)addr)
 						    ->sin_addr) :
-					(void *)&(((struct sockaddr_in6 *)addr)
+				  (void *)&(((struct sockaddr_in6 *)addr)
 						    ->sin6_addr),
 			  client_ip_str, sizeof(client_ip_str));
 

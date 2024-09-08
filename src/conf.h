@@ -20,11 +20,11 @@
 
 #include "../config.h"
 
-#if HAVE_ZYRE !=0
+#if HAVE_ZYRE != 0
 #include <zyre.h>
 #endif
 
-#if HAVE_OPENDHT_C !=0
+#if HAVE_OPENDHT_C != 0
 #include <opendht/opendht_c.h>
 #endif
 
@@ -62,18 +62,18 @@ struct sentrypeer_config {
 	char *node_id;
 	char *p2p_bootstrap_node;
 	pthread_t sip_daemon_thread;
+	void *sip_tls_handle;
 	struct MHD_Daemon *http_daemon;
 
-#if HAVE_ZYRE !=0
+#if HAVE_ZYRE != 0
 	zyre_t *p2p_node;
 #endif
 
-#if HAVE_OPENDHT_C !=0
+#if HAVE_OPENDHT_C != 0
 	dht_runner *dht_node;
 	dht_infohash *dht_info_hash;
 	dht_op_token *dht_op_token;
 #endif
-
 };
 
 //  Constructor

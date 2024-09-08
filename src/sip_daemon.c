@@ -93,11 +93,16 @@ int sip_daemon_run(sentrypeer_config *config)
 	return EXIT_SUCCESS;
 }
 
-int shutdown_listen_tls(void)
+#if HAVE_RUST != 0
+int shutdown_listen_tls(sentrypeer_config const *config)
 {
-    // Get our Join handle here?
+    if (shutdown_tls(config) != EXIT_SUCCESS) {
+	fprintf(stderr, "Failed to shutdown TLS listener.\n");
+	return EXIT_FAILURE;
+    }    
     return EXIT_SUCCESS;
 }
+#endif // HAVE_RUST
 
 int sip_daemon_stop(sentrypeer_config const *config)
 {
@@ -117,7 +122,7 @@ int sip_daemon_stop(sentrypeer_config const *config)
 
    // Shutdown our Rust TLS listener
 #if HAVE_RUST != 0
-    if (shutdown_listen_tls() != EXIT_SUCCESS) {
+    if (shutdown_listen_tls(config) != EXIT_SUCCESS) {
         fprintf(stderr, "Failed to shutdown TLS listener.\n");
         return EXIT_FAILURE;
     }
