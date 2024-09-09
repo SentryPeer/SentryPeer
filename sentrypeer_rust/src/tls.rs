@@ -27,7 +27,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
-use tokio::signal;
+use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
@@ -154,15 +154,21 @@ unsafe fn clean_up_sip_message(
 #[no_mangle]
 pub(crate) unsafe extern "C" fn shutdown_tls(sentrypeer_c_config: *const sentrypeer_config) -> i32 {
     // Assert we're not getting a null pointer
-    assert!(!sentrypeer_c_config.is_null());
+    assert!(!sentrypeer_c_config.is_null(), "sentrypeer_c_config is null.");
+
+    // And this
     assert!(
-        !(*sentrypeer_c_config).sip_tls_handle.is_null(),
-        "sentrypeer_c_config.sip_tls_handle is null"
+        !(*sentrypeer_c_config).sip_tls_channel.is_null(),
+        "sentrypeer_c_config.sip_tls_handle is null."
     );
 
-    let handle = Box::from_raw((*sentrypeer_c_config).sip_tls_handle as *mut std::thread::JoinHandle<()>);
+    let tx = Box::from_raw((*sentrypeer_c_config).sip_tls_channel as *mut oneshot::Sender<String>);
 
-    handle.join().unwrap();
+    // Send the message to the tokio runtime to shutdown
+    if tx.send(String::from("Please shutdown :-)")).is_err() {
+        eprintln!("Failed to send message to tokio runtime to shutdown");
+        return libc::EXIT_FAILURE;
+    }
 
     libc::EXIT_SUCCESS
 }
@@ -183,12 +189,16 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         .build()
         .unwrap();
 
+    // Create a oneshot channel to send a message to tokio runtime to shutdown
+    let (tx, rx) = oneshot::channel::<String>();
+
     let sentrypeer_config = SentryPeerConfig {
         p: sentrypeer_c_config,
     };
 
+    // Launch our Tokio runtime from a new thread so we can exit this function
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
-    let handle = thread_builder.spawn(move || {
+    let _handle = thread_builder.spawn(move || {
         rt.block_on(async move {
             let config = config_from_env().unwrap();
 
@@ -224,37 +234,39 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
             }
 
             let mut buf = [0; 1024];
-            loop {
-                let (stream, peer_addr) = listener.accept().await.unwrap();
-                let acceptor = acceptor.clone();
 
-                if debug_mode || verbose_mode {
-                    eprintln!("Accepted TLS connection from: {}", peer_addr);
-                }
-
-                let fut = async move {
-                    let stream = acceptor.accept(stream).await.unwrap();
-
-                    let (mut reader, mut writer) = split(stream);
-                    let bytes_read = reader.read(&mut buf).await.unwrap();
-
-                    if log_sip_packet(sentrypeer_config, buf.to_vec(), bytes_read, peer_addr, addr)
-                        != libc::EXIT_SUCCESS
-                    {
-                        eprintln!("Failed to log SIP packet");
-                    }
+            tokio::spawn(async move {
+                loop {
+                    let (stream, peer_addr) = listener.accept().await.unwrap();
+                    let acceptor = acceptor.clone();
 
                     if debug_mode || verbose_mode {
-                        eprintln!(
-                            "Received: {:?}",
-                            String::from_utf8_lossy(&buf[..bytes_read])
-                        );
+                        eprintln!("Accepted TLS connection from: {}", peer_addr);
                     }
 
-                    if sip_responsive_mode {
-                        writer
-                            .write_all(
-                                &b"SIP/2.0 200 OK\r\n
+                    let fut = async move {
+                        let stream = acceptor.accept(stream).await.unwrap();
+
+                        let (mut reader, mut writer) = split(stream);
+                        let bytes_read = reader.read(&mut buf).await.unwrap();
+
+                        if log_sip_packet(sentrypeer_config, buf.to_vec(), bytes_read, peer_addr, addr)
+                            != libc::EXIT_SUCCESS
+                        {
+                            eprintln!("Failed to log SIP packet");
+                        }
+
+                        if debug_mode || verbose_mode {
+                            eprintln!(
+                                "Received: {:?}",
+                                String::from_utf8_lossy(&buf[..bytes_read])
+                            );
+                        }
+
+                        if sip_responsive_mode {
+                            writer
+                                .write_all(
+                                    &b"SIP/2.0 200 OK\r\n
                     Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
 		            Call-ID: 1179563087@127.0.0.1\r\n
 		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
@@ -267,40 +279,40 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
 		            Accept-Language: en\r\n
 		            Server: FPBX-16.0.33(18.13.0)\r\n
 		            Content-Length:  0\r\n"[..],
-                            )
-                            .await.unwrap();
-                    }
-
-                    libc::EXIT_SUCCESS
-                };
-
-                // This runs the future on the tokio runtime
-                tokio::spawn(async move {
-                    if fut.await != libc::EXIT_SUCCESS {
-                        eprintln!("Failed to handle TLS connection");
-                    }
-                });
-
-                // Make sure we shutdown correctly.
-                // https://tokio.rs/tokio/topics/shutdown#figuring-out-when-to-shut-down
-                // and https://rust-cli.github.io/book/in-depth/signals.html#first-off-handling-ctrlc
-                match signal::ctrl_c().await {
-                    Ok(_) => {
-                        if debug_mode || verbose_mode {
-                            eprintln!("Ctrl-C/SIGINT received, shutting down...");
-                            return libc::EXIT_SUCCESS;
+                                )
+                                .await.unwrap();
                         }
+
+                        libc::EXIT_SUCCESS
+                    };
+
+                    // This runs the future on the tokio runtime
+                    tokio::spawn(async move {
+                        if fut.await != libc::EXIT_SUCCESS {
+                            eprintln!("Failed to handle TLS connection");
+                        }
+                    });
+                }
+            });
+
+            match rx.await {
+                Ok(msg) => {
+                    if debug_mode || verbose_mode {
+                        eprintln!("Received message to shutdown: {:?}", msg);
                     }
-                    Err(e) => {
-                        eprintln!("Error handling signal: {}", e);
-                    }
+                    libc::EXIT_SUCCESS
+                }
+                Err(_) => {
+                    eprintln!("Failed to receive message to shutdown.");
+                    libc::EXIT_FAILURE
                 }
             }
         });
     });
-    // Set the pointer to the runtime
+
+    // Set the pointer to the oneshot channel
     unsafe {
-        (*sentrypeer_c_config).sip_tls_handle = Box::into_raw(Box::new(handle)) as *mut libc::c_void;
+        (*sentrypeer_c_config).sip_tls_channel = Box::into_raw(Box::new(tx)) as *mut libc::c_void;
     }
 
     libc::EXIT_SUCCESS

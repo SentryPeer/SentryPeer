@@ -62,7 +62,7 @@ struct sentrypeer_config {
 	char *node_id;
 	char *p2p_bootstrap_node;
 	pthread_t sip_daemon_thread;
-	void *sip_tls_handle;
+	void *sip_tls_channel;
 	struct MHD_Daemon *http_daemon;
 
 #if HAVE_ZYRE != 0
