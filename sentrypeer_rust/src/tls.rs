@@ -189,6 +189,9 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         .build()
         .unwrap();
 
+    let runtime = Arc::new(rt);
+    let rt_shutdown = runtime.clone();
+
     // Create a oneshot channel to send a message to tokio runtime to shutdown
     let (tx, rx) = oneshot::channel::<String>();
 
@@ -199,7 +202,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
     // Launch our Tokio runtime from a new thread so we can exit this function
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
     let _handle = thread_builder.spawn(move || {
-        rt.block_on(async move {
+        runtime.block_on(async move {
             let config = config_from_env().unwrap();
 
             let addr = config
@@ -300,6 +303,10 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
                     if debug_mode || verbose_mode {
                         eprintln!("Received message to shutdown: {:?}", msg);
                     }
+                    // https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html#method.into_inner
+                    Arc::into_inner(rt_shutdown)
+                        .unwrap()
+                        .shutdown_background();
                     libc::EXIT_SUCCESS
                 }
                 Err(_) => {
