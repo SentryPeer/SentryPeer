@@ -27,6 +27,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
+use tokio::runtime::Runtime;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
@@ -189,9 +190,6 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         .build()
         .unwrap();
 
-    let runtime = Arc::new(rt);
-    let rt_shutdown = runtime.clone();
-
     // Create a oneshot channel to send a message to tokio runtime to shutdown
     let (tx, rx) = oneshot::channel::<String>();
 
@@ -202,8 +200,11 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
     // Launch our Tokio runtime from a new thread so we can exit this function
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
     let _handle = thread_builder.spawn(move || {
-        runtime.block_on(async move {
+        rt.block_on(async move {
             let config = config_from_env().unwrap();
+
+            // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
+            let inner_runtime = Runtime::new().unwrap();
 
             let addr = config
                 .tls_listen_address
@@ -301,11 +302,10 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
             match rx.await {
                 Ok(msg) => {
                     if debug_mode || verbose_mode {
-                        eprintln!("Received message to shutdown: {:?}", msg);
+                        eprintln!("Tokio received a message to shutdown: {:?}", msg);
                     }
-                    // https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html#method.into_inner
-                    Arc::into_inner(rt_shutdown)
-                        .unwrap()
+                    // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
+                    inner_runtime
                         .shutdown_background();
                     libc::EXIT_SUCCESS
                 }
