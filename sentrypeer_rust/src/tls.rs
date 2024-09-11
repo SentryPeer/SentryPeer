@@ -27,7 +27,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
-use tokio::runtime::Runtime;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
@@ -189,6 +188,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         .enable_all()
         .build()
         .unwrap();
+    let handle = rt.handle().clone();
 
     // Create a oneshot channel to send a message to tokio runtime to shutdown
     let (tx, rx) = oneshot::channel::<String>();
@@ -199,12 +199,9 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
 
     // Launch our Tokio runtime from a new thread so we can exit this function
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
-    let _handle = thread_builder.spawn(move || {
-        rt.block_on(async move {
+    let _std_thread_handle = thread_builder.spawn(move || {
+        handle.block_on(async move {
             let config = config_from_env().unwrap();
-
-            // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
-            let inner_runtime = Runtime::new().unwrap();
 
             let addr = config
                 .tls_listen_address
@@ -305,8 +302,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
                         eprintln!("Tokio received a message to shutdown: {:?}", msg);
                     }
                     // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
-                    inner_runtime
-                        .shutdown_background();
+                    rt.shutdown_background();
                     libc::EXIT_SUCCESS
                 }
                 Err(_) => {
