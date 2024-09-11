@@ -31,7 +31,7 @@ use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use crate::{sentrypeer_config, sip_log_event, sip_message_event_new};
+use crate::{sentrypeer_config, sip_log_event, sip_message_event_new, sip_message_event_destroy};
 
 #[derive(Debug, Copy, Clone)]
 struct SentryPeerConfig {
@@ -91,7 +91,7 @@ fn log_sip_packet(
 
     unsafe {
         // https://doc.rust-lang.org/std/primitive.pointer.html
-        let sip_message = sip_message_event_new(
+        let mut sip_message = sip_message_event_new(
             // packet from stream
             packet_ptr,
             // packet length
@@ -120,6 +120,7 @@ fn log_sip_packet(
                 client_ip_addr_ptr,
                 dest_ip_addr_ptr,
             );
+            sip_message_event_destroy(&mut sip_message);
 
             return libc::EXIT_FAILURE;
         }
@@ -131,6 +132,7 @@ fn log_sip_packet(
             client_ip_addr_ptr,
             dest_ip_addr_ptr,
         );
+        sip_message_event_destroy(&mut sip_message);
 
         libc::EXIT_SUCCESS
     }
