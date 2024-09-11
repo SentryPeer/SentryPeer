@@ -299,7 +299,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
             match rx.await {
                 Ok(msg) => {
                     if debug_mode || verbose_mode {
-                        eprintln!("Tokio received a message to shutdown: {:?}", msg);
+                        eprintln!("Tokio received a oneshot message to shutdown: {:?}", msg);
                     }
                     // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
                     rt.shutdown_background();
