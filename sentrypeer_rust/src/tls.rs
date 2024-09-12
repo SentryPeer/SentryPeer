@@ -120,6 +120,16 @@ fn log_sip_packet(
                 client_ip_addr_ptr,
                 dest_ip_addr_ptr,
             );
+            
+            // Since we're managing the memory on the Rust side for the parts we'd 
+            // normally free on the C side, we need to set these pointers to null. 
+            // We only `free` in `sip_message_event_destroy` if they are not null. 
+            // Alternatively, we could just use `util_duplicate_string` and create 
+            // CStr on the Rust side.
+            (*sip_message).packet = std::ptr::null_mut();
+            (*sip_message).transport_type = std::ptr::null_mut();
+            (*sip_message).client_ip_addr_str = std::ptr::null_mut();
+            (*sip_message).dest_ip_addr_str = std::ptr::null_mut();
             sip_message_event_destroy(&mut sip_message);
 
             return libc::EXIT_FAILURE;
@@ -132,6 +142,15 @@ fn log_sip_packet(
             client_ip_addr_ptr,
             dest_ip_addr_ptr,
         );
+        // Since we're managing the memory on the Rust side for the parts we'd 
+        // normally free on the C side, we need to set these pointers to null. 
+        // We only `free` in `sip_message_event_destroy` if they are not null. 
+        // Alternatively, we could just use `util_duplicate_string` and create 
+        // CStr on the Rust side.
+        (*sip_message).packet = std::ptr::null_mut();
+        (*sip_message).transport_type = std::ptr::null_mut();
+        (*sip_message).client_ip_addr_str = std::ptr::null_mut();
+        (*sip_message).dest_ip_addr_str = std::ptr::null_mut();
         sip_message_event_destroy(&mut sip_message);
 
         libc::EXIT_SUCCESS
