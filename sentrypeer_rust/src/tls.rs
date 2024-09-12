@@ -120,7 +120,7 @@ fn log_sip_packet(
                 client_ip_addr_ptr,
                 dest_ip_addr_ptr,
             );
-            
+
             // Since we're managing the memory on the Rust side for the parts we'd 
             // normally free on the C side, we need to set these pointers to null. 
             // We only `free` in `sip_message_event_destroy` if they are not null. 
@@ -249,10 +249,6 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
 
             if debug_mode || verbose_mode {
                 eprintln!("Listening for incoming TLS connections...");
-
-                if sip_responsive_mode {
-                    eprintln!("SIP responsive mode enabled. Will reply to SIP probes...");
-                }
             }
 
             let mut buf = [0; 1024];
