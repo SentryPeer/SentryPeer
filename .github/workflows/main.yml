@@ -73,6 +73,11 @@ jobs:
           make
           make check || (cat ./test-suite.log; false)
           ./sentrypeer -V
-          make distcheck
+          # Leave this out for now. We've tried:
+          # https://github.com/rust-lang/rust-bindgen/issues/2930
+          # https://users.rust-lang.org/t/make-distcheck-vpath-and-autotools-vars-in-build-rs/117502/1
+          # https://stackoverflow.com/questions/75722074/how-to-do-autotools-vpath-builds-with-rust/78981344#78981344
+          # make distcheck
+          make dist
           make clean
           make distclean
