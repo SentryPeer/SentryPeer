@@ -130,7 +130,9 @@ unit_test_SOURCES = \
     tests/unit_tests/test_sip_message_event.c \
     tests/unit_tests/test_sip_message_event.h \
     tests/unit_tests/test_sip_daemon.c \
-    tests/unit_tests/test_sip_daemon.h
+    tests/unit_tests/test_sip_daemon.h \
+    tests/unit_tests/127.0.0.1.pem \
+    tests/unit_tests/127.0.0.1-key.pem
 
 if !DISABLE_RUST
 if HAVE_RUST
@@ -153,7 +155,8 @@ unit_test_SOURCES += tests/unit_tests/runner.c
 EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
            LICENSE.GPL-3.0-only CMakeLists.txt \
-           cmake/git_revision.cmake cmake/config.h.in
+           cmake/git_revision.cmake cmake/config.h.in \
+           .env
 
 if !DISABLE_RUST
 if HAVE_RUST

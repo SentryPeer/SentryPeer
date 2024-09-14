@@ -347,10 +347,10 @@ mod tests {
     #[test]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
-        assert_eq!(config.cert, PathBuf::from("../tests/tools/127.0.0.1.pem"));
+        assert_eq!(config.cert, PathBuf::from("../tests/unit_tests/127.0.0.1.pem"));
         assert_eq!(
             config.key,
-            PathBuf::from("../tests/tools/127.0.0.1-key.pem")
+            PathBuf::from("../tests/unit_tests/127.0.0.1-key.pem")
         );
         assert_eq!(config.tls_listen_address, "127.0.0.1:8088");
     }
