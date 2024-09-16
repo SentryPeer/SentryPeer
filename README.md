@@ -323,7 +323,7 @@ Fedora:
 macOS:
 
     brew install git libtool autoconf automake autoconf-archive libosip cmocka \
-    libmicrohttpd jansson curl pcre2 pkg-config
+    libmicrohttpd jansson curl pcre2 pkg-config opendht
 
 Rust:
 
