@@ -64,6 +64,7 @@ jobs:
             brew install cmocka
             brew install pcre2
             brew install opendht
+            brew install ossp-uuid
           fi
       - name: Build and Clean
         run: |
