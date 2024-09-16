@@ -322,7 +322,7 @@ Fedora:
 
 macOS:
 
-    brew install git clang libtool autoconf automake autoconf-archive libosip cmocka \
+    brew install git libtool autoconf automake autoconf-archive libosip cmocka \
     libmicrohttpd jansson curl pcre2
 
 Rust:
