@@ -317,13 +317,13 @@ Debian/Ubuntu:
 
 Fedora:
 
-    sudo dnf install git clang autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
+    sudo dnf install git clang pkg-config autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
     libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
 
 macOS:
 
     brew install git libtool autoconf automake autoconf-archive libosip cmocka \
-    libmicrohttpd jansson curl pcre2
+    libmicrohttpd jansson curl pcre2 pkg-config
 
 Rust:
 
