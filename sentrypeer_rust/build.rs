@@ -25,7 +25,7 @@ fn main() {
 
     println!("cargo:rustc-link-lib=sentrypeer");
 
-    // Our other SentryPeer dependencies
+    // Our other hard SentryPeer dependencies
     println!("cargo:rustc-link-lib=jansson");
     println!("cargo:rustc-link-lib=uuid");
     println!("cargo:rustc-link-lib=curl");
@@ -33,6 +33,7 @@ fn main() {
     println!("cargo:rustc-link-lib=osipparser2");
 
     // Check to see if OpenDHT-C is wanted in config.h and is not != 0
+    // Works with autotools AND cmake
     let opendht = std::fs::read_to_string("../config.h").unwrap();
     if opendht.contains("#define HAVE_OPENDHT_C 1") {
         println!("cargo:rustc-link-lib=opendht-c");
