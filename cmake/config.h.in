@@ -16,3 +16,7 @@
 #define PACKAGE_NAME "@PACKAGE_NAME@"
 #define PACKAGE_VERSION "@PACKAGE_VERSION@"
 #define REVISION "@REVISION@"
+
+// Set this via CMake just like autotools does for our config.h
+// We parse this in our build.rs
+#define HAVE_OPENDHT_C @OPENDHT_FOUND@

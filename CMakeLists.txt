@@ -22,25 +22,25 @@ include(CMakePackageConfigHelpers)
 include(CMakeDependentOption)
 include(FindPkgConfig)
 
-option (UNIT_TESTING "Enable unit testing" OFF)
-option (DISABLE_OPENDHT "Disable OpenDHT support" OFF)
-option (DISABLE_RUST "Disable Rust parts" OFF)
-option (RUST_DEBUG_RELEASE "Rust debug or release" OFF)
+option(UNIT_TESTING "Enable unit testing" OFF)
+option(DISABLE_OPENDHT "Disable OpenDHT support" OFF)
+option(DISABLE_RUST "Disable Rust parts" OFF)
+option(RUST_DEBUG_RELEASE "Rust debug or release" OFF)
 
 if (DISABLE_OPENDHT)
-        add_definitions(-DHAVE_OPENDHT=0)
-        message(STATUS "OpenDHT support disabled")
-endif()
+    add_definitions(-DHAVE_OPENDHT=0)
+    message(STATUS "OpenDHT support disabled")
+endif ()
 
 if (DISABLE_RUST)
-        add_definitions(-DHAVE_RUST=0)
-        message(STATUS "Rust support disabled")
-endif()
+    add_definitions(-DHAVE_RUST=0)
+    message(STATUS "Rust support disabled")
+endif ()
 
 if (RUST_DEBUG_RELEASE)
-        add_definitions(-DRUST_DEBUG_RELEASE=1)
-        message(STATUS "Rust debug release enabled")
-endif()
+    add_definitions(-DRUST_DEBUG_RELEASE=1)
+    message(STATUS "Rust debug release enabled")
+endif ()
 
 set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
         ${CMAKE_SOURCE_DIR}/src/signal_handler.c
@@ -93,15 +93,15 @@ pkg_search_module(CURL REQUIRED libcurl)
 pkg_search_module(PCRE2 REQUIRED libpcre2-8)
 
 if (NOT DISABLE_OPENDHT)
-        pkg_search_module(OPENDHT opendht)
-        message(STATUS "OpenDHT support not disabled")
-endif()
+    pkg_search_module(OPENDHT opendht)
+    message(STATUS "OpenDHT support not disabled")
+endif ()
 
 if (OPENDHT_FOUND)
-        add_definitions(-DHAVE_OPENDHT_C=1)
-	message(STATUS "OPENDHT_C_VERSION: ${OPENDHT_VERSION}")
-	add_definitions(-DOPENDHT_C_VERSION="${OPENDHT_VERISON}")
-endif()
+    add_definitions(-DHAVE_OPENDHT_C=1)
+    message(STATUS "OPENDHT_C_VERSION: ${OPENDHT_VERSION}")
+    add_definitions(-DOPENDHT_C_VERSION="${OPENDHT_VERISON}")
+endif ()
 
 include_directories(${OSIP2_INCLUDE_DIRS})
 include_directories(${SQLITE3_INCLUDE_DIRS})
@@ -119,17 +119,17 @@ set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 # For our Rust code
 # See https://github.com/corrosion-rs/corrosion
 if (NOT DISABLE_RUST)
-include(FetchContent)
+    include(FetchContent)
 
-FetchContent_Declare(
-        Corrosion
-        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
-)
-FetchContent_MakeAvailable(Corrosion)
+    FetchContent_Declare(
+            Corrosion
+            GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+    )
+    FetchContent_MakeAvailable(Corrosion)
 
-# Import targets defined in a package or workspace manifest `Cargo.toml` file
-corrosion_import_crate(MANIFEST_PATH sentrypeer_rust/Cargo.toml)
-message(STATUS "Rust support enabled")
+    # Import targets defined in a package or workspace manifest `Cargo.toml` file
+    corrosion_import_crate(MANIFEST_PATH sentrypeer_rust/Cargo.toml)
+    message(STATUS "Rust support enabled")
 endif ()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} -losipparser2)
@@ -141,14 +141,14 @@ target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
 
 if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
-        target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
-        message(STATUS "Linking with OpenDHT")
-endif()
+    target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
+    message(STATUS "Linking with OpenDHT")
+endif ()
 
 if (NOT DISABLE_RUST)
-target_link_libraries(${CMAKE_PROJECT_NAME} sentrypeer_rust)
-message(STATUS "Linking with Rust parts")
-endif()
+    target_link_libraries(${CMAKE_PROJECT_NAME} sentrypeer_rust)
+    message(STATUS "Linking with Rust parts")
+endif ()
 
 # configure header file
 configure_file(
@@ -162,9 +162,9 @@ configure_file(
 )
 
 if (UNIT_TESTING)
-        include(CTest)
-        find_package(cmocka 1.1.5 REQUIRED)
-        add_subdirectory(tests/unit_tests)
-        message(STATUS "Unit testing enabled")
-endif()
+    include(CTest)
+    find_package(cmocka 1.1.5 REQUIRED)
+    add_subdirectory(tests/unit_tests)
+    message(STATUS "Unit testing enabled")
+endif ()
 
