@@ -118,3 +118,8 @@ sentrypeer_json.log
 
 # Rust
 sentrypeer_rust/target/
+
+# Other tools
+clang_output*
+cmake-build-debug
+

@@ -45,4 +45,4 @@ jobs:
           set -x
           ./bootstrap.sh
           ./configure
-          scan-build --status-bugs make
+          scan-build --status-bugs --exclude .cargo make

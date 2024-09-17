@@ -20,9 +20,8 @@ fn main() {
     // shared library and how to find it
     println!("cargo:rustc-link-search=../.libs"); // Autotools
     println!("cargo:rustc-link-search=../build"); // CMake
-
-    // If macOS
-    println!("cargo:rustc-link-search=/opt/homebrew/lib"); 
+    // macOS - harmless on other platforms
+    println!("cargo:rustc-link-search=/opt/homebrew/lib");
 
     println!("cargo:rustc-link-lib=sentrypeer");
 
@@ -47,7 +46,7 @@ fn main() {
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.h")
-        // If macOS
+        // macOS - harmless on other platforms
         .clang_arg("-I/opt/homebrew/include")
         // Pick the functions we want to generate bindings for
         .allowlist_function("sentrypeer_config_new|sentrypeer_config_destroy")
