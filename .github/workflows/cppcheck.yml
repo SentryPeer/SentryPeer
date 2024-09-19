@@ -37,6 +37,7 @@ jobs:
           libjansson-dev \
           libpcre2-dev \
           libcurl4-openssl-dev \
+          libsqlite3-dev \
           cppcheck -y
           brew update
           brew upgrade          

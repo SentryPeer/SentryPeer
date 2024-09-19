@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf-archive libosip2-dev libcmocka-dev uuid-dev \
-          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev libpcre2-dev -y
+          libmicrohttpd-dev libjansson-dev libcurl4-openssl-dev libpcre2-dev libsqlite3-dev -y
           brew update
           brew upgrade
           brew install libosip opendht

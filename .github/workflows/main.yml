@@ -45,6 +45,7 @@ jobs:
             libmicrohttpd-dev \
             libjansson-dev \
             libcurl4-openssl-dev \
+            libsqlite3-dev \
             libpcre2-dev -y
             brew update
             brew upgrade

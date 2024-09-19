@@ -52,6 +52,7 @@ jobs:
         libjansson-dev \
         libcurl4-openssl-dev \
         libpcre2-dev \
+        libsqlite3-dev \
         autoconf-archive -y
         brew update
         brew upgrade        
