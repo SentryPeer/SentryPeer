@@ -15,7 +15,7 @@ on:
 jobs:
   clang-analyzer:
     name: Cppcheck Static Analysis
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Add Homebrew to $PATH
         run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
