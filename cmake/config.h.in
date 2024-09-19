@@ -19,4 +19,4 @@
 
 // Set this via CMake just like autotools does for our config.h
 // We parse this in our build.rs
-#define HAVE_OPENDHT_C @OPENDHT_FOUND@
+#define HAVE_OPENDHT_C @HAVE_OPENDHT_C@

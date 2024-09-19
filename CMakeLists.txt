@@ -140,14 +140,15 @@ target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
 
-# Used in config.h.in
-if (!OPENDHT_FOUND)
-    set(OPENDHT_FOUND 0)
+# Used in config.h.in - can't reset OPENDHT_FOUND here, so use a new variable
+if (NOT OPENDHT_FOUND)
+    set(HAVE_OPENDHT_C 0)
 endif ()
 
 if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
     target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
     message(STATUS "Linking with OpenDHT")
+    set(HAVE_OPENDHT_C 1)
 endif ()
 
 if (NOT DISABLE_RUST)

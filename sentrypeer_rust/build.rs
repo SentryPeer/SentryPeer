@@ -31,6 +31,7 @@ fn main() {
     println!("cargo:rustc-link-lib=curl");
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=osipparser2");
+    println!("cargo:rustc-link-lib=microhttpd");
 
     // Check to see if OpenDHT-C is wanted in config.h and is not != 0
     // Works with autotools AND cmake
