@@ -66,6 +66,7 @@ jobs:
             brew install pcre2
             brew install opendht
             brew install ossp-uuid
+            brew install libtool
           fi
       - name: Build and Clean
         run: |

@@ -69,6 +69,7 @@ jobs:
             brew install opendht
             brew install ossp-uuid
             brew install llvm
+            brew install libtool
           fi
       - name: Build and Clean
         run: |
