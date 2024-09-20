@@ -67,12 +67,14 @@ jobs:
             brew install opendht
             brew install ossp-uuid
             brew install libtool
+            export LDFLAGS="-L/opt/homebrew/lib"
+            export CPPFLAGS="-I/opt/homebrew/include"
           fi
       - name: Build and Clean
         run: |
           set -x
           ./bootstrap.sh
-          LDFLAGS="-L/opt/homebrew/lib" ./configure
+          ./configure
           make
           make check || (cat ./test-suite.log; false)
           ./sentrypeer -V
