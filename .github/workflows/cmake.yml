@@ -74,8 +74,8 @@ jobs:
       - name: Build and Clean
         run: |
           set -x
-          LDFLAGS="-L/opt/homebrew/lib" CPPFLAGS="-I/opt/homebrew/include" \
-          cmake -S . -B build -DUNIT_TESTING=ON
+          LDFLAGS="-L/opt/homebrew/lib" \
+          cmake -S . -B build -DUNIT_TESTING=ON VERBOSE=1
           cmake --build build
           ctest --test-dir build
 
