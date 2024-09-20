@@ -70,8 +70,6 @@ jobs:
             brew install ossp-uuid
             brew install llvm
             brew install libtool
-            echo "LDFLAGS=-L/opt/homebrew/lib" >> "$GITHUB_ENV" 
-            echo "CPPFLAGS=-I/opt/homebrew/include" >> "$GITHUB_ENV" 
           fi
       - name: Build and Clean
         run: |
