@@ -22,6 +22,9 @@ jobs:
         cc: [ gcc, clang ]
     env:
       CC: ${{ matrix.cc }}
+      HOMEBREW_PREFIX: $(brew --prefix)
+      CPPFLAGS: -I${HOMEBREW_PREFIX}/include${CPPFLAGS+ ${CPPFLAGS}}
+      LDFLAGS: -L${HOMEBREW_PREFIX}/lib${LDFLAGS+ ${LDFLAGS}}
     steps:
       - name: Add Homebrew to $PATH
         run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
