@@ -72,7 +72,7 @@ jobs:
         run: |
           set -x
           ./bootstrap.sh
-          ./configure
+          LDFLAGS="-L/opt/homebrew/lib" CPPFLAGS="-I/opt/homebrew/include" ./configure
           make
           make check || (cat ./test-suite.log; false)
           ./sentrypeer -V
