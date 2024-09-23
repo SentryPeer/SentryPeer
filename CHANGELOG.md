@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- TLS support for SIP mode, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
+- SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
 - Environment variables `SENTRYPEER_CERT`, `SENTRYPEER_KEY` and `SENTRYPEER_TLS_LISTEN_ADDRESS`
 - We now look for `cargo` and `rustc`, as we are porting parts of SentryPeer to Rust. New features will
-  be written in Rust. 
+  be written in Rust
+- SIP TLS support and other Rust-powered features will not be built if Rust is not detected. 
 - `make check` now runs Rust tests
+- `make clean` cleans up Rust builds
 - `--enable-debug` argument added to `./configure` to enable debug mode for Rust code. Default is `--release`
 - `--enable-silent-rules` and `make V=1` honoured in Rust code build
 - `--disable-rust` argument added to `./configure` so you can disable Rust code build
