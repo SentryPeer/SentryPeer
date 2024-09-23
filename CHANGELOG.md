@@ -1,23 +1,26 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Changes
+
+### Added
+- TLS support for SIP mode, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
+- Environment variables `SENTRYPEER_CERT`, `SENTRYPEER_KEY` and `SENTRYPEER_TLS_LISTEN_ADDRESS`
 - We now look for `cargo` and `rustc`, as we are porting parts of SentryPeer to Rust. New features will
   be written in Rust. 
 - `make check` now runs Rust tests
 - `--enable-debug` argument added to `./configure` to enable debug mode for Rust code. Default is `--release`
 - `--enable-silent-rules` and `make V=1` honoured in Rust code build
 - `--disable-rust` argument added to `./configure` so you can disable Rust code build
-- CMakeLists.txt updated to build Rust code and run all tests.
-  We're using https://github.com/corrosion-rs/corrosion for this
+- `CMakeLists.txt` updated to build Rust code and run all tests. We're using https://github.com/corrosion-rs/corrosion for this
 - README.md updated to reflect the new Rust code build options, and CMake build instructions that now also 
   include Rust code and running our tests
 
 ## [3.0.2] - 2023-11-17
+
 ### Fixes
 - Check `user_agent_header->hvalue` is not NULL as you can get a blank user-agent value in malformed SIP packets
 
