@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CMakeLists.txt` updated to build Rust code and run all tests. We're using https://github.com/corrosion-rs/corrosion for this
 - README.md updated to reflect the new Rust code build options, and CMake build instructions that now also 
   include Rust code and running our tests
+- Show `CPPFLAGS` and `LDFLAGS` in `configure` status summary as needed to do macOS builds if on arm64  
 
 ## [3.0.2] - 2023-11-17
 

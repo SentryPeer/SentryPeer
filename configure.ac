@@ -342,6 +342,8 @@ Configured build options for $PROJECT_NAME:
   Compiler:         
    C compiler         ${CC}
    CFLAGS:            ${CFLAGS} ${LIBASAN_FLAGS}
+   CPPFLAGS	      ${CPPFLAGS}		 
+   LDFLAGS	      ${LDFLAGS}
    LIBS:              ${LIBS}
 
   Configure complete! Now proceed with:
