@@ -109,6 +109,13 @@ int32_t callback_from_c(int32_t (*callback)(bool), bool success);
  *
  * Shutdown the tokio runtime.
  */
+int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config);
+
+/**
+ * # Safety
+ *
+ * Shutdown the tokio runtime.
+ */
 int32_t shutdown_tls(const sentrypeer_config *sentrypeer_c_config);
 
 /**

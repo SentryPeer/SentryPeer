@@ -31,7 +31,7 @@ use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
 // Our C FFI functions
-use crate::{sentrypeer_config, sip_log_event, sip_message_event_new, sip_message_event_destroy};
+use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
 #[derive(Debug, Copy, Clone)]
 struct SentryPeerConfig {
@@ -121,10 +121,10 @@ fn log_sip_packet(
                 dest_ip_addr_ptr,
             );
 
-            // Since we're managing the memory on the Rust side for the parts we'd 
-            // normally free on the C side, we need to set these pointers to null. 
-            // We only `free` in `sip_message_event_destroy` if they are not null. 
-            // Alternatively, we could just use `util_duplicate_string` and create 
+            // Since we're managing the memory on the Rust side for the parts we'd
+            // normally free on the C side, we need to set these pointers to null.
+            // We only `free` in `sip_message_event_destroy` if they are not null.
+            // Alternatively, we could just use `util_duplicate_string` and create
             // CStr on the Rust side.
             (*sip_message).packet = std::ptr::null_mut();
             (*sip_message).transport_type = std::ptr::null_mut();
@@ -142,10 +142,10 @@ fn log_sip_packet(
             client_ip_addr_ptr,
             dest_ip_addr_ptr,
         );
-        // Since we're managing the memory on the Rust side for the parts we'd 
-        // normally free on the C side, we need to set these pointers to null. 
-        // We only `free` in `sip_message_event_destroy` if they are not null. 
-        // Alternatively, we could just use `util_duplicate_string` and create 
+        // Since we're managing the memory on the Rust side for the parts we'd
+        // normally free on the C side, we need to set these pointers to null.
+        // We only `free` in `sip_message_event_destroy` if they are not null.
+        // Alternatively, we could just use `util_duplicate_string` and create
         // CStr on the Rust side.
         (*sip_message).packet = std::ptr::null_mut();
         (*sip_message).transport_type = std::ptr::null_mut();
@@ -175,7 +175,10 @@ unsafe fn clean_up_sip_message(
 #[no_mangle]
 pub(crate) unsafe extern "C" fn shutdown_tls(sentrypeer_c_config: *const sentrypeer_config) -> i32 {
     // Assert we're not getting a null pointer
-    assert!(!sentrypeer_c_config.is_null(), "sentrypeer_c_config is null.");
+    assert!(
+        !sentrypeer_c_config.is_null(),
+        "sentrypeer_c_config is null."
+    );
 
     // And this
     assert!(
@@ -347,7 +350,10 @@ mod tests {
     #[test]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
-        assert_eq!(config.cert, PathBuf::from("../tests/unit_tests/127.0.0.1.pem"));
+        assert_eq!(
+            config.cert,
+            PathBuf::from("../tests/unit_tests/127.0.0.1.pem")
+        );
         assert_eq!(
             config.key,
             PathBuf::from("../tests/unit_tests/127.0.0.1-key.pem")

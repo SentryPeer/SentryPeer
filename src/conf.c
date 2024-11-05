@@ -30,6 +30,10 @@
 // Produced by autoconf and cmake (manually by me)
 #include "config.h"
 
+#if HAVE_RUST != 0
+#include "sentrypeer_rust.h"
+#endif // HAVE_RUST
+
 //  Constructor
 sentrypeer_config *sentrypeer_config_new(void)
 {
@@ -211,10 +215,13 @@ void print_version(void)
 
 int process_cli(sentrypeer_config *config, int argc, char **argv)
 {
-	int cli_option;
-
 	// Check env vars first
 	process_env_vars(config);
+
+#if HAVE_RUST != 0
+	process_cli_rs(config);
+#else
+	int cli_option;
 
 	while ((cli_option = getopt(argc, argv, "hVvf:l:b:c:i:w:jpdrRas")) !=
 	       -1) {
@@ -296,6 +303,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+#endif // HAVE_RUST
 
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "SentryPeer node id: %s\n", config->node_id);

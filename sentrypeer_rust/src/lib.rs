@@ -25,6 +25,7 @@ use libc::c_char;
 use std::ffi::CString;
 use uuid::Uuid;
 
+pub mod cli;
 pub mod tls;
 
 /// A manually created struct to represent a BadActor from bad_actor.h
