@@ -10,8 +10,8 @@
                               __/ |
                              |___/
 */
-use std::ffi::CString;
 use clap::Parser;
+use std::ffi::CString;
 use std::path::PathBuf;
 
 // Our C FFI functions
@@ -96,53 +96,83 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     (*sentrypeer_c_config).syslog_mode = args.syslog;
     (*sentrypeer_c_config).verbose_mode = args.verbose;
 
-
-
+    // TODO: Validate things with PathBuf ?
+    // How?
     // Set strings
     if args.db_file.is_some() {
-        let db_file = args.db_file.unwrap();      
-            (*sentrypeer_c_config).db_file = CString::new(db_file.to_str().unwrap()).unwrap().into_raw();
+        let db_file = args.db_file.unwrap();
+        (*sentrypeer_c_config).db_file =
+            CString::new(db_file.to_str().unwrap()).unwrap().into_raw();
     }
-    
+
     if args.json {
         (*sentrypeer_c_config).json_log_mode = true;
-        
+
         if args.json_log_file.is_some() {
             let json_log_file = args.json_log_file.unwrap();
-            (*sentrypeer_c_config).json_log_file = CString::new(json_log_file.to_str().unwrap()).unwrap().into_raw();
+            (*sentrypeer_c_config).json_log_file = CString::new(json_log_file.to_str().unwrap())
+                .unwrap()
+                .into_raw();
         }
     }
-    
+
     if args.bootstrap.is_some() {
-        (*sentrypeer_c_config).p2p_bootstrap_node = CString::new(args.bootstrap.unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).p2p_bootstrap_node =
+            CString::new(args.bootstrap.unwrap()).unwrap().into_raw();
     }
-    
+
     if args.client_id.is_some() {
-        (*sentrypeer_c_config).oauth2_client_id = CString::new(args.client_id.unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).oauth2_client_id =
+            CString::new(args.client_id.unwrap()).unwrap().into_raw();
     }
 
     if args.client_secret.is_some() {
-        (*sentrypeer_c_config).oauth2_client_secret = CString::new(args.client_secret.unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).oauth2_client_secret = CString::new(args.client_secret.unwrap())
+            .unwrap()
+            .into_raw();
     }
 
     if args.webhook_url.is_some() {
-        (*sentrypeer_c_config).webhook_url = CString::new(args.webhook_url.unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).webhook_url =
+            CString::new(args.webhook_url.unwrap()).unwrap().into_raw();
     }
-    
+
     println!("API Mode: {}", (*sentrypeer_c_config).api_mode);
     println!("Debug Mode: {}", (*sentrypeer_c_config).debug_mode);
     println!("P2P DHT Mode: {}", (*sentrypeer_c_config).p2p_dht_mode);
     println!("SIP Mode: {}", (*sentrypeer_c_config).sip_mode);
-    println!("SIP Responsive Mode: {}", (*sentrypeer_c_config).sip_responsive_mode);
+    println!(
+        "SIP Responsive Mode: {}",
+        (*sentrypeer_c_config).sip_responsive_mode
+    );
     println!("Syslog Mode: {}", (*sentrypeer_c_config).syslog_mode);
     println!("Verbose Mode: {}", (*sentrypeer_c_config).verbose_mode);
+
+    println!(
+        "DB File: {:?}",
+        CString::from_raw((*sentrypeer_c_config).db_file)
+    );
     println!("JSON Log Mode: {}", (*sentrypeer_c_config).json_log_mode);
-    println!("JSON Log File: {:?}", (*sentrypeer_c_config).json_log_file);
-    println!("DB File: {:?}", (*sentrypeer_c_config).db_file);
-    println!("P2P Bootstrap Node: {:?}", (*sentrypeer_c_config).p2p_bootstrap_node);
-    println!("OAuth2 Client ID: {:?}", (*sentrypeer_c_config).oauth2_client_id);
-    println!("OAuth2 Client Secret: {:?}", (*sentrypeer_c_config).oauth2_client_secret);
-    println!("WebHook URL: {:?}", (*sentrypeer_c_config).webhook_url);
-    
+    println!(
+        "JSON Log File: {:?}",
+        CString::from_raw((*sentrypeer_c_config).json_log_file)
+    );
+    println!(
+        "P2P Bootstrap Node: {:?}",
+        CString::from_raw((*sentrypeer_c_config).p2p_bootstrap_node)
+    );
+    println!(
+        "OAuth2 Client ID: {:?}",
+        CString::from_raw((*sentrypeer_c_config).oauth2_client_id)
+    );
+    println!(
+        "OAuth2 Client Secret: {:?}",
+        CString::from_raw((*sentrypeer_c_config).oauth2_client_secret)
+    );
+    println!(
+        "WebHook URL: {:?}",
+        CString::from_raw((*sentrypeer_c_config).webhook_url)
+    );
+
     libc::EXIT_SUCCESS
 }

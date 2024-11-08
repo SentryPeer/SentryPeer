@@ -20,7 +20,7 @@ fn main() {
     // shared library and how to find it
     println!("cargo:rustc-link-search=../.libs"); // Autotools
     println!("cargo:rustc-link-search=../build"); // CMake
-    // macOS - harmless on other platforms
+                                                  // macOS - harmless on other platforms
     println!("cargo:rustc-link-search=/opt/homebrew/lib");
 
     println!("cargo:rustc-link-lib=sentrypeer");
