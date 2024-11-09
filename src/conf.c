@@ -100,6 +100,11 @@ sentrypeer_config *sentrypeer_config_new(void)
 	assert(self->dht_info_hash);
 	dht_infohash_get_from_string(self->dht_info_hash, DHT_BAD_ACTORS_KEY);
 #endif
+	
+#if HAVE_RUST != 0
+	self->tls_cert_file = 0;
+	self->tls_key_file = 0;
+#endif
 
 	return self;
 }

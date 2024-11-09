@@ -66,6 +66,11 @@ struct sentrypeer_config {
 	dht_infohash *dht_info_hash;
 	dht_op_token *dht_op_token;
 #endif
+	
+#if HAVE_RUST != 0
+	char *tls_cert_file;
+	char *tls_key_file;
+#endif
 };
 
 //  Constructor

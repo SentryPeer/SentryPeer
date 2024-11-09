@@ -64,6 +64,14 @@ struct Args {
     /// Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
     #[arg(short = 'l')]
     json_log_file: Option<PathBuf>,
+    
+    /// Set 'tls_cert.pem' location or use SENTRYPEER_CERT env
+    #[arg(short = 't')]
+    tls_cert_file: Option<PathBuf>,
+    
+    /// Set 'tls_key.pem' location or use SENTRYPEER_KEY env
+    #[arg(short = 'k')]
+    tls_key_file: Option<PathBuf>,
 
     /// Enable syslog logging or use SENTRYPEER_SYSLOG env
     #[arg(short)]
@@ -136,6 +144,16 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
         (*sentrypeer_c_config).webhook_url =
             CString::new(args.webhook_url.unwrap()).unwrap().into_raw();
     }
+    
+    if args.tls_cert_file.is_some() {
+        let tls_cert_file = args.tls_cert_file.unwrap();
+        (*sentrypeer_c_config).tls_cert_file = CString::new(tls_cert_file.to_str().unwrap()).unwrap().into_raw();
+    }
+    
+    if args.tls_key_file.is_some() {
+        let tls_key_file = args.tls_key_file.unwrap();
+        (*sentrypeer_c_config).tls_key_file = CString::new(tls_key_file.to_str().unwrap()).unwrap().into_raw();
+    }
 
     println!("API Mode: {}", (*sentrypeer_c_config).api_mode);
     println!("Debug Mode: {}", (*sentrypeer_c_config).debug_mode);
@@ -172,6 +190,16 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     println!(
         "WebHook URL: {:?}",
         CString::from_raw((*sentrypeer_c_config).webhook_url)
+    );
+    
+    println!(
+        "TLS Cert File: {:?}",
+        CString::from_raw((*sentrypeer_c_config).tls_cert_file)
+    );
+    
+    println!(
+        "TLS Key File: {:?}",
+        CString::from_raw((*sentrypeer_c_config).tls_key_file)
     );
 
     libc::EXIT_SUCCESS
