@@ -34,15 +34,15 @@ struct Args {
     p2p: bool,
 
     /// Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
-    #[arg(short, value_name = "BOOTSTRAP_NODE")]
+    #[arg(short, value_name = "BOOTSTRAP_NODE", requires = "p2p")]
     bootstrap: Option<String>,
 
     /// Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
-    #[arg(short = 'i')]
+    #[arg(short = 'i', requires = "client_secret")]
     client_id: Option<String>,
 
     /// Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
-    #[arg(short)]
+    #[arg(short, requires = "client_id")]
     client_secret: Option<String>,
 
     /// Enable RESTful API mode or use SENTRYPEER_API env
@@ -50,7 +50,7 @@ struct Args {
     api: bool,
 
     /// Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
-    #[arg(short)]
+    #[arg(short, requires = "client_id", requires = "client_secret")]
     webhook_url: Option<String>,
 
     /// Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
@@ -62,17 +62,17 @@ struct Args {
     unresponsive: bool,
 
     /// Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
-    #[arg(short = 'l')]
+    #[arg(short = 'l', requires = "json")]
     json_log_file: Option<PathBuf>,
 
     /// Disable TLS mode completely or use SENTRYPEER_TLS_DISABLE env
     #[arg(short = 'T')]
     tls_mode: bool,
-    
+
     /// Set 'tls_cert.pem' location or use SENTRYPEER_CERT env
     #[arg(short = 't', requires = "tls_key_file")]
     tls_cert_file: Option<PathBuf>,
-    
+
     /// Set 'tls_key.pem' location or use SENTRYPEER_KEY env
     #[arg(short = 'k', requires = "tls_cert_file")]
     tls_key_file: Option<PathBuf>,
@@ -151,15 +151,19 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
         (*sentrypeer_c_config).webhook_url =
             CString::new(args.webhook_url.unwrap()).unwrap().into_raw();
     }
-    
+
     if args.tls_cert_file.is_some() {
         let tls_cert_file = args.tls_cert_file.unwrap();
-        (*sentrypeer_c_config).tls_cert_file = CString::new(tls_cert_file.to_str().unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).tls_cert_file = CString::new(tls_cert_file.to_str().unwrap())
+            .unwrap()
+            .into_raw();
     }
-    
+
     if args.tls_key_file.is_some() {
         let tls_key_file = args.tls_key_file.unwrap();
-        (*sentrypeer_c_config).tls_key_file = CString::new(tls_key_file.to_str().unwrap()).unwrap().into_raw();
+        (*sentrypeer_c_config).tls_key_file = CString::new(tls_key_file.to_str().unwrap())
+            .unwrap()
+            .into_raw();
     }
 
     println!("API Mode: {}", (*sentrypeer_c_config).api_mode);
@@ -200,12 +204,12 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     );
 
     println!("TLS Mode: {}", (*sentrypeer_c_config).tls_mode);
-    
+
     println!(
         "TLS Cert File: {:?}",
         CString::from_raw((*sentrypeer_c_config).tls_cert_file)
     );
-    
+
     println!(
         "TLS Key File: {:?}",
         CString::from_raw((*sentrypeer_c_config).tls_key_file)
