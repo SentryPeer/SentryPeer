@@ -68,6 +68,7 @@ struct sentrypeer_config {
 #endif
 	
 #if HAVE_RUST != 0
+	bool tls_mode;
 	char *tls_cert_file;
 	char *tls_key_file;
 #endif

@@ -64,13 +64,17 @@ struct Args {
     /// Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
     #[arg(short = 'l')]
     json_log_file: Option<PathBuf>,
+
+    /// Disable TLS mode completely or use SENTRYPEER_TLS_DISABLE env
+    #[arg(short = 'T')]
+    tls_mode: bool,
     
     /// Set 'tls_cert.pem' location or use SENTRYPEER_CERT env
-    #[arg(short = 't')]
+    #[arg(short = 't', requires = "tls_key_file")]
     tls_cert_file: Option<PathBuf>,
     
     /// Set 'tls_key.pem' location or use SENTRYPEER_KEY env
-    #[arg(short = 'k')]
+    #[arg(short = 'k', requires = "tls_cert_file")]
     tls_key_file: Option<PathBuf>,
 
     /// Enable syslog logging or use SENTRYPEER_SYSLOG env
@@ -99,6 +103,9 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     (*sentrypeer_c_config).p2p_dht_mode = args.p2p;
     if args.unresponsive {
         (*sentrypeer_c_config).sip_mode = false;
+    }
+    if args.tls_mode {
+        (*sentrypeer_c_config).tls_mode = false;
     }
     (*sentrypeer_c_config).sip_responsive_mode = args.responsive;
     (*sentrypeer_c_config).syslog_mode = args.syslog;
@@ -191,6 +198,8 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
         "WebHook URL: {:?}",
         CString::from_raw((*sentrypeer_c_config).webhook_url)
     );
+
+    println!("TLS Mode: {}", (*sentrypeer_c_config).tls_mode);
     
     println!(
         "TLS Cert File: {:?}",
