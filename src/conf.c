@@ -105,6 +105,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->tls_mode = true; // Default on
 	self->tls_cert_file = 0;
 	self->tls_key_file = 0;
+	self->tls_listen_address = 0;
 #endif
 
 	return self;

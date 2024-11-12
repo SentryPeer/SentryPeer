@@ -83,10 +83,14 @@ int sip_daemon_run(sentrypeer_config *config)
 	config->sip_daemon_thread = sip_daemon_thread;
 
 #if HAVE_RUST != 0
-	// Run our Rust listen_tls() function
-	if (listen_tls(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to run listen_tls().\n");
-		return EXIT_FAILURE;
+	if (config->tls_mode == true) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Starting Rust TLS listener...\n");
+		}
+		if (listen_tls(config) != EXIT_SUCCESS) {
+			fprintf(stderr, "Failed to run listen_tls().\n");
+			return EXIT_FAILURE;
+		}
 	}
 #endif // HAVE_RUST
 
@@ -122,9 +126,11 @@ int sip_daemon_stop(sentrypeer_config const *config)
 
 	// Shutdown our Rust TLS listener
 #if HAVE_RUST != 0
-	if (shutdown_listen_tls(config) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to shutdown TLS listener.\n");
-		return EXIT_FAILURE;
+	if (config->tls_mode == true) {
+		if (shutdown_listen_tls(config) != EXIT_SUCCESS) {
+			fprintf(stderr, "Failed to shutdown TLS listener.\n");
+			return EXIT_FAILURE;
+		}
 	}
 #endif // HAVE_RUST
 

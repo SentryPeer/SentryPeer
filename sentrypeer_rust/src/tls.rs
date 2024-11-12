@@ -11,14 +11,12 @@
                              |___/
 */
 use crate::sockaddr;
-use anyhow::Context;
-use dotenvy::dotenv;
 use libc::c_int;
 use os_socketaddr::OsSocketAddr;
 use pki_types::{CertificateDer, PrivateKeyDer};
 use rustls_pemfile::{certs, private_key};
 use serde::Deserialize;
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind};
 use std::net::ToSocketAddrs;
@@ -29,6 +27,10 @@ use tokio::io::{split, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
+
+const CERT_FILE: &str = "cert.pem";
+const KEY_FILE: &str = "key.pem";
+const TLS_LISTEN_ADDRESS: &str = "127.0.0.1:5061";
 
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
@@ -48,13 +50,55 @@ pub struct Config {
 }
 
 fn config_from_env() -> Result<Config, Box<dyn std::error::Error>> {
-    // These two steps will be done in our main config, but for testing we're doing it here
-    // Load the .env file
-    dotenv().ok();
+    // Try to load SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_TLS_LISTEN_ADDRESS from our env
+    let cert = std::env::var("SENTRYPEER_CERT").unwrap_or_else(|_| CERT_FILE.to_string());
+    let key = std::env::var("SENTRYPEER_KEY").unwrap_or_else(|_| KEY_FILE.to_string());
+    let tls_listen_address = std::env::var("SENTRYPEER_TLS_LISTEN_ADDRESS")
+        .unwrap_or_else(|_| TLS_LISTEN_ADDRESS.to_string());
 
-    let config = envy::prefixed("SENTRYPEER_").from_env::<Config>().with_context(|| {
-        "Please set SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_TLS_LISTEN_ADDRESS in your .env file or environment."
-    })?;
+    let config = Config {
+        cert: PathBuf::from(cert),
+        key: PathBuf::from(key),
+        tls_listen_address,
+    };
+
+    Ok(config)
+}
+
+fn config_from_cli(
+    config: Config,
+    sentrypeer_c_config: *mut sentrypeer_config,
+) -> Result<Config, Box<dyn std::error::Error>> {
+    // We just test one, as the cert and key are both "required" by clap-rs
+    if unsafe { (*sentrypeer_c_config).tls_cert_file.is_null() } {
+        return Ok(config);
+    }
+
+    let tls_cert_file = unsafe {
+        CStr::from_ptr((*sentrypeer_c_config).tls_cert_file)
+            .to_str()
+            .unwrap()
+    };
+    let tls_key_file = unsafe {
+        CStr::from_ptr((*sentrypeer_c_config).tls_key_file)
+            .to_str()
+            .unwrap()
+    };
+
+    let tls_listen_address = unsafe {
+        CStr::from_ptr((*sentrypeer_c_config).tls_listen_address)
+            .to_str()
+            .unwrap()
+    };
+
+    let cert = PathBuf::from(tls_cert_file);
+    let key = PathBuf::from(tls_key_file);
+
+    let config = Config {
+        cert,
+        key,
+        tls_listen_address: tls_listen_address.to_string(),
+    };
 
     Ok(config)
 }
@@ -225,8 +269,8 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
     let _std_thread_handle = thread_builder.spawn(move || {
         handle.block_on(async move {
-            let config = config_from_env().unwrap();
-
+            let mut config = config_from_env().unwrap();
+            config = config_from_cli(config, sentrypeer_config.p).unwrap();
             let addr = config
                 .tls_listen_address
                 .to_socket_addrs()
@@ -234,8 +278,8 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
                 .next()
                 .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable))
                 .unwrap();
-            let certs = load_certs(&config.cert).unwrap();
-            let key = load_key(&config.key).unwrap();
+            let certs = load_certs(&config.cert).expect("Failed to load TLS cert. Please set SENTRYPEER_CERT or use -t");
+            let key = load_key(&config.key).expect("Failed to load TLS key. Please set SENTRYPEER_KEY or use -k");
 
             let config = rustls::ServerConfig::builder()
                 .with_no_client_auth()

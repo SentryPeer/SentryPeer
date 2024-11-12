@@ -71,6 +71,7 @@ struct sentrypeer_config {
 	bool tls_mode;
 	char *tls_cert_file;
 	char *tls_key_file;
+	char *tls_listen_address;
 #endif
 };
 

@@ -69,13 +69,17 @@ struct Args {
     #[arg(short = 'T')]
     tls_mode: bool,
 
-    /// Set 'tls_cert.pem' location or use SENTRYPEER_CERT env
+    /// Set 'cert.pem' location or use SENTRYPEER_CERT env
     #[arg(short = 't', requires = "tls_key_file")]
     tls_cert_file: Option<PathBuf>,
 
-    /// Set 'tls_key.pem' location or use SENTRYPEER_KEY env
+    /// Set 'key.pem' location or use SENTRYPEER_KEY env
     #[arg(short = 'k', requires = "tls_cert_file")]
     tls_key_file: Option<PathBuf>,
+
+    /// Set TLS listen address '127.0.0.1:8088' or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+    #[arg(short = 'z', requires = "tls_cert_file", requires = "tls_key_file")]
+    tls_listen_address: Option<String>,
 
     /// Enable syslog logging or use SENTRYPEER_SYSLOG env
     #[arg(short)]
@@ -102,17 +106,17 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     (*sentrypeer_c_config).debug_mode = args.debug;
     (*sentrypeer_c_config).p2p_dht_mode = args.p2p;
     if args.unresponsive {
+        // Set to true by default in C
         (*sentrypeer_c_config).sip_mode = false;
     }
     if args.tls_mode {
+        // Set to true by default in C
         (*sentrypeer_c_config).tls_mode = false;
     }
     (*sentrypeer_c_config).sip_responsive_mode = args.responsive;
     (*sentrypeer_c_config).syslog_mode = args.syslog;
     (*sentrypeer_c_config).verbose_mode = args.verbose;
 
-    // TODO: Validate things with PathBuf ?
-    // How?
     // Set strings
     if args.db_file.is_some() {
         let db_file = args.db_file.unwrap();
@@ -166,54 +170,11 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
             .into_raw();
     }
 
-    println!("API Mode: {}", (*sentrypeer_c_config).api_mode);
-    println!("Debug Mode: {}", (*sentrypeer_c_config).debug_mode);
-    println!("P2P DHT Mode: {}", (*sentrypeer_c_config).p2p_dht_mode);
-    println!("SIP Mode: {}", (*sentrypeer_c_config).sip_mode);
-    println!(
-        "SIP Responsive Mode: {}",
-        (*sentrypeer_c_config).sip_responsive_mode
-    );
-    println!("Syslog Mode: {}", (*sentrypeer_c_config).syslog_mode);
-    println!("Verbose Mode: {}", (*sentrypeer_c_config).verbose_mode);
-
-    println!(
-        "DB File: {:?}",
-        CString::from_raw((*sentrypeer_c_config).db_file)
-    );
-    println!("JSON Log Mode: {}", (*sentrypeer_c_config).json_log_mode);
-    println!(
-        "JSON Log File: {:?}",
-        CString::from_raw((*sentrypeer_c_config).json_log_file)
-    );
-    println!(
-        "P2P Bootstrap Node: {:?}",
-        CString::from_raw((*sentrypeer_c_config).p2p_bootstrap_node)
-    );
-    println!(
-        "OAuth2 Client ID: {:?}",
-        CString::from_raw((*sentrypeer_c_config).oauth2_client_id)
-    );
-    println!(
-        "OAuth2 Client Secret: {:?}",
-        CString::from_raw((*sentrypeer_c_config).oauth2_client_secret)
-    );
-    println!(
-        "WebHook URL: {:?}",
-        CString::from_raw((*sentrypeer_c_config).webhook_url)
-    );
-
-    println!("TLS Mode: {}", (*sentrypeer_c_config).tls_mode);
-
-    println!(
-        "TLS Cert File: {:?}",
-        CString::from_raw((*sentrypeer_c_config).tls_cert_file)
-    );
-
-    println!(
-        "TLS Key File: {:?}",
-        CString::from_raw((*sentrypeer_c_config).tls_key_file)
-    );
+    if args.tls_listen_address.is_some() {
+        (*sentrypeer_c_config).tls_listen_address = CString::new(args.tls_listen_address.unwrap())
+            .unwrap()
+            .into_raw();
+    }
 
     libc::EXIT_SUCCESS
 }
