@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- New `-T`, `-t` and `-k` options for SIP TLS support
+- New `-T`, `-z`, -t` and `-k` options for SIP TLS support
 - Command Line Interface (CLI) new powered by Rust using [clap-rs](https://github.com/clap-rs/clap)
 - SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
 - Environment variables `SENTRYPEER_CERT`, `SENTRYPEER_KEY` and `SENTRYPEER_TLS_LISTEN_ADDRESS`
