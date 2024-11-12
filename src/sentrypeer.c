@@ -152,9 +152,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-//#if HAVE_RUST != 0
-//	sentrypeer_cli_destroy_rs(config);
-//#endif
+#if HAVE_RUST != 0
+	sentrypeer_cli_destroy_rs(config);	
+#endif
 
 	sentrypeer_config_destroy(&config);
 

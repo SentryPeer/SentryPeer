@@ -189,56 +189,56 @@ pub(crate) unsafe extern "C" fn sentrypeer_cli_destroy_rs(
     // Set strings
     if !(*sentrypeer_c_config).db_file.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).db_file);
-        // (*sentrypeer_c_config).db_file =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).db_file =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).json_log_file.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).json_log_file);
-        // (*sentrypeer_c_config).json_log_file =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).json_log_file =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).p2p_bootstrap_node.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).p2p_bootstrap_node);
-        // (*sentrypeer_c_config).p2p_bootstrap_node =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).p2p_bootstrap_node =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).oauth2_client_id.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).oauth2_client_id);
-        // (*sentrypeer_c_config).oauth2_client_id =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).oauth2_client_id =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).oauth2_client_secret.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).oauth2_client_secret);
-        // (*sentrypeer_c_config).oauth2_client_secret =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).oauth2_client_secret =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).webhook_url.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).webhook_url);
-        // (*sentrypeer_c_config).webhook_url =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).webhook_url =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).tls_cert_file.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).tls_cert_file);
-        // (*sentrypeer_c_config).tls_cert_file =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).tls_cert_file =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).tls_key_file.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).tls_key_file);
-        // (*sentrypeer_c_config).tls_key_file =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).tls_key_file =
+            std::ptr::null_mut();
     }
 
     if !(*sentrypeer_c_config).tls_listen_address.is_null() {
         let _ = CString::from_raw((*sentrypeer_c_config).tls_listen_address);
-        // (*sentrypeer_c_config).tls_listen_address =
-        //     std::ptr::null_mut();
+        (*sentrypeer_c_config).tls_listen_address =
+            std::ptr::null_mut();
     }
 
     libc::EXIT_SUCCESS
