@@ -409,9 +409,7 @@ mod tests {
     #[ignore = "not yet implemented"]
     fn test_load_certs() {
         let path = Path::new("tests/certs/cert.pem");
-        let certs = load_certs(path)
-            .with_context(|| "Failed to load certs")
-            .unwrap();
+        let certs = load_certs(path).expect("Failed to load certs");
         assert_eq!(certs.len(), 1);
     }
 

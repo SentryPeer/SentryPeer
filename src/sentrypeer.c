@@ -30,6 +30,10 @@
 #include "peer_to_peer_dht.h"
 #endif // HAVE_OPENDHT_C
 
+#if HAVE_RUST != 0
+#include "sentrypeer_rust.h"
+#endif
+
 volatile sig_atomic_t cleanup_flag = 0;
 
 int main(int argc, char **argv)
@@ -147,6 +151,11 @@ int main(int argc, char **argv)
 			syslog(LOG_ERR, "Stopped %s\n", PACKAGE_NAME);
 		}
 	}
+
+//#if HAVE_RUST != 0
+//	sentrypeer_cli_destroy_rs(config);
+//#endif
+
 	sentrypeer_config_destroy(&config);
 
 	return EXIT_SUCCESS;
