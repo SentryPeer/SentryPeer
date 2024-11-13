@@ -166,6 +166,24 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 			free(self->json_log_file);
 			self->json_log_file = 0;
 		}
+
+#if HAVE_RUST != 0
+		if (self->tls_cert_file != 0) {
+			free(self->tls_cert_file);
+			self->tls_cert_file = 0;
+		}
+
+		if (self->tls_key_file != 0) {
+			free(self->tls_key_file);
+			self->tls_key_file = 0;
+		}
+
+		if (self->tls_listen_address != 0) {
+			free(self->tls_listen_address);
+			self->tls_listen_address = 0;
+		}
+#endif
+
 		free(self);
 		*self_ptr = 0;
 	}
