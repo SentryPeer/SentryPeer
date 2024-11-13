@@ -14,3 +14,4 @@
 #include "../src/conf.h"
 #include "../src/sip_message_event.h"
 #include "../src/sip_daemon.h"
+#include "../src/utils.h"

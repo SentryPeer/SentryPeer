@@ -53,6 +53,7 @@ fn main() {
         .allowlist_function("sentrypeer_config_new|sentrypeer_config_destroy")
         .allowlist_function("sip_message_event_new|sip_message_event_destroy")
         .allowlist_function("sip_log_event")
+        .allowlist_function("util_duplicate_string")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))

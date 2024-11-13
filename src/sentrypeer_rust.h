@@ -114,13 +114,6 @@ int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config);
 /**
  * # Safety
  *
- * Clean up the sentrypeer_config struct after use by clap-rs
- */
-int32_t sentrypeer_cli_destroy_rs(sentrypeer_config *sentrypeer_c_config);
-
-/**
- * # Safety
- *
  * Shutdown the tokio runtime.
  */
 int32_t shutdown_tls(const sentrypeer_config *sentrypeer_c_config);

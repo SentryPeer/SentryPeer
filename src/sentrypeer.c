@@ -151,11 +151,6 @@ int main(int argc, char **argv)
 			syslog(LOG_ERR, "Stopped %s\n", PACKAGE_NAME);
 		}
 	}
-
-#if HAVE_RUST != 0
-	sentrypeer_cli_destroy_rs(config);	
-#endif
-
 	sentrypeer_config_destroy(&config);
 
 	return EXIT_SUCCESS;

@@ -15,7 +15,7 @@ use std::ffi::CString;
 use std::path::PathBuf;
 
 // Our C FFI functions
-use crate::sentrypeer_config;
+use crate::{sentrypeer_config, util_duplicate_string};
 
 /// Protect your SIP Servers from bad actors at https://sentrypeer.org
 #[derive(Parser, Debug)]
@@ -70,11 +70,19 @@ struct Args {
     tls_mode: bool,
 
     /// Set 'cert.pem' location or use SENTRYPEER_CERT env
-    #[arg(short = 't', requires = "tls_key_file")]
+    #[arg(
+        short = 't',
+        requires = "tls_key_file",
+        requires = "tls_listen_address"
+    )]
     tls_cert_file: Option<PathBuf>,
 
     /// Set 'key.pem' location or use SENTRYPEER_KEY env
-    #[arg(short = 'k', requires = "tls_cert_file")]
+    #[arg(
+        short = 'k',
+        requires = "tls_cert_file",
+        requires = "tls_listen_address"
+    )]
     tls_key_file: Option<PathBuf>,
 
     /// Set TLS listen address '127.0.0.1:8088' or use SENTRYPEER_TLS_LISTEN_ADDRESS env
@@ -117,11 +125,11 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
     (*sentrypeer_c_config).syslog_mode = args.syslog;
     (*sentrypeer_c_config).verbose_mode = args.verbose;
 
-    // Set strings
+    // Set strings that will be freed on the C side
     if args.db_file.is_some() {
         let db_file = args.db_file.unwrap();
-        (*sentrypeer_c_config).db_file =
-            CString::new(db_file.to_str().unwrap()).unwrap().into_raw();
+        let db_file_c_str = CString::new(db_file.to_str().unwrap()).expect("CString::new failed");
+        (*sentrypeer_c_config).db_file = util_duplicate_string(db_file_c_str.as_ptr());
     }
 
     if args.json {
@@ -129,116 +137,58 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
 
         if args.json_log_file.is_some() {
             let json_log_file = args.json_log_file.unwrap();
-            (*sentrypeer_c_config).json_log_file = CString::new(json_log_file.to_str().unwrap())
-                .unwrap()
-                .into_raw();
+            let json_log_file_c_str =
+                CString::new(json_log_file.to_str().unwrap()).expect("CString::new failed");
+            (*sentrypeer_c_config).json_log_file =
+                util_duplicate_string(json_log_file_c_str.as_ptr());
         }
     }
 
     if args.bootstrap.is_some() {
-        (*sentrypeer_c_config).p2p_bootstrap_node =
-            CString::new(args.bootstrap.unwrap()).unwrap().into_raw();
+        let bootstrap = args.bootstrap.unwrap();
+        let bootstrap_c_str = CString::new(bootstrap).expect("CString::new failed");
+        (*sentrypeer_c_config).p2p_bootstrap_node = util_duplicate_string(bootstrap_c_str.as_ptr());
     }
 
     if args.client_id.is_some() {
-        (*sentrypeer_c_config).oauth2_client_id =
-            CString::new(args.client_id.unwrap()).unwrap().into_raw();
+        let client_id = args.client_id.unwrap();
+        let client_id_c_str = CString::new(client_id).expect("CString::new failed");
+        (*sentrypeer_c_config).oauth2_client_id = util_duplicate_string(client_id_c_str.as_ptr());
     }
 
     if args.client_secret.is_some() {
-        (*sentrypeer_c_config).oauth2_client_secret = CString::new(args.client_secret.unwrap())
-            .unwrap()
-            .into_raw();
+        let client_secret = args.client_secret.unwrap();
+        let client_secret_c_str = CString::new(client_secret).expect("CString::new failed");
+        (*sentrypeer_c_config).oauth2_client_secret =
+            util_duplicate_string(client_secret_c_str.as_ptr());
     }
 
     if args.webhook_url.is_some() {
-        (*sentrypeer_c_config).webhook_url =
-            CString::new(args.webhook_url.unwrap()).unwrap().into_raw();
+        let webhook_url = args.webhook_url.unwrap();
+        let webhook_url_c_str = CString::new(webhook_url).expect("CString::new failed");
+        (*sentrypeer_c_config).webhook_url = util_duplicate_string(webhook_url_c_str.as_ptr());
     }
 
     if args.tls_cert_file.is_some() {
         let tls_cert_file = args.tls_cert_file.unwrap();
-        (*sentrypeer_c_config).tls_cert_file = CString::new(tls_cert_file.to_str().unwrap())
-            .unwrap()
-            .into_raw();
+        let tls_cert_file_c_str =
+            CString::new(tls_cert_file.to_str().unwrap()).expect("CString::new failed");
+        (*sentrypeer_c_config).tls_cert_file = util_duplicate_string(tls_cert_file_c_str.as_ptr());
     }
 
     if args.tls_key_file.is_some() {
         let tls_key_file = args.tls_key_file.unwrap();
-        (*sentrypeer_c_config).tls_key_file = CString::new(tls_key_file.to_str().unwrap())
-            .unwrap()
-            .into_raw();
+        let tls_key_file_c_str =
+            CString::new(tls_key_file.to_str().unwrap()).expect("CString::new failed");
+        (*sentrypeer_c_config).tls_key_file = util_duplicate_string(tls_key_file_c_str.as_ptr());
     }
 
     if args.tls_listen_address.is_some() {
-        (*sentrypeer_c_config).tls_listen_address = CString::new(args.tls_listen_address.unwrap())
-            .unwrap()
-            .into_raw();
-    }
-
-    libc::EXIT_SUCCESS
-}
-
-/// # Safety
-///
-/// Clean up the sentrypeer_config struct after use by clap-rs
-#[no_mangle]
-pub(crate) unsafe extern "C" fn sentrypeer_cli_destroy_rs(
-    sentrypeer_c_config: *mut sentrypeer_config,
-) -> i32 {
-    // Set strings
-    if !(*sentrypeer_c_config).db_file.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).db_file);
-        (*sentrypeer_c_config).db_file =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).json_log_file.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).json_log_file);
-        (*sentrypeer_c_config).json_log_file =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).p2p_bootstrap_node.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).p2p_bootstrap_node);
-        (*sentrypeer_c_config).p2p_bootstrap_node =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).oauth2_client_id.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).oauth2_client_id);
-        (*sentrypeer_c_config).oauth2_client_id =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).oauth2_client_secret.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).oauth2_client_secret);
-        (*sentrypeer_c_config).oauth2_client_secret =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).webhook_url.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).webhook_url);
-        (*sentrypeer_c_config).webhook_url =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).tls_cert_file.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).tls_cert_file);
-        (*sentrypeer_c_config).tls_cert_file =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).tls_key_file.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).tls_key_file);
-        (*sentrypeer_c_config).tls_key_file =
-            std::ptr::null_mut();
-    }
-
-    if !(*sentrypeer_c_config).tls_listen_address.is_null() {
-        let _ = CString::from_raw((*sentrypeer_c_config).tls_listen_address);
+        let tls_listen_address = args.tls_listen_address.unwrap();
+        let tls_listen_address_c_str =
+            CString::new(tls_listen_address).expect("CString::new failed");
         (*sentrypeer_c_config).tls_listen_address =
-            std::ptr::null_mut();
+            util_duplicate_string(tls_listen_address_c_str.as_ptr());
     }
 
     libc::EXIT_SUCCESS

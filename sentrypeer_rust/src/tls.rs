@@ -288,7 +288,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
                 .unwrap();
             let acceptor = TlsAcceptor::from(Arc::new(config));
 
-            let listener = TcpListener::bind(&addr).await.unwrap();
+            let listener = TcpListener::bind(&addr).await.expect("Failed to bind to address");
 
             let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
             let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
@@ -394,15 +394,9 @@ mod tests {
     #[test]
     fn test_config_from_env() {
         let config = config_from_env().unwrap();
-        assert_eq!(
-            config.cert,
-            PathBuf::from("../tests/unit_tests/127.0.0.1.pem")
-        );
-        assert_eq!(
-            config.key,
-            PathBuf::from("../tests/unit_tests/127.0.0.1-key.pem")
-        );
-        assert_eq!(config.tls_listen_address, "127.0.0.1:8088");
+        assert_eq!(config.cert, PathBuf::from("cert.pem"));
+        assert_eq!(config.key, PathBuf::from("key.pem"));
+        assert_eq!(config.tls_listen_address, "127.0.0.1:5061");
     }
 
     #[test]
