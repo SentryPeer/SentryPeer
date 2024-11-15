@@ -271,7 +271,6 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         handle.block_on(async move {
             let mut config = config_from_env().unwrap();
             config = config_from_cli(config, sentrypeer_config.p).unwrap();
-            println!("Config: {:?}", config);            
             let addr = config
                 .tls_listen_address
                 .to_socket_addrs()

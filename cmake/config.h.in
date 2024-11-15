@@ -20,3 +20,6 @@
 // Set this via CMake just like autotools does for our config.h
 // We parse this in our build.rs
 #define HAVE_OPENDHT_C @HAVE_OPENDHT_C@
+// Same for HAVE_RUST as we are only enabling certain parts of our sentrypeer_config
+// struct is Rust is detected and not disabled via CMake
+#define HAVE_RUST @HAVE_RUST@

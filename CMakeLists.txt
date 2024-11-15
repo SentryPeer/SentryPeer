@@ -130,6 +130,10 @@ if (NOT DISABLE_RUST)
     # Import targets defined in a package or workspace manifest `Cargo.toml` file
     corrosion_import_crate(MANIFEST_PATH sentrypeer_rust/Cargo.toml)
     message(STATUS "Rust support enabled")
+
+    # For config.h.in
+    set(HAVE_RUST 1)
+    add_definitions(-DHAVE_RUST=1)
 endif ()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} -losipparser2)
@@ -156,7 +160,7 @@ if (NOT DISABLE_RUST)
     message(STATUS "Linking with Rust parts")
 endif ()
 
-# configure header file
+# configure header files
 configure_file(
         ${CMAKE_SOURCE_DIR}/cmake/config.h.in
         ${CMAKE_SOURCE_DIR}/config.h
