@@ -30,7 +30,7 @@ use tokio_rustls::{rustls, TlsAcceptor};
 
 const CERT_FILE: &str = "cert.pem";
 const KEY_FILE: &str = "key.pem";
-const TLS_LISTEN_ADDRESS: &str = "127.0.0.1:5061";
+const TLS_LISTEN_ADDRESS: &str = "0.0.0.0:5061";
 
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
@@ -69,7 +69,7 @@ fn config_from_cli(
     config: Config,
     sentrypeer_c_config: *mut sentrypeer_config,
 ) -> Result<Config, Box<dyn std::error::Error>> {
-    // We just test one, as the cert and key are both "required" by clap-rs
+    // We just test one, as the cert, key and listen address are all "required" by clap-rs
     if unsafe { (*sentrypeer_c_config).tls_cert_file.is_null() } {
         return Ok(config);
     }
@@ -271,6 +271,7 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
         handle.block_on(async move {
             let mut config = config_from_env().unwrap();
             config = config_from_cli(config, sentrypeer_config.p).unwrap();
+            println!("Config: {:?}", config);            
             let addr = config
                 .tls_listen_address
                 .to_socket_addrs()
@@ -396,7 +397,7 @@ mod tests {
         let config = config_from_env().unwrap();
         assert_eq!(config.cert, PathBuf::from("cert.pem"));
         assert_eq!(config.key, PathBuf::from("key.pem"));
-        assert_eq!(config.tls_listen_address, "127.0.0.1:5061");
+        assert_eq!(config.tls_listen_address, "0.0.0.0:5061");
     }
 
     #[test]

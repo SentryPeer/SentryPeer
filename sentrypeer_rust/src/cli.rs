@@ -61,7 +61,7 @@ struct Args {
     #[arg(short = 'R')]
     unresponsive: bool,
 
-    /// Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
+    /// Set JSON logfile (default './sentrypeer_json.log') location or use SENTRYPEER_JSON_LOG_FILE env
     #[arg(short = 'l', requires = "json")]
     json_log_file: Option<PathBuf>,
 
@@ -69,7 +69,7 @@ struct Args {
     #[arg(short = 'T')]
     tls_mode: bool,
 
-    /// Set 'cert.pem' location or use SENTRYPEER_CERT env
+    /// Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
     #[arg(
         short = 't',
         requires = "tls_key_file",
@@ -77,7 +77,7 @@ struct Args {
     )]
     tls_cert_file: Option<PathBuf>,
 
-    /// Set 'key.pem' location or use SENTRYPEER_KEY env
+    /// Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
     #[arg(
         short = 'k',
         requires = "tls_cert_file",
@@ -85,7 +85,7 @@ struct Args {
     )]
     tls_key_file: Option<PathBuf>,
 
-    /// Set TLS listen address '127.0.0.1:8088' or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+    /// Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
     #[arg(short = 'z', requires = "tls_cert_file", requires = "tls_key_file")]
     tls_listen_address: Option<String>,
 
