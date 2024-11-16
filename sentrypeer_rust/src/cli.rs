@@ -11,15 +11,19 @@
                              |___/
 */
 use clap::Parser;
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::path::PathBuf;
-
 // Our C FFI functions
-use crate::{sentrypeer_config, util_duplicate_string};
+use crate::{sentrypeer_config, util_duplicate_string, PACKAGE_NAME, PACKAGE_VERSION};
 
-/// Protect your SIP Servers from bad actors at https://sentrypeer.org
+fn cstr_to_string (cstr: &CStr) -> String {
+    cstr.to_string_lossy().into_owned()
+}
+
+
+/// Protect your SIP Servers from bad actors at https://sentrypeer.com
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command( name = cstr_to_string(PACKAGE_NAME), version = cstr_to_string(PACKAGE_VERSION), about, long_about = None)]
 struct Args {
     /// Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
     #[arg(short = 'f')]

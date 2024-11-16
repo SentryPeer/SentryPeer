@@ -30,7 +30,7 @@ serde = { version = "1.0.204", features = ["derive"] }
 anyhow = "1.0.86" # We're building a binary here, but Rust is our lib, so maybe move to thiserror?
 os_socketaddr = "0.2.5"
 log = "0.4.21"
-clap = { version = "4.5.20", features = ["derive"] }
+clap = { version = "4.5.20", features = ["derive", "string"] }
 
 [dependencies.uuid]
 version = "1.8.0"

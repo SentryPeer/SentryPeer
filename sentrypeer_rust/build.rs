@@ -54,6 +54,10 @@ fn main() {
         .allowlist_function("sip_message_event_new|sip_message_event_destroy")
         .allowlist_function("sip_log_event")
         .allowlist_function("util_duplicate_string")
+        // defines from config.h
+        .allowlist_item("PACKAGE_NAME|PACKAGE_VERSION")
+        // Set whether string constants should be generated as &CStr instead of &[u8].
+        .generate_cstr(true)
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))

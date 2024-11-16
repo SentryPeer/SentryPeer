@@ -11,6 +11,7 @@
                              |___/
 */
 
+#include "../config.h"
 #include "../src/conf.h"
 #include "../src/sip_message_event.h"
 #include "../src/sip_daemon.h"
