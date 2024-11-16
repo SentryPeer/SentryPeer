@@ -16,10 +16,9 @@ use std::path::PathBuf;
 // Our C FFI functions
 use crate::{sentrypeer_config, util_duplicate_string, PACKAGE_NAME, PACKAGE_VERSION};
 
-fn cstr_to_string (cstr: &CStr) -> String {
+fn cstr_to_string(cstr: &CStr) -> String {
     cstr.to_string_lossy().into_owned()
 }
-
 
 /// Protect your SIP Servers from bad actors at https://sentrypeer.com
 #[derive(Parser, Debug)]
