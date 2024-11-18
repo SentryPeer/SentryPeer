@@ -31,6 +31,8 @@ anyhow = "1.0.86" # We're building a binary here, but Rust is our lib, so maybe 
 os_socketaddr = "0.2.5"
 log = "0.4.21"
 clap = { version = "4.5.20", features = ["derive", "string"] }
+rcgen = "0.13.1"
+confy = "0.6.1"
 
 [dev-dependencies]
 assert_cmd = "2.0.16"

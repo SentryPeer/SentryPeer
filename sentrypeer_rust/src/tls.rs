@@ -10,12 +10,14 @@
                               __/ |
                              |___/
 */
+use crate::config;
 use crate::sockaddr;
 use libc::c_int;
 use os_socketaddr::OsSocketAddr;
 use pki_types::{CertificateDer, PrivateKeyDer};
+use rcgen::{generate_simple_self_signed, CertifiedKey};
 use rustls_pemfile::{certs, private_key};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::ffi::{CStr, CString};
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind};
@@ -28,10 +30,6 @@ use tokio::net::TcpListener;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
-const CERT_FILE: &str = "cert.pem";
-const KEY_FILE: &str = "key.pem";
-const TLS_LISTEN_ADDRESS: &str = "0.0.0.0:5061";
-
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
@@ -42,19 +40,21 @@ struct SentryPeerConfig {
 unsafe impl Send for SentryPeerConfig {}
 unsafe impl Sync for SentryPeerConfig {}
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub cert: PathBuf,
     pub key: PathBuf,
     pub tls_listen_address: String,
 }
 
-fn config_from_env() -> Result<Config, Box<dyn std::error::Error>> {
+fn config_from_env(config: Config) -> Result<Config, Box<dyn std::error::Error>> {
     // Try to load SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_TLS_LISTEN_ADDRESS from our env
-    let cert = std::env::var("SENTRYPEER_CERT").unwrap_or_else(|_| CERT_FILE.to_string());
-    let key = std::env::var("SENTRYPEER_KEY").unwrap_or_else(|_| KEY_FILE.to_string());
+    let cert = std::env::var("SENTRYPEER_CERT")
+        .unwrap_or_else(|_| config.cert.into_os_string().into_string().unwrap());
+    let key = std::env::var("SENTRYPEER_KEY")
+        .unwrap_or_else(|_| config.key.into_os_string().into_string().unwrap());
     let tls_listen_address = std::env::var("SENTRYPEER_TLS_LISTEN_ADDRESS")
-        .unwrap_or_else(|_| TLS_LISTEN_ADDRESS.to_string());
+        .unwrap_or_else(|_| config.tls_listen_address.clone());
 
     let config = Config {
         cert: PathBuf::from(cert),
@@ -269,7 +269,12 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
     let thread_builder = std::thread::Builder::new().name("tls_std_thread".to_string());
     let _std_thread_handle = thread_builder.spawn(move || {
         handle.block_on(async move {
-            let mut config = config_from_env().unwrap();
+            // TODO: Move to a config function in config.rs
+            // Our Configuration file is loaded first, with defaults
+            let mut config = config::load_file().expect("Failed to load config file");            
+            // Then our env
+            config = config_from_env(config).unwrap();
+            // Then our CLI args
             config = config_from_cli(config, sentrypeer_config.p).unwrap();
             let addr = config
                 .tls_listen_address
@@ -385,6 +390,34 @@ pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config)
     libc::EXIT_SUCCESS
 }
 
+/// Ask to create a new TLS cert and key using rcgen
+pub fn create_tls_cert_and_key() -> i32 {
+    // Prompt Y/N
+    let mut input = String::new();
+    println!("Would you like to create a new TLS cert and key? [Y/n]");
+    std::io::stdin().read_line(&mut input).unwrap();
+    let input = input.trim().to_lowercase();
+
+    if input == "y" || input == "yes" {
+        // Create a new TLS cert and key
+        let CertifiedKey { cert, key_pair } =
+            generate_simple_self_signed(vec!["localhost".to_string()]).unwrap();
+
+        std::fs::write("cert.pem", cert.pem()).expect("Unable to write cert.pem");
+        std::fs::write("key.pem", key_pair.serialize_pem()).expect("Unable to write key.pem");
+
+        println!("New TLS cert and key created.");
+        return libc::EXIT_SUCCESS;
+    };
+
+    if input == "n" || input == "no" {
+        println!("Please provide a valid TLS cert and key file");
+    } else {
+        println!("Invalid input.");
+    }
+    libc::EXIT_SUCCESS
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -393,7 +426,12 @@ mod tests {
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
     fn test_config_from_env() {
-        let config = config_from_env().unwrap();
+        let mut config = Config {
+            cert: PathBuf::from("cert.pem"),
+            key: PathBuf::from("key.pem"),
+            tls_listen_address: "0.0.0.0:5061".into(),
+        };
+        config = config_from_env(config).unwrap();
         assert_eq!(config.cert, PathBuf::from("cert.pem"));
         assert_eq!(config.key, PathBuf::from("key.pem"));
         assert_eq!(config.tls_listen_address, "0.0.0.0:5061");

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- We now support TLS configuration loaded from `sentrypeer.toml`
+- If a cert or key file is not found using `-t` or `-k` options, SentryPeer will 
+  ask you if you'd like to create them - we use the very nice [rcgen](https://crates.io/crates/rcgen) for this
 - New `-T`, `-z`, -t` and `-k` options for SIP TLS support
 - Command Line Interface (CLI) now powered by Rust using [clap-rs](https://github.com/clap-rs/clap)
 - SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 

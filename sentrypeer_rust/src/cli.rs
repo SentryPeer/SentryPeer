@@ -10,9 +10,11 @@
                               __/ |
                              |___/
 */
+use crate::tls::create_tls_cert_and_key;
 use clap::Parser;
 use std::ffi::{CStr, CString};
 use std::path::PathBuf;
+
 // Our C FFI functions
 use crate::{sentrypeer_config, util_duplicate_string, PACKAGE_NAME, PACKAGE_VERSION};
 
@@ -174,6 +176,12 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
 
     if args.tls_cert_file.is_some() {
         let tls_cert_file = args.tls_cert_file.unwrap();
+
+        if !tls_cert_file.exists() {
+            eprintln!("TLS cert file does not exist: {:?}", tls_cert_file);
+            create_tls_cert_and_key();
+        }
+
         let tls_cert_file_c_str =
             CString::new(tls_cert_file.to_str().unwrap()).expect("CString::new failed");
         (*sentrypeer_c_config).tls_cert_file = util_duplicate_string(tls_cert_file_c_str.as_ptr());
@@ -181,6 +189,12 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
 
     if args.tls_key_file.is_some() {
         let tls_key_file = args.tls_key_file.unwrap();
+
+        if !tls_key_file.exists() {
+            eprintln!("TLS key file does not exist: {:?}", tls_key_file);
+            return libc::EXIT_FAILURE;
+        }
+
         let tls_key_file_c_str =
             CString::new(tls_key_file.to_str().unwrap()).expect("CString::new failed");
         (*sentrypeer_c_config).tls_key_file = util_duplicate_string(tls_key_file_c_str.as_ptr());
