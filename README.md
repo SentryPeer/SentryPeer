@@ -250,6 +250,17 @@ Either set these in the Dockerfile or in your `Dockerfile.env` file or docker ru
 
 Settings any of these to `0` will also _enable_ the feature. We _don't care_ what you set it to, just that it's set.
 
+#### TLS Configuration
+
+You can either set the appropriate ENV vars, cli arguments or use a configudation files. For example:
+
+```
+cat ~/.config/sentrypeer/default-config.toml 
+cert = "tests/unit_tests/127.0.0.1.pem"
+key = "tests/unit_tests/127.0.0.1-key.pem"
+tls_listen_address = "0.0.0.0:5061"
+```
+
 ### Installation
  
 Debian or Fedora packages are always available from the release page for the current version of SentryPeer:

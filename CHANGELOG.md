@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- We now support TLS configuration loaded from `sentrypeer.toml`
+- We now support TLS configuration loaded from config using [confy](https://crates.io/crates/confy)
 - If a cert or key file is not found using `-t` or `-k` options, SentryPeer will 
   ask you if you'd like to create them - we use the very nice [rcgen](https://crates.io/crates/rcgen) for this
 - New `-T`, `-z`, -t` and `-k` options for SIP TLS support
