@@ -22,7 +22,7 @@ chrono = "0.4.38"
 libc = "0.2.155"
 # START_HIGHLIGHT
 tokio-rustls = "0.26.0"
-rustls-pemfile = "2.1.2"
+rustls-pemfile = "2.2.0"
 tokio = { version = "1.38.0", features = ["full"] }
 pki-types = { package = "rustls-pki-types", version = "1" }
 envy = "0.4.2"
