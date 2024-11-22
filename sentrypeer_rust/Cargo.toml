@@ -23,7 +23,7 @@ libc = "0.2.164"
 # START_HIGHLIGHT
 tokio-rustls = "0.26.0"
 rustls-pemfile = "2.2.0"
-tokio = { version = "1.38.0", features = ["full"] }
+tokio = { version = "1.41.1", features = ["full"] }
 pki-types = { package = "rustls-pki-types", version = "1" }
 envy = "0.4.2"
 serde = { version = "1.0.215", features = ["derive"] }
