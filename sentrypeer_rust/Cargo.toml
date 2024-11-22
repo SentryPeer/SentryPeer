@@ -40,7 +40,7 @@ predicates = "3.1.2"
 pretty_assertions = "1.4.1"
 
 [dependencies.uuid]
-version = "1.8.0"
+version = "1.11.0"
 features = [
     "v4",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
