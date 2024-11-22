@@ -18,10 +18,6 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     target-branch: main
-    labels:
-      - "dependencies"
-      - "rust"
-      - "cargo"
   - package-ecosystem: npm
     directory: "/web-gui-theme"
     schedule:
