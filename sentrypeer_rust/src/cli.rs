@@ -10,7 +10,7 @@
                               __/ |
                              |___/
 */
-use crate::tls::create_tls_cert_and_key;
+use crate::config::create_tls_cert_and_key;
 use clap::Parser;
 use std::ffi::{CStr, CString};
 use std::path::PathBuf;
