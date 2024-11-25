@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
+# Copyright (c) 2021 - 2024 Gavin Henry <ghenry@sentrypeer.org>
+
+name: Cargo Audit
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * *' # Daily at 10:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /sentrypeer_rust
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Install Cargo Audit
+        run: cargo install cargo-audit --locked
+        shell: bash
+      - name: Run Audit
+        run: cargo audit
