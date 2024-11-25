@@ -16,9 +16,6 @@ jobs:
   check:
     name: audit
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: /sentrypeer_rust
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -27,7 +24,6 @@ jobs:
         with:
           toolchain: stable
       - name: Install Cargo Audit
-        run: cargo install cargo-audit --locked
-        shell: bash
+        run: cd /sentrypeer_rust && cargo install cargo-audit --locked
       - name: Run Audit
-        run: cargo audit
+        run: cd /sentrypeer_rust && cargo audit
