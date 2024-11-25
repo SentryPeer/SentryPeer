@@ -24,6 +24,6 @@ jobs:
         with:
           toolchain: stable
       - name: Install Cargo Audit
-        run: cd /sentrypeer_rust && cargo install cargo-audit --locked
+        run: cd sentrypeer_rust && cargo install cargo-audit --locked
       - name: Run Audit
-        run: cd /sentrypeer_rust && cargo audit
+        run: cd sentrypeer_rust && cargo audit
