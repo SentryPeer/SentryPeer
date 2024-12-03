@@ -192,7 +192,7 @@ mod tests {
             assert!((*sentrypeer_c_config).verbose_mode);
             assert!((*sentrypeer_c_config).sip_responsive_mode);
 
-            if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+            if listen_udp(sentrypeer_c_config) != libc::EXIT_SUCCESS {
                 eprintln!("Failed to listen for TLS connections");
             }
 

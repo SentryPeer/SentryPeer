@@ -118,29 +118,3 @@ unsafe fn clean_up_sip_message(
     let _ = CString::from_raw(client_ip_addr_ptr);
     let _ = CString::from_raw(dest_ip_addr_ptr);
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::{sentrypeer_config_destroy, sentrypeer_config_new};
-
-    #[test]
-    fn test_listen() {
-        unsafe {
-            let mut sentrypeer_c_config = sentrypeer_config_new();
-            (*sentrypeer_c_config).debug_mode = true;
-            (*sentrypeer_c_config).verbose_mode = true;
-            (*sentrypeer_c_config).sip_responsive_mode = true;
-
-            assert_ne!(sentrypeer_c_config, std::ptr::null_mut());
-            assert!((*sentrypeer_c_config).debug_mode);
-            assert!((*sentrypeer_c_config).verbose_mode);
-            assert!((*sentrypeer_c_config).sip_responsive_mode);
-
-            if listen_tls(sentrypeer_c_config) != libc::EXIT_SUCCESS {
-                eprintln!("Failed to listen for TLS connections");
-            }
-
-            sentrypeer_config_destroy(&mut sentrypeer_c_config);
-        }
-    }
-}

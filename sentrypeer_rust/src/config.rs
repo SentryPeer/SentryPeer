@@ -226,6 +226,8 @@ mod tests {
 
     #[test]
     fn test_load_file_and_save() {
+        setup_config_file();
+
         let cfg: Config = load_file(true, false).unwrap();
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
         assert_eq!(cfg.key, PathBuf::from("key.pem"));
