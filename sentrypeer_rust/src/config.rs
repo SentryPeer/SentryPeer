@@ -29,6 +29,17 @@ pub struct SentryPeerConfig {
 unsafe impl Send for SentryPeerConfig {}
 unsafe impl Sync for SentryPeerConfig {}
 
+/// `Config` implements `Default`
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            cert: "cert.pem".into(),
+            key: "key.pem".into(),
+            tls_listen_address: "0.0.0.0:5061".into(),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub cert: PathBuf,
@@ -103,17 +114,6 @@ pub(crate) fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
     ))
 }
 
-/// `Config` implements `Default`
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            cert: "cert.pem".into(),
-            key: "key.pem".into(),
-            tls_listen_address: "0.0.0.0:5061".into(),
-        }
-    }
-}
-
 pub fn load_file(debug: bool, verbose: bool) -> Result<Config, confy::ConfyError> {
     if debug || verbose {
         let config_file_location = get_configuration_file_path("sentrypeer", None)?;
@@ -133,15 +133,16 @@ pub fn create_tls_cert_and_key() -> i32 {
     let input = input.trim().to_lowercase();
 
     if input == "y" || input == "yes" {
-        // Create a new TLS cert and key
-        let CertifiedKey { cert, key_pair } =
-            generate_simple_self_signed(vec!["localhost".to_string()]).unwrap();
-
-        std::fs::write("cert.pem", cert.pem()).expect("Unable to write cert.pem");
-        std::fs::write("key.pem", key_pair.serialize_pem()).expect("Unable to write key.pem");
-
-        println!("New TLS cert and key created.");
-        return libc::EXIT_SUCCESS;
+        return match create_certs() {
+            Ok(_) => {
+                println!("cert.pem and key.pem created successfully");
+                libc::EXIT_SUCCESS
+            }
+            Err(e) => {
+                eprintln!("Failed to create TLS cert and key: {}", e);
+                libc::EXIT_FAILURE
+            }
+        };
     };
 
     if input == "n" || input == "no" {
@@ -150,6 +151,17 @@ pub fn create_tls_cert_and_key() -> i32 {
         println!("Invalid input.");
     }
     libc::EXIT_SUCCESS
+}
+
+// Create a new TLS cert and key usng rcgen
+fn create_certs() -> io::Result<()> {
+    let CertifiedKey { cert, key_pair } =
+        generate_simple_self_signed(vec!["localhost".to_string()]).expect("Failed to create cert");
+
+    std::fs::write("cert.pem", cert.pem())?;
+    std::fs::write("key.pem", key_pair.serialize_pem())?;
+
+    Ok(())
 }
 
 #[cfg(test)]

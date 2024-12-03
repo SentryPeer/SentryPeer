@@ -11,8 +11,8 @@
                              |___/
 */
 use crate::config::{config_from_cli, config_from_env, load_certs, load_key, SentryPeerConfig};
-use crate::config;
 use crate::sip::log_sip_packet;
+use crate::config;
 use std::io;
 use std::net::ToSocketAddrs;
 use std::sync::Arc;
@@ -26,39 +26,11 @@ use crate::sentrypeer_config;
 
 /// # Safety
 ///
-/// Shutdown the tokio runtime.
-#[no_mangle]
-pub(crate) unsafe extern "C" fn shutdown_tls(sentrypeer_c_config: *const sentrypeer_config) -> i32 {
-    // Assert we're not getting a null pointer
-    assert!(
-        !sentrypeer_c_config.is_null(),
-        "sentrypeer_c_config is null."
-    );
-
-    // And this
-    assert!(
-        !(*sentrypeer_c_config).sip_tls_channel.is_null(),
-        "sentrypeer_c_config.sip_tls_handle is null."
-    );
-
-    let tx = Box::from_raw((*sentrypeer_c_config).sip_tls_channel as *mut oneshot::Sender<String>);
-
-    // Send the message to the tokio runtime to shutdown
-    if tx.send(String::from("Please shutdown :-)")).is_err() {
-        eprintln!("Failed to send message to tokio runtime to shutdown");
-        return libc::EXIT_FAILURE;
-    }
-
-    libc::EXIT_SUCCESS
-}
-
-/// # Safety
-///
 /// Nothing is done with the `sentrypeer_config` pointer, it's treated read-only.
 ///
 /// A default multi-threaded tokio runtime that listens for incoming TLS connections.
 #[no_mangle]
-pub(crate) extern "C" fn listen_tls(sentrypeer_c_config: *mut sentrypeer_config) -> i32 {
+pub(crate) extern "C" fn listen_tcp(sentrypeer_c_config: *mut sentrypeer_config) -> i32 {
     // Assert we're not getting a null pointer
     assert!(!sentrypeer_c_config.is_null());
 

@@ -114,6 +114,15 @@ int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config);
 /**
  * # Safety
  *
+ * Nothing is done with the `sentrypeer_config` pointer, it's treated read-only.
+ *
+ * A default multi-threaded tokio runtime that listens for incoming TLS connections.
+ */
+int32_t listen_tcp(sentrypeer_config *sentrypeer_c_config);
+
+/**
+ * # Safety
+ *
  * Shutdown the tokio runtime.
  */
 int32_t shutdown_tls(const sentrypeer_config *sentrypeer_c_config);
@@ -126,5 +135,14 @@ int32_t shutdown_tls(const sentrypeer_config *sentrypeer_c_config);
  * A default multi-threaded tokio runtime that listens for incoming TLS connections.
  */
 int32_t listen_tls(sentrypeer_config *sentrypeer_c_config);
+
+/**
+ * # Safety
+ *
+ * Nothing is done with the `sentrypeer_config` pointer, it's treated read-only.
+ *
+ * A default multi-threaded tokio runtime that listens for incoming TLS connections.
+ */
+int32_t listen_udp(sentrypeer_config *sentrypeer_c_config);
 
 #endif  /* SENTRYPEER_RUST_H */

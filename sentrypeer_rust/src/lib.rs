@@ -27,7 +27,10 @@ use uuid::Uuid;
 
 pub mod cli;
 mod config;
+pub mod sip;
+pub mod tcp;
 pub mod tls;
+pub mod udp;
 
 /// A manually created struct to represent a BadActor from bad_actor.h
 #[repr(C)]
