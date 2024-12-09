@@ -22,7 +22,7 @@ chrono = "0.4.38"
 libc = "0.2.164"
 tokio-rustls = "0.26.0"
 rustls-pemfile = "2.2.0"
-tokio = { version = "1.41.1", features = ["full"] }
+tokio = { version = "1.42.0", features = ["full"] }
 pki-types = { package = "rustls-pki-types", version = "1" }
 serde = { version = "1.0.215", features = ["derive"] }
 os_socketaddr = "0.2.5"
