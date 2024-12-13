@@ -70,9 +70,9 @@ struct Args {
     #[arg(short = 'l', requires = "json")]
     json_log_file: Option<PathBuf>,
 
-    /// Disable TLS mode completely or use SENTRYPEER_TLS_DISABLE env
-    #[arg(short = 'T')]
-    tls_mode: bool,
+    /// Disable Rust powered TCP, UDP and TLS or use SENTRYPEER_TLS_DISABLE env
+    #[arg(short = 'N')]
+    new_mode: bool,
 
     /// Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
     #[arg(
@@ -122,9 +122,9 @@ pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentryp
         // Set to true by default in C
         (*sentrypeer_c_config).sip_mode = false;
     }
-    if args.tls_mode {
-        // Set to true by default in C
-        (*sentrypeer_c_config).tls_mode = false;
+    if args.new_mode {
+        // Set to true by default in C if Rust detected
+        (*sentrypeer_c_config).new_mode = false;
     }
     (*sentrypeer_c_config).sip_responsive_mode = args.responsive;
     (*sentrypeer_c_config).syslog_mode = args.syslog;

@@ -40,6 +40,7 @@ struct sentrypeer_config {
 	bool api_mode;
 	bool bgp_agent_mode;
 	bool debug_mode;
+	bool new_mode;
 	bool json_log_mode;
 	bool p2p_dht_mode;
 	bool sip_agent_mode;
@@ -58,7 +59,7 @@ struct sentrypeer_config {
 	char *node_id;
 	char *p2p_bootstrap_node;
 	pthread_t sip_daemon_thread;
-	void *sip_tls_channel;
+	void *sip_channel;
 	struct MHD_Daemon *http_daemon;
 
 #if HAVE_OPENDHT_C != 0
@@ -68,7 +69,6 @@ struct sentrypeer_config {
 #endif
 	
 #if HAVE_RUST != 0
-	bool tls_mode;
 	char *tls_cert_file;
 	char *tls_key_file;
 	char *tls_listen_address;

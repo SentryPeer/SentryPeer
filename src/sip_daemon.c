@@ -37,8 +37,6 @@
 #include "sip_daemon.h"
 #include "sip_message_event.h"
 #include "sip_parser.h"
-#include "database.h"
-#include "json_logger.h"
 
 #if HAVE_OPENDHT_C != 0
 #include "peer_to_peer_dht.h"
@@ -83,11 +81,11 @@ int sip_daemon_run(sentrypeer_config *config)
 	config->sip_daemon_thread = sip_daemon_thread;
 
 #if HAVE_RUST != 0
-	if (config->tls_mode == true) {
+	if (config->new_mode == true) {
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr, "Starting Rust TLS listener...\n");
 		}
-		if (listen_tls(config) != EXIT_SUCCESS) {
+		if (run_sip_server(config) != EXIT_SUCCESS) {
 			fprintf(stderr, "Failed to run listen_tls().\n");
 			return EXIT_FAILURE;
 		}
@@ -98,9 +96,9 @@ int sip_daemon_run(sentrypeer_config *config)
 }
 
 #if HAVE_RUST != 0
-int shutdown_listen_tls(sentrypeer_config const *config)
+int shutdown_sip_server(sentrypeer_config const *config)
 {
-	if (shutdown_tls(config) != EXIT_SUCCESS) {
+	if (shutdown_sip(config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to shutdown TLS listener.\n");
 		return EXIT_FAILURE;
 	}
@@ -124,10 +122,10 @@ int sip_daemon_stop(sentrypeer_config const *config)
 		return EXIT_FAILURE;
 	}
 
-	// Shutdown our Rust TLS listener
+	// Shutdown our Rust listeners
 #if HAVE_RUST != 0
-	if (config->tls_mode == true) {
-		if (shutdown_listen_tls(config) != EXIT_SUCCESS) {
+	if (config->new_mode == true) {
+		if (shutdown_sip_server(config) != EXIT_SUCCESS) {
 			fprintf(stderr, "Failed to shutdown TLS listener.\n");
 			return EXIT_FAILURE;
 		}
@@ -249,6 +247,10 @@ int sip_send_reply(sentrypeer_config const *config,
 
 int sip_daemon_init(sentrypeer_config *config)
 {
+    if (config->new_mode == true) {
+        return EXIT_SUCCESS;
+    }
+    
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Configuring local address...\n");
 	}

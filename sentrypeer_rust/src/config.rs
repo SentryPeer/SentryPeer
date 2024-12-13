@@ -103,6 +103,22 @@ pub(crate) fn config_from_cli(
     Ok(config)
 }
 
+pub fn load_all_configs(
+    sentrypeer_config: SentryPeerConfig,
+) -> Result<Config, Box<dyn std::error::Error>> {
+    let debug_mode = unsafe { (*sentrypeer_config.p).debug_mode };
+    let verbose_mode = unsafe { (*sentrypeer_config.p).verbose_mode };
+
+    // Our Configuration file is loaded first, with defaults
+    let mut config = load_file(debug_mode, verbose_mode).expect("Failed to load config file");
+    // Then our env
+    config = config_from_env(config).unwrap();
+    // Then our CLI args
+    config = config_from_cli(config, sentrypeer_config.p).unwrap();
+
+    Ok(config)
+}
+
 pub(crate) fn load_certs(path: &Path) -> io::Result<Vec<CertificateDer<'static>>> {
     certs(&mut BufReader::new(File::open(path)?)).collect()
 }

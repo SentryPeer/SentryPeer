@@ -46,6 +46,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->api_mode = false;
 	self->bgp_agent_mode = false;
 	self->debug_mode = false;
+	self->new_mode = false; 
 	self->json_log_mode = false;
 	self->node_id = util_uuid_generate_string(uuid_string);
 	self->p2p_dht_mode = false;
@@ -62,7 +63,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->oauth2_access_token = 0;
 	
 	self->sip_daemon_thread = 0;
-	self->sip_tls_channel = 0;
+	self->sip_channel = 0;
 
 	self->db_file = calloc(SENTRYPEER_PATH_MAX + 1, sizeof(char));
 	assert(self->db_file);
@@ -102,7 +103,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 #endif
 	
 #if HAVE_RUST != 0
-	self->tls_mode = true; // Default on
+	self->new_mode = true; // Default false above for fallback if no Rust
 	self->tls_cert_file = 0;
 	self->tls_key_file = 0;
 	self->tls_listen_address = 0;
