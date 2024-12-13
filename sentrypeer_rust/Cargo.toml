@@ -18,7 +18,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4.38"
+chrono = "0.4.39"
 libc = "0.2.164"
 tokio-rustls = "0.26.0"
 rustls-pemfile = "2.2.0"
