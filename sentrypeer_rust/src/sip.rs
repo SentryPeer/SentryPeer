@@ -131,20 +131,29 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
 
             tokio::spawn(async move {
                 loop {
+                    let mut buf = [0; 1024];
+                    let (bytes_read, peer_addr) = arc_socket.recv_from(&mut buf).await.unwrap();
                     let socket = arc_socket.clone();
 
                     // https://github.com/tokio-rs/tokio/discussions/3755#discussioncomment-702928
                     // UdpSocket docs: This type does not provide a split method, because
                     // this functionality can be achieved by instead wrapping the socket
                     // in an [Arc]
-                    let handle = tokio::spawn(async move {
-                        if handle_udp_connection(socket, sentrypeer_config, addr).await
+                    tokio::spawn(async move {
+                        if handle_udp_connection(
+                            peer_addr,
+                            &mut buf,
+                            bytes_read,
+                            socket,
+                            sentrypeer_config,
+                            addr,
+                        )
+                        .await
                             != libc::EXIT_SUCCESS
                         {
                             eprintln!("Failed to handle UDP connection");
                         }
                     });
-                    let _ = handle.await;
                 }
             });
 

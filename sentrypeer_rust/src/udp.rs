@@ -18,14 +18,14 @@ use std::sync::Arc;
 use tokio::net::UdpSocket;
 
 pub fn handle_udp_connection(
+    peer_addr: SocketAddr,
+    buf: &mut [u8],
+    bytes_read: usize,
     udp_socket: Arc<UdpSocket>,
     sentrypeer_config: SentryPeerConfig,
     addr: SocketAddr,
-) -> impl Future<Output = i32> {
+) -> impl Future<Output = i32> + use<'_> {
     async move {
-        let mut buf = [0; 1024];
-        let (bytes_read, peer_addr) = udp_socket.recv_from(&mut buf).await.unwrap();
-
         let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
         let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
         let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
