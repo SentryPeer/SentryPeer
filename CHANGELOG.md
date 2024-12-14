@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `-N` options to revert to old C way with `select()` for TCP and UDP
+- `-N` option to revert to old C way with `select()` for TCP and UDP
 - TCP, UDP now all powered by Rust and Tokio
 - We now support TLS configuration loaded from config using [confy](https://crates.io/crates/confy)
 - If a cert or key file is not found using `-t` or `-k` options, SentryPeer will 
