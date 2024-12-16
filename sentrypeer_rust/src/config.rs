@@ -183,8 +183,8 @@ fn create_certs() -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use serial_test::serial;
+    use std::path::PathBuf;
 
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
@@ -229,7 +229,7 @@ mod tests {
     }
 
     #[test]
-    #[serial]   
+    #[serial]
     fn test_load_file() {
         setup_config_file();
 

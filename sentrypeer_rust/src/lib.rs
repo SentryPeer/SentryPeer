@@ -52,6 +52,8 @@ pub struct BadActor {
 
 /// An associated function called new() for the BadActor struct
 impl BadActor {
+    // disable clippy warning for the long function signature
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         sip_message: *const c_char,
         source_ip: *const c_char,

@@ -12,51 +12,48 @@
 */
 use crate::config::SentryPeerConfig;
 use crate::sip::{log_sip_packet, SIP_PACKET};
-use std::future::Future;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::UdpSocket;
 
-pub fn handle_udp_connection(
+pub async fn handle_udp_connection(
     peer_addr: SocketAddr,
     buf: &mut [u8],
     bytes_read: usize,
     udp_socket: Arc<UdpSocket>,
     sentrypeer_config: SentryPeerConfig,
     addr: SocketAddr,
-) -> impl Future<Output = i32> + use<'_> {
-    async move {
-        let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
-        let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
-        let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
+) -> i32 {
+    let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
+    let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
+    let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
 
-        if debug_mode || verbose_mode {
-            eprintln!("Received UDP packet from: {}", peer_addr);
-        }
-
-        if log_sip_packet(
-            sentrypeer_config,
-            buf.to_vec(),
-            bytes_read,
-            peer_addr,
-            addr,
-            "UDP",
-        ) != libc::EXIT_SUCCESS
-        {
-            eprintln!("Failed to log SIP packet");
-        }
-
-        if debug_mode || verbose_mode {
-            eprintln!(
-                "Received: {:?}",
-                String::from_utf8_lossy(&buf[..bytes_read])
-            );
-        }
-
-        if sip_responsive_mode {
-            udp_socket.send_to(SIP_PACKET, peer_addr).await.unwrap();
-        }
-
-        libc::EXIT_SUCCESS
+    if debug_mode || verbose_mode {
+        eprintln!("Received UDP packet from: {}", peer_addr);
     }
+
+    if log_sip_packet(
+        sentrypeer_config,
+        buf.to_vec(),
+        bytes_read,
+        peer_addr,
+        addr,
+        "UDP",
+    ) != libc::EXIT_SUCCESS
+    {
+        eprintln!("Failed to log SIP packet");
+    }
+
+    if debug_mode || verbose_mode {
+        eprintln!(
+            "Received: {:?}",
+            String::from_utf8_lossy(&buf[..bytes_read])
+        );
+    }
+
+    if sip_responsive_mode {
+        udp_socket.send_to(SIP_PACKET, peer_addr).await.unwrap();
+    }
+
+    libc::EXIT_SUCCESS
 }

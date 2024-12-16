@@ -15,6 +15,7 @@ use predicates::prelude::*;
 
 #[test]
 #[ignore = "not yet implemented"]
+#[allow(clippy::zombie_processes)]
 fn tls_probe() {
     // Delete our JSON log file
     let mut json_log = Command::new("rm");
