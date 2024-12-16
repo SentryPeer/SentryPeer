@@ -184,9 +184,11 @@ fn create_certs() -> io::Result<()> {
 mod tests {
     use super::*;
     use std::path::PathBuf;
+    use serial_test::serial;
 
     // https://doc.rust-lang.org/reference/attributes/testing.html#the-ignore-attribute
     #[test]
+    #[serial]
     fn test_config_from_env() {
         let mut config = Config {
             cert: PathBuf::from("cert.pem"),
@@ -201,6 +203,7 @@ mod tests {
 
     #[test]
     #[ignore = "not yet implemented"]
+    #[serial]
     fn test_load_certs() {
         let path = Path::new("tests/certs/cert.pem");
         let certs = load_certs(path).expect("Failed to load certs");
@@ -217,6 +220,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_config_default() {
         let cfg = Config::default();
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
@@ -225,6 +229,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]   
     fn test_load_file() {
         setup_config_file();
 
@@ -235,12 +240,14 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_load_file_error() {
         let cfg: Result<Config, confy::ConfyError> = load_file(true, false);
         assert!(cfg.is_ok());
     }
 
     #[test]
+    #[serial]
     fn test_load_file_and_save() {
         setup_config_file();
 
