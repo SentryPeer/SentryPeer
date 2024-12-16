@@ -14,7 +14,7 @@ on:
 
 jobs:
   check:
-    name: audit
+    name: clippy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -23,5 +23,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
+      - name: Install clippy
+        run: rustup component add clippy    
       - name: Run Clippy
         run: cd sentrypeer_rust && cargo clippy --all-targets --all-features -- -D warnings
