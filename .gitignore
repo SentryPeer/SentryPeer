@@ -122,4 +122,6 @@ sentrypeer_rust/target/
 # Other tools
 clang_output*
 cmake-build-debug
+cert.pem
+key.pem
 

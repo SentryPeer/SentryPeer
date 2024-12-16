@@ -170,7 +170,7 @@ pub fn create_tls_cert_and_key() -> i32 {
 }
 
 // Create a new TLS cert and key usng rcgen
-fn create_certs() -> io::Result<()> {
+pub fn create_certs() -> io::Result<()> {
     let CertifiedKey { cert, key_pair } =
         generate_simple_self_signed(vec!["localhost".to_string()]).expect("Failed to create cert");
 

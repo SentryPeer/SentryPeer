@@ -24,7 +24,7 @@ use tokio::net::UdpSocket;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
-use crate::config::{load_all_configs, load_certs, load_key, SentryPeerConfig};
+use crate::config::{create_certs, load_all_configs, load_certs, load_key, SentryPeerConfig};
 use crate::tcp::handle_tcp_connection;
 use crate::tls::handle_tls_connection;
 use crate::udp::handle_udp_connection;
@@ -166,8 +166,22 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                 .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable))
                 .unwrap();
 
+            // if certs doesn't exist, create our default ones
+            if !config.cert.exists() || !config.key.exists() {
+                if debug_mode || verbose_mode {
+                    eprintln!(
+                        "Can't find any TLS certs, so creating default cert.pem and key.pem..."
+                    );
+                }
+
+                if create_certs().is_err() {
+                    eprintln!("Failed to create TLS cert and key");
+                    return libc::EXIT_FAILURE;
+                }
+            }
             let certs = load_certs(&config.cert)
-                .expect("Failed to load TLS cert. Please set SENTRYPEER_CERT or use -t");
+                .expect("Failed to load TLS cert. Please set SENTRYPEER_CERT or use -c");
+
             let key = load_key(&config.key)
                 .expect("Failed to load TLS key. Please set SENTRYPEER_KEY or use -k");
 

@@ -83,10 +83,10 @@ int sip_daemon_run(sentrypeer_config *config)
 #if HAVE_RUST != 0
 	if (config->new_mode == true) {
 		if (config->debug_mode || config->verbose_mode) {
-			fprintf(stderr, "Starting Rust TLS listener...\n");
+			fprintf(stderr, "Starting Rust powered TCP, UDP and TLS...\n");
 		}
 		if (run_sip_server(config) != EXIT_SUCCESS) {
-			fprintf(stderr, "Failed to run listen_tls().\n");
+			fprintf(stderr, "Failed to run run_sip_server().\n");
 			return EXIT_FAILURE;
 		}
 	}
