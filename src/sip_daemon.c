@@ -32,6 +32,7 @@
 #include <time.h>
 #include <syslog.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "conf.h"
 #include "sip_daemon.h"
@@ -75,6 +76,11 @@ int sip_daemon_run(sentrypeer_config *config)
 	if (pthread_setname_np(sip_daemon_thread, sip_daemon_thread_name) !=
 	    EXIT_SUCCESS) {
 		fprintf(stderr, "Failed to set SIP daemon thread name.\n");
+		// Error is?
+		fprintf(stderr, "Error is: %d\n", errno);
+		// Error description?
+		fprintf(stderr, "Error description is: %s\n", strerror(errno));
+
 		return EXIT_FAILURE;
 	}
 #endif
