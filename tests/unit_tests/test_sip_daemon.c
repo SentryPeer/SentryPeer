@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only  */
 /* Copyright (c) 2021 - 2024 Gavin Henry <ghenry@sentrypeer.org> */
-/* 
+/*
    _____            _              _____
   / ____|          | |            |  __ \
  | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
@@ -20,6 +20,10 @@
 #include <stdlib.h>
 #include "../../src/sip_daemon.h"
 
+#if HAVE_RUST != 0
+#include "../../src/sentrypeer_rust.h"
+#endif
+
 void test_sip_daemon(void **state)
 {
 	(void)state; /* unused */
@@ -27,7 +31,13 @@ void test_sip_daemon(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 
-	assert_int_equal(sip_daemon_run(config), EXIT_SUCCESS);
+	if (config->new_mode == true) {
+#if HAVE_RUST != 0
+		assert_int_equal(run_sip_server(config), EXIT_SUCCESS);
+#endif
+	} else {
+		assert_int_equal(sip_daemon_run(config), EXIT_SUCCESS);
+	}
 	assert_int_equal(sip_daemon_stop(config), EXIT_SUCCESS);
 
 	sentrypeer_config_destroy(&config);

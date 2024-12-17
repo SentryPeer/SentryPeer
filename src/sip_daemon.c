@@ -86,18 +86,6 @@ int sip_daemon_run(sentrypeer_config *config)
 #endif
 	config->sip_daemon_thread = sip_daemon_thread;
 
-#if HAVE_RUST != 0
-	if (config->new_mode == true) {
-		if (config->debug_mode || config->verbose_mode) {
-			fprintf(stderr, "Starting Rust powered TCP, UDP and TLS...\n");
-		}
-		if (run_sip_server(config) != EXIT_SUCCESS) {
-			fprintf(stderr, "Failed to run run_sip_server().\n");
-			return EXIT_FAILURE;
-		}
-	}
-#endif // HAVE_RUST
-
 	return EXIT_SUCCESS;
 }
 
@@ -114,18 +102,23 @@ int shutdown_sip_server(sentrypeer_config const *config)
 
 int sip_daemon_stop(sentrypeer_config const *config)
 {
-	if (config->debug_mode || config->verbose_mode) {
-		fprintf(stderr, "Stopping sip daemon...\n");
-	}
+    // default if no Rust or set via config file/CLI/ENV
+	if (config->new_mode == false) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "Stopping sip daemon...\n");
+		}
 
-	if (pthread_cancel(config->sip_daemon_thread) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to cancel SIP daemon thread.\n");
-		return EXIT_FAILURE;
-	}
+		if (pthread_cancel(config->sip_daemon_thread) != EXIT_SUCCESS) {
+			fprintf(stderr,
+				"Failed to cancel SIP daemon thread.\n");
+			return EXIT_FAILURE;
+		}
 
-	if (pthread_join(config->sip_daemon_thread, NULL) != EXIT_SUCCESS) {
-		fprintf(stderr, "Failed to join SIP daemon thread.\n");
-		return EXIT_FAILURE;
+		if (pthread_join(config->sip_daemon_thread, NULL) !=
+		    EXIT_SUCCESS) {
+			fprintf(stderr, "Failed to join SIP daemon thread.\n");
+			return EXIT_FAILURE;
+		}
 	}
 
 	// Shutdown our Rust listeners
@@ -253,10 +246,6 @@ int sip_send_reply(sentrypeer_config const *config,
 
 int sip_daemon_init(sentrypeer_config *config)
 {
-    if (config->new_mode == true) {
-        return EXIT_SUCCESS;
-    }
-    
 	if (config->debug_mode || config->verbose_mode) {
 		fprintf(stderr, "Configuring local address...\n");
 	}

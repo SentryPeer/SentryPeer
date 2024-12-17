@@ -244,7 +244,6 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
     });
 
     // Set the pointer to the oneshot channel
-    // TODO: Rename this in config.h
     unsafe {
         (*sentrypeer_c_config).sip_channel = Box::into_raw(Box::new(tx)) as *mut libc::c_void;
     }
