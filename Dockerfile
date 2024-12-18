@@ -17,7 +17,8 @@ LABEL maintainer="Gavin Henry, ghenry@sentrypeer.org"
 #
 RUN apk add --no-cache autoconf automake autoconf-archive \
 	git sqlite-dev cmocka-dev util-linux-dev curl-dev \
-	pcre2-dev jansson-dev libmicrohttpd-dev build-base
+	pcre2-dev jansson-dev libmicrohttpd-dev build-base \
+	libtool rust rust-bindgen clang19-libclang cargo cmake
 #
 RUN apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
     libosip2-dev
@@ -73,9 +74,10 @@ STOPSIGNAL SIGKILL
 USER sentrypeer:sentrypeer
 WORKDIR /opt/sentrypeer/
 #
-# SIP Port 5060
+# SIP Port 5060 and SIP TLS 5061
 EXPOSE 5060/udp
 EXPOSE 5060/tcp
+EXPOSE 5061/tcp
 EXPOSE 8082/tcp
  #
  # ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db

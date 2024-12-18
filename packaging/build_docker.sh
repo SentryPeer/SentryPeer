@@ -14,7 +14,7 @@
 # cd ~/src/sentrypeer
 # ./packaging/build_docker.sh v3.0.2
 
-sudo docker build --no-cache -t sentrypeer/sentrypeer:latest .
-sudo docker push sentrypeer/sentrypeer:latest
-sudo docker build --no-cache -t sentrypeer/sentrypeer:"$1" .
-sudo docker push sentrypeer/sentrypeer:"$1"
+docker build --no-cache -t sentrypeer/sentrypeer:latest .
+docker push sentrypeer/sentrypeer:latest
+docker build --no-cache -t sentrypeer/sentrypeer:"$1" .
+docker push sentrypeer/sentrypeer:"$1"

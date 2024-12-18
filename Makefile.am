@@ -278,7 +278,7 @@ if HAVE_RUST
 # Rust tests
 check-local: @abs_top_builddir@/$(RUST_SENTRYPEER_TARGET)/libsentrypeer_rust.a
 	cd $(top_srcdir)/$(RUST_SENTRYPEER_DIR); \
-	CARGO_TARGET_DIR=@abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target $(CARGO) test
+	CARGO_TARGET_DIR=@abs_top_builddir@/$(RUST_SENTRYPEER_DIR)/target $(CARGO) test --libs
 endif
 endif
 
