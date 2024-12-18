@@ -58,11 +58,11 @@ RUN apk -U add --no-cache \
     apk -U add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
     opendht-libs && \
     \
-    # Setup user, groups and configs \
+    # Setup user, groups and configs
     mkdir -p /var/lib/sentrypeer && \
     mkdir -p /var/log/sentrypeer && \
     addgroup -g 2000 sentrypeer && \
-    adduser -S -H -s /bin/ash -u 2000 -D -g 2000 sentrypeer && \
+    adduser -S -s /bin/ash -u 2000 -D -g 2000 sentrypeer && \
     chown -R sentrypeer:sentrypeer /opt/sentrypeer /var/lib/sentrypeer /var/log/sentrypeer && \
 #
 # Clean up
