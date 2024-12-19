@@ -1,4 +1,4 @@
-.TH SentryPeer 1 "November 2023" "SentryPeer"
+.TH SentryPeer 1 "December 2024" "SentryPeer"
 .SH NAME
 sentrypeer \- A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot
 
@@ -7,7 +7,7 @@ sentrypeer \- A distributed list of bad IP addresses and phone numbers collected
 [\-hVvjplfdrRaws]
 .SH DESCRIPTION
 .B SentryPeer
-is basically a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
+is a fraud detection tool. It lets bad actors try to make phone calls and saves the IP address they came
 from and number they tried to call. Those details are then used to block them at the service providers network and the
 next time a user/customer tries to call a collected number, it's blocked.
 
@@ -18,60 +18,68 @@ If you've collected it, you should have the choice to keep it and/or opt in to s
 members via p2p methods.
 .SH OPTIONS
 .TP
-.BI "-h
-Shows the help screen
+\fB-f <DB_FILE>
+Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
 .TP
-.BI "\-V
-shows the version of SentryPeer
+\fB-j
+Enable json logging or use SENTRYPEER_JSON_LOG env
 .TP
-.BI "\-f
-Set 'sentrypeer.db' location or set SENTRYPEER_DB_FILE environment variable
+\fB-p                           
+Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
 .TP
-.BI "\-j
-Enable json logging or use SENTRYPEER_JSON_LOG environment variable
+\fB-b <BOOTSTRAP_NODE>          
+Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
 .TP
-.BI "\-p
-Runs SentryPeer in peer to peer mode or use SENTRYPEER_PEER_TO_PEER environment variable
+\fB-i <CLIENT_ID>               
+Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
 .TP
-.BI "\-b
-Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE environment variable
+\fB-c <CLIENT_SECRET>           
+Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
 .TP
-.BI "\-a
-Runs SentryPeer with the RESTful API or set SENTRYPEER_API=1 environment variable
+\fB-a                           
+Enable RESTful API mode or use SENTRYPEER_API env
 .TP
-.BI "\-r
-Runs SentryPeer in SIP responsive mode or set SENTRYPEER_SIP_RESPONSIVE=1 environment variable. Enables replies to SIP
-probes to prompt INVITEs and actual attacks
+\fB-w <WEBHOOK_URL>             
+Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
 .TP
-.BI "\-R
-Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE environment variable. This allows you to run SentryPeer as an
-API server or just as a node that is part of the Peer to Peer network to replicate the data
+\fB-r                           
+Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
 .TP
-.BI "\-l
-Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE environment variable
+\fB-R                           
+Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
 .TP
-.BI "\-s
-Runs SentryPeer with syslog logging or set SENTRYPEER_SYSLOG=1 environment variable. Allows Fail2ban to use SentryPeer
-to block IP addresses
+\fB-l <JSON_LOG_FILE>           
+Set JSON logfile (default './sentrypeer_json.log') location or use SENTRYPEER_JSON_LOG_FILE env
 .TP
-.BI "\-v
-Runs SentryPeer in verbose mode or set SENTRYPEER_VERBOSE=1 environment variable
+\fB-N                           
+Disable Rust powered TCP, UDP and TLS or use SENTRYPEER_TLS_DISABLE env
 .TP
-.BI "\-w
-Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL environment variable
+\fB-t <TLS_CERT_FILE>           
+Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
 .TP
-.BI "\-i
-Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID environment variable to get a Bearer token for WebHook
+\fB-k <TLS_KEY_FILE>            
+Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
 .TP
-.BI "\-c
-Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET environment variable to get a Bearer token for WebHook
+\fB-z <TLS_LISTEN_ADDRESS>      
+Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
 .TP
-.BI "-d
-Runs SentryPeer in debug mode (preferred method at the moment) or set SENTRYPEER_DEBUG=1 environment variable
+\fB-s                           
+Enable syslog logging or use SENTRYPEER_SYSLOG env
+.TP
+\fB-v                           
+Enable verbose logging or use SENTRYPEER_VERBOSE env
+.TP
+\fB-d                           
+Enable debug mode or use SENTRYPEER_DEBUG env
+.TP
+\fB-h, --help                   
+Print help
+.TP
+\fB-V, --version                
+Print version
 .SH USING SENTRYPEER
 You can run SentryPeer via the console, use a Docker image via Docker Hub, build your own container with the Dockerfile
-on GitHub or install a deb or rpm. It looks like you installed from source or a package if you're reading this :-) Peer
-to Peer is the next step.
+on GitHub or install a deb or rpm. It looks like you installed from source or a package if you're reading this :-) 
 .SH BUGS
 Issues and can be raised on the SentryPeer GitHub page:
 

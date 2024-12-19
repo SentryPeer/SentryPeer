@@ -224,7 +224,7 @@ You can run the latest version of SentryPeer with [Docker](https://www.docker.co
 Or build yourself:
 
     sudo docker build --no-cache -t sentrypeer .
-    sudo docker run -d -p 5050:5060/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
+    sudo docker run -d -p 5060:5060/tcp -p 5061:5061/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
 
 Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:8082/health-check` to see if it's running.
 
@@ -245,6 +245,9 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
     ENV SENTRYPEER_VERBOSE=1
     ENV SENTRYPEER_DEBUG=1
+    ENV SENTRYPEER_CERT=/my/location/sentrypeer-crt.pem
+    ENV SENTRYPEER_KEY=/my/location/sentrypeer-key.pem
+    ENV SENTRYPEER_TLS_LISTEN_ADDRESS=0.0.0.0:5061
 
 Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
 
@@ -252,7 +255,8 @@ Settings any of these to `0` will also _enable_ the feature. We _don't care_ wha
 
 #### TLS Configuration
 
-You can either set the appropriate ENV vars, cli arguments or use a configudation files. For example:
+To use your own certs, you can either set the appropriate ENV vars, cli arguments 
+or use the configuration file. For example:
 
 ```
 cat ~/.config/sentrypeer/default-config.toml 
@@ -260,6 +264,10 @@ cert = "tests/unit_tests/127.0.0.1.pem"
 key = "tests/unit_tests/127.0.0.1-key.pem"
 tls_listen_address = "0.0.0.0:5061"
 ```
+
+If you don't set these, a certifcate for localhost will be automatically 
+generated in the directory that sentrypeer is run from creating a `cert.pem` and
+a `key.pem` file.
 
 ### Installation
  
@@ -322,19 +330,21 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential clang autoconf-archive autoconf automake libtool \ 
-    libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev \
-    libmicrohttpd-dev 
+    sudo apt-get install git build-essential clang autoconf-archive autoconf \
+    automake libtool cmake libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev \
+    libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev libclang-dev
 
 Fedora:
 
-    sudo dnf install git clang pkg-config autoconf automake autoconf-archive libtool rustc cargo libosip2-devel \
-    libsqlite3-devel libcmocka-devel libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git clang pkg-config autoconf automake autoconf-archive \ 
+    libtool libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel \
+    libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel cmake \
+    clang-libs clang
 
 macOS:
 
     brew install git libtool autoconf automake autoconf-archive libosip cmocka \
-    libmicrohttpd jansson curl pcre2 pkg-config opendht ossp-uuid
+    libmicrohttpd jansson curl pcre2 pkg-config opendht ossp-uuid cmake 
 
 Rust:
 
@@ -650,29 +660,31 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-i OAuth_2_Client_ID] [-c OAuth_2_Client_Secret] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+Protect your SIP Servers from bad actors at https://sentrypeer.com
+
+Usage: sentrypeer [OPTIONS]
 
 Options:
-  -h,      Print this help
-  -V,      Print version
-  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
-  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
-  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
-  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
-  -i,      Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
-  -c,      Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
-  -a,      Enable RESTful API mode or use SENTRYPEER_API env
-  -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
-  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
-  -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
-  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
-  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env
-  -v,      Enable verbose logging or use SENTRYPEER_VERBOSE env
-  -d,      Enable debug mode or use SENTRYPEER_DEBUG env
-
-Report bugs to https://github.com/SentryPeer/SentryPeer/issues
-
-See https://sentrypeer.org for more information.
+  -f <DB_FILE>                 Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
+  -j                           Enable json logging or use SENTRYPEER_JSON_LOG env
+  -p                           Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -b <BOOTSTRAP_NODE>          Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
+  -i <CLIENT_ID>               Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
+  -c <CLIENT_SECRET>           Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
+  -a                           Enable RESTful API mode or use SENTRYPEER_API env
+  -w <WEBHOOK_URL>             Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
+  -r                           Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
+  -R                           Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
+  -l <JSON_LOG_FILE>           Set JSON logfile (default './sentrypeer_json.log') location or use SENTRYPEER_JSON_LOG_FILE env
+  -N                           Disable Rust powered TCP, UDP and TLS or use SENTRYPEER_TLS_DISABLE env
+  -t <TLS_CERT_FILE>           Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
+  -k <TLS_KEY_FILE>            Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
+  -z <TLS_LISTEN_ADDRESS>      Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+  -s                           Enable syslog logging or use SENTRYPEER_SYSLOG env
+  -v                           Enable verbose logging or use SENTRYPEER_VERBOSE env
+  -d                           Enable debug mode or use SENTRYPEER_DEBUG env
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ### IPv6 Multicast Address

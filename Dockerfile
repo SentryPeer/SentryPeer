@@ -95,6 +95,9 @@ EXPOSE 8082/tcp
  # ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
  # ENV SENTRYPEER_VERBOSE=1
  # ENV SENTRYPEER_DEBUG=1
+ # ENV SENTRYPEER_CERT=/my/location/sentrypeer-crt.pem
+ # ENV SENTRYPEER_KEY=/my/location/sentrypeer-key.pem
+ # ENV SENTRYPEER_TLS_LISTEN_ADDRESS=0.0.0.0:5061
  #
 CMD ["./sentrypeer", "-rav", "-f", "/var/lib/sentrypeer/sentrypeer.db"]
 
