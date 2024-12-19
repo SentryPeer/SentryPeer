@@ -166,8 +166,13 @@ EXTRA_DIST+= sentrypeer_rust/Cargo.toml \
             sentrypeer_rust/cbindgen.toml \
             sentrypeer_rust/rust-toolchain.toml \
             sentrypeer_rust/wrapper.h \
+            sentrypeer_rust/src/cli.rs \
+            sentrypeer_rust/src/config.rs \
             sentrypeer_rust/src/lib.rs \
-            sentrypeer_rust/src/tls.rs
+            sentrypeer_rust/src/sip.rs \
+            sentrypeer_rust/src/tcp.rs \
+            sentrypeer_rust/src/tls.rs \
+            sentrypeer_rust/src/udp.rs
 endif
 endif
 

@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [4.0.0] - 2024-12-19
+
+### Changes
+- SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
+- If no `cert.pem` or `key.pem` files are found, we automatically create them for you in the current working directory for a seemless start up experience
 - `-N` option to revert to old C way with `select()` for TCP and UDP
 - TCP, UDP now all powered by Rust and Tokio
 - We now support TLS configuration loaded from config using [confy](https://crates.io/crates/confy)
@@ -14,10 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ask you if you'd like to create them - we use the very nice [rcgen](https://crates.io/crates/rcgen) for this
 - New `-z`, -t` and `-k` options for SIP TLS support
 - Command Line Interface (CLI) now powered by Rust using [clap-rs](https://github.com/clap-rs/clap)
-- SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
 - Environment variables `SENTRYPEER_CERT`, `SENTRYPEER_KEY` and `SENTRYPEER_TLS_LISTEN_ADDRESS`
-- We now look for `cargo` and `rustc`, as we are porting parts of SentryPeer to Rust. New features will
-  be written in Rust
+- We now look for `cargo` and `rustc`, as we are porting parts of SentryPeer to Rust. New features will be written in Rust
 - SIP TLS support and other Rust-powered features will not be built if Rust is not detected. 
 - `make check` now runs Rust tests
 - `make clean` cleans up Rust builds
