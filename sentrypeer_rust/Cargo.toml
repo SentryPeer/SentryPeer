@@ -27,7 +27,7 @@ pki-types = { package = "rustls-pki-types", version = "1" }
 serde = { version = "1.0.216", features = ["derive"] }
 os_socketaddr = "0.2.5"
 clap = { version = "4.5.23", features = ["derive", "string"] }
-rcgen = "0.13.1"
+rcgen = "0.13.2"
 confy = "0.6.1"
 
 [dev-dependencies]
