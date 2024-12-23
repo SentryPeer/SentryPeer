@@ -19,7 +19,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.39"
-libc = "0.2.168"
+libc = "0.2.169"
 tokio-rustls = "0.26.1"
 rustls-pemfile = "2.2.0"
 tokio = { version = "1.42.0", features = ["full"] }
