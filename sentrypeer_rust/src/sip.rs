@@ -13,9 +13,10 @@
 use crate::sockaddr;
 use libc::c_int;
 use os_socketaddr::OsSocketAddr;
+use socket2::{Domain, Socket, Type};
 use std::ffi::CString;
 use std::io;
-use std::net::ToSocketAddrs;
+use std::net::{SocketAddr, ToSocketAddrs};
 use std::os::raw::c_char;
 use std::sync::Arc;
 use tokio::io::{AsyncWriteExt, WriteHalf};
@@ -118,10 +119,23 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                 }
             });
 
-            // UDP
-            let udp_socket = UdpSocket::bind("0.0.0.0:5060")
-                .await
+            let addr = "0.0.0.0:5060".parse::<SocketAddr>().unwrap();
+
+            let socket =
+                Socket::new(Domain::IPV4, Type::DGRAM, None).expect("UDP: Failed to create socket");
+            socket
+                .set_reuse_address(true)
+                .expect("UDP: Failed to set reuse address");
+            socket
+                .set_nonblocking(true)
+                .expect("UDP: Failed to set non-blocking");
+
+            socket
+                .bind(&addr.into())
                 .expect("UDP: Failed to bind to address");
+
+            let udp_socket =
+                UdpSocket::from_std(socket.into()).expect("UDP: Failed to convert to UdpSocket");
             let addr = udp_socket.local_addr().unwrap();
 
             if debug_mode || verbose_mode {

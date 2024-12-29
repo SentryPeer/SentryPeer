@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changes
+- UDP socket now created using `socket2` crate to set `set_reuse_address()` and
+`set_nonblocking()` options e.g. `SO_REUSEADDR` `
+
 ## [4.0.0] - 2024-12-19
 
 ### Changes
