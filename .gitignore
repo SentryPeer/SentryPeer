@@ -118,6 +118,8 @@ sentrypeer_json.log
 
 # Rust
 sentrypeer_rust/target/
+sentrypeer_rust/coverage/
+sentrypeer_rust/lcov.info
 
 # Other tools
 clang_output*
