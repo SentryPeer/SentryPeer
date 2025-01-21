@@ -33,9 +33,9 @@ use crate::udp::handle_udp_connection;
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
-// SIP packet const with \r\n - \n is added in the formatting 
+// SIP packet const with \r\n - \n is added in the formatting
 pub const SIP_PACKET: &[u8] = b"SIP/2.0 200 OK\r
-Via: SIP/2.0/UDP 127.0.0.1:56940\r
+Via: SIP/2.0/UDP 127.0.0.1:5061\r
 Call-ID: 1179563087@127.0.0.1\r
 From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r
 To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r

@@ -3,13 +3,13 @@
 	<send>
 		<![CDATA[
 OPTIONS sip:[service]@[remote_ip] SIP/2.0
-Via: SIP/2.0/UDP 127.0.0.1:56940
+Via: SIP/2.0/UDP 127.0.0.1:5061
 Max-Forwards: 70
 To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828
-From: sipp <sip:sipsak@127.0.0.1>;tag=464eb44f
+From: <sip:sipsak@127.0.0.1>;tag=464eb44f
 Call-ID: 1179563087@127.0.0.1
 CSeq: 1 OPTIONS
-Contact: <sip:sipsak@127.0.0.1:56940>
+Contact: <sip:sipsak@127.0.0.1:5061>
 Accept: application/sdp
 Content-Length: 0
 
