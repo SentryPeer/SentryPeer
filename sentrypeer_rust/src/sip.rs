@@ -33,20 +33,20 @@ use crate::udp::handle_udp_connection;
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
-// SIP packet const
-pub const SIP_PACKET: &[u8] = b"SIP/2.0 200 OK\r\n
-Via: SIP/2.0/UDP 127.0.0.1:56940\r\n
-		            Call-ID: 1179563087@127.0.0.1\r\n
-		            From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n
-		            To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r\n
-		            CSeq: 1 OPTIONS\r\n
-		            Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n
-		            Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n
-		            Supported: 100rel, timer, replaces, norefersub\r\n
-		            Accept-Encoding: text/plain\r\n
-		            Accept-Language: en\r\n
-		            Server: FPBX-16.0.33(18.13.0)\r\n
-		            Content-Length:  0\r\n";
+// SIP packet const with \r\n - \n is added in the formatting 
+pub const SIP_PACKET: &[u8] = b"SIP/2.0 200 OK\r
+Via: SIP/2.0/UDP 127.0.0.1:56940\r
+Call-ID: 1179563087@127.0.0.1\r
+From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r
+To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r
+CSeq: 1 OPTIONS\r
+Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r
+Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r
+Supported: 100rel, timer, replaces, norefersub\r
+Accept-Encoding: text/plain\r
+Accept-Language: en\r
+Server: FPBX-16.0.33(18.13.0)\r
+Content-Length:  0\r\n";
 
 // Allow any type that implements AsyncWriteExt so we can use tokio::net::TcpStream for TCP
 // and tokio_rustls::TlsStream<tokio::net::TcpStream> for TLS, e.g. WriteHalf<TlsStream<TcpStream>
