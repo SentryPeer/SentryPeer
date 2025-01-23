@@ -10,6 +10,7 @@
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
 [![Clang Static Analysis](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
+[![gitleaks](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml/badge.svg?branch=main)](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml)
 
 Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us! Very kind!
 
@@ -17,6 +18,7 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
 
 ## Table of Contents
 * [Introduction](#introduction)
+* [Overview](#overview)
 * [Features](#features)
 * [Talks](#talks)
 * [Adoption](#adoption)
@@ -33,7 +35,8 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
 * [RESTful API](#restful-api)
   * [Endpoint /health-check](#endpoint-health-check)
   * [Endpoint /ip-addresses](#endpoint-ip-addresses)
-  * [Endpoint /ip-address/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /ip-addressss/{ip-address}](#endpoint-ip-addressip-address)
+  * [Endpoint /numbers](#endpoint-numbers)
   * [Endpoint /numbers/{phone-number}](#endpoint-numbersphone-number)
 * [Syslog and Fail2ban](#syslog-and-fail2ban)
 * [JSON Log Format](#json-log-format) 
@@ -80,9 +83,80 @@ What would lead to this scenario?
 3. An innocent user is calling a phishing number or known expensive
    number etc. that SentryPeer has seen before.
 
-Traditionally this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
+Traditionally, this data is shipped to a central place, so you don't own the data you've collected. This project is all about Peer to Peer sharing of that data. The user owning the data and various Service Provider / Network Provider related feeds of the data is the key bit for me. I'm sick of all the services out there that keep it and sell it. If you've collected it, you should have the choice to keep it and/or opt in to share it with other SentryPeer community members via p2p methods.
 
-### Features
+### Overview
+
+#### SentryPeer Node
+
+Here we are using [Mermaid Sequence diagrams](https://mermaid.js.org/syntax/sequenceDiagram.html) to show the flow of data from a SentryPeer node to SentryPeerHQ.
+
+```mermaid
+sequenceDiagram
+    actor A as Attacker
+    participant S as SentryPeer Node
+    participant DS as Data Store
+    participant W as WebHook <br/>Endpoint
+    Note over DS: sqlite/json log/syslog <br/>(if enabled)
+    Note over W: if enabled
+    A->>S: SIP probe OPTIONS/REGISTER/etc
+    S->>DS: Save event
+    S->>W: Send event
+    W->>S: 200 OK
+    S->>A: 200 OK
+    A->>S: INVITE sip:00046500729221@
+```
+
+#### SentryPeer Node to SentryPeerHQ
+
+```mermaid
+sequenceDiagram
+    actor A as Attacker
+    participant S as SentryPeer Node
+    participant DS as Data Store
+    participant HQ as SentryPeerHQ
+    Note over DS: sqlite/json log/syslog (if enabled)
+    Note over HQ: OAuth2 creds required.<br/> if using https://sentrypeer.com
+    A->>S: SIP probe OPTIONS/REGISTER/etc
+    S->>DS: Save event
+    S->>HQ: Send event
+    HQ->>S: 201 Created
+    S->>A: 200 OK
+    A->>S: INVITE sip:00046500729221@
+```
+
+#### Using the SentryPeer Node and SentryPeerHQ API
+
+```mermaid
+sequenceDiagram
+    Actor U as User
+    participant S as SentryPeer Node/HQ API
+    Note over S: if enabled
+    U->>S: GET /numbers
+    S->>U: 200 OK Return all Phone numbers seen in database
+```
+
+#### Integrating with your own systems
+
+```mermaid
+sequenceDiagram
+    participant D as Device
+    participant P as PBX/ITSP/Carrier
+    participant HQ as SentryPeer Node/HQ API
+    participant N as NOC
+    Note over P: Integration with <br/>SentryPeer needed
+    Note over N: Consumes alerts
+    Note over HQ: OAuth2 creds required<br/> if using SentryPeerHQ
+    Note over P,HQ: API rate limiting if using SentryPeerHQ
+    D->>P: SIP INVITE
+    P->>HQ: Have you seen attackers call this number?
+    HQ->>P: Yes, this has been seen on SentryPeer Nodes
+    HQ->>N: WebHook/Email/Slack
+    Note over HQ,N: Only if using SentryPeerHQ
+    P->>D: I'm blocking this call. Sorry
+```
+
+### :construction: Features
 
 - [x] All code [Free/Libre and Open Source Software](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 - [x] FAST
@@ -96,7 +170,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [x] Multithreaded
 - [x] UDP transport
 - [x] TCP transport
-- [ ] TLS transport
+- [x] TLS transport
 - [x] [JSON logging](#json-log-format) to a file
 - [x] SIP mode can be disabled. This allows you to run SentryPeer in API mode or DHT mode only etc. i.e.
   not as a honeypot, but as a node in the SentryPeer community or to just serve replicated data
@@ -116,7 +190,7 @@ Traditionally this data is shipped to a central place, so you don't own the data
 - [ ] SDKs/libs for external access - [CGRateS](https://github.com/cgrates/cgrates) to start with or our own firewall with nftables
 - [x] Small binary size for IoT usage
 - [x] Cross-platform
-- [ ] Firewall options to use distributed data in real time - [DHT](https://en.wikipedia.org/wiki/Distributed_hash_table)?
+- [x] Firewall options to use distributed data in real time
 - [x] Container on [Docker Hub for latest build](https://hub.docker.com/r/sentrypeer/sentrypeer)
 - [ ] BGP agent to peer with for blackholing collected IP addresses (similar to [Team Cymru Bogon Router Server Project](https://team-cymru.com/community-services/bogon-reference/bogon-reference-bgp/))
 - [ ] SIP agent to return 404 or default destination for SIP redirects
@@ -150,7 +224,7 @@ You can run the latest version of SentryPeer with [Docker](https://www.docker.co
 Or build yourself:
 
     sudo docker build --no-cache -t sentrypeer .
-    sudo docker run -d -p 5050:5060/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
+    sudo docker run -d -p 5060:5060/tcp -p 5061:5061/tcp -p 5060:5060/udp -p 8082:8082 -p 4222:4222/udp sentrypeer:latest
 
 Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost:8082/health-check` to see if it's running.
 
@@ -158,10 +232,10 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
+    ENV SENTRYPEER_WEBHOOK=1
     ENV SENTRYPEER_WEBHOOK_URL=https://my.webhook.url/events
     ENV SENTRYPEER_OAUTH2_CLIENT_ID=1234567890
     ENV SENTRYPEER_OAUTH2_CLIENT_SECRET=1234567890
-    ENV SENTRYPEER_WEBHOOK=1
     ENV SENTRYPEER_SIP_RESPONSIVE=1
     ENV SENTRYPEER_SIP_DISABLE=1
     ENV SENTRYPEER_SYSLOG=1
@@ -171,10 +245,29 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_JSON_LOG_FILE=/my/location/sentrypeer_json.log
     ENV SENTRYPEER_VERBOSE=1
     ENV SENTRYPEER_DEBUG=1
+    ENV SENTRYPEER_CERT=/my/location/sentrypeer-crt.pem
+    ENV SENTRYPEER_KEY=/my/location/sentrypeer-key.pem
+    ENV SENTRYPEER_TLS_LISTEN_ADDRESS=0.0.0.0:5061
 
 Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
 
 Settings any of these to `0` will also _enable_ the feature. We _don't care_ what you set it to, just that it's set.
+
+#### TLS Configuration
+
+To use your own certs, you can either set the appropriate ENV vars, cli arguments 
+or use the configuration file. For example:
+
+```
+cat ~/.config/sentrypeer/default-config.toml 
+cert = "tests/unit_tests/127.0.0.1.pem"
+key = "tests/unit_tests/127.0.0.1-key.pem"
+tls_listen_address = "0.0.0.0:5061"
+```
+
+If you don't set these, a certifcate for localhost will be automatically 
+generated in the directory that sentrypeer is run from creating a `cert.pem` and
+a `key.pem` file.
 
 ### Installation
  
@@ -224,7 +317,8 @@ If you are a Fedora user, you can install this via [Fedora copr](https://copr.fe
 
 If you are going to build from this repository, you will need to have the following installed:
 
-  - `git`, `autoconf`, `automake` and `autoconf-archive` (Debian/Ubuntu) 
+  - `git`, `autoconf`, `automake` and `autoconf-archive` (Debian/Ubuntu)
+  - `libtool`, `rustc` and `cargo` (Fedora)
   - `libosip2-dev` (Debian/Ubuntu) or `libosip2-devel` (Fedora)
   - `libsqlite3-dev` (Debian/Ubuntu) or `sqlite-devel` (Fedora)
   - `uuid-dev` (Debian/Ubuntu) or `libuuid-devel` (Fedora)
@@ -236,17 +330,25 @@ If you are going to build from this repository, you will need to have the follow
 
 Debian/Ubuntu:
 
-    sudo apt-get install git build-essential autoconf-archive autoconf automake libosip2-dev libsqlite3-dev \
-    libcmocka-dev uuid-dev libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev 
+    sudo apt-get install git build-essential clang autoconf-archive autoconf \
+    automake libtool cmake libosip2-dev libsqlite3-dev libcmocka-dev uuid-dev \
+    libcurl4-openssl-dev libpcre2-dev libjansson-dev libmicrohttpd-dev libclang-dev
 
 Fedora:
 
-    sudo dnf install git autoconf automake autoconf-archive libosip2-devel libsqlite3-devel libcmocka-devel \
-    libuuid-devel libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel
+    sudo dnf install git clang pkg-config autoconf automake autoconf-archive \ 
+    libtool libosip2-devel libsqlite3-devel libcmocka-devel libuuid-devel \
+    libmicrohttpd-devel jansson-devel libcurl-devel pcre2-devel cmake \
+    clang-libs clang
 
 macOS:
 
-    brew install git autoconf automake autoconf-archive libosip cmocka libmicrohttpd jansson curl pcre2
+    brew install git libtool autoconf automake autoconf-archive libosip cmocka \
+    libmicrohttpd jansson curl pcre2 pkg-config opendht ossp-uuid cmake 
+
+Rust:
+
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 then (make check is highly recommended):
 
@@ -255,6 +357,13 @@ then (make check is highly recommended):
     make
     make check
     make install
+
+CMake:
+
+    cmake -S . -B build -DUNIT_TESTING=ON
+    cmake --build build
+    ctest --test-dir build
+    cmake --install build
 
 ### Running SentryPeer
 
@@ -418,12 +527,12 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses
 }
 ```
 
-#### Endpoint /ip-address/{ip-address}
+#### Endpoint /ip-addresses/{ip-address}
 
 Query a single IP address:
 
 ```bash
-curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8.8.8
+curl -v -H "Content-Type: application/json" http://localhost:8082/ip-addresses/8.8.8.8
 
 * Connected to localhost (127.0.0.1) port 8082 (#0)
 > GET /ip-addresses/8.8.8.8 HTTP/1.1
@@ -447,6 +556,48 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/ip-address/8.8
 }
 ```
 
+#### Endpoint /numbers 
+
+List all the called numbers that have been seen by SentryPeer:
+
+```bash
+curl -v -H "Content-Type: application/json" http://localhost:8082/numbers
+
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET /numbers HTTP/1.1
+> Host: localhost:8082
+> User-Agent: curl/8.0.1
+> Accept: */*
+> Content-Type: application/json
+< Date: Thu, 27 Jul 2023 11:10:35 GMT
+< Content-Type: application/json
+< Access-Control-Allow-Origin: *
+< X-Powered-By: SentryPeer
+< X-SentryPeer-Version: 4.0.0
+< Content-Length: 31746258
+
+
+ {
+  "called_numbers_total": 244850,
+  "called_numbers": [
+    {
+      "called_number": "981046500729221",
+      "seen_last": "2023-07-27 12:06:59.388055505",
+      "seen_count": "451"
+    },
+    {
+      "called_number": "81046500729221",
+      "seen_last": "2023-07-27 12:05:19.206442003",
+      "seen_count": "453"
+    },
+    {
+      "called_number": "100",
+      "seen_last": "2023-07-27 11:59:57.679798597",
+      "seen_count": "17335"
+    },
+    ....
+```
+
 #### Endpoint /numbers/{phone-number}
 
 Query a phone number a bad actor tried to call with optional `+` prefix:
@@ -461,7 +612,6 @@ curl -v -H "Content-Type: application/json" http://localhost:8082/numbers/878494
 > Accept: */*
 > Content-Type: application/json
 > 
-* Mark bundle as not supporting multiuse
 < HTTP/1.1 200 OK
 < Date: Mon, 24 Jan 2022 11:19:53 GMT
 < Content-Type: application/json
@@ -510,29 +660,31 @@ plus other metadata (set a custom log file location with `-l`):
 
 ```bash
 ./sentrypeer -h
-Usage: sentrypeer [-h] [-V] [-w https://api.example.com/events] [-j] [-p] [-b bootstrap.example.com] [-i OAuth_2_Client_ID] [-c OAuth_2_Client_Secret] [-f fullpath for sentrypeer.db] [-l fullpath for sentrypeer_json.log] [-r] [-R] [-a] [-s] [-v] [-d]
+Protect your SIP Servers from bad actors at https://sentrypeer.com
+
+Usage: sentrypeer [OPTIONS]
 
 Options:
-  -h,      Print this help
-  -V,      Print version
-  -f,      Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
-  -j,      Enable json logging or use SENTRYPEER_JSON_LOG env
-  -p,      Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
-  -b,      Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
-  -i,      Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
-  -c,      Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
-  -a,      Enable RESTful API mode or use SENTRYPEER_API env
-  -w,      Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
-  -r,      Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
-  -R,      Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
-  -l,      Set 'sentrypeer_json.log' location or use SENTRYPEER_JSON_LOG_FILE env
-  -s,      Enable syslog logging or use SENTRYPEER_SYSLOG env
-  -v,      Enable verbose logging or use SENTRYPEER_VERBOSE env
-  -d,      Enable debug mode or use SENTRYPEER_DEBUG env
-
-Report bugs to https://github.com/SentryPeer/SentryPeer/issues
-
-See https://sentrypeer.org for more information.
+  -f <DB_FILE>                 Set 'sentrypeer.db' location or use SENTRYPEER_DB_FILE env
+  -j                           Enable json logging or use SENTRYPEER_JSON_LOG env
+  -p                           Enable Peer to Peer mode or use SENTRYPEER_PEER_TO_PEER env
+  -b <BOOTSTRAP_NODE>          Set Peer to Peer bootstrap node or use SENTRYPEER_BOOTSTRAP_NODE env
+  -i <CLIENT_ID>               Set OAuth 2 client ID or use SENTRYPEER_OAUTH2_CLIENT_ID env to get a Bearer token for WebHook
+  -c <CLIENT_SECRET>           Set OAuth 2 client secret or use SENTRYPEER_OAUTH2_CLIENT_SECRET env to get a Bearer token for WebHook
+  -a                           Enable RESTful API mode or use SENTRYPEER_API env
+  -w <WEBHOOK_URL>             Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
+  -r                           Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env
+  -R                           Disable SIP mode completely or use SENTRYPEER_SIP_DISABLE env
+  -l <JSON_LOG_FILE>           Set JSON logfile (default './sentrypeer_json.log') location or use SENTRYPEER_JSON_LOG_FILE env
+  -N                           Disable Rust powered TCP, UDP and TLS or use SENTRYPEER_TLS_DISABLE env
+  -t <TLS_CERT_FILE>           Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
+  -k <TLS_KEY_FILE>            Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
+  -z <TLS_LISTEN_ADDRESS>      Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+  -s                           Enable syslog logging or use SENTRYPEER_SYSLOG env
+  -v                           Enable verbose logging or use SENTRYPEER_VERBOSE env
+  -d                           Enable debug mode or use SENTRYPEER_DEBUG env
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ### IPv6 Multicast Address
@@ -549,6 +701,8 @@ Please see http://www.iana.org/assignments/ipv6-multicast-addresses
 The assigned variable-scope address -- which can also be listed as "FF0X::172" for short -- the "X" denotes any possible scope.
 
 ### License
+
+[![AGPLv3](https://camo.githubusercontent.com/473b62766b498e4f2b008ada39f1d56fb3183649f24447866e25d958ac3fd79a/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f6167706c76332d3135357835312e706e67)](https://www.gnu.org/licenses/why-affero-gpl.en.html)
  
 Great reading - [How to choose a license for your own work](https://www.gnu.org/licenses/license-recommendations.en.html)
 
