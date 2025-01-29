@@ -26,7 +26,7 @@ tokio = { version = "1.43.0", features = ["full"] }
 pki-types = { package = "rustls-pki-types", version = "1" }
 serde = { version = "1.0.217", features = ["derive"] }
 os_socketaddr = "0.2.5"
-clap = { version = "4.5.26", features = ["derive", "string"] }
+clap = { version = "4.5.27", features = ["derive", "string"] }
 rcgen = "0.13.2"
 confy = "0.6.1"
 socket2 = "0.5.8"
