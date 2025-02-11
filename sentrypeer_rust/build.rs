@@ -32,6 +32,11 @@ fn main() {
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=osipparser2");
     println!("cargo:rustc-link-lib=microhttpd");
+    
+    // Code coverage
+    if env::var("CARGO_FEATURE_COVERAGE").is_ok() {
+        println!("cargo:rustc-link-lib=gcov");
+    }
 
     // Check to see if OpenDHT-C is wanted in config.h and is not != 0
     // Works with autotools AND cmake
