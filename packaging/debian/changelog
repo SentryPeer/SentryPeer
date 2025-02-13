@@ -1,9 +1,9 @@
-sentrypeer (3.0.2-1) UNRELEASED; urgency=medium
+sentrypeer (4.0.2-1) UNRELEASED; urgency=medium
 
-    * Check `user_agent_header->hvalue` is not NULL as you can
-      get a blank user-agent value in malformed SIP packets
+    * New TLS mode with auto cert and key generation
+    * TCP, UDP now all powered by Rust and Tokio
 
- -- Gavin Henry <ghenry@sentrypeer.org>  Fri, 17 Nov 2023 10:00:00 +0000
+ -- Gavin Henry <ghenry@sentrypeer.org>  Thu, 13 Feb 2025 10:00:00 +0000
 
 sentrypeer (3.0.1-1) UNRELEASED; urgency=medium
 
