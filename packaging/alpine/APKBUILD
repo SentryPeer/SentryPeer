@@ -2,34 +2,34 @@
 # Maintainer: Gavin Henry <ghenry@sentrypeer.org>
 pkgname=sentrypeer
 pkgver=3.0.2
-pkgrel=1
+pkgrel=0
 pkgdesc="Honeypot for a distributed p2p list of bad actor IP addresses and phone numbers"
 url="https://sentrypeer.org/"
-arch="all !x86 !armhf !armv7"
+# ppc64le: fails tests
+arch="all !ppc64le !x86 !armhf !armv7"
 license="GPL-2.0-only OR GPL-3.0-only"
 makedepends="
-        autoconf
-        autoconf-archive
-        automake
-        jansson-dev
-        libmicrohttpd-dev
-        libosip2-dev
-        opendht-dev
-        pcre2-dev
-        sqlite-dev
-        util-linux-dev"
-checkdepends="cmocka-dev curl-dev"
+	autoconf
+	autoconf-archive
+	automake
+	chrpath
+	curl-dev
+	jansson-dev
+	libmicrohttpd-dev
+	libosip2-dev
+	opendht-dev
+	pcre2-dev
+	sqlite-dev
+	util-linux-dev
+	"
+checkdepends="cmocka-dev"
 subpackages="$pkgname-doc"
-source="$pkgname-$pkgver.tar.gz::https://github.com/SentryPeer/SentryPeer/archive/refs/tags/v$pkgver.tar.gz"
-builddir="$srcdir/SentryPeer-$pkgver"
-
-prepare() {
-	default_prepare
-	sed -i '/AM_LDFLAGS=/d' Makefile.am
-	./bootstrap.sh
-}
+source="https://github.com/SentryPeer/SentryPeer/releases/download/v$pkgver/sentrypeer-$pkgver.tar.gz"
+options="!check" # needs net
 
 build() {
+	CFLAGS="$CFLAGS -flto=auto" \
+	CXXFLAGS="$CXXFLAGS -flto=auto" \
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -38,14 +38,17 @@ build() {
 }
 
 check() {
-	make check
+	make check || {
+		cat test-suite.log
+		return 1
+	}
 }
 
 package() {
 	make DESTDIR="$pkgdir" install
+	chrpath -d "$pkgdir"/usr/bin/sentrypeer
 }
 
-
 sha512sums="
-33112f299b7b5a2575e55ec7324cee19207d768820f93cdab131f29c1b82f0d83be16cf7a1ccd06f888c1a35ecc52a77e08af2ccb6cd39aea533996e558f38bd  sentrypeer-3.0.0.tar.gz
+6ec2c0ccd3e08cc4e711261d3c7135bdd0b699f4d92d982d31f7e664dfd13ff4a15a6c7106bdca4b65fa7c663f526985e530ab2bd42ee43b5695455c8f28b660  sentrypeer-3.0.2.tar.gz
 "
