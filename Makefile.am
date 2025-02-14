@@ -214,7 +214,8 @@ MAINTAINERCLEANFILES=configure aclocal.m4 compile \
                      stamp-h1 Makefile.in config.guess \
                      config.sub include/Makefile.in \
                      ltmain.sh depcomp libtool config.h.in \
-                     config.h.in~ test-driver
+                     config.h.in~ test-driver \
+                     cert.pem key.pem
 
 maintainer-clean-local: 
 	-rm -rf $(top_srcdir)/build
