@@ -13,6 +13,7 @@
 [Unit]
 Description=SentryPeer - SIP peer to peer honeypot for VoIP
 After=network.target
+Documentation=https://github.com/SentryPeer/SentryPeer/blob/main/README.md
 
 [Service]
 Type=simple
@@ -24,6 +25,7 @@ Group=sentrypeer
 StandardOutput=journal
 StandardError=journal
 Restart=on-failure
+PrivateTmp=yes
 
 [Install]
 WantedBy=multi-user.target

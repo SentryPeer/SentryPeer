@@ -7,18 +7,18 @@ sentrypeer (4.0.2-1) unstable; urgency=medium
 
 sentrypeer (3.0.2-1) UNRELEASED; urgency=medium
 
-    * Check user_agent_header->hvalue is not NULL as you can get 
+    * Check user_agent_header->hvalue is not NULL as you can get
       a blank user-agent value in malformed SIP packets
 
  -- Gavin Henry <ghenry@sentrypeer.org>  Fri, 17 Nov 2023 10:00:00 +0000
 
 sentrypeer (3.0.1-1) UNRELEASED; urgency=medium
 
-    * Add a check for a response code of 403 to trigger a new access 
+    * Add a check for a response code of 403 to trigger a new access
       token request for WebHooks in addition to a 401
-    * Switch to getsockname() to correctly get destination IP address 
+    * Switch to getsockname() to correctly get destination IP address
       for SIP TCP mode
-    * Check for a blank User-agent SIP header and add a test case. Only 
+    * Check for a blank User-agent SIP header and add a test case. Only
       a missing one was catered for before.
 
  -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 19 Jul 2023 10:00:00 +0000
@@ -156,4 +156,3 @@ sentrypeer (0.0.3-1) UNRELEASED; urgency=medium
   * Debian packaging placeholder
 
  -- Gavin Henry <ghenry@sentrypeer.org>  Wed, 01 Dec 2021 14:58:53 +0000
-
