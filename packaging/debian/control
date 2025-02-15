@@ -15,7 +15,6 @@ Build-Depends: autoconf,
                libsqlite3-dev,
                pkg-config,
                libclang-dev,
-               rustc,
                uuid-dev
 Standards-Version: 4.6.1.0
 Homepage: https://sentrypeer.org
