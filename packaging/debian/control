@@ -6,6 +6,7 @@ Build-Depends: autoconf,
                autoconf-archive,
                automake,
                debhelper-compat (= 13),
+ 	           libclang-dev,
                libcmocka-dev,
                libcurl4-openssl-dev,
                libjansson-dev,
@@ -14,7 +15,6 @@ Build-Depends: autoconf,
                libpcre2-dev,
                libsqlite3-dev,
                pkg-config,
-               libclang-dev,
                uuid-dev
 Standards-Version: 4.6.1.0
 Homepage: https://sentrypeer.org
