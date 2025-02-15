@@ -1,4 +1,4 @@
-sentrypeer (4.0.1-1) UNRELEASED; urgency=medium
+sentrypeer (4.0.2-1) unstable; urgency=medium
 
     * New TLS mode with auto cert and key generation
     * TCP, UDP now all powered by Rust and Tokio
