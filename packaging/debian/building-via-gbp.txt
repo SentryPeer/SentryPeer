@@ -2,7 +2,7 @@ Bits from https://wiki.debian.org/PackagingWithGit#Importing_upstream_as_tarball
 
 git clean -fd
 git checkout Makefile.am
-gbp import-orig --uscan
+gbp import-orig --uscan --upstream-branch=main --debian-branch=main
 gbp buildpackage
 gbp buildpackage --git-tag
 git push --tags
