@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.3] - 2025-02-16
+
+### Fixes
+- Fix build issues on Alpine Linux due to [ring not building](https://github.com/briansmith/ring/issues/2378)
+
 ## [4.0.2] - 2025-02-15
 
 ### Packaging
