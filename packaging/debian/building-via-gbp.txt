@@ -4,7 +4,6 @@ Bits from https://wiki.debian.org/PackagingWithGit#Importing_upstream_as_tarball
 
 TODO: Find what's needed in ~./gbp.conf
 
-[All the steps to test](https://wiki.debian.org/PhilWyett/DebianMentoring)
 
 git clean -fd
 git checkout Makefile.am
@@ -12,3 +11,12 @@ gbp import-orig ../sentrypeer-4.0.3.tar.gz -u 4.0.3 --upstream-branch=upstream/l
 gbp buildpackage --git-debian-branch=debian/latest
 gbp buildpackage --git-debian-branch=debian/latest --git-tag
 git push --tags
+
+
+Checking builds:
+
+All the steps to test - https://wiki.debian.org/PhilWyett/DebianMentoring
+
+1. sudo reprotest --vary=-build_path,domain_host.use_sudo=1 --auto-build ../sentrypeer_4.0.3-2.dsc -- schroot unstable-amd64-sbuild
+2. sudo pbuilder build ../sentrypeer_4.0.3-2.dsc
+3. sudo pbuilder build --twice ../sentrypeer_4.0.3-2.dsc
