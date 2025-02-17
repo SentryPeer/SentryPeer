@@ -4,6 +4,8 @@ Bits from https://wiki.debian.org/PackagingWithGit#Importing_upstream_as_tarball
 
 TODO: Find what's needed in ~./gbp.conf
 
+[All the steps to test](https://wiki.debian.org/PhilWyett/DebianMentoring)
+
 git clean -fd
 git checkout Makefile.am
 gbp import-orig ../sentrypeer-4.0.3.tar.gz -u 4.0.3 --upstream-branch=upstream/latest --debian-branch=debian/latest
