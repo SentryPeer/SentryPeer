@@ -20,4 +20,5 @@ All the steps to test - https://wiki.debian.org/PhilWyett/DebianMentoring
 1. sudo reprotest --vary=-build_path,domain_host.use_sudo=1 --auto-build ../sentrypeer_4.0.3-2.dsc -- schroot unstable-amd64-sbuild
 2. sudo pbuilder build ../sentrypeer_4.0.3-2.dsc
 3. sudo pbuilder build --twice ../sentrypeer_4.0.3-2.dsc
-4. sbuild -d unstable --enable-network sentrypeer_4.0.3-2.dsc
+4. sudo mount -o remount,size=5G /dev/shm
+5. sbuild -d unstable --enable-network sentrypeer_4.0.3-2.dsc
