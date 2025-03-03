@@ -17,6 +17,45 @@ jobs:
     name: clippy
     runs-on: ubuntu-latest
     steps:
+      - name: Add Homebrew to $PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+      - name: Test brew call
+        run: brew search hello
+      - uses: actions/checkout@v2
+      - name: Fetch Dependencies
+        run: |
+          set -x
+          sudo apt-get update
+          sudo apt-get -y install \
+            git \
+            build-essential \
+            autoconf-archive \
+            curl \
+            wget \
+            libosip2-dev \
+            libcmocka-dev \
+            uuid-dev \
+            libmicrohttpd-dev \
+            libjansson-dev \
+            libpcre2-dev \
+            libsqlite3-dev \
+            libcurl4-openssl-dev
+            brew update
+            brew upgrade          
+            brew install libosip opendht
+      - name: Run bootstrap.sh
+        run: ./bootstrap.sh
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: |
+          set -x
+          ./bootstrap.sh
+          ./configure
+          make
+
       - name: Checkout sources
         uses: actions/checkout@v4
       - name: Install toolchain
