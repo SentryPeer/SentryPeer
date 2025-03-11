@@ -27,6 +27,8 @@ use uuid::Uuid;
 
 pub mod cli;
 mod config;
+//mod json_logger;
+mod json_logger;
 pub mod sip;
 pub mod tcp;
 pub mod tls;
