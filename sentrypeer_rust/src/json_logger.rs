@@ -43,17 +43,65 @@ fn bad_actor_to_json_rs(
     });
 
     if debug_mode || verbose_mode {
-        eprintln!("Bad Actor JSON: {:?}", json);
+        eprintln!("Bad actor in JSON format: {:?}", json);
     }
 
     // Return the JSON as a C string which must be freed
     CString::new(json.to_string()).unwrap().into_raw()
 }
 
+fn json_to_bad_actor_rs(
+    sentrypeer_c_config: *const sentrypeer_config,
+    json_to_convert: *const c_char,
+) -> BadActor {
+    let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
+    let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
+
+    let json_str = unsafe { CStr::from_ptr(json_to_convert).to_str().unwrap() };
+    if debug_mode || verbose_mode {
+        eprintln!("JSON to convert to a bad_actor: {:?}", json_str);
+    }
+
+    let v: serde_json::Value = serde_json::from_str(json_str).unwrap();
+
+    let bad_actor = BadActor::new(
+        CString::new(v["sip_message"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["source_ip"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["destination_ip"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["called_number"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["sip_method"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["transport_type"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["sip_user_agent"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["collected_method"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+        CString::new(v["created_by_node_id"].as_str().unwrap())
+            .unwrap()
+            .into_raw(),
+    );
+
+    bad_actor
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::sentrypeer_config_new;
+    use pretty_assertions::assert_str_eq;
     use serde_json::Value;
 
     #[test]
@@ -61,14 +109,14 @@ mod tests {
         unsafe {
             let sentrypeer_c_config = sentrypeer_config_new();
             let bad_actor = BadActor::new(
-                CString::new("blah").unwrap().into_raw(),
+                CString::new("SIP Message").unwrap().into_raw(),
                 CString::new("127.0.0.1").unwrap().into_raw(),
                 CString::new("127.0.0.1").unwrap().into_raw(),
-                CString::new("1234").unwrap().into_raw(),
+                CString::new("441234512346").unwrap().into_raw(),
                 CString::new("INVITE").unwrap().into_raw(),
-                CString::new("UDP").unwrap().into_raw(),
+                CString::new("TLS").unwrap().into_raw(),
                 CString::new("SIPp").unwrap().into_raw(),
-                CString::new("INVITE").unwrap().into_raw(),
+                CString::new("responsive").unwrap().into_raw(),
                 CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
                     .unwrap()
                     .into_raw(),
@@ -81,6 +129,37 @@ mod tests {
             let final_json: Value = serde_json::from_str(bad_actor_json_str).unwrap();
             dbg!(&final_json["app_name"]);
             assert_eq!(final_json["app_name"], "sentrypeer");
+        }
+    }
+
+    #[test]
+    fn test_json_to_bad_actor_rs() {
+        unsafe {
+            let sentrypeer_c_config = sentrypeer_config_new();
+            let json_str = r#"{
+                "app_name": "sentrypeer",
+                "app_version": "0.1.0",
+                "event_timestamp": "blah",
+                "event_uuid": "460f30e4-ce1d-4d53-9004-dd40a1c4abc9",
+                "created_by_node_id": "350f30e4-ce1d-4d53-9004-dd40a1c4abc8",
+                "collected_method": "responsive",
+                "transport_type": "UDP",
+                "source_ip": "127.0.0.1",
+                "destination_ip": "127.0.0.1",
+                "called_number": "1234",
+                "sip_method": "INVITE",
+                "sip_user_agent": "SIPp",
+                "sip_message": "INVITE"
+            }"#;
+
+            let bad_actor = json_to_bad_actor_rs(
+                sentrypeer_c_config,
+                CString::new(json_str).unwrap().into_raw(),
+            );
+            assert_str_eq!(
+                CStr::from_ptr(bad_actor.collected_method).to_str().unwrap(),
+                String::from("responsive")
+            );
         }
     }
 }
