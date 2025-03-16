@@ -40,5 +40,5 @@ fn check_version() {
 
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("sentrypeer 4.0.3"));
+        .stdout(predicate::str::contains("sentrypeer 4.0.4"));
 }
