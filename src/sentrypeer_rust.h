@@ -109,7 +109,7 @@ int32_t callback_from_c(int32_t (*callback)(bool), bool success);
  *
  * Process the CLI arguments and set the sentrypeer_config struct
  */
-int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config);
+int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config, size_t argc, char **argv);
 
 /**
  * # Safety

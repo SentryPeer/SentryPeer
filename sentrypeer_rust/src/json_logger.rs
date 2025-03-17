@@ -157,7 +157,9 @@ mod tests {
                 CString::new(json_str).unwrap().into_raw(),
             );
             assert_str_eq!(
-                CStr::from_ptr(bad_actor_event.collected_method).to_str().unwrap(),
+                CStr::from_ptr(bad_actor_event.collected_method)
+                    .to_str()
+                    .unwrap(),
                 String::from("responsive")
             );
         }

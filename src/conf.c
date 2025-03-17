@@ -245,7 +245,7 @@ int process_cli(sentrypeer_config *config, int argc, char **argv)
 	process_env_vars(config);
 
 #if HAVE_RUST != 0
-	process_cli_rs(config);
+	process_cli_rs(config, argc, argv);
 #else
 	int cli_option;
 

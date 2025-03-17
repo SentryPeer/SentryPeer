@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.4] - 2025-03-17
+
+### Fixes
+- Switch to `Args::parse_from()`, so cli works when using [musl libc](https://www.musl-libc.org/)
+as per [FFI, ALpine, musl and C](https://users.rust-lang.org/t/binary-wont-run-ffi-alpine-musl-and-c/127012/13)
+and [aports issue](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/81324)
+
 ## [4.0.3] - 2025-02-16
 
 ### Fixes

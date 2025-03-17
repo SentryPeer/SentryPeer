@@ -172,7 +172,8 @@ EXTRA_DIST+= sentrypeer_rust/Cargo.toml \
             sentrypeer_rust/src/sip.rs \
             sentrypeer_rust/src/tcp.rs \
             sentrypeer_rust/src/tls.rs \
-            sentrypeer_rust/src/udp.rs
+            sentrypeer_rust/src/udp.rs \
+            sentrypeer_rust/src/json_logger.rs
 endif
 endif
 

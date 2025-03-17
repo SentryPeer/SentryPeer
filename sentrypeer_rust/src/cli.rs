@@ -12,7 +12,7 @@
 */
 use crate::config::create_tls_cert_and_key;
 use clap::Parser;
-use std::ffi::{CStr, CString};
+use std::ffi::{c_char, CStr, CString};
 use std::path::PathBuf;
 
 // Our C FFI functions
@@ -111,8 +111,22 @@ struct Args {
 ///
 /// Process the CLI arguments and set the sentrypeer_config struct
 #[no_mangle]
-pub(crate) unsafe extern "C" fn process_cli_rs(sentrypeer_c_config: *mut sentrypeer_config) -> i32 {
-    let args = Args::parse();
+pub(crate) unsafe extern "C" fn process_cli_rs(
+    sentrypeer_c_config: *mut sentrypeer_config,
+    argc: usize,
+    argv: *mut *mut c_char,
+) -> i32 {
+    // Convert argc and argv from C to Vec(&str)
+    let args_from_c = std::slice::from_raw_parts(argv, argc)
+        .iter()
+        .map(|&arg| {
+            CStr::from_ptr(arg)
+                .to_str()
+                .expect("Failed to convert CStr to str for command line argument processing.")
+        })
+        .collect::<Vec<&str>>();
+
+    let args = Args::parse_from(args_from_c);
 
     // Set booleans
     (*sentrypeer_c_config).api_mode = args.api;
