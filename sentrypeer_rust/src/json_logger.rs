@@ -102,14 +102,12 @@ fn json_log_bad_actor_rs(
     sentrypeer_c_config: *const sentrypeer_config,
     bad_actor_event: &BadActor,
 ) -> i32 {
-    // Open our JSON log file sentrypeer_c_config->json_log_file  for appending
     let log_file_name = unsafe {
         CStr::from_ptr((*sentrypeer_c_config).json_log_file)
             .to_str()
             .unwrap()
     };
 
-    // Write the JSON to the log file
     let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
     let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
 
