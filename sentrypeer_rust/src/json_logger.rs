@@ -14,7 +14,8 @@ use crate::cli;
 use crate::BadActor;
 use libc::c_char;
 use std::ffi::{CStr, CString};
-
+use std::fs::OpenOptions;
+use std::io::{BufWriter, Write};
 // Our C FFI functions
 use crate::{sentrypeer_config, PACKAGE_NAME, PACKAGE_VERSION};
 
@@ -97,6 +98,62 @@ fn json_to_bad_actor_rs(
     bad_actor_event
 }
 
+fn json_log_bad_actor_rs(
+    sentrypeer_c_config: *const sentrypeer_config,
+    bad_actor_event: &BadActor,
+) -> i32 {
+    // Open our JSON log file sentrypeer_c_config->json_log_file  for appending
+    let log_file_name = unsafe {
+        CStr::from_ptr((*sentrypeer_c_config).json_log_file)
+            .to_str()
+            .unwrap()
+    };
+
+    // Write the JSON to the log file
+    let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
+    let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
+
+    let json_log_file = match OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(log_file_name)
+    {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("Could not open JSON log file: {}", e);
+            return libc::EXIT_FAILURE;
+        }
+    };
+
+    let mut buf = BufWriter::new(json_log_file);
+    let json_str = format!("{}\n", json_str);
+
+    match buf.write_all(json_str.as_bytes()) {
+        Ok(_) => (),
+        Err(e) => {
+            eprintln!("Error writing to JSON log file: {}", e);
+            return libc::EXIT_FAILURE;
+        }
+    }
+
+    libc::EXIT_SUCCESS
+}
+
+fn json_http_post_bad_actor_rs(
+    sentrypeer_c_config: *const sentrypeer_config,
+    bad_actor_event: &BadActor,
+) {
+    let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
+    let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
+
+    let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
+    let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
+
+    if debug_mode || verbose_mode {
+        eprintln!("Bad actor in JSON format: {:?}", json_str);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -162,6 +219,29 @@ mod tests {
                     .unwrap(),
                 String::from("responsive")
             );
+        }
+    }
+
+    #[test]
+    fn test_json_log_bad_actor_rs() {
+        unsafe {
+            let sentrypeer_c_config = sentrypeer_config_new();
+            let bad_actor_event = BadActor::new(
+                CString::new("SIP Message").unwrap().into_raw(),
+                CString::new("127.0.0.1").unwrap().into_raw(),
+                CString::new("127.0.0.1").unwrap().into_raw(),
+                CString::new("441234512346").unwrap().into_raw(),
+                CString::new("INVITE").unwrap().into_raw(),
+                CString::new("TLS").unwrap().into_raw(),
+                CString::new("SIPp").unwrap().into_raw(),
+                CString::new("responsive").unwrap().into_raw(),
+                CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
+                    .unwrap()
+                    .into_raw(),
+            );
+
+            let result = json_log_bad_actor_rs(sentrypeer_c_config, &bad_actor_event);
+            assert_eq!(result, libc::EXIT_SUCCESS);
         }
     }
 }
