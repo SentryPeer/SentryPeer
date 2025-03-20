@@ -199,7 +199,8 @@ void test_bad_actor(void **state)
 			strlen(test_valid_sip_message_to_parse_blank_user_agent),
 			bad_actor_event4_1, config),
 		EXIT_SUCCESS);
-	assert_string_equal(bad_actor_event4_1->user_agent, BAD_ACTOR_NOT_FOUND);
+	assert_string_equal(bad_actor_event4_1->user_agent,
+			    BAD_ACTOR_NOT_FOUND);
 	bad_actor_destroy(&bad_actor_event4_1);
 	assert_null(bad_actor_event4_1);
 

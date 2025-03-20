@@ -125,9 +125,8 @@ void test_route_regex_check(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	config->debug_mode = true;
 	assert_null(matched_string);
-	assert_int_equal(regex_match("/ip-addresses/8.8.8.8",
-					   IP_ADDRESS_ROUTE, &matched_string,
-					   config),
+	assert_int_equal(regex_match("/ip-addresses/8.8.8.8", IP_ADDRESS_ROUTE,
+				     &matched_string, config),
 			 0);
 	assert_non_null(matched_string);
 	assert_string_equal(matched_string, "8.8.8.8");

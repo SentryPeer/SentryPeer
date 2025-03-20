@@ -234,8 +234,9 @@ void test_open_select_close_sqlite_db(void **state)
 			 SQLITE_OK);
 
 	assert_int_equal(sqlite3_step(select_bad_actor_stmt), SQLITE_ROW);
-	assert_string_equal((const char*)sqlite3_column_text(select_bad_actor_stmt, 0),
-			    BAD_ACTOR_SOURCE_IP);
+	assert_string_equal(
+		(const char *)sqlite3_column_text(select_bad_actor_stmt, 0),
+		BAD_ACTOR_SOURCE_IP);
 
 	assert_int_equal(sqlite3_finalize(select_bad_actor_stmt), SQLITE_OK);
 	fprintf(stderr,
