@@ -28,19 +28,27 @@
 
 bad_actor *test_bad_actor_event_new(void)
 {
+	char test_sip_message[] = "OPTIONS sip:100@";
 	char test_source_ip[] = "104.149.141.214";
 	char test_destination_ip[] = "8.8.8.8";
 	char test_transport_type[] = "UDP";
 	char test_collected_method[] = "passive";
+	char test_called_number[] = "100";
+	char test_method[] = "OPTIONS";
+	char test_user_agent[] = "friendly-scanner";
 
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
 
 	bad_actor *bad_actor_event =
-		bad_actor_new(0, util_duplicate_string(test_source_ip),
-			      util_duplicate_string(test_destination_ip), 0, 0,
-			      util_duplicate_string(test_transport_type), 0,
+		bad_actor_new(util_duplicate_string(test_sip_message),
+			      util_duplicate_string(test_source_ip),
+			      util_duplicate_string(test_destination_ip),
+			      util_duplicate_string(test_called_number),
+			      util_duplicate_string(test_method),
+			      util_duplicate_string(test_transport_type),
+			      util_duplicate_string(test_user_agent),
 			      util_duplicate_string(test_collected_method),
 			      config->node_id);
 	assert_non_null(bad_actor_event);
