@@ -16,3 +16,4 @@
 #include "../src/sip_message_event.h"
 #include "../src/sip_daemon.h"
 #include "../src/utils.h"
+#include "../src/bad_actor.h"

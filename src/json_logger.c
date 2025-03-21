@@ -21,6 +21,10 @@
 #include <assert.h>
 #include <curl/curl.h>
 
+#if HAVE_RUST != 0
+#include "sentrypeer_rust.h"
+#endif
+
 #define BAD_ACTOR_JSON_FMT                                                     \
 	"{s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s,s:s}"
 #define AUTH0_CLIENT_CREDS_JSON_FMT "{s:s,s:s,s:s,s:s}"
@@ -422,8 +426,8 @@ int json_log_bad_actor(const sentrypeer_config *config,
 	}
 
 	char *json_string =
-		bad_actor_to_json(config,
-				  bad_actor_to_log); // Caller must free
+		bad_actor_to_json_rs(config,
+				     bad_actor_to_log); // Caller must free
 	// We don't assert here, because we want to continue even if it fails
 	if (json_string == NULL) {
 		fprintf(stderr, "Failed to convert bad actor to json.\n");

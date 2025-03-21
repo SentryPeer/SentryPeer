@@ -11,17 +11,17 @@
                              |___/
 */
 use crate::cli;
-use crate::BadActor;
 use libc::c_char;
 use std::ffi::{CStr, CString};
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 // Our C FFI functions
-use crate::{sentrypeer_config, PACKAGE_NAME, PACKAGE_VERSION};
+use crate::{bad_actor, bad_actor_new, sentrypeer_config, PACKAGE_NAME, PACKAGE_VERSION};
 
-fn bad_actor_to_json_rs(
+#[no_mangle]
+pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
     sentrypeer_c_config: *const sentrypeer_config,
-    bad_actor_event: &BadActor,
+    bad_actor_event: *const bad_actor,
 ) -> *mut c_char {
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
@@ -30,17 +30,17 @@ fn bad_actor_to_json_rs(
     let json = serde_json::json!({
         "app_name": cli::cstr_to_string(PACKAGE_NAME),
         "app_version": cli::cstr_to_string(PACKAGE_VERSION),
-        "event_timestamp": unsafe { CStr::from_ptr(bad_actor_event.event_timestamp).to_str().unwrap() },
-        "event_uuid": unsafe { CStr::from_ptr(bad_actor_event.event_uuid).to_str().unwrap() },
-        "created_by_node_id": unsafe { CStr::from_ptr(bad_actor_event.created_by_node_id).to_str().unwrap() },
-        "collected_method": unsafe { CStr::from_ptr(bad_actor_event.collected_method).to_str().unwrap() },
-        "transport_type": unsafe { CStr::from_ptr(bad_actor_event.transport_type).to_str().unwrap() },
-        "source_ip": unsafe { CStr::from_ptr(bad_actor_event.source_ip).to_str().unwrap() },
-        "destination_ip": unsafe { CStr::from_ptr(bad_actor_event.destination_ip).to_str().unwrap() },
-        "called_number": unsafe { CStr::from_ptr(bad_actor_event.called_number).to_str().unwrap() },
-        "sip_method": unsafe { CStr::from_ptr(bad_actor_event.method).to_str().unwrap() },
-        "sip_user_agent": unsafe { CStr::from_ptr(bad_actor_event.user_agent).to_str().unwrap() },
-        "sip_message": unsafe { CStr::from_ptr(bad_actor_event.sip_message).to_str().unwrap() },
+        "event_timestamp": unsafe { CStr::from_ptr((*bad_actor_event).event_timestamp).to_str().unwrap() },
+        "event_uuid": unsafe { CStr::from_ptr((*bad_actor_event).event_uuid).to_str().unwrap() },
+        "created_by_node_id": unsafe { CStr::from_ptr((*bad_actor_event).created_by_node_id).to_str().unwrap() },
+        "collected_method": unsafe { CStr::from_ptr((*bad_actor_event).collected_method).to_str().unwrap() },
+        "transport_type": unsafe { CStr::from_ptr((*bad_actor_event).transport_type).to_str().unwrap() },
+        "source_ip": unsafe { CStr::from_ptr((*bad_actor_event).source_ip).to_str().unwrap() },
+        "destination_ip": unsafe { CStr::from_ptr((*bad_actor_event).destination_ip).to_str().unwrap() },
+        "called_number": unsafe { CStr::from_ptr((*bad_actor_event).called_number).to_str().unwrap() },
+        "sip_method": unsafe { CStr::from_ptr((*bad_actor_event).method).to_str().unwrap() },
+        "sip_user_agent": unsafe { CStr::from_ptr((*bad_actor_event).user_agent).to_str().unwrap() },
+        "sip_message": unsafe { CStr::from_ptr((*bad_actor_event).sip_message).to_str().unwrap() },
     });
 
     if debug_mode || verbose_mode {
@@ -51,10 +51,20 @@ fn bad_actor_to_json_rs(
     CString::new(json.to_string()).unwrap().into_raw()
 }
 
-fn json_to_bad_actor_rs(
+#[no_mangle]
+pub(crate) unsafe extern "C" fn free_json_rs(json: *mut c_char) {
+    if json.is_null() {
+        return;
+    }
+
+    let _ = CString::from_raw(json);
+}
+
+#[no_mangle]
+pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
     sentrypeer_c_config: *const sentrypeer_config,
     json_to_convert: *const c_char,
-) -> BadActor {
+) -> *mut bad_actor {
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
 
@@ -65,7 +75,7 @@ fn json_to_bad_actor_rs(
 
     let v: serde_json::Value = serde_json::from_str(json_str).unwrap();
 
-    let bad_actor_event = BadActor::new(
+    let bad_actor_event = bad_actor_new(
         CString::new(v["sip_message"].as_str().unwrap())
             .unwrap()
             .into_raw(),
@@ -98,9 +108,10 @@ fn json_to_bad_actor_rs(
     bad_actor_event
 }
 
-fn json_log_bad_actor_rs(
+#[no_mangle]
+pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
     sentrypeer_c_config: *const sentrypeer_config,
-    bad_actor_event: &BadActor,
+    bad_actor_event: *const bad_actor,
 ) -> i32 {
     let log_file_name = unsafe {
         CStr::from_ptr((*sentrypeer_c_config).json_log_file)
@@ -137,9 +148,10 @@ fn json_log_bad_actor_rs(
     libc::EXIT_SUCCESS
 }
 
-fn json_http_post_bad_actor_rs(
-    sentrypeer_c_config: *const sentrypeer_config,
-    bad_actor_event: &BadActor,
+#[no_mangle]
+pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
+    sentrypeer_c_config: *mut sentrypeer_config,
+    bad_actor_event: *const bad_actor,
 ) {
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
@@ -155,7 +167,7 @@ fn json_http_post_bad_actor_rs(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sentrypeer_config_new;
+    use crate::{bad_actor_destroy, bad_actor_new, sentrypeer_config_new, util_duplicate_string};
     use pretty_assertions::assert_str_eq;
     use serde_json::Value;
 
@@ -163,27 +175,31 @@ mod tests {
     fn test_bad_actor_to_json_rs() {
         unsafe {
             let sentrypeer_c_config = sentrypeer_config_new();
-            let bad_actor_event = BadActor::new(
-                CString::new("SIP Message").unwrap().into_raw(),
-                CString::new("127.0.0.1").unwrap().into_raw(),
-                CString::new("127.0.0.1").unwrap().into_raw(),
-                CString::new("441234512346").unwrap().into_raw(),
-                CString::new("INVITE").unwrap().into_raw(),
-                CString::new("TLS").unwrap().into_raw(),
-                CString::new("SIPp").unwrap().into_raw(),
-                CString::new("responsive").unwrap().into_raw(),
-                CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
-                    .unwrap()
-                    .into_raw(),
+            let bad_actor_event = bad_actor_new(
+                util_duplicate_string(CString::new("SIP Message").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("441234512346").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("INVITE").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("TLS").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("SIPp").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("responsive").unwrap().as_ptr()),
+                util_duplicate_string(
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
+                        .unwrap()
+                        .as_ptr(),
+                ),
             );
 
-            let bad_actor_json = bad_actor_to_json_rs(sentrypeer_c_config, &bad_actor_event);
+            let bad_actor_json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
             let bad_actor_json_str = CStr::from_ptr(bad_actor_json).to_str().unwrap();
 
             // Check our JSON string has a few expected fields
             let final_json: Value = serde_json::from_str(bad_actor_json_str).unwrap();
             dbg!(&final_json["app_name"]);
             assert_eq!(final_json["app_name"], "sentrypeer");
+
+            bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
         }
     }
 
@@ -212,11 +228,14 @@ mod tests {
                 CString::new(json_str).unwrap().into_raw(),
             );
             assert_str_eq!(
-                CStr::from_ptr(bad_actor_event.collected_method)
+                CStr::from_ptr((*bad_actor_event).collected_method)
                     .to_str()
                     .unwrap(),
                 String::from("responsive")
             );
+
+            // Clean up
+            bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
         }
     }
 
@@ -224,22 +243,27 @@ mod tests {
     fn test_json_log_bad_actor_rs() {
         unsafe {
             let sentrypeer_c_config = sentrypeer_config_new();
-            let bad_actor_event = BadActor::new(
-                CString::new("SIP Message").unwrap().into_raw(),
-                CString::new("127.0.0.1").unwrap().into_raw(),
-                CString::new("127.0.0.1").unwrap().into_raw(),
-                CString::new("441234512346").unwrap().into_raw(),
-                CString::new("INVITE").unwrap().into_raw(),
-                CString::new("TLS").unwrap().into_raw(),
-                CString::new("SIPp").unwrap().into_raw(),
-                CString::new("responsive").unwrap().into_raw(),
-                CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
-                    .unwrap()
-                    .into_raw(),
+            let bad_actor_event = bad_actor_new(
+                util_duplicate_string(CString::new("SIP Message").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("441234512346").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("INVITE").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("TLS").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("SIPp").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("responsive").unwrap().as_ptr()),
+                util_duplicate_string(
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
+                        .unwrap()
+                        .as_ptr(),
+                ),
             );
 
-            let result = json_log_bad_actor_rs(sentrypeer_c_config, &bad_actor_event);
+            let result = json_log_bad_actor_rs(sentrypeer_c_config, bad_actor_event);
             assert_eq!(result, libc::EXIT_SUCCESS);
+
+            // Clean up
+            bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
         }
     }
 }

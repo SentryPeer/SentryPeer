@@ -55,11 +55,18 @@ fn main() {
         // macOS - harmless on other platforms
         .clang_arg("-I/opt/homebrew/include")
         // Pick the functions we want to generate bindings for
+        // conf.h
         .allowlist_function("sentrypeer_config_new|sentrypeer_config_destroy")
+        // sip_message_event.h
         .allowlist_function("sip_message_event_new|sip_message_event_destroy")
+        // sip_daemon.h
         .allowlist_function("sip_log_event")
+        // utils.h
         .allowlist_function("util_duplicate_string")
-        // defines from config.h
+        // bad_actor.h
+        .allowlist_function("bad_actor_new|bad_actor_destroy")
+        .allowlist_item("bad_actor")
+        // config.h
         .allowlist_item("PACKAGE_NAME|PACKAGE_VERSION")
         // Set whether string constants should be generated as &CStr instead of &[u8].
         .generate_cstr(true)

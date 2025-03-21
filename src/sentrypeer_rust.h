@@ -111,6 +111,20 @@ int32_t callback_from_c(int32_t (*callback)(bool), bool success);
  */
 int32_t process_cli_rs(sentrypeer_config *sentrypeer_c_config, size_t argc, char **argv);
 
+char *bad_actor_to_json_rs(const sentrypeer_config *sentrypeer_c_config,
+                           const bad_actor *bad_actor_event);
+
+void free_json_rs(char *json);
+
+bad_actor *json_to_bad_actor_rs(const sentrypeer_config *sentrypeer_c_config,
+                                const char *json_to_convert);
+
+int32_t json_log_bad_actor_rs(const sentrypeer_config *sentrypeer_c_config,
+                              const bad_actor *bad_actor_event);
+
+void json_http_post_bad_actor_rs(sentrypeer_config *sentrypeer_c_config,
+                                 const bad_actor *bad_actor_event);
+
 /**
  * # Safety
  *
