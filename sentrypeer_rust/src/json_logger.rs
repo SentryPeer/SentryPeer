@@ -30,17 +30,72 @@ pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
     let json = serde_json::json!({
         "app_name": cli::cstr_to_string(PACKAGE_NAME),
         "app_version": cli::cstr_to_string(PACKAGE_VERSION),
-        "event_timestamp": unsafe { CStr::from_ptr((*bad_actor_event).event_timestamp).to_str().unwrap() },
-        "event_uuid": unsafe { CStr::from_ptr((*bad_actor_event).event_uuid).to_str().unwrap() },
-        "created_by_node_id": unsafe { CStr::from_ptr((*bad_actor_event).created_by_node_id).to_str().unwrap() },
-        "collected_method": unsafe { CStr::from_ptr((*bad_actor_event).collected_method).to_str().unwrap() },
-        "transport_type": unsafe { CStr::from_ptr((*bad_actor_event).transport_type).to_str().unwrap() },
-        "source_ip": unsafe { CStr::from_ptr((*bad_actor_event).source_ip).to_str().unwrap() },
-        "destination_ip": unsafe { CStr::from_ptr((*bad_actor_event).destination_ip).to_str().unwrap() },
-        "called_number": unsafe { CStr::from_ptr((*bad_actor_event).called_number).to_str().unwrap() },
-        "sip_method": unsafe { CStr::from_ptr((*bad_actor_event).method).to_str().unwrap() },
-        "sip_user_agent": unsafe { CStr::from_ptr((*bad_actor_event).user_agent).to_str().unwrap() },
-        "sip_message": unsafe { CStr::from_ptr((*bad_actor_event).sip_message).to_str().unwrap() },
+        "event_timestamp":
+        if (*bad_actor_event).event_timestamp.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).event_timestamp).to_str().unwrap() }
+        },
+        "event_uuid":
+        if (*bad_actor_event).event_uuid.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).event_uuid).to_str().unwrap() }
+        },
+        "created_by_node_id": 
+        if (*bad_actor_event).created_by_node_id.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).created_by_node_id).to_str().unwrap() }
+        },
+        "collected_method": 
+        if (*bad_actor_event).collected_method.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).collected_method).to_str().unwrap() }
+        },
+        "transport_type": 
+        if (*bad_actor_event).transport_type.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).transport_type).to_str().unwrap() }
+        },
+        "source_ip": 
+        if (*bad_actor_event).source_ip.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).source_ip).to_str().unwrap() }
+        },
+        "destination_ip": 
+        if (*bad_actor_event).destination_ip.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).destination_ip).to_str().unwrap() }
+        },
+        "called_number": 
+        if (*bad_actor_event).called_number.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).called_number).to_str().unwrap() }
+        },
+        "sip_method": 
+        if (*bad_actor_event).method.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).method).to_str().unwrap() }
+        },
+        "sip_user_agent": 
+        if (*bad_actor_event).user_agent.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).user_agent).to_str().unwrap() }
+        },
+        "sip_message": 
+        if (*bad_actor_event).sip_message.is_null() {
+            ""
+        } else {
+            unsafe { CStr::from_ptr((*bad_actor_event).sip_message).to_str().unwrap() }
+        },
     });
 
     if debug_mode || verbose_mode {
