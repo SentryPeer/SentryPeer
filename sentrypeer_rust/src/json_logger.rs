@@ -42,55 +42,55 @@ pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).event_uuid).to_str().unwrap() }
         },
-        "created_by_node_id": 
+        "created_by_node_id":
         if (*bad_actor_event).created_by_node_id.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).created_by_node_id).to_str().unwrap() }
         },
-        "collected_method": 
+        "collected_method":
         if (*bad_actor_event).collected_method.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).collected_method).to_str().unwrap() }
         },
-        "transport_type": 
+        "transport_type":
         if (*bad_actor_event).transport_type.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).transport_type).to_str().unwrap() }
         },
-        "source_ip": 
+        "source_ip":
         if (*bad_actor_event).source_ip.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).source_ip).to_str().unwrap() }
         },
-        "destination_ip": 
+        "destination_ip":
         if (*bad_actor_event).destination_ip.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).destination_ip).to_str().unwrap() }
         },
-        "called_number": 
+        "called_number":
         if (*bad_actor_event).called_number.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).called_number).to_str().unwrap() }
         },
-        "sip_method": 
+        "sip_method":
         if (*bad_actor_event).method.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).method).to_str().unwrap() }
         },
-        "sip_user_agent": 
+        "sip_user_agent":
         if (*bad_actor_event).user_agent.is_null() {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).user_agent).to_str().unwrap() }
         },
-        "sip_message": 
+        "sip_message":
         if (*bad_actor_event).sip_message.is_null() {
             ""
         } else {
