@@ -32,6 +32,7 @@ fn main() {
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=osipparser2");
     println!("cargo:rustc-link-lib=microhttpd");
+    println!("cargo:rustc-link-lib=pcre2-8");
 
     // Code coverage
     if env::var("CARGO_FEATURE_COVERAGE").is_ok() {
@@ -66,6 +67,8 @@ fn main() {
         // bad_actor.h
         .allowlist_function("bad_actor_new|bad_actor_destroy")
         .allowlist_item("bad_actor")
+        // http_daemon.h
+        .allowlist_function("http_daemon_init|http_daemon_stop")
         // config.h
         .allowlist_item("PACKAGE_NAME|PACKAGE_VERSION")
         // Set whether string constants should be generated as &CStr instead of &[u8].

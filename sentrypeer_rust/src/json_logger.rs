@@ -222,8 +222,12 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{bad_actor_destroy, bad_actor_new, sentrypeer_config_new, util_duplicate_string};
+    use crate::{
+        bad_actor_destroy, bad_actor_new, http_daemon_init, http_daemon_stop,
+        sentrypeer_config_new, util_duplicate_string, PACKAGE_VERSION,
+    };
     use pretty_assertions::assert_str_eq;
+    use reqwest::blocking::Client;
     use serde_json::Value;
 
     #[test]
@@ -319,6 +323,33 @@ mod tests {
 
             // Clean up
             bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
+        }
+    }
+
+    #[test]
+    fn test_http_api_health_check_version() {
+        unsafe {
+            let sentrypeer_c_config = sentrypeer_config_new();
+            if http_daemon_init(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+                panic!("Failed to start the HTTP server");
+            }
+
+            let health_check_endpoint = "http://localhost:8082/health-check";
+            let client = Client::new();
+            let res = client
+                .get(health_check_endpoint)
+                .header("Content-Type", "application/json")
+                .send()
+                .expect("Failed to send request");
+
+            assert_eq!(res.status(), 200);
+            let body = res.text().expect("Failed to read response");
+            dbg!(&body);
+            assert!(body.contains(&cli::cstr_to_string(PACKAGE_VERSION)));
+
+            if http_daemon_stop(sentrypeer_c_config) != libc::EXIT_SUCCESS {
+                panic!("Failed to stop the HTTP server");
+            }
         }
     }
 }
