@@ -122,8 +122,8 @@ bad_actor *json_to_bad_actor_rs(const sentrypeer_config *sentrypeer_c_config,
 int32_t json_log_bad_actor_rs(const sentrypeer_config *sentrypeer_c_config,
                               const bad_actor *bad_actor_event);
 
-void json_http_post_bad_actor_rs(sentrypeer_config *sentrypeer_c_config,
-                                 const bad_actor *bad_actor_event);
+int32_t json_http_post_bad_actor_rs(sentrypeer_config *sentrypeer_c_config,
+                                    const bad_actor *bad_actor_event);
 
 /**
  * # Safety

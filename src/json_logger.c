@@ -627,19 +627,8 @@ int json_http_post_bad_actor(sentrypeer_config *config,
 				if (json_http_post_bad_actor(
 					    config, bad_actor_to_log) !=
 				    EXIT_SUCCESS) {
-					{
-						fprintf(stderr,
-							"Failed to POST bad actor.\n");
-
-						return EXIT_FAILURE;
-					}
-				} else {
 					fprintf(stderr,
-						"WebHook POSTing failed: HTTP response code %ld\n",
-						http_response_code);
-
-					free(json_string);
-					http_cleanup_curl(curl, headers);
+						"Failed to POST bad actor.\n");
 
 					return EXIT_FAILURE;
 				}
@@ -653,15 +642,25 @@ int json_http_post_bad_actor(sentrypeer_config *config,
 
 				return EXIT_FAILURE;
 			}
-		}
-
-		free(json_string);
-		http_cleanup_curl(curl, headers);
-
-		if (config->debug_mode || config->verbose_mode) {
+		} else {
 			fprintf(stderr,
-				"WebHook POSTing succeeded: HTTP response code %ld\n",
+				"WebHook POSTing failed: HTTP response code %ld\n",
 				http_response_code);
+
+			free(json_string);
+			http_cleanup_curl(curl, headers);
+
+			return EXIT_FAILURE;
 		}
-		return EXIT_SUCCESS;
 	}
+
+	free(json_string);
+	http_cleanup_curl(curl, headers);
+
+	if (config->debug_mode || config->verbose_mode) {
+		fprintf(stderr,
+			"WebHook POSTing succeeded: HTTP response code %ld\n",
+			http_response_code);
+	}
+	return EXIT_SUCCESS;
+}
