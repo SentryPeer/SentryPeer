@@ -71,6 +71,9 @@ fn main() {
         .allowlist_function("http_daemon_init|http_daemon_stop")
         // config.h
         .allowlist_item("PACKAGE_NAME|PACKAGE_VERSION")
+        .allowlist_item(
+            "SENTRYPEER_OAUTH2_TOKEN_URL|SENTRYPEER_OAUTH2_GRANT_TYPE|SENTRYPEER_OAUTH2_AUDIENCE",
+        )
         // Set whether string constants should be generated as &CStr instead of &[u8].
         .generate_cstr(true)
         // Tell cargo to invalidate the built crate whenever any of the

@@ -16,7 +16,11 @@ use std::ffi::{CStr, CString};
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 // Our C FFI functions
-use crate::{bad_actor, bad_actor_new, sentrypeer_config, PACKAGE_NAME, PACKAGE_VERSION};
+use crate::{
+    bad_actor, bad_actor_new, sentrypeer_config, util_duplicate_string, PACKAGE_NAME,
+    PACKAGE_VERSION, SENTRYPEER_OAUTH2_AUDIENCE, SENTRYPEER_OAUTH2_GRANT_TYPE,
+    SENTRYPEER_OAUTH2_TOKEN_URL,
+};
 
 #[no_mangle]
 pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
@@ -207,7 +211,7 @@ pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
 pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
     sentrypeer_c_config: *mut sentrypeer_config,
     bad_actor_event: *const bad_actor,
-) {
+) -> i32 {
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
 
@@ -217,6 +221,150 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
     if debug_mode || verbose_mode {
         eprintln!("Bad actor in JSON format: {:?}", json_str);
     }
+
+    // We already have an access token, so we set it in our header
+    if (unsafe { *sentrypeer_c_config }).oauth2_mode {
+        if (unsafe { *sentrypeer_c_config })
+            .oauth2_access_token
+            .is_null()
+        {
+            if debug_mode || verbose_mode {
+                eprintln!("Requesting OAuth2 Bearer Token");
+            }
+
+            // Create JSON string for the request body
+            // {
+            //    "client_id": "your_client_id",
+            //    "client_secret": "your_client_secret",
+            //    "audience": "your_audience",
+            //    "grant_type": "client_credentials"
+            // }
+            let client_id = (unsafe { *sentrypeer_c_config }).oauth2_client_id;
+            let client_id_str = unsafe { CStr::from_ptr(client_id).to_str().unwrap() };
+
+            let client_secret = (unsafe { *sentrypeer_c_config }).oauth2_client_secret;
+            let client_secret_str = unsafe { CStr::from_ptr(client_secret).to_str().unwrap() };
+
+            let audience = &cli::cstr_to_string(SENTRYPEER_OAUTH2_AUDIENCE);
+            let grant_type = &cli::cstr_to_string(SENTRYPEER_OAUTH2_GRANT_TYPE);
+
+            let json_client_creds = serde_json::json!({
+                "client_id": client_id_str,
+                "client_secret": client_secret_str,
+                "audience": audience,
+                "grant_type": grant_type
+            });
+
+            if debug_mode || verbose_mode {
+                eprintln!("Client credentials in JSON format: {}", json_client_creds);
+            }
+
+            // Send the request to get the access token
+            let url = cli::cstr_to_string(SENTRYPEER_OAUTH2_TOKEN_URL);
+            let client = reqwest::blocking::Client::new();
+            let res = client
+                .post(&url)
+                .header("Content-Type", "application/json")
+                .body(json_client_creds.to_string())
+                .send()
+                .expect("OAuth2 Token Request POSTing failed.");
+
+            let access_token_json = res
+                .json::<serde_json::Value>()
+                .expect("Failed to parse JSON response");
+
+            let access_token = access_token_json
+                .get("access_token")
+                .expect("Failed to get access_token from JSON response")
+                .as_str()
+                .expect("access_token is not a string");
+
+            if debug_mode || verbose_mode {
+                eprintln!("Got access_token: {:?}", access_token);
+            }
+
+            (unsafe { *sentrypeer_c_config }).oauth2_access_token =
+                util_duplicate_string(CString::new(access_token).unwrap().as_ptr());
+
+            if debug_mode || verbose_mode {
+                eprintln!(
+                    "Retrieved access_token from config: {:?}",
+                    CStr::from_ptr((unsafe { *sentrypeer_c_config }).oauth2_access_token)
+                        .to_str()
+                        .unwrap()
+                );
+            }
+        }
+
+        // Now we have an access token, we can send the JSON to the webhook URL
+        let access_token = (unsafe { *sentrypeer_c_config }).oauth2_access_token;
+        let access_token_str = unsafe { CStr::from_ptr(access_token).to_str().unwrap() };
+
+        let url = (unsafe { *sentrypeer_c_config }).webhook_url;
+        let url_str = unsafe { CStr::from_ptr(url).to_str().unwrap() };
+
+        let client = reqwest::blocking::Client::new();
+        let res = client
+            .post(url_str)
+            .header("Authorization", format!("Bearer {}", access_token_str))
+            .header("Content-Type", "application/json")
+            .body(json_str.to_string())
+            .send()
+            .expect("WebHook POSTing failed.");
+
+        if debug_mode || verbose_mode {
+            eprintln!("Response: {:?}", res);
+        }
+
+        if res.status() != 200 && res.status() != 201 {
+            return if res.status() == 401 || res.status() == 403 {
+                // The token has probably expired (lasts 86400 seconds - 1 day)
+                // Let's reset it and get a new one
+                if !(unsafe { *sentrypeer_c_config })
+                    .oauth2_access_token
+                    .is_null()
+                {
+                    // Free from the C side somehow
+
+                    // Reset it
+                    (unsafe { *sentrypeer_c_config }).oauth2_access_token = std::ptr::null_mut();
+                }
+                if debug_mode || verbose_mode {
+                    eprintln!("OAuth2 access token expired, resetting.");
+                }
+
+                if json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event)
+                    != libc::EXIT_SUCCESS
+                {
+                    eprintln!("Failed to POST bad actor.");
+                    libc::EXIT_FAILURE
+                } else {
+                    eprintln!(
+                        "WebHook POSTing failed: HTTP response code: {:?}",
+                        res.status()
+                    );
+                    libc::EXIT_FAILURE
+                }
+            } else {
+                eprintln!(
+                    "WebHook POSTing failed: HTTP response code: {:?}",
+                    res.status()
+                );
+                libc::EXIT_FAILURE
+            };
+        }
+
+        if debug_mode || verbose_mode {
+            eprintln!(
+                "WebHook POSTing succeeded: HTTP response code {:?}",
+                res.status()
+            );
+        }
+
+        return libc::EXIT_SUCCESS;
+    }
+
+    libc::EXIT_SUCCESS
 }
 
 #[cfg(test)]
@@ -350,6 +498,37 @@ mod tests {
             if http_daemon_stop(sentrypeer_c_config) != libc::EXIT_SUCCESS {
                 panic!("Failed to stop the HTTP server");
             }
+        }
+    }
+
+    #[test]
+    fn test_json_http_post_bad_actor_rs() {
+        unsafe {
+            let sentrypeer_c_config = sentrypeer_config_new();
+            ({ *sentrypeer_c_config }).oauth2_mode = true;
+            ({ *sentrypeer_c_config }).debug_mode = true;
+
+            let bad_actor_event = bad_actor_new(
+                util_duplicate_string(CString::new("SIP Message").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("127.0.0.1").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("441234512346").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("INVITE").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("TLS").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("SIPp").unwrap().as_ptr()),
+                util_duplicate_string(CString::new("responsive").unwrap().as_ptr()),
+                util_duplicate_string(
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
+                        .unwrap()
+                        .as_ptr(),
+                ),
+            );
+
+            let result = json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event);
+            assert_eq!(result, libc::EXIT_SUCCESS);
+
+            // Clean up
+            bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
         }
     }
 }
