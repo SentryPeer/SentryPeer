@@ -185,7 +185,10 @@ sentrypeer_CFLAGS = $(AM_CFLAGS)
 # https://www.gnu.org/software/automake/manual/html_node/A-Library.html
 noinst_LTLIBRARIES = libsentrypeer.la
 libsentrypeer_la_SOURCES = $(sentrypeer_SOURCES)
-libsentrypeer_la_LDFLAGS = -version-info 0:0:0
+
+if HOST_MACOS
+libsentrypeer_la_LDFLAGS = -framework CoreFoundation -framework Security -framework SystemConfiguration
+endif
 sentrypeer_LDADD = libsentrypeer.la
 
 if !DISABLE_RUST
