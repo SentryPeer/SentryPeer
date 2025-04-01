@@ -158,6 +158,14 @@ endif ()
 if (NOT DISABLE_RUST)
     target_link_libraries(${CMAKE_PROJECT_NAME} sentrypeer_rust)
     message(STATUS "Linking with Rust parts")
+
+    # Check if we're on macOS
+    if (APPLE)
+        # Add the Rust library path to the library search path
+        message(STATUS "macOS detected, adding frameworks")
+        target_link_libraries(${CMAKE_PROJECT_NAME} -framework CoreFoundation -framework Security -framework SystemConfiguration)
+    endif ()
+
 endif ()
 
 # configure header files
