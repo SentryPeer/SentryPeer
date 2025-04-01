@@ -144,14 +144,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
 
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -losipparser2)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lsqlite3)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -luuid)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lmicrohttpd)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -ljansson)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lcurl)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lpcre2-8)
-
 # Used in config.h.in - can't reset OPENDHT_FOUND here, so use a new variable
 if (NOT OPENDHT_FOUND)
     set(HAVE_OPENDHT_C 0)
