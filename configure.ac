@@ -315,21 +315,6 @@ AC_OUTPUT
 
 AC_CANONICAL_HOST
 
-# Test OSes for use with libtool in Makefile.am
-case $host in
-  *-apple-darwin*)
-    # macOS
-    AC_MSG_NOTICE([macOS detected])
-    build_macos=yes
-    ;;
-  *)
-    # Other OS
-    ;;
-esac
-
-dnl Pass on to automake
-AM_CONDITIONAL([HOST_MACOS], [test "$build_macos" = "yes"])
-
 # https://github.com/zeromq/zyre/blob/master/configure.ac#L691
 BUILD_USER=${USER}
 BUILD_ARCH=${host}

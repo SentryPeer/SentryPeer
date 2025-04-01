@@ -21,6 +21,11 @@ fn main() {
     println!("cargo:rustc-link-search=../.libs"); // Autotools
     println!("cargo:rustc-link-search=../build"); // CMake
 
+    #[cfg(target_os = "macos")]
+    {
+        println!("cargo:rustc-link-search=/opt/homebrew/lib");
+    }
+
     println!("cargo:rustc-link-lib=sentrypeer");
 
     // Our other hard SentryPeer dependencies
@@ -31,11 +36,6 @@ fn main() {
     println!("cargo:rustc-link-lib=osipparser2");
     println!("cargo:rustc-link-lib=microhttpd");
     println!("cargo:rustc-link-lib=pcre2-8");
-
-    #[cfg(target_os = "macos")]
-    {
-        println!("cargo:rustc-link-search=/opt/homebrew/lib");
-    }
 
     // Code coverage
     if env::var("CARGO_FEATURE_COVERAGE").is_ok() {
