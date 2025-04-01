@@ -18,3 +18,4 @@
 #include "../src/utils.h"
 #include "../src/bad_actor.h"
 #include "../src/http_daemon.h"
+#include "../src/json_logger.h"

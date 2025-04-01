@@ -20,8 +20,6 @@ fn main() {
     // shared library and how to find it
     println!("cargo:rustc-link-search=../.libs"); // Autotools
     println!("cargo:rustc-link-search=../build"); // CMake
-                                                  // macOS - harmless on other platforms
-    println!("cargo:rustc-link-search=/opt/homebrew/lib");
 
     println!("cargo:rustc-link-lib=sentrypeer");
 
@@ -33,6 +31,11 @@ fn main() {
     println!("cargo:rustc-link-lib=osipparser2");
     println!("cargo:rustc-link-lib=microhttpd");
     println!("cargo:rustc-link-lib=pcre2-8");
+
+    #[cfg(target_os = "macos")]
+    {
+        println!("cargo:rustc-link-search=/opt/homebrew/lib");
+    }
 
     // Code coverage
     if env::var("CARGO_FEATURE_COVERAGE").is_ok() {
@@ -74,6 +77,8 @@ fn main() {
         .allowlist_item(
             "SENTRYPEER_OAUTH2_TOKEN_URL|SENTRYPEER_OAUTH2_GRANT_TYPE|SENTRYPEER_OAUTH2_AUDIENCE",
         )
+        // json_logger.h
+        .allowlist_function("free_oauth2_access_token")
         // Set whether string constants should be generated as &CStr instead of &[u8].
         .generate_cstr(true)
         // Tell cargo to invalidate the built crate whenever any of the

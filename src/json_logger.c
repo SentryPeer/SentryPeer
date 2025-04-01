@@ -664,3 +664,11 @@ int json_http_post_bad_actor(sentrypeer_config *config,
 	}
 	return EXIT_SUCCESS;
 }
+
+void free_oauth2_access_token(sentrypeer_config *config)
+{
+	if (config->oauth2_access_token != 0) {
+		free(config->oauth2_access_token);
+		config->oauth2_access_token = 0;
+	}
+}

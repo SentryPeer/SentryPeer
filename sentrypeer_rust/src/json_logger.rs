@@ -17,8 +17,8 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 // Our C FFI functions
 use crate::{
-    bad_actor, bad_actor_new, sentrypeer_config, util_duplicate_string, PACKAGE_NAME,
-    PACKAGE_VERSION, SENTRYPEER_OAUTH2_AUDIENCE, SENTRYPEER_OAUTH2_GRANT_TYPE,
+    bad_actor, bad_actor_new, free_oauth2_access_token, sentrypeer_config, util_duplicate_string,
+    PACKAGE_NAME, PACKAGE_VERSION, SENTRYPEER_OAUTH2_AUDIENCE, SENTRYPEER_OAUTH2_GRANT_TYPE,
     SENTRYPEER_OAUTH2_TOKEN_URL,
 };
 
@@ -320,18 +320,10 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
             return if res.status() == 401 || res.status() == 403 {
                 // The token has probably expired (lasts 86400 seconds - 1 day)
                 // Let's reset it and get a new one
-                if !(unsafe { *sentrypeer_c_config })
-                    .oauth2_access_token
-                    .is_null()
-                {
-                    // Free from the C side somehow
-
-                    // Reset it
-                    (unsafe { *sentrypeer_c_config }).oauth2_access_token = std::ptr::null_mut();
-                }
                 if debug_mode || verbose_mode {
                     eprintln!("OAuth2 access token expired, resetting.");
                 }
+                free_oauth2_access_token(sentrypeer_c_config);
 
                 if json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event)
                     != libc::EXIT_SUCCESS

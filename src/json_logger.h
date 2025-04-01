@@ -27,5 +27,6 @@ int json_log_bad_actor(const sentrypeer_config *config,
 		       const bad_actor *bad_actor);
 int json_http_post_bad_actor(sentrypeer_config *config,
 			     const bad_actor *bad_actor);
+void free_oauth2_access_token(sentrypeer_config *config);
 
 #endif //SENTRYPEER_JSON_LOGGER_H
