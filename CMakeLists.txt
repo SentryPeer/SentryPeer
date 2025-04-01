@@ -144,6 +144,14 @@ target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
 target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
 
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -losipparser2)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lsqlite3)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -luuid)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lmicrohttpd)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -ljansson)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib -lpcre2-8)
+
 # Used in config.h.in - can't reset OPENDHT_FOUND here, so use a new variable
 if (NOT OPENDHT_FOUND)
     set(HAVE_OPENDHT_C 0)
@@ -158,14 +166,6 @@ endif ()
 if (NOT DISABLE_RUST)
     target_link_libraries(${CMAKE_PROJECT_NAME} sentrypeer_rust)
     message(STATUS "Linking with Rust parts")
-
-    # Check if we're on macOS
-    if (APPLE)
-        # Add the Rust library path to the library search path
-        message(STATUS "macOS detected, adding frameworks")
-        target_link_libraries(${CMAKE_PROJECT_NAME} -framework CoreFoundation -framework Security -framework SystemConfiguration)
-    endif ()
-
 endif ()
 
 # configure header files
