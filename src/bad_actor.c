@@ -25,6 +25,10 @@
 #include "json_logger.h"
 #include "utils.h"
 
+#if HAVE_RUST != 0
+#include "sentrypeer_rust.h"
+#endif // HAVE_RUST
+
 //  A Bad Actor class.
 //  Implemented as a proper wee class using the CZMQ style.
 // See https://github.com/booksbyus/zguide/blob/master/examples/C/udplib.c
@@ -93,18 +97,43 @@ int bad_actor_log(sentrypeer_config *config, const bad_actor *bad_actor_event)
 		       bad_actor_event->user_agent);
 	}
 
+#if HAVE_RUST != 0
+	if (config->new_mode == true) {
+		if (config->json_log_mode &&
+		    (json_log_bad_actor_rs(config, bad_actor_event) !=
+		     EXIT_SUCCESS)) {
+			fprintf(stderr, "Saving bad_actor json to %s failed.\n",
+				config->json_log_file);
+			return EXIT_FAILURE;
+		}
+	}
+#else
 	if (config->json_log_mode &&
 	    (json_log_bad_actor(config, bad_actor_event) != EXIT_SUCCESS)) {
 		fprintf(stderr, "Saving bad_actor json to %s failed.\n",
 			config->json_log_file);
 		return EXIT_FAILURE;
 	}
+#endif
 
 	if (db_insert_bad_actor(bad_actor_event, config) != EXIT_SUCCESS) {
 		fprintf(stderr, "Saving bad actor to db failed\n");
 		return EXIT_FAILURE;
 	}
 
+#if HAVE_RUST != 0
+	if (config->new_mode == true) {
+		if (config->webhook_mode &&
+		    (json_http_post_bad_actor_rs(config, bad_actor_event) !=
+		     EXIT_SUCCESS)) {
+			fprintf(stderr,
+				"POSTing bad_actor json to URL '%s' failed.\n",
+				config->webhook_url);
+			// Just log failing WebHook POSTs
+			return EXIT_SUCCESS;
+		}
+	}
+#else
 	if (config->webhook_mode &&
 	    (json_http_post_bad_actor(config, bad_actor_event) !=
 	     EXIT_SUCCESS)) {
@@ -113,6 +142,7 @@ int bad_actor_log(sentrypeer_config *config, const bad_actor *bad_actor_event)
 		// Just log failing WebHook POSTs
 		return EXIT_SUCCESS;
 	}
+#endif
 
 	return EXIT_SUCCESS;
 }
