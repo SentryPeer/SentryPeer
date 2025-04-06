@@ -103,7 +103,7 @@ pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
     });
 
     if debug_mode || verbose_mode {
-        eprintln!("Bad actor in JSON format: {:?}", json);
+        eprintln!("Bad actor in JSON format: {:?}", json.to_string());
     }
 
     // Return the JSON as a C string which must be freed

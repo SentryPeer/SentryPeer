@@ -199,6 +199,9 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
             let key = load_key(&config.key)
                 .expect("Failed to load TLS key. Please set SENTRYPEER_KEY or use -k");
 
+            rustls::crypto::aws_lc_rs::default_provider()
+                .install_default()
+                .expect("Can't set crypto provider to aws_lc_rs");
             let server_config = rustls::ServerConfig::builder()
                 .with_no_client_auth()
                 .with_single_cert(certs, key)
