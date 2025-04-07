@@ -279,8 +279,11 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                 eprintln!("Got access_token: {:?}", access_token);
             }
 
-            (unsafe { *sentrypeer_c_config }).oauth2_access_token =
-                util_duplicate_string(CString::new(access_token).unwrap().as_ptr());
+            let access_token_c_str =
+                CString::new(access_token).expect("access_token is not a string");
+
+            (*sentrypeer_c_config).oauth2_access_token =
+                util_duplicate_string(access_token_c_str.as_ptr());
 
             if debug_mode || verbose_mode {
                 eprintln!(
@@ -307,10 +310,6 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
             .body(json_str.to_string())
             .send()
             .expect("WebHook POSTing failed.");
-
-        if debug_mode || verbose_mode {
-            eprintln!("Response: {:?}", res);
-        }
 
         if res.status() != 200 && res.status() != 201 {
             return if res.status() == 401 || res.status() == 403 {
