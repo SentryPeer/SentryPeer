@@ -170,12 +170,16 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
     }
 
     if args.client_id.is_some() {
+        (*sentrypeer_c_config).oauth2_mode = true;
+
         let client_id = args.client_id.unwrap();
         let client_id_c_str = CString::new(client_id).expect("CString::new failed");
         (*sentrypeer_c_config).oauth2_client_id = util_duplicate_string(client_id_c_str.as_ptr());
     }
 
     if args.client_secret.is_some() {
+        (*sentrypeer_c_config).oauth2_mode = true;
+
         let client_secret = args.client_secret.unwrap();
         let client_secret_c_str = CString::new(client_secret).expect("CString::new failed");
         (*sentrypeer_c_config).oauth2_client_secret =
@@ -183,6 +187,8 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
     }
 
     if args.webhook_url.is_some() {
+        (*sentrypeer_c_config).webhook_mode = true;
+
         let webhook_url = args.webhook_url.unwrap();
         let webhook_url_c_str = CString::new(webhook_url).expect("CString::new failed");
         (*sentrypeer_c_config).webhook_url = util_duplicate_string(webhook_url_c_str.as_ptr());

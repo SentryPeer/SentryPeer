@@ -218,10 +218,6 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
     let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
     let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
 
-    if debug_mode || verbose_mode {
-        eprintln!("Bad actor in JSON format: {:?}", json_str);
-    }
-
     // We already have an access token, so we set it in our header
     if (unsafe { *sentrypeer_c_config }).oauth2_mode {
         if (unsafe { *sentrypeer_c_config })
