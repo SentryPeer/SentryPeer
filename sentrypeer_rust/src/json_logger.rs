@@ -265,6 +265,14 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                 .send()
                 .expect("OAuth2 Token Request POSTing failed.");
 
+            if res.status() != 200 {
+                eprintln!(
+                    "OAuth2 Token Request POSTing failed: HTTP response code: {:?}",
+                    res.status()
+                );
+                return libc::EXIT_FAILURE;
+            }
+            
             let access_token_json = res
                 .json::<serde_json::Value>()
                 .expect("Failed to parse JSON response");
@@ -492,8 +500,8 @@ mod tests {
     fn test_json_http_post_bad_actor_rs() {
         unsafe {
             let sentrypeer_c_config = sentrypeer_config_new();
-            ({ *sentrypeer_c_config }).oauth2_mode = true;
-            ({ *sentrypeer_c_config }).debug_mode = true;
+            (*sentrypeer_c_config).oauth2_mode = true;
+            (*sentrypeer_c_config).debug_mode = true;
 
             let bad_actor_event = bad_actor_new(
                 util_duplicate_string(CString::new("SIP Message").unwrap().as_ptr()),
@@ -512,7 +520,7 @@ mod tests {
             );
 
             let result = json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event);
-            assert_eq!(result, libc::EXIT_SUCCESS);
+            assert_eq!(result, libc::EXIT_FAILURE);
 
             // Clean up
             bad_actor_destroy(Box::into_raw(Box::new(bad_actor_event)));
