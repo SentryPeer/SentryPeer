@@ -425,9 +425,17 @@ int json_log_bad_actor(const sentrypeer_config *config,
 		return EXIT_FAILURE;
 	}
 
+	// Caller must free
 	char *json_string =
+
+#if HAVE_RUST != 0
 		bad_actor_to_json_rs(config,
-				     bad_actor_to_log); // Caller must free
+				     bad_actor_to_log);
+#else
+		bad_actor_to_json(config,
+				  bad_actor_to_log);
+#endif
+
 	// We don't assert here, because we want to continue even if it fails
 	if (json_string == NULL) {
 		fprintf(stderr, "Failed to convert bad actor to json.\n");
