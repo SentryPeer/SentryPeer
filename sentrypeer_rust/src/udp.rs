@@ -14,13 +14,13 @@ use crate::config::SentryPeerConfig;
 use crate::sip::{log_sip_packet, SIP_PACKET};
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tokio::net::UdpSocket;
+use tokio_dstip::UdpSocketWithDst;
 
 pub async fn handle_udp_connection(
     peer_addr: SocketAddr,
     buf: &mut [u8],
     bytes_read: usize,
-    udp_socket: Arc<UdpSocket>,
+    udp_socket: Arc<UdpSocketWithDst>,
     sentrypeer_config: SentryPeerConfig,
     addr: SocketAddr,
 ) -> i32 {

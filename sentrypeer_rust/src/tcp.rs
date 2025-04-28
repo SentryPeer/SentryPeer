@@ -19,7 +19,7 @@ use tokio::net::TcpStream;
 pub async fn handle_tcp_connection(
     stream: TcpStream,
     sentrypeer_config: SentryPeerConfig,
-    peer_addr: std::net::SocketAddr,
+    peer_addr: SocketAddr,
     addr: SocketAddr,
 ) -> i32 {
     let mut buf = [0; 1024];
