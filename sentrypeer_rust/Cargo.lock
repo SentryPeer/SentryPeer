@@ -1963,9 +1963,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-dstip"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdfa56b2b8910a913e60ea51f47e65b8495b6db616593301c08c06e46f722064"
+checksum = "bccca3cb7fa305d02ceaeb37fec7cad1847f7a647141ed76d681d7bb7a7cc14c"
 dependencies = [
  "libc",
  "nix",
