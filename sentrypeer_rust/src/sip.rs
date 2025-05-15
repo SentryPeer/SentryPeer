@@ -13,14 +13,15 @@
 use crate::sockaddr;
 use libc::c_int;
 use os_socketaddr::OsSocketAddr;
+use socket2::{Domain, Socket, Type};
 use std::ffi::CString;
 use std::io;
 use std::net::{SocketAddr, ToSocketAddrs};
 use std::os::raw::c_char;
 use std::sync::Arc;
-use tokio_dstip::UdpSocketWithDst;
-use tokio_dstip::TcpListenerWithDst;
 use tokio::io::{AsyncWriteExt, WriteHalf};
+use tokio::net::TcpListener;
+use tokio::net::UdpSocket;
 use tokio::sync::oneshot;
 use tokio_rustls::{rustls, TlsAcceptor};
 
@@ -91,7 +92,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
             let config = load_all_configs(sentrypeer_config).expect("Failed to load all configs");
 
             // TCP
-            let tcp_listener = TcpListenerWithDst::bind("0.0.0.0:5060")
+            let tcp_listener = TcpListener::bind("0.0.0.0:5060")
                 .await
                 .expect("TCP: Failed to bind to address");
             let addr = tcp_listener.local_addr().unwrap();
@@ -102,7 +103,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
 
             tokio::spawn(async move {
                 loop {
-                    let (stream, peer_addr, dest_ip) = tcp_listener.accept_with_dst().await.unwrap();
+                    let (stream, peer_addr) = tcp_listener.accept().await.unwrap();
 
                     if debug_mode || verbose_mode {
                         eprintln!("Accepted TCP connection from: {}", peer_addr);
@@ -117,11 +118,27 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     });
                 }
             });
-            
+
             // UDP
-            let udp_socket = UdpSocketWithDst::bind("0.0.0.0:5060".parse().unwrap())
+            let addr = "0.0.0.0:5060".parse::<SocketAddr>().unwrap();
+
+            let socket =
+                Socket::new(Domain::IPV4, Type::DGRAM, None).expect("UDP: Failed to create socket");
+
+            socket
+                .set_reuse_address(true)
+                .expect("UDP: Failed to set reuse address");
+
+            socket
+                .set_nonblocking(true)
+                .expect("UDP: Failed to set non-blocking");
+
+            socket
+                .bind(&addr.into())
                 .expect("UDP: Failed to bind to address");
 
+            let udp_socket =
+                UdpSocket::from_std(socket.into()).expect("UDP: Failed to convert to UdpSocket");
             let addr = udp_socket.local_addr().unwrap();
 
             if debug_mode || verbose_mode {
@@ -132,7 +149,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
             tokio::spawn(async move {
                 loop {
                     let mut buf = [0; 1024];
-                    let (bytes_read, peer_addr, dest_ip) = arc_socket.recv_from(&mut buf).await.unwrap();
+                    let (bytes_read, peer_addr) = arc_socket.recv_from(&mut buf).await.unwrap();
                     let socket = arc_socket.clone();
 
                     // https://github.com/tokio-rs/tokio/discussions/3755#discussioncomment-702928
@@ -141,7 +158,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     // in an [Arc]
                     tokio::spawn(async move {
                         if handle_udp_connection(
-                            dest_ip,
+                            peer_addr,
                             &mut buf,
                             bytes_read,
                             socket,
@@ -195,7 +212,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                 .unwrap();
             let tls_acceptor = TlsAcceptor::from(Arc::new(server_config));
 
-            let tls_listener = TcpListenerWithDst::bind(addr)
+            let tls_listener = TcpListener::bind(addr)
                 .await
                 .expect("TLS: Failed to bind to address");
 

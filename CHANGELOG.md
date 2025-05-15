@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changes
 - Replace `jansson` with `serde_json` for JSON parsing/generation and switch to using Rust versions
 - Replace `libcurl` with `reqwest` for HTTP requests and switch to using Rust versions
-- Migration TCP and UDP code to use our [tokio-dstip](https://crates.io/crates/tokio-dstip)
 
 ## [4.0.4] - 2025-03-17
 

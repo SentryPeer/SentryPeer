@@ -272,7 +272,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                 );
                 return libc::EXIT_FAILURE;
             }
-            
+
             let access_token_json = res
                 .json::<serde_json::Value>()
                 .expect("Failed to parse JSON response");
