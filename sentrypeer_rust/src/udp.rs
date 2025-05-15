@@ -11,7 +11,7 @@
                              |___/
 */
 use crate::config::SentryPeerConfig;
-use crate::sip::{log_sip_packet, SIP_PACKET};
+use crate::sip::{SIP_PACKET, log_sip_packet};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::UdpSocket;

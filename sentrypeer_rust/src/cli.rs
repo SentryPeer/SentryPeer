@@ -12,11 +12,11 @@
 */
 use crate::config::create_tls_cert_and_key;
 use clap::Parser;
-use std::ffi::{c_char, CStr, CString};
+use std::ffi::{CStr, CString, c_char};
 use std::path::PathBuf;
 
 // Our C FFI functions
-use crate::{sentrypeer_config, util_duplicate_string, PACKAGE_NAME, PACKAGE_VERSION};
+use crate::{PACKAGE_NAME, PACKAGE_VERSION, sentrypeer_config, util_duplicate_string};
 
 pub fn cstr_to_string(cstr: &CStr) -> String {
     cstr.to_string_lossy().into_owned()
@@ -110,123 +110,130 @@ struct Args {
 /// # Safety
 ///
 /// Process the CLI arguments and set the sentrypeer_config struct
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn process_cli_rs(
     sentrypeer_c_config: *mut sentrypeer_config,
     argc: usize,
     argv: *mut *mut c_char,
 ) -> i32 {
-    // Convert argc and argv from C to Vec(&str)
-    let args_from_c = std::slice::from_raw_parts(argv, argc)
-        .iter()
-        .map(|&arg| {
-            CStr::from_ptr(arg)
-                .to_str()
-                .expect("Failed to convert CStr to str for command line argument processing.")
-        })
-        .collect::<Vec<&str>>();
+    unsafe {
+        // Convert argc and argv from C to Vec(&str)
+        let args_from_c = std::slice::from_raw_parts(argv, argc)
+            .iter()
+            .map(|&arg| {
+                CStr::from_ptr(arg)
+                    .to_str()
+                    .expect("Failed to convert CStr to str for command line argument processing.")
+            })
+            .collect::<Vec<&str>>();
 
-    let args = Args::parse_from(args_from_c);
+        let args = Args::parse_from(args_from_c);
 
-    // Set booleans
-    (*sentrypeer_c_config).api_mode = args.api;
-    (*sentrypeer_c_config).debug_mode = args.debug;
-    (*sentrypeer_c_config).p2p_dht_mode = args.p2p;
-    if args.unresponsive {
-        // Set to true by default in C
-        (*sentrypeer_c_config).sip_mode = false;
-    }
-    if args.new_mode {
-        // Set to true by default in C if Rust detected
-        (*sentrypeer_c_config).new_mode = false;
-    }
-    (*sentrypeer_c_config).sip_responsive_mode = args.responsive;
-    (*sentrypeer_c_config).syslog_mode = args.syslog;
-    (*sentrypeer_c_config).verbose_mode = args.verbose;
-
-    // Set strings that will be freed on the C side
-    if args.db_file.is_some() {
-        let db_file = args.db_file.unwrap();
-        let db_file_c_str = CString::new(db_file.to_str().unwrap()).expect("CString::new failed");
-        (*sentrypeer_c_config).db_file = util_duplicate_string(db_file_c_str.as_ptr());
-    }
-
-    if args.json {
-        (*sentrypeer_c_config).json_log_mode = true;
-
-        if args.json_log_file.is_some() {
-            let json_log_file = args.json_log_file.unwrap();
-            let json_log_file_c_str =
-                CString::new(json_log_file.to_str().unwrap()).expect("CString::new failed");
-            (*sentrypeer_c_config).json_log_file =
-                util_duplicate_string(json_log_file_c_str.as_ptr());
+        // Set booleans
+        (*sentrypeer_c_config).api_mode = args.api;
+        (*sentrypeer_c_config).debug_mode = args.debug;
+        (*sentrypeer_c_config).p2p_dht_mode = args.p2p;
+        if args.unresponsive {
+            // Set to true by default in C
+            (*sentrypeer_c_config).sip_mode = false;
         }
-    }
+        if args.new_mode {
+            // Set to true by default in C if Rust detected
+            (*sentrypeer_c_config).new_mode = false;
+        }
+        (*sentrypeer_c_config).sip_responsive_mode = args.responsive;
+        (*sentrypeer_c_config).syslog_mode = args.syslog;
+        (*sentrypeer_c_config).verbose_mode = args.verbose;
 
-    if args.bootstrap.is_some() {
-        let bootstrap = args.bootstrap.unwrap();
-        let bootstrap_c_str = CString::new(bootstrap).expect("CString::new failed");
-        (*sentrypeer_c_config).p2p_bootstrap_node = util_duplicate_string(bootstrap_c_str.as_ptr());
-    }
-
-    if args.client_id.is_some() {
-        (*sentrypeer_c_config).oauth2_mode = true;
-
-        let client_id = args.client_id.unwrap();
-        let client_id_c_str = CString::new(client_id).expect("CString::new failed");
-        (*sentrypeer_c_config).oauth2_client_id = util_duplicate_string(client_id_c_str.as_ptr());
-    }
-
-    if args.client_secret.is_some() {
-        (*sentrypeer_c_config).oauth2_mode = true;
-
-        let client_secret = args.client_secret.unwrap();
-        let client_secret_c_str = CString::new(client_secret).expect("CString::new failed");
-        (*sentrypeer_c_config).oauth2_client_secret =
-            util_duplicate_string(client_secret_c_str.as_ptr());
-    }
-
-    if args.webhook_url.is_some() {
-        (*sentrypeer_c_config).webhook_mode = true;
-
-        let webhook_url = args.webhook_url.unwrap();
-        let webhook_url_c_str = CString::new(webhook_url).expect("CString::new failed");
-        (*sentrypeer_c_config).webhook_url = util_duplicate_string(webhook_url_c_str.as_ptr());
-    }
-
-    if args.tls_cert_file.is_some() {
-        let tls_cert_file = args.tls_cert_file.unwrap();
-
-        if !tls_cert_file.exists() {
-            eprintln!("TLS cert file does not exist: {:?}", tls_cert_file);
-            create_tls_cert_and_key();
+        // Set strings that will be freed on the C side
+        if args.db_file.is_some() {
+            let db_file = args.db_file.unwrap();
+            let db_file_c_str =
+                CString::new(db_file.to_str().unwrap()).expect("CString::new failed");
+            (*sentrypeer_c_config).db_file = util_duplicate_string(db_file_c_str.as_ptr());
         }
 
-        let tls_cert_file_c_str =
-            CString::new(tls_cert_file.to_str().unwrap()).expect("CString::new failed");
-        (*sentrypeer_c_config).tls_cert_file = util_duplicate_string(tls_cert_file_c_str.as_ptr());
-    }
+        if args.json {
+            (*sentrypeer_c_config).json_log_mode = true;
 
-    if args.tls_key_file.is_some() {
-        let tls_key_file = args.tls_key_file.unwrap();
-
-        if !tls_key_file.exists() {
-            eprintln!("TLS key file does not exist: {:?}", tls_key_file);
-            return libc::EXIT_FAILURE;
+            if args.json_log_file.is_some() {
+                let json_log_file = args.json_log_file.unwrap();
+                let json_log_file_c_str =
+                    CString::new(json_log_file.to_str().unwrap()).expect("CString::new failed");
+                (*sentrypeer_c_config).json_log_file =
+                    util_duplicate_string(json_log_file_c_str.as_ptr());
+            }
         }
 
-        let tls_key_file_c_str =
-            CString::new(tls_key_file.to_str().unwrap()).expect("CString::new failed");
-        (*sentrypeer_c_config).tls_key_file = util_duplicate_string(tls_key_file_c_str.as_ptr());
-    }
+        if args.bootstrap.is_some() {
+            let bootstrap = args.bootstrap.unwrap();
+            let bootstrap_c_str = CString::new(bootstrap).expect("CString::new failed");
+            (*sentrypeer_c_config).p2p_bootstrap_node =
+                util_duplicate_string(bootstrap_c_str.as_ptr());
+        }
 
-    if args.tls_listen_address.is_some() {
-        let tls_listen_address = args.tls_listen_address.unwrap();
-        let tls_listen_address_c_str =
-            CString::new(tls_listen_address).expect("CString::new failed");
-        (*sentrypeer_c_config).tls_listen_address =
-            util_duplicate_string(tls_listen_address_c_str.as_ptr());
-    }
+        if args.client_id.is_some() {
+            (*sentrypeer_c_config).oauth2_mode = true;
 
-    libc::EXIT_SUCCESS
+            let client_id = args.client_id.unwrap();
+            let client_id_c_str = CString::new(client_id).expect("CString::new failed");
+            (*sentrypeer_c_config).oauth2_client_id =
+                util_duplicate_string(client_id_c_str.as_ptr());
+        }
+
+        if args.client_secret.is_some() {
+            (*sentrypeer_c_config).oauth2_mode = true;
+
+            let client_secret = args.client_secret.unwrap();
+            let client_secret_c_str = CString::new(client_secret).expect("CString::new failed");
+            (*sentrypeer_c_config).oauth2_client_secret =
+                util_duplicate_string(client_secret_c_str.as_ptr());
+        }
+
+        if args.webhook_url.is_some() {
+            (*sentrypeer_c_config).webhook_mode = true;
+
+            let webhook_url = args.webhook_url.unwrap();
+            let webhook_url_c_str = CString::new(webhook_url).expect("CString::new failed");
+            (*sentrypeer_c_config).webhook_url = util_duplicate_string(webhook_url_c_str.as_ptr());
+        }
+
+        if args.tls_cert_file.is_some() {
+            let tls_cert_file = args.tls_cert_file.unwrap();
+
+            if !tls_cert_file.exists() {
+                eprintln!("TLS cert file does not exist: {:?}", tls_cert_file);
+                create_tls_cert_and_key();
+            }
+
+            let tls_cert_file_c_str =
+                CString::new(tls_cert_file.to_str().unwrap()).expect("CString::new failed");
+            (*sentrypeer_c_config).tls_cert_file =
+                util_duplicate_string(tls_cert_file_c_str.as_ptr());
+        }
+
+        if args.tls_key_file.is_some() {
+            let tls_key_file = args.tls_key_file.unwrap();
+
+            if !tls_key_file.exists() {
+                eprintln!("TLS key file does not exist: {:?}", tls_key_file);
+                return libc::EXIT_FAILURE;
+            }
+
+            let tls_key_file_c_str =
+                CString::new(tls_key_file.to_str().unwrap()).expect("CString::new failed");
+            (*sentrypeer_c_config).tls_key_file =
+                util_duplicate_string(tls_key_file_c_str.as_ptr());
+        }
+
+        if args.tls_listen_address.is_some() {
+            let tls_listen_address = args.tls_listen_address.unwrap();
+            let tls_listen_address_c_str =
+                CString::new(tls_listen_address).expect("CString::new failed");
+            (*sentrypeer_c_config).tls_listen_address =
+                util_duplicate_string(tls_listen_address_c_str.as_ptr());
+        }
+
+        libc::EXIT_SUCCESS
+    }
 }

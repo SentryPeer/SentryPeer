@@ -23,9 +23,9 @@ use tokio::io::{AsyncWriteExt, WriteHalf};
 use tokio::net::TcpListener;
 use tokio::net::UdpSocket;
 use tokio::sync::oneshot;
-use tokio_rustls::{rustls, TlsAcceptor};
+use tokio_rustls::{TlsAcceptor, rustls};
 
-use crate::config::{create_certs, load_all_configs, load_certs, load_key, SentryPeerConfig};
+use crate::config::{SentryPeerConfig, create_certs, load_all_configs, load_certs, load_key};
 use crate::tcp::handle_tcp_connection;
 use crate::tls::handle_tls_connection;
 use crate::udp::handle_udp_connection;
@@ -62,7 +62,7 @@ where
 /// Nothing is done with the `sentrypeer_config` pointer, it's treated read-only.
 ///
 /// A default multi-threaded tokio runtime that listens for incoming TLS connections.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_config) -> i32 {
     // Assert we're not getting a null pointer
     assert!(!sentrypeer_c_config.is_null());
@@ -274,29 +274,31 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
 /// # Safety
 ///
 /// Shutdown the tokio runtime.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn shutdown_sip(sentrypeer_c_config: *const sentrypeer_config) -> i32 {
-    // Assert we're not getting a null pointer
-    assert!(
-        !sentrypeer_c_config.is_null(),
-        "sentrypeer_c_config is null."
-    );
+    unsafe {
+        // Assert we're not getting a null pointer
+        assert!(
+            !sentrypeer_c_config.is_null(),
+            "sentrypeer_c_config is null."
+        );
 
-    // And this
-    assert!(
-        !(*sentrypeer_c_config).sip_channel.is_null(),
-        "sentrypeer_c_config.sip_channel is null."
-    );
+        // And this
+        assert!(
+            !(*sentrypeer_c_config).sip_channel.is_null(),
+            "sentrypeer_c_config.sip_channel is null."
+        );
 
-    let tx = Box::from_raw((*sentrypeer_c_config).sip_channel as *mut oneshot::Sender<String>);
+        let tx = Box::from_raw((*sentrypeer_c_config).sip_channel as *mut oneshot::Sender<String>);
 
-    // Send the message to the tokio runtime to shutdown
-    if tx.send(String::from("Please shutdown :-)")).is_err() {
-        eprintln!("Failed to send message to tokio runtime to shutdown");
-        return libc::EXIT_FAILURE;
+        // Send the message to the tokio runtime to shutdown
+        if tx.send(String::from("Please shutdown :-)")).is_err() {
+            eprintln!("Failed to send message to tokio runtime to shutdown");
+            return libc::EXIT_FAILURE;
+        }
+
+        libc::EXIT_SUCCESS
     }
-
-    libc::EXIT_SUCCESS
 }
 
 pub fn log_sip_packet(
@@ -393,10 +395,12 @@ unsafe fn clean_up_sip_message(
     client_ip_addr_ptr: *mut c_char,
     dest_ip_addr_ptr: *mut c_char,
 ) {
-    let _ = CString::from_raw(packet_ptr);
-    let _ = CString::from_raw(transport_type_ptr);
-    let _ = CString::from_raw(client_ip_addr_ptr);
-    let _ = CString::from_raw(dest_ip_addr_ptr);
+    unsafe {
+        let _ = CString::from_raw(packet_ptr);
+        let _ = CString::from_raw(transport_type_ptr);
+        let _ = CString::from_raw(client_ip_addr_ptr);
+        let _ = CString::from_raw(dest_ip_addr_ptr);
+    }
 }
 
 #[cfg(test)]

@@ -13,7 +13,7 @@
 use crate::sentrypeer_config;
 use confy::get_configuration_file_path;
 use pki_types::{CertificateDer, PrivateKeyDer};
-use rcgen::{generate_simple_self_signed, CertifiedKey};
+use rcgen::{CertifiedKey, generate_simple_self_signed};
 use rustls_pemfile::{certs, private_key};
 use serde::{Deserialize, Serialize};
 use std::ffi::CStr;

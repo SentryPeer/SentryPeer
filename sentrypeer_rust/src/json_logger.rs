@@ -17,12 +17,12 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 // Our C FFI functions
 use crate::{
-    bad_actor, bad_actor_new, free_oauth2_access_token, sentrypeer_config, util_duplicate_string,
     PACKAGE_NAME, PACKAGE_VERSION, SENTRYPEER_OAUTH2_AUDIENCE, SENTRYPEER_OAUTH2_GRANT_TYPE,
-    SENTRYPEER_OAUTH2_TOKEN_URL,
+    SENTRYPEER_OAUTH2_TOKEN_URL, bad_actor, bad_actor_new, free_oauth2_access_token,
+    sentrypeer_config, util_duplicate_string,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
     sentrypeer_c_config: *const sentrypeer_config,
     bad_actor_event: *const bad_actor,
@@ -35,67 +35,67 @@ pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
         "app_name": cli::cstr_to_string(PACKAGE_NAME),
         "app_version": cli::cstr_to_string(PACKAGE_VERSION),
         "event_timestamp":
-        if (*bad_actor_event).event_timestamp.is_null() {
+        if unsafe { (*bad_actor_event).event_timestamp.is_null() } {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).event_timestamp).to_str().unwrap() }
         },
         "event_uuid":
-        if (*bad_actor_event).event_uuid.is_null() {
+        if unsafe { (*bad_actor_event).event_uuid.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).event_uuid).to_str().unwrap() }
         },
         "created_by_node_id":
-        if (*bad_actor_event).created_by_node_id.is_null() {
+        if unsafe { (*bad_actor_event).created_by_node_id.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).created_by_node_id).to_str().unwrap() }
         },
         "collected_method":
-        if (*bad_actor_event).collected_method.is_null() {
+        if unsafe { (*bad_actor_event).collected_method.is_null()} {
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).collected_method).to_str().unwrap() }
         },
         "transport_type":
-        if (*bad_actor_event).transport_type.is_null() {
+        if unsafe { (*bad_actor_event).transport_type.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).transport_type).to_str().unwrap() }
         },
         "source_ip":
-        if (*bad_actor_event).source_ip.is_null() {
+        if unsafe { (*bad_actor_event).source_ip.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).source_ip).to_str().unwrap() }
         },
         "destination_ip":
-        if (*bad_actor_event).destination_ip.is_null() {
+        if unsafe { (*bad_actor_event).destination_ip.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).destination_ip).to_str().unwrap() }
         },
         "called_number":
-        if (*bad_actor_event).called_number.is_null() {
+        if unsafe { (*bad_actor_event).called_number.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).called_number).to_str().unwrap() }
         },
         "sip_method":
-        if (*bad_actor_event).method.is_null() {
+        if unsafe { (*bad_actor_event).method.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).method).to_str().unwrap() }
         },
         "sip_user_agent":
-        if (*bad_actor_event).user_agent.is_null() {
+        if unsafe { (*bad_actor_event).user_agent.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).user_agent).to_str().unwrap() }
         },
         "sip_message":
-        if (*bad_actor_event).sip_message.is_null() {
+        if unsafe { (*bad_actor_event).sip_message.is_null() }{
             ""
         } else {
             unsafe { CStr::from_ptr((*bad_actor_event).sip_message).to_str().unwrap() }
@@ -110,16 +110,18 @@ pub(crate) unsafe extern "C" fn bad_actor_to_json_rs(
     CString::new(json.to_string()).unwrap().into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn free_json_rs(json: *mut c_char) {
-    if json.is_null() {
-        return;
-    }
+    unsafe {
+        if json.is_null() {
+            return;
+        }
 
-    let _ = CString::from_raw(json);
+        let _ = CString::from_raw(json);
+    }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
     sentrypeer_c_config: *const sentrypeer_config,
     json_to_convert: *const c_char,
@@ -134,40 +136,42 @@ pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
 
     let v: serde_json::Value = serde_json::from_str(json_str).unwrap();
 
-    let bad_actor_event = bad_actor_new(
-        CString::new(v["sip_message"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["source_ip"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["destination_ip"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["called_number"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["sip_method"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["transport_type"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["sip_user_agent"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["collected_method"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-        CString::new(v["created_by_node_id"].as_str().unwrap())
-            .unwrap()
-            .into_raw(),
-    );
+    let bad_actor_event = unsafe {
+        bad_actor_new(
+            CString::new(v["sip_message"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["source_ip"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["destination_ip"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["called_number"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["sip_method"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["transport_type"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["sip_user_agent"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["collected_method"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+            CString::new(v["created_by_node_id"].as_str().unwrap())
+                .unwrap()
+                .into_raw(),
+        )
+    };
 
     bad_actor_event
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
     sentrypeer_c_config: *const sentrypeer_config,
     bad_actor_event: *const bad_actor,
@@ -178,7 +182,7 @@ pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
             .unwrap()
     };
 
-    let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
+    let json = unsafe { bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event) };
     let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
 
     let json_log_file = match OpenOptions::new()
@@ -207,7 +211,7 @@ pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
     libc::EXIT_SUCCESS
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
     sentrypeer_c_config: *mut sentrypeer_config,
     bad_actor_event: *const bad_actor,
@@ -215,7 +219,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
     let debug_mode = (unsafe { *sentrypeer_c_config }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_c_config }).verbose_mode;
 
-    let json = bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event);
+    let json = unsafe { bad_actor_to_json_rs(sentrypeer_c_config, bad_actor_event) };
     let json_str = unsafe { CStr::from_ptr(json).to_str().unwrap() };
 
     // We already have an access token, so we set it in our header
@@ -290,16 +294,17 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
             let access_token_c_str =
                 CString::new(access_token).expect("access_token is not a string");
 
-            (*sentrypeer_c_config).oauth2_access_token =
-                util_duplicate_string(access_token_c_str.as_ptr());
+            unsafe {
+                (*sentrypeer_c_config).oauth2_access_token =
+                    util_duplicate_string(access_token_c_str.as_ptr())
+            };
 
             if debug_mode || verbose_mode {
-                eprintln!(
-                    "Retrieved access_token from config: {:?}",
-                    CStr::from_ptr((unsafe { *sentrypeer_c_config }).oauth2_access_token)
+                eprintln!("Retrieved access_token from config: {:?}", unsafe {
+                    CStr::from_ptr((*sentrypeer_c_config).oauth2_access_token)
                         .to_str()
                         .unwrap()
-                );
+                });
             }
         }
 
@@ -326,9 +331,9 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                 if debug_mode || verbose_mode {
                     eprintln!("OAuth2 access token expired, resetting.");
                 }
-                free_oauth2_access_token(sentrypeer_c_config);
+                unsafe { free_oauth2_access_token(sentrypeer_c_config) };
 
-                if json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event)
+                if unsafe { json_http_post_bad_actor_rs(sentrypeer_c_config, bad_actor_event) }
                     != libc::EXIT_SUCCESS
                 {
                     eprintln!("Failed to POST bad actor.");
@@ -366,8 +371,8 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
 mod tests {
     use super::*;
     use crate::{
-        bad_actor_destroy, bad_actor_new, http_daemon_init, http_daemon_stop,
-        sentrypeer_config_new, util_duplicate_string, PACKAGE_VERSION,
+        PACKAGE_VERSION, bad_actor_destroy, bad_actor_new, http_daemon_init, http_daemon_stop,
+        sentrypeer_config_new, util_duplicate_string,
     };
     use pretty_assertions::assert_str_eq;
     use reqwest::blocking::Client;

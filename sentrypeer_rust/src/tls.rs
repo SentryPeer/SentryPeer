@@ -13,7 +13,7 @@
 use crate::config::SentryPeerConfig;
 use crate::sip::{gen_sip_reply, log_sip_packet};
 use std::net::SocketAddr;
-use tokio::io::{split, AsyncReadExt};
+use tokio::io::{AsyncReadExt, split};
 use tokio::net::TcpStream;
 use tokio_rustls::TlsAcceptor;
 

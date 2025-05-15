@@ -88,7 +88,7 @@ impl BadActor {
 }
 
 /// Initialize a BadActor struct and return a pointer to it
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn return_bad_actor_new(
     sip_message: *const c_char,
     source_ip: *const c_char,
@@ -119,7 +119,7 @@ pub extern "C" fn return_bad_actor_new(
 /// the whole BadActor struct and its CString fields (from_raw).
 ///
 /// Destroy a BadActor struct
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn bad_actor_free(bad_actor: *mut BadActor) {
     if !bad_actor.is_null() {
         unsafe {
@@ -183,13 +183,13 @@ pub unsafe extern "C" fn bad_actor_free(bad_actor: *mut BadActor) {
 }
 
 /// The simplest function used to confirm that calling our Rust library from C is working
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn display_rust() {
     println!("Greetings from Rust");
 }
 
 /// Return libc::EXIT_SUCCESS or libc::EXIT_FAILURE depending on the function argument
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn return_exit_status(success: bool) -> i32 {
     if success {
         libc::EXIT_SUCCESS
@@ -204,7 +204,7 @@ pub extern "C" fn return_exit_status(success: bool) -> i32 {
 ///
 /// The caller is responsible for freeing the string. Generally, the caller
 /// from the C FFI side.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn return_string() -> *mut c_char {
     let string = CString::new("Greetings from Rust").unwrap();
     string.into_raw()
@@ -213,7 +213,7 @@ pub extern "C" fn return_string() -> *mut c_char {
 /// # Safety
 ///
 /// Free the string allocated by into_raw from return_string
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn free_string(ptr_s: *mut c_char) {
     unsafe {
         if ptr_s.is_null() {
@@ -227,7 +227,7 @@ pub unsafe extern "C" fn free_string(ptr_s: *mut c_char) {
 ///
 /// This function takes a function pointer as an argument and calls it, so we can pass them
 /// in from C and call it from Rust - a callback inside a thread or loop.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn callback_from_c(
     callback: extern "C" fn(bool) -> i32,
     success: bool,
