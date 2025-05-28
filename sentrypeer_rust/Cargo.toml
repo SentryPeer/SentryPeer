@@ -40,7 +40,7 @@ pretty_assertions = "1.4.1"
 serial_test = "3.2.0"
 
 [dependencies.uuid]
-version = "1.16.0"
+version = "1.17.0"
 features = [
     "v4",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
