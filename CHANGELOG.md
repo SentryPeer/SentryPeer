@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changes
 - Replace `jansson` with `serde_json` for JSON parsing/generation and switch to using Rust versions
 - Replace `libcurl` with `reqwest` for HTTP requests and switch to using Rust versions
+- `cargo clippy` warnings fixed
 - Upgrade to Rust 2024 edition
 
 ## [4.0.4] - 2025-03-17

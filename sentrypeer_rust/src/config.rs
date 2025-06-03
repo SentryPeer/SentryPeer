@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io;
-use std::io::{BufReader, ErrorKind};
+use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Copy, Clone)]
@@ -124,10 +124,8 @@ pub(crate) fn load_certs(path: &Path) -> io::Result<Vec<CertificateDer<'static>>
 }
 
 pub(crate) fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
-    private_key(&mut BufReader::new(File::open(path)?))?.ok_or(io::Error::new(
-        ErrorKind::Other,
-        "no private key found".to_string(),
-    ))
+    private_key(&mut BufReader::new(File::open(path)?))?
+        .ok_or(io::Error::other("no private key found".to_string()))
 }
 
 pub fn load_file(debug: bool, verbose: bool) -> Result<Config, confy::ConfyError> {

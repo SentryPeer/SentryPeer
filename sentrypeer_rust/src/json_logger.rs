@@ -136,7 +136,7 @@ pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
 
     let v: serde_json::Value = serde_json::from_str(json_str).unwrap();
 
-    let bad_actor_event = unsafe {
+    unsafe {
         bad_actor_new(
             CString::new(v["sip_message"].as_str().unwrap())
                 .unwrap()
@@ -166,9 +166,7 @@ pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
                 .unwrap()
                 .into_raw(),
         )
-    };
-
-    bad_actor_event
+    }
 }
 
 #[unsafe(no_mangle)]
