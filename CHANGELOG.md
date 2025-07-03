@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `libcurl` with `reqwest` for HTTP requests and switch to using Rust versions
 - `cargo clippy` warnings fixed
 - Upgrade to Rust 2024 edition
-- Dependencies updated to latest versions
+- Dependencies updated to the latest versions
 
 ## [4.0.4] - 2025-03-17
 
@@ -42,10 +42,10 @@ and [aports issue](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests
 - SIP TLS support, using [Rust](https://www.rust-lang.org/) and [Tokio-rustls](https://github.com/rustls/tokio-rustls) 
 - If no `cert.pem` or `key.pem` files are found, we automatically create them for you in the current working directory for a seemless start up experience
 - `-N` option to revert to old C way with `select()` for TCP and UDP
-- TCP, UDP now all powered by Rust and Tokio
+- TCP and UDP now all powered by Rust and Tokio
 - We now support TLS configuration loaded from config using [confy](https://crates.io/crates/confy)
 - If a cert or key file is not found using `-t` or `-k` options, SentryPeer will 
-  ask you if you'd like to create them - we use the very nice [rcgen](https://crates.io/crates/rcgen) for this
+  ask you if you'd like to create them—we use the very nice [rcgen](https://crates.io/crates/rcgen) for this
 - New `-z`, -t` and `-k` options for SIP TLS support
 - Command Line Interface (CLI) now powered by Rust using [clap-rs](https://github.com/clap-rs/clap)
 - Environment variables `SENTRYPEER_CERT`, `SENTRYPEER_KEY` and `SENTRYPEER_TLS_LISTEN_ADDRESS`

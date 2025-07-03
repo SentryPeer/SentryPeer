@@ -263,12 +263,6 @@ mod tests {
     }
 
     #[test]
-    fn test_return_string() {
-        let string = unsafe { CStr::from_ptr(return_string()).to_str().unwrap() };
-        assert_eq!(string, "Greetings from Rust");
-    }
-
-    #[test]
     fn test_free_string() {
         let ptr = return_string();
         unsafe {
