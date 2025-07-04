@@ -94,7 +94,7 @@ struct Args {
     #[arg(short = 'z', requires = "tls_cert_file", requires = "tls_key_file")]
     tls_listen_address: Option<String>,
 
-    /// Set the config file location or use SENTRYPEER_CONFIG_FILE env
+    /// Set config file location or use SENTRYPEER_CONFIG_FILE env
     #[arg(short = 'g')]
     config_file: Option<PathBuf>,
 

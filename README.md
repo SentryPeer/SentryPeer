@@ -687,7 +687,7 @@ Options:
   -t <TLS_CERT_FILE>           Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
   -k <TLS_KEY_FILE>            Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
   -z <TLS_LISTEN_ADDRESS>      Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
-  -g <CONFIG_FILE>             Set the config file location or use SENTRYPEER_CONFIG_FILE env
+  -g <CONFIG_FILE>             Set config file location or use SENTRYPEER_CONFIG_FILE env
   -s                           Enable syslog logging or use SENTRYPEER_SYSLOG env
   -v                           Enable verbose logging or use SENTRYPEER_VERBOSE env
   -d                           Enable debug mode or use SENTRYPEER_DEBUG env
