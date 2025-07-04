@@ -106,7 +106,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     let (stream, peer_addr) = tcp_listener.accept().await.unwrap();
 
                     if debug_mode || verbose_mode {
-                        eprintln!("Accepted TCP connection from: {}", peer_addr);
+                        eprintln!("Accepted TCP connection from: {peer_addr}");
                     }
 
                     tokio::spawn(async move {
@@ -226,7 +226,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     let acceptor = tls_acceptor.clone();
 
                     if debug_mode || verbose_mode {
-                        eprintln!("Accepted TLS connection from: {}", peer_addr);
+                        eprintln!("Accepted TLS connection from: {peer_addr}");
                     }
 
                     tokio::spawn(async move {
@@ -249,7 +249,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
             match rx.await {
                 Ok(msg) => {
                     if debug_mode || verbose_mode {
-                        eprintln!("Tokio received a oneshot message to shutdown: {:?}", msg);
+                        eprintln!("Tokio received a oneshot message to shutdown: {msg:?}");
                     }
                     // https://docs.rs/tokio/latest/tokio/runtime/struct.Runtime.html#method.shutdown_background
                     rt.shutdown_background();

@@ -131,7 +131,7 @@ pub(crate) unsafe extern "C" fn json_to_bad_actor_rs(
 
     let json_str = unsafe { CStr::from_ptr(json_to_convert).to_str().unwrap() };
     if debug_mode || verbose_mode {
-        eprintln!("JSON to convert to a bad_actor: {:?}", json_str);
+        eprintln!("JSON to convert to a bad_actor: {json_str:?}");
     }
 
     let v: serde_json::Value = serde_json::from_str(json_str).unwrap();
@@ -190,18 +190,18 @@ pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
     {
         Ok(f) => f,
         Err(e) => {
-            eprintln!("Could not open JSON log file: {}", e);
+            eprintln!("Could not open JSON log file: {e}");
             return libc::EXIT_FAILURE;
         }
     };
 
     let mut buf = BufWriter::new(json_log_file);
-    let json_str = format!("{}\n", json_str);
+    let json_str = format!("{json_str}\n");
 
     match buf.write_all(json_str.as_bytes()) {
         Ok(_) => (),
         Err(e) => {
-            eprintln!("Error writing to JSON log file: {}", e);
+            eprintln!("Error writing to JSON log file: {e}");
             return libc::EXIT_FAILURE;
         }
     }
@@ -254,7 +254,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
             });
 
             if debug_mode || verbose_mode {
-                eprintln!("Client credentials in JSON format: {}", json_client_creds);
+                eprintln!("Client credentials in JSON format: {json_client_creds}");
             }
 
             // Send the request to get the access token
@@ -286,7 +286,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                 .expect("access_token is not a string");
 
             if debug_mode || verbose_mode {
-                eprintln!("Got access_token: {:?}", access_token);
+                eprintln!("Got access_token: {access_token:?}");
             }
 
             let access_token_c_str =
@@ -316,7 +316,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
         let client = reqwest::blocking::Client::new();
         let res = client
             .post(url_str)
-            .header("Authorization", format!("Bearer {}", access_token_str))
+            .header("Authorization", format!("Bearer {access_token_str}"))
             .header("Content-Type", "application/json")
             .body(json_str.to_string())
             .send()

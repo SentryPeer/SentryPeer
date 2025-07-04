@@ -131,7 +131,7 @@ pub(crate) fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
 pub fn load_file(debug: bool, verbose: bool) -> Result<Config, confy::ConfyError> {
     if debug || verbose {
         let config_file_location = get_configuration_file_path("sentrypeer", None)?;
-        println!("Loading config file from: {:?}", config_file_location);
+        println!("Loading config file from: {config_file_location:?}");
     }
 
     let cfg = confy::load("sentrypeer", None)?;
@@ -153,7 +153,7 @@ pub fn create_tls_cert_and_key() -> i32 {
                 libc::EXIT_SUCCESS
             }
             Err(e) => {
-                eprintln!("Failed to create TLS cert and key: {}", e);
+                eprintln!("Failed to create TLS cert and key: {e}");
                 libc::EXIT_FAILURE
             }
         };

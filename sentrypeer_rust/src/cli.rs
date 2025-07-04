@@ -202,7 +202,7 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
             let tls_cert_file = args.tls_cert_file.unwrap();
 
             if !tls_cert_file.exists() {
-                eprintln!("TLS cert file does not exist: {:?}", tls_cert_file);
+                eprintln!("TLS cert file does not exist: {tls_cert_file:?}");
                 create_tls_cert_and_key();
             }
 
@@ -216,7 +216,7 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
             let tls_key_file = args.tls_key_file.unwrap();
 
             if !tls_key_file.exists() {
-                eprintln!("TLS key file does not exist: {:?}", tls_key_file);
+                eprintln!("TLS key file does not exist: {tls_key_file:?}");
                 return libc::EXIT_FAILURE;
             }
 

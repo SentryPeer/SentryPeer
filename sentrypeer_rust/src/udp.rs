@@ -29,7 +29,7 @@ pub async fn handle_udp_connection(
     let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
 
     if debug_mode || verbose_mode {
-        eprintln!("Received UDP packet from: {}", peer_addr);
+        eprintln!("Received UDP packet from: {peer_addr}");
     }
 
     if log_sip_packet(
