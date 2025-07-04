@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `cargo clippy` warnings fixed
 - Upgrade to Rust 2024 edition
 - Dependencies updated to the latest versions
+- Apply `cargo clippy` suggestions
 
 ## [4.0.4] - 2025-03-17
 
