@@ -94,6 +94,10 @@ struct Args {
     #[arg(short = 'z', requires = "tls_cert_file", requires = "tls_key_file")]
     tls_listen_address: Option<String>,
 
+    /// Set the config file location or use SENTRYPEER_CONFIG_FILE env
+    #[arg(short = 'g')]
+    config_file: Option<PathBuf>,
+
     /// Enable syslog logging or use SENTRYPEER_SYSLOG env
     #[arg(short)]
     syslog: bool,
@@ -232,6 +236,13 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
                 CString::new(tls_listen_address).expect("CString::new failed");
             (*sentrypeer_c_config).tls_listen_address =
                 util_duplicate_string(tls_listen_address_c_str.as_ptr());
+        }
+
+        if args.config_file.is_some() {
+            let config_file = args.config_file.unwrap();
+            let config_file_c_str =
+                CString::new(config_file.to_str().unwrap()).expect("CString::new failed");
+            (*sentrypeer_c_config).config_file = util_duplicate_string(config_file_c_str.as_ptr());
         }
 
         libc::EXIT_SUCCESS

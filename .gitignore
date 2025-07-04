@@ -123,6 +123,7 @@ sentrypeer_json.log
 sentrypeer_rust/target/
 sentrypeer_rust/coverage/
 sentrypeer_rust/lcov.info
+sentrypeer_rust/non_existent_file.toml
 
 # Other tools
 clang_output*

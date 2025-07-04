@@ -108,13 +108,15 @@ pub fn load_all_configs(
 ) -> Result<Config, Box<dyn std::error::Error>> {
     let debug_mode = unsafe { (*sentrypeer_config.p).debug_mode };
     let verbose_mode = unsafe { (*sentrypeer_config.p).verbose_mode };
+    let config_file = get_config_file_path(sentrypeer_config)?;
 
     // Our Configuration file is loaded first, with defaults
-    let mut config = load_file(debug_mode, verbose_mode).expect("Failed to load config file");
+    let mut config =
+        load_file(debug_mode, verbose_mode, config_file).expect("Failed to load config file");
     // Then our env
-    config = config_from_env(config).unwrap();
+    config = config_from_env(config)?;
     // Then our CLI args
-    config = config_from_cli(config, sentrypeer_config.p).unwrap();
+    config = config_from_cli(config, sentrypeer_config.p)?;
 
     Ok(config)
 }
@@ -128,14 +130,44 @@ pub(crate) fn load_key(path: &Path) -> io::Result<PrivateKeyDer<'static>> {
         .ok_or(io::Error::other("no private key found".to_string()))
 }
 
-pub fn load_file(debug: bool, verbose: bool) -> Result<Config, confy::ConfyError> {
-    if debug || verbose {
-        let config_file_location = get_configuration_file_path("sentrypeer", None)?;
-        println!("Loading config file from: {config_file_location:?}");
-    }
+pub fn get_config_file_path(
+    sentrypeer_config: SentryPeerConfig,
+) -> Result<PathBuf, confy::ConfyError> {
+    // If no config file is provided on the cli, we check the env or use the default
+    let config_file: PathBuf = if unsafe { (*sentrypeer_config.p).config_file.is_null() } {
+        std::env::var("SENTRYPEER_CONFIG_FILE")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| {
+                get_configuration_file_path("sentrypeer", None)
+                    .expect("Failed to load default config file")
+            })
+    } else {
+        // If a config file is provided on the cli, we use that or the default if it fails
+        // to load
+        unsafe {
+            CStr::from_ptr((*sentrypeer_config.p).config_file)
+                .to_str()
+                .map(PathBuf::from)
+                .unwrap_or_else(|_| {
+                    get_configuration_file_path("sentrypeer", None)
+                        .expect("Failed to load default config file")
+                })
+        }
+    };
 
-    let cfg = confy::load("sentrypeer", None)?;
-    Ok(cfg)
+    Ok(config_file)
+}
+
+pub fn load_file(
+    debug: bool,
+    verbose: bool,
+    config_file: PathBuf,
+) -> Result<Config, confy::ConfyError> {
+    // then env
+    if debug || verbose {
+        eprintln!("Loading config file: {config_file:?}");
+    }
+    confy::load_path(config_file)
 }
 
 /// Ask to create a new TLS cert and key using rcgen
@@ -143,7 +175,7 @@ pub fn create_tls_cert_and_key() -> i32 {
     // Prompt Y/N
     let mut input = String::new();
     println!("Would you like to create a new TLS cert and key? [Y/n]");
-    std::io::stdin().read_line(&mut input).unwrap();
+    io::stdin().read_line(&mut input).unwrap();
     let input = input.trim().to_lowercase();
 
     if input == "y" || input == "yes" {
@@ -181,6 +213,7 @@ pub fn create_certs() -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{sentrypeer_config_destroy, sentrypeer_config_new};
     use serial_test::serial;
     use std::path::PathBuf;
 
@@ -231,7 +264,8 @@ mod tests {
     fn test_load_file() {
         setup_config_file();
 
-        let cfg: Config = load_file(true, false).unwrap();
+        let config_file = PathBuf::from("./tests/custom_config.toml");
+        let cfg: Config = load_file(true, false, config_file).unwrap();
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
         assert_eq!(cfg.key, PathBuf::from("key.pem"));
         assert_eq!(cfg.tls_listen_address, "0.0.0.0:5061");
@@ -240,7 +274,8 @@ mod tests {
     #[test]
     #[serial]
     fn test_load_file_error() {
-        let cfg: Result<Config, confy::ConfyError> = load_file(true, false);
+        let cfg: Result<Config, confy::ConfyError> =
+            load_file(true, false, PathBuf::from("non_existent_file.toml"));
         assert!(cfg.is_ok());
     }
 
@@ -249,7 +284,8 @@ mod tests {
     fn test_load_file_and_save() {
         setup_config_file();
 
-        let cfg: Config = load_file(true, false).unwrap();
+        let config_file = PathBuf::from("./tests/custom_config.toml");
+        let cfg: Config = load_file(true, false, config_file).unwrap();
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
         assert_eq!(cfg.key, PathBuf::from("key.pem"));
         assert_eq!(cfg.tls_listen_address, "0.0.0.0:5061");
@@ -262,5 +298,21 @@ mod tests {
 
         // Reset to original
         setup_config_file();
+    }
+
+    #[test]
+    #[serial]
+    fn test_get_config_file_path() {
+        let mut sentrypeer_c_config = unsafe { sentrypeer_config_new() };
+
+        let sentrypeer_config = SentryPeerConfig {
+            p: Box::into_raw(Box::new(unsafe { *sentrypeer_c_config })),
+        };
+        let config_file_path = get_config_file_path(sentrypeer_config).unwrap();
+
+        eprintln!("test_get_config_file_path: config file is {config_file_path:?}");
+        assert_ne!(config_file_path, PathBuf::from("./sentrypeer.toml"));
+
+        unsafe { sentrypeer_config_destroy(&mut sentrypeer_c_config) };
     }
 }

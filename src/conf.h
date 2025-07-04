@@ -72,6 +72,7 @@ struct sentrypeer_config {
 	char *tls_cert_file;
 	char *tls_key_file;
 	char *tls_listen_address;
+	char *config_file;
 #endif
 };
 

@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+- Config file location configurable via `-g` flag and `SENTRYPEER_CONFIG_FILE` 
+  environment variable, defaulting to OS dependent locations 
+
 ### Changes
 - Replace `jansson` with `serde_json` for JSON parsing/generation and switch to using Rust versions
 - Replace `libcurl` with `reqwest` for HTTP requests and switch to using Rust versions

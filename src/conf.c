@@ -107,6 +107,7 @@ sentrypeer_config *sentrypeer_config_new(void)
 	self->tls_cert_file = 0;
 	self->tls_key_file = 0;
 	self->tls_listen_address = 0;
+	self->config_file = 0;
 #endif
 
 	return self;
@@ -182,6 +183,11 @@ void sentrypeer_config_destroy(sentrypeer_config **self_ptr)
 		if (self->tls_listen_address != 0) {
 			free(self->tls_listen_address);
 			self->tls_listen_address = 0;
+		}
+
+		if (self->config_file != 0) {
+			free(self->config_file);
+			self->config_file = 0;
 		}
 #endif
 
