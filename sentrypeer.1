@@ -1,4 +1,4 @@
-.TH SentryPeer 1 "December 2024" "SentryPeer"
+.TH SentryPeer 1 "July 2025" "SentryPeer"
 .SH NAME
 sentrypeer \- A distributed list of bad IP addresses and phone numbers collected via a SIP Honeypot
 
@@ -62,6 +62,9 @@ Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
 .TP
 \fB-z <TLS_LISTEN_ADDRESS>      
 Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+.TP
+\fB-g <CONFIG_FILE>
+Set the config file location or use SENTRYPEER_CONFIG_FILE env
 .TP
 \fB-s                           
 Enable syslog logging or use SENTRYPEER_SYSLOG env

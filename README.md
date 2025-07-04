@@ -230,6 +230,7 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
 
 #### Environment Variables
 
+    ENV SENTRYPEER_CONFIG_FILE=/my/location/sentrypeer.toml
     ENV SENTRYPEER_DB_FILE=/my/location/sentrypeer.db
     ENV SENTRYPEER_API=1
     ENV SENTRYPEER_WEBHOOK=1
@@ -249,9 +250,15 @@ Then you can check at `http://localhost:8082/ip-addresses` and `http://localhost
     ENV SENTRYPEER_KEY=/my/location/sentrypeer-key.pem
     ENV SENTRYPEER_TLS_LISTEN_ADDRESS=0.0.0.0:5061
 
-Either set these in the Dockerfile or in your `Dockerfile.env` file or docker run command.
+Either set these in the Dockerfile or in your `Dockerfile.env` file or `docker run` command.
 
 Settings any of these to `0` will also _enable_ the feature. We _don't care_ what you set it to, just that it's set.
+
+#### Configuration File
+
+You can also use a configuration file to set certain things. Mainly the TLS configuration
+below. The default location is `~/.config/sentrypeer/default-config.toml`, but can 
+change this with the `SENTRYPEER_CONFIG_FILE` environment variable or `-g` cli option.
 
 #### TLS Configuration
 
@@ -265,7 +272,7 @@ key = "tests/unit_tests/127.0.0.1-key.pem"
 tls_listen_address = "0.0.0.0:5061"
 ```
 
-If you don't set these, a certifcate for localhost will be automatically 
+If you don't set these, a certificate for localhost will be automatically 
 generated in the directory that sentrypeer is run from creating a `cert.pem` and
 a `key.pem` file.
 
@@ -680,6 +687,7 @@ Options:
   -t <TLS_CERT_FILE>           Set TLS cert location (default './cert.pem') or use SENTRYPEER_CERT env
   -k <TLS_KEY_FILE>            Set TLS key location (default './key.pem') or use SENTRYPEER_KEY env
   -z <TLS_LISTEN_ADDRESS>      Set TLS listen address (default '0.0.0.0:5061') or use SENTRYPEER_TLS_LISTEN_ADDRESS env
+  -g <CONFIG_FILE>             Set the config file location or use SENTRYPEER_CONFIG_FILE env
   -s                           Enable syslog logging or use SENTRYPEER_SYSLOG env
   -v                           Enable verbose logging or use SENTRYPEER_VERBOSE env
   -d                           Enable debug mode or use SENTRYPEER_DEBUG env
