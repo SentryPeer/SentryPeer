@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade to Rust 2024 edition
 - Dependencies updated to the latest versions
 - Apply `cargo clippy` suggestions
+- Update breaking changes `rcgen` API
 
 ## [4.0.4] - 2025-03-17
 
