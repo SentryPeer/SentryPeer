@@ -201,11 +201,11 @@ pub fn create_tls_cert_and_key() -> i32 {
 
 // Create a new TLS cert and key usng rcgen
 pub fn create_certs() -> io::Result<()> {
-    let CertifiedKey { cert, key_pair } =
+    let CertifiedKey { cert, signing_key } =
         generate_simple_self_signed(vec!["localhost".to_string()]).expect("Failed to create cert");
 
     std::fs::write("cert.pem", cert.pem())?;
-    std::fs::write("key.pem", key_pair.serialize_pem())?;
+    std::fs::write("key.pem", signing_key.serialize_pem())?;
 
     Ok(())
 }
