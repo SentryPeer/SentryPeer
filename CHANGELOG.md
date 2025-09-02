@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependencies updated to the latest versions
 - Apply `cargo clippy` suggestions
 - Update breaking changes `rcgen` API
+- Only check major version output in our cli integration test
 
 ## [4.0.4] - 2025-03-17
 
