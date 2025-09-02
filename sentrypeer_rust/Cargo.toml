@@ -48,7 +48,7 @@ features = [
 ]
 
 [build-dependencies]
-bindgen = "0.72.0"
+bindgen = "0.72.1"
 cbindgen = "0.29.0"
 
 [lib]
