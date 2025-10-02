@@ -121,15 +121,28 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
     argv: *mut *mut c_char,
 ) -> i32 {
     unsafe {
+        match parse_args(sentrypeer_c_config, argc, argv) {
+            Ok(()) => libc::EXIT_SUCCESS,
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                libc::EXIT_FAILURE
+            }
+        }
+    }
+}
+
+unsafe fn parse_args(
+    sentrypeer_c_config: *mut sentrypeer_config,
+    argc: usize,
+    argv: *mut *mut c_char,
+) -> Result<(), Box<dyn std::error::Error>> {
+    unsafe {
         // Convert argc and argv from C to Vec(&str)
+
         let args_from_c = std::slice::from_raw_parts(argv, argc)
             .iter()
-            .map(|&arg| {
-                CStr::from_ptr(arg)
-                    .to_str()
-                    .expect("Failed to convert CStr to str for command line argument processing.")
-            })
-            .collect::<Vec<&str>>();
+            .map(|&arg| CStr::from_ptr(arg).to_str())
+            .collect::<Result<Vec<&str>, _>>()?;
 
         let args = Args::parse_from(args_from_c);
 
@@ -151,9 +164,10 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
 
         // Set strings that will be freed on the C side
         if args.db_file.is_some() {
-            let db_file = args.db_file.unwrap();
-            let db_file_c_str =
-                CString::new(db_file.to_str().unwrap()).expect("CString::new failed");
+            // https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html talks about
+            // ok_or()
+            let db_file = args.db_file.ok_or("db_file is required.")?;
+            let db_file_c_str = CString::new(db_file.to_str().ok_or("db_file is invalid.")?)?;
             (*sentrypeer_c_config).db_file = util_duplicate_string(db_file_c_str.as_ptr());
         }
 
@@ -161,17 +175,17 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
             (*sentrypeer_c_config).json_log_mode = true;
 
             if args.json_log_file.is_some() {
-                let json_log_file = args.json_log_file.unwrap();
+                let json_log_file = args.json_log_file.ok_or("json_log_file is required.")?;
                 let json_log_file_c_str =
-                    CString::new(json_log_file.to_str().unwrap()).expect("CString::new failed");
+                    CString::new(json_log_file.to_str().ok_or("json_log_file is invalid.")?)?;
                 (*sentrypeer_c_config).json_log_file =
                     util_duplicate_string(json_log_file_c_str.as_ptr());
             }
         }
 
         if args.bootstrap.is_some() {
-            let bootstrap = args.bootstrap.unwrap();
-            let bootstrap_c_str = CString::new(bootstrap).expect("CString::new failed");
+            let bootstrap = args.bootstrap.ok_or("bootstrap node is required.")?;
+            let bootstrap_c_str = CString::new(bootstrap)?;
             (*sentrypeer_c_config).p2p_bootstrap_node =
                 util_duplicate_string(bootstrap_c_str.as_ptr());
         }
@@ -179,8 +193,8 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
         if args.client_id.is_some() {
             (*sentrypeer_c_config).oauth2_mode = true;
 
-            let client_id = args.client_id.unwrap();
-            let client_id_c_str = CString::new(client_id).expect("CString::new failed");
+            let client_id = args.client_id.ok_or("client_id is required.")?;
+            let client_id_c_str = CString::new(client_id)?;
             (*sentrypeer_c_config).oauth2_client_id =
                 util_duplicate_string(client_id_c_str.as_ptr());
         }
@@ -188,8 +202,8 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
         if args.client_secret.is_some() {
             (*sentrypeer_c_config).oauth2_mode = true;
 
-            let client_secret = args.client_secret.unwrap();
-            let client_secret_c_str = CString::new(client_secret).expect("CString::new failed");
+            let client_secret = args.client_secret.ok_or("client secret is required.")?;
+            let client_secret_c_str = CString::new(client_secret)?;
             (*sentrypeer_c_config).oauth2_client_secret =
                 util_duplicate_string(client_secret_c_str.as_ptr());
         }
@@ -197,13 +211,13 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
         if args.webhook_url.is_some() {
             (*sentrypeer_c_config).webhook_mode = true;
 
-            let webhook_url = args.webhook_url.unwrap();
-            let webhook_url_c_str = CString::new(webhook_url).expect("CString::new failed");
+            let webhook_url = args.webhook_url.ok_or("webhook URL is required.")?;
+            let webhook_url_c_str = CString::new(webhook_url)?;
             (*sentrypeer_c_config).webhook_url = util_duplicate_string(webhook_url_c_str.as_ptr());
         }
 
         if args.tls_cert_file.is_some() {
-            let tls_cert_file = args.tls_cert_file.unwrap();
+            let tls_cert_file = args.tls_cert_file.ok_or("tls_cert_file is required.")?;
 
             if !tls_cert_file.exists() {
                 eprintln!("TLS cert file does not exist: {tls_cert_file:?}");
@@ -211,40 +225,41 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
             }
 
             let tls_cert_file_c_str =
-                CString::new(tls_cert_file.to_str().unwrap()).expect("CString::new failed");
+                CString::new(tls_cert_file.to_str().ok_or("tls_cert_file is invalid.")?)?;
             (*sentrypeer_c_config).tls_cert_file =
                 util_duplicate_string(tls_cert_file_c_str.as_ptr());
         }
 
         if args.tls_key_file.is_some() {
-            let tls_key_file = args.tls_key_file.unwrap();
+            let tls_key_file = args.tls_key_file.ok_or("tls_key_file is required.")?;
 
             if !tls_key_file.exists() {
                 eprintln!("TLS key file does not exist: {tls_key_file:?}");
-                return libc::EXIT_FAILURE;
+                Err("TLS key file does not exist")?;
             }
 
             let tls_key_file_c_str =
-                CString::new(tls_key_file.to_str().unwrap()).expect("CString::new failed");
+                CString::new(tls_key_file.to_str().ok_or("tls_key_file is invalid.")?)?;
             (*sentrypeer_c_config).tls_key_file =
                 util_duplicate_string(tls_key_file_c_str.as_ptr());
         }
 
         if args.tls_listen_address.is_some() {
-            let tls_listen_address = args.tls_listen_address.unwrap();
-            let tls_listen_address_c_str =
-                CString::new(tls_listen_address).expect("CString::new failed");
+            let tls_listen_address = args
+                .tls_listen_address
+                .ok_or("tls_listen_address is required.")?;
+            let tls_listen_address_c_str = CString::new(tls_listen_address)?;
             (*sentrypeer_c_config).tls_listen_address =
                 util_duplicate_string(tls_listen_address_c_str.as_ptr());
         }
 
         if args.config_file.is_some() {
-            let config_file = args.config_file.unwrap();
+            let config_file = args.config_file.ok_or("config_file is required.")?;
             let config_file_c_str =
-                CString::new(config_file.to_str().unwrap()).expect("CString::new failed");
+                CString::new(config_file.to_str().ok_or("config_file is invalid.")?)?;
             (*sentrypeer_c_config).config_file = util_duplicate_string(config_file_c_str.as_ptr());
         }
-
-        libc::EXIT_SUCCESS
     }
+
+    Ok(())
 }
