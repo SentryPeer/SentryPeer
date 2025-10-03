@@ -49,12 +49,24 @@ pub struct Config {
 
 pub(crate) fn config_from_env(config: Config) -> Result<Config, Box<dyn std::error::Error>> {
     // Try to load SENTRYPEER_CERT, SENTRYPEER_KEY and SENTRYPEER_TLS_LISTEN_ADDRESS from our env
-    let cert = std::env::var("SENTRYPEER_CERT")
-        .unwrap_or_else(|_| config.cert.into_os_string().into_string().unwrap());
-    let key = std::env::var("SENTRYPEER_KEY")
-        .unwrap_or_else(|_| config.key.into_os_string().into_string().unwrap());
+    let cert = std::env::var("SENTRYPEER_CERT").or_else(|_| {
+        config
+            .cert
+            .into_os_string()
+            .into_string()
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{:?}", e)))
+    })?;
+
+    let key = std::env::var("SENTRYPEER_KEY").or_else(|_| {
+        config
+            .key
+            .into_os_string()
+            .into_string()
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{:?}", e)))
+    })?;
     let tls_listen_address = std::env::var("SENTRYPEER_TLS_LISTEN_ADDRESS")
-        .unwrap_or_else(|_| config.tls_listen_address.clone());
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))
+        .or_else(|_| Ok::<String, io::Error>(config.tls_listen_address.clone()))?;
 
     let config = Config {
         cert: PathBuf::from(cert),
@@ -74,22 +86,11 @@ pub(crate) fn config_from_cli(
         return Ok(config);
     }
 
-    let tls_cert_file = unsafe {
-        CStr::from_ptr((*sentrypeer_c_config).tls_cert_file)
-            .to_str()
-            .unwrap()
-    };
-    let tls_key_file = unsafe {
-        CStr::from_ptr((*sentrypeer_c_config).tls_key_file)
-            .to_str()
-            .unwrap()
-    };
+    let tls_cert_file = unsafe { CStr::from_ptr((*sentrypeer_c_config).tls_cert_file).to_str()? };
+    let tls_key_file = unsafe { CStr::from_ptr((*sentrypeer_c_config).tls_key_file).to_str()? };
 
-    let tls_listen_address = unsafe {
-        CStr::from_ptr((*sentrypeer_c_config).tls_listen_address)
-            .to_str()
-            .unwrap()
-    };
+    let tls_listen_address =
+        unsafe { CStr::from_ptr((*sentrypeer_c_config).tls_listen_address).to_str()? };
 
     let cert = PathBuf::from(tls_cert_file);
     let key = PathBuf::from(tls_key_file);
@@ -137,10 +138,7 @@ pub fn get_config_file_path(
     let config_file: PathBuf = if unsafe { (*sentrypeer_config.p).config_file.is_null() } {
         std::env::var("SENTRYPEER_CONFIG_FILE")
             .map(PathBuf::from)
-            .unwrap_or_else(|_| {
-                get_configuration_file_path("sentrypeer", None)
-                    .expect("Failed to load default config file")
-            })
+            .or_else(|_| get_configuration_file_path("sentrypeer", None))?
     } else {
         // If a config file is provided on the cli, we use that or the default if it fails
         // to load
@@ -148,10 +146,7 @@ pub fn get_config_file_path(
             CStr::from_ptr((*sentrypeer_config.p).config_file)
                 .to_str()
                 .map(PathBuf::from)
-                .unwrap_or_else(|_| {
-                    get_configuration_file_path("sentrypeer", None)
-                        .expect("Failed to load default config file")
-                })
+                .or_else(|_| get_configuration_file_path("sentrypeer", None))?
         }
     };
 
@@ -171,22 +166,22 @@ pub fn load_file(
 }
 
 /// Ask to create a new TLS cert and key using rcgen
-pub fn create_tls_cert_and_key() -> i32 {
+pub fn create_tls_cert_and_key() -> Result<(), Box<dyn std::error::Error>> {
     // Prompt Y/N
     let mut input = String::new();
     println!("Would you like to create a new TLS cert and key? [Y/n]");
-    io::stdin().read_line(&mut input).unwrap();
+    io::stdin().read_line(&mut input)?;
     let input = input.trim().to_lowercase();
 
     if input == "y" || input == "yes" {
         return match create_certs() {
             Ok(_) => {
                 println!("cert.pem and key.pem created successfully");
-                libc::EXIT_SUCCESS
+                Ok(())
             }
             Err(e) => {
                 eprintln!("Failed to create TLS cert and key: {e}");
-                libc::EXIT_FAILURE
+                Err(Box::new(e))
             }
         };
     };
@@ -196,7 +191,7 @@ pub fn create_tls_cert_and_key() -> i32 {
     } else {
         println!("Invalid input.");
     }
-    libc::EXIT_SUCCESS
+    Ok(())
 }
 
 // Create a new TLS cert and key usng rcgen

@@ -124,7 +124,7 @@ pub(crate) unsafe extern "C" fn process_cli_rs(
         match parse_args(sentrypeer_c_config, argc, argv) {
             Ok(()) => libc::EXIT_SUCCESS,
             Err(err) => {
-                eprintln!("Error: {}", err);
+                eprintln!("Error: {err}");
                 libc::EXIT_FAILURE
             }
         }
@@ -221,7 +221,13 @@ unsafe fn parse_args(
 
             if !tls_cert_file.exists() {
                 eprintln!("TLS cert file does not exist: {tls_cert_file:?}");
-                create_tls_cert_and_key();
+                match create_tls_cert_and_key() {
+                    Ok(_) => {}
+                    Err(err) => {
+                        eprintln!("Error creating TLS cert and key: {err}");
+                        Err("Error creating TLS cert and key")?;
+                    }
+                }
             }
 
             let tls_cert_file_c_str =

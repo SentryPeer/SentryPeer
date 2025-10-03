@@ -110,10 +110,14 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     }
 
                     tokio::spawn(async move {
-                        if handle_tcp_connection(stream, sentrypeer_config, peer_addr, addr).await
-                            != libc::EXIT_SUCCESS
+                        match handle_tcp_connection(stream, sentrypeer_config, peer_addr, addr)
+                            .await
                         {
-                            eprintln!("Failed to handle TCP connection");
+                            Ok(()) => libc::EXIT_SUCCESS,
+                            Err(err) => {
+                                eprintln!("Failed to handle TCP connection: {err}");
+                                libc::EXIT_FAILURE
+                            }
                         }
                     });
                 }
@@ -157,7 +161,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     // this functionality can be achieved by instead wrapping the socket
                     // in an [Arc]
                     tokio::spawn(async move {
-                        if handle_udp_connection(
+                        match handle_udp_connection(
                             peer_addr,
                             &mut buf,
                             bytes_read,
@@ -166,9 +170,12 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                             addr,
                         )
                         .await
-                            != libc::EXIT_SUCCESS
                         {
-                            eprintln!("Failed to handle UDP connection");
+                            Ok(()) => libc::EXIT_SUCCESS,
+                            Err(err) => {
+                                eprintln!("Failed to handle UDP connection: {err}");
+                                libc::EXIT_FAILURE
+                            }
                         }
                     });
                 }
@@ -183,7 +190,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                 .ok_or_else(|| io::Error::from(io::ErrorKind::AddrNotAvailable))
                 .unwrap();
 
-            // if certs doesn't exist, create our default ones
+            // if certs don't exist, create our default ones
             if !config.cert.exists() || !config.key.exists() {
                 if debug_mode || verbose_mode {
                     eprintln!(
@@ -230,7 +237,7 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                     }
 
                     tokio::spawn(async move {
-                        if handle_tls_connection(
+                        match handle_tls_connection(
                             stream,
                             acceptor,
                             sentrypeer_config,
@@ -238,9 +245,12 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
                             addr,
                         )
                         .await
-                            != libc::EXIT_SUCCESS
                         {
-                            eprintln!("Failed to handle TLS connection");
+                            Ok(()) => libc::EXIT_SUCCESS,
+                            Err(err) => {
+                                eprintln!("Failed to handle TLS connection: {err}");
+                                libc::EXIT_FAILURE
+                            }
                         }
                     });
                 }

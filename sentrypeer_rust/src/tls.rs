@@ -23,12 +23,12 @@ pub async fn handle_tls_connection(
     sentrypeer_config: SentryPeerConfig,
     peer_addr: SocketAddr,
     addr: SocketAddr,
-) -> i32 {
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut buf = [0; 1024];
-    let tls_stream = acceptor.accept(stream).await.unwrap();
+    let tls_stream = acceptor.accept(stream).await?;
 
     let (mut reader, writer) = split(tls_stream);
-    let bytes_read = reader.read(&mut buf).await.unwrap();
+    let bytes_read = reader.read(&mut buf).await?;
     let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
     let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
@@ -56,5 +56,5 @@ pub async fn handle_tls_connection(
         gen_sip_reply(writer).await;
     }
 
-    libc::EXIT_SUCCESS
+    Ok(())
 }

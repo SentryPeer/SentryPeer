@@ -23,7 +23,7 @@ pub async fn handle_udp_connection(
     udp_socket: Arc<UdpSocket>,
     sentrypeer_config: SentryPeerConfig,
     addr: SocketAddr,
-) -> i32 {
+) -> Result<(), Box<dyn std::error::Error>> {
     let debug_mode = (unsafe { *sentrypeer_config.p }).debug_mode;
     let verbose_mode = (unsafe { *sentrypeer_config.p }).verbose_mode;
     let sip_responsive_mode = (unsafe { *sentrypeer_config.p }).sip_responsive_mode;
@@ -52,8 +52,8 @@ pub async fn handle_udp_connection(
     }
 
     if sip_responsive_mode {
-        udp_socket.send_to(SIP_PACKET, peer_addr).await.unwrap();
+        udp_socket.send_to(SIP_PACKET, peer_addr).await?;
     }
 
-    libc::EXIT_SUCCESS
+    Ok(())
 }
