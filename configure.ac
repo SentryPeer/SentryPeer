@@ -30,6 +30,7 @@ AC_CONFIG_MACRO_DIRS([m4])
 AM_PROG_AR
 LT_INIT
 
+AC_PROG_AR
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
@@ -37,6 +38,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Check for libraries.
 PKG_CHECK_MODULES(libosip2, libosip2 >= 5.0, [], [
@@ -80,19 +82,18 @@ AC_SEARCH_LIBS(ceil, m, [], [
 ])
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
+AC_CHECK_HEADERS([arpa/inet.h inttypes.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h unistd.h signal.h pthread.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
+AC_TYPE_INT32_T
 AC_TYPE_INT64_T
 AC_TYPE_SIZE_T
 AC_TYPE_UINT32_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_FUNC_STRNLEN
-AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strncasecmp strndup atexit bzero])
+AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strerror strncasecmp strndup atexit bzero])
 
 # https://github.com/stedolan/jq/blob/master/configure.ac#L129
 # Find pthread, if we have it. We do this first because we may set -pthread on CFLAGS

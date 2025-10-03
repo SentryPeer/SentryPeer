@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Apply `cargo clippy` suggestions
 - Update breaking changes `rcgen` API
 - Only check major version output in our cli integration test
+- Removed unneeded `AC_FUNC_MALLOC` and `AC_FUNC_REALLOC` from `configure.ac`
+- Run `autoscan` to update missing checks from `configure.ac` 
 
 ## [4.0.4] - 2025-03-17
 
