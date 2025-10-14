@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only check major version output in our cli integration test
 - Run `autoscan` to update missing checks from `configure.ac` 
 - Don't use `rust-lld` due to https://github.com/rust-lang/rust/issues/147329
+- Add clippy lint checks to Cargo.toml to catch and `unwrap()` or `expect()` usage
 
 ## [4.0.4] - 2025-03-17
 
