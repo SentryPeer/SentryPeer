@@ -49,7 +49,7 @@ features = [
 
 [build-dependencies]
 bindgen = "0.72.1"
-cbindgen = "0.29.0"
+cbindgen = "0.29.2"
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
