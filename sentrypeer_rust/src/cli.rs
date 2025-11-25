@@ -55,7 +55,7 @@ struct Args {
     api: bool,
 
     /// Set WebHook URL for bad actor json POSTs or use SENTRYPEER_WEBHOOK_URL env
-    #[arg(short, requires = "client_id", requires = "client_secret")]
+    #[arg(short)]
     webhook_url: Option<String>,
 
     /// Enable SIP responsive mode or use SENTRYPEER_SIP_RESPONSIVE env

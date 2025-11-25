@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixes
+- Removed the requirement of supplying `client_id` and `client_secret` on the 
+command line if the `webook_url` option of `-w` is passed. See [#274](https://github.com/SentryPeer/SentryPeer/issues/274) 
+Thanks for reporting @szenzero
+
 ### Added
 - Config file location configurable via `-g` flag and `SENTRYPEER_CONFIG_FILE` 
   environment variable, defaulting to OS dependent locations 
