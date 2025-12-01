@@ -19,7 +19,7 @@ _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypee
 ## Table of Contents
 * [Introduction](#introduction)
 * [Overview](#overview)
-* [Features](#features)
+* [Features](#construction-features)
 * [Talks](#talks)
 * [Adoption](#adoption)
 * [Design](#design)
