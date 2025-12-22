@@ -30,7 +30,7 @@ clap = { version = "4.5.53", features = ["derive", "string"] }
 rcgen = "0.14.6"
 confy = "2.0.0"
 socket2 = "0.5.10"
-serde_json = "1.0.145"
+serde_json = "1.0.146"
 reqwest = { version = "0.12.26", features = ["json", "blocking", "rustls-tls"], default-features = false }
 
 [dev-dependencies]
