@@ -19,7 +19,7 @@
 #
 #
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only
-# Copyright (c) 2021 - 2025 Gavin Henry <ghenry@sentrypeer.org>
+# Copyright (c) 2021 - 2026 Gavin Henry <ghenry@sentrypeer.org>
 #   _____            _              _____
 #  / ____|          | |            |  __ \
 # | (___   ___ _ __ | |_ _ __ _   _| |__) |__  ___ _ __
@@ -272,7 +272,7 @@ __DATA__
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Log in to SentryPeer.">
-    <meta name="author" content="Gavin Henry (c) 2021 - 2025">
+    <meta name="author" content="Gavin Henry (c) 2021 - 2026">
     <title>SentryPeer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   </head>
