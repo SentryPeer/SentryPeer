@@ -27,6 +27,7 @@ Thanks for reporting @szenzero
 - Run `autoscan` to update missing checks from `configure.ac` 
 - Don't use `rust-lld` due to https://github.com/rust-lang/rust/issues/147329
 - Add clippy lint checks to Cargo.toml to catch and `unwrap()` or `expect()` usage
+- Update Rust crates to the latest versions for security fixes
 
 ## [4.0.4] - 2025-03-17
 
