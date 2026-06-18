@@ -43,7 +43,7 @@
         "browser-sync": "3.0.4",
         "chokidar": "5.0.0",
         "concurrently": "10.0.3",
-        "postcss": "8.5.14",
+        "postcss": "8.5.15",
         "prettier": "3.8.4",
         "pug": "3.0.4",
         "sass": "1.101.0",
