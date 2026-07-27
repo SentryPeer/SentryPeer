@@ -18,7 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-13 ]
+        #os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest ]
         cc: [ gcc, clang ]
     env:
       CC: ${{ matrix.cc }}
