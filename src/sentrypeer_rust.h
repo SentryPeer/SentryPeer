@@ -15,7 +15,7 @@
 #ifndef SENTRYPEER_RUST_H
 #define SENTRYPEER_RUST_H
 
-/* Generated with cbindgen:0.29.2 */
+/* Generated with cbindgen:0.29.4 */
 
 /* Warning, do not modify this manually. */
 
