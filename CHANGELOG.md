@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.5] - 2026-07-27
+
 ### Fixes
 - Removed the requirement of supplying `client_id` and `client_secret` on the 
 command line if the `webook_url` option of `-w` is passed. See [#274](https://github.com/SentryPeer/SentryPeer/issues/274) 

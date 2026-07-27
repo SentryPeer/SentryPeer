@@ -1,3 +1,28 @@
+sentrypeer (4.0.5-1) unstable; urgency=medium
+
+    * Removed the requirement of supplying `client_id` and `client_secret` on the 
+      command line if the `webook_url` option of `-w` is passed. See [#274](https://github.com/SentryPeer/SentryPeer/issues/274)
+      Thanks for reporting @szenzero
+    * Config file location configurable via `-g` flag and `SENTRYPEER_CONFIG_FILE`
+      environment variable, defaulting to OS dependent locations
+    * Replace `jansson` with `serde_json` for JSON parsing/generation and switch to using Rust versions
+    * Replace `libcurl` with `reqwest` for HTTP requests and switch to using Rust versions
+    * `cargo clippy` warnings fixed
+    * Upgrade to Rust 2024 edition
+    * Dependencies updated to the latest versions
+    * Apply `cargo clippy` suggestions
+    * Update breaking changes `rcgen` API
+    * Only check major version output in our cli integration test
+    * Run `autoscan` to update missing checks from `configure.ac`
+    * Don't use `rust-lld` due to https://github.com/rust-lang/rust/issues/147329
+    * Add clippy lint checks to Cargo.toml to catch and `unwrap()` or `expect()` usage
+    * Update Rust crates to the latest versions for security fixes
+    * Switch to `Args::parse_from()`, so cli works when using [musl libc](https://www.musl-libc.org/)
+      as per [FFI, Alpine, musl and C](https://users.rust-lang.org/t/binary-wont-run-ffi-alpine-musl-and-c/127012/13)
+      and [aports issue](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/81324)
+
+ -- Gavin Henry <ghenry@sentrypeer.org>  Mon, 27 Jul 2026 10:00:00 +0000
+
 sentrypeer (4.0.2-1) unstable; urgency=medium
 
     * New TLS mode with auto cert and key generation
