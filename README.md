@@ -12,7 +12,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 [![gitleaks](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml/badge.svg?branch=main)](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml)
 
-Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us! Very kind!
+Special thanks to [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us in 2024.
 
 _Why not give us a star and follow us on [Twitter](https://twitter.com/sentrypeer)!_  
 
@@ -739,7 +739,7 @@ It's okay to raise an issue to ask a question.
 ### Special Thanks
 
 Special thanks to:
-  - [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us!
+  - [Deutsche Telekom Security GmbH](https://github.com/telekom-security) for sponsoring us in 2024!
   - [psanders](https://github.com/psanders) from the [Routr](https://github.com/fonoster/routr) project for [tips on re-working this README.md](https://mobile.twitter.com/pedrosanders_/status/1554572884714070019) file.
   - [Fly.io](https://fly.io) for crediting the SentryPeer account for hosting the [SentryPeer HQ web app](https://sentrypeer.com) on their infrastructure
   - [AppSignal](https://www.appsignal.com/) for Application performance monitoring sponsorship in the [SentryPeer HQ web app](https://sentrypeer.com)
