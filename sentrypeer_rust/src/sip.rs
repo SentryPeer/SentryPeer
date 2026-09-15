@@ -311,6 +311,34 @@ pub(crate) unsafe extern "C" fn shutdown_sip(sentrypeer_c_config: *const sentryp
     }
 }
 
+/// Converts raw, untrusted packet bytes into a `CString` that is always
+/// safe to hand across the FFI boundary.
+///
+/// `CString::new` returns an `Err` for any input containing an interior
+/// NUL byte, and the previous code (`CString::new(...).unwrap()`) panicked
+/// on that `Err` - meaning any peer who sent a SIP packet containing a
+/// literal `0x00` byte anywhere in the body could crash the whole process.
+/// Since SentryPeer's entire purpose is to safely observe malicious and
+/// malformed traffic, panicking on malformed input is exactly the failure
+/// mode it needs to avoid.
+///
+/// NUL bytes are replaced with `.` in place (rather than filtered out) so a
+/// packet containing only valid-UTF-8 bytes plus one or more embedded NULs
+/// keeps the exact same length after sanitizing - callers pass the original
+/// byte count (`bytes_read`) separately across the FFI boundary, so
+/// preserving length where possible keeps that count meaningful. This is
+/// unrelated to (and does not change) `from_utf8_lossy`'s pre-existing
+/// lossy handling of genuinely invalid UTF-8 sequences elsewhere in the
+/// buffer, which can still change length exactly as it did before this fix.
+fn packet_bytes_to_cstring(buf: &[u8]) -> CString {
+    let sanitized: Vec<u8> = buf
+        .iter()
+        .map(|&b| if b == 0 { b'.' } else { b })
+        .collect();
+    CString::new(String::from_utf8_lossy(&sanitized).into_owned())
+        .expect("NUL bytes were just replaced above, so this cannot fail")
+}
+
 pub fn log_sip_packet(
     sentrypeer_c_config: SentryPeerConfig,
     buf: Vec<u8>,
@@ -324,9 +352,7 @@ pub fn log_sip_packet(
 
     // To free on our side
     // https://doc.rust-lang.org/std/ffi/struct.CString.html#method.into_raw
-    let packet_ptr = CString::new(String::from_utf8_lossy(&buf[..bytes_read]).to_string())
-        .unwrap()
-        .into_raw();
+    let packet_ptr = packet_bytes_to_cstring(&buf[..bytes_read]).into_raw();
     let transport_type_ptr = CString::new(transport_type).unwrap().into_raw();
     let client_ip_addr_ptr = CString::new(peer_addr.to_string()).unwrap().into_raw();
     let dest_ip_addr_ptr = CString::new(listen_addr.to_string()).unwrap().into_raw();
@@ -437,5 +463,32 @@ mod tests {
 
             sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }
+    }
+
+    /// A peer sending a packet with an embedded NUL byte anywhere in the
+    /// body used to panic the whole process (`CString::new(...).unwrap()`
+    /// on a string containing `0x00` always fails). Since this is exactly
+    /// the kind of malformed/malicious input SentryPeer exists to observe,
+    /// this must never panic.
+    #[test]
+    fn test_packet_bytes_to_cstring_never_panics_on_embedded_nul() {
+        let malicious_packet = b"INVITE sip:test\x00SIP/2.0\r\n\x00\x00".to_vec();
+
+        let result = packet_bytes_to_cstring(&malicious_packet);
+
+        // The NUL bytes must be gone from the resulting CString (a real
+        // CString can never contain one), and the length must be preserved
+        // so callers relying on a separately-tracked byte count stay correct.
+        assert!(!result.as_bytes().contains(&0));
+        assert_eq!(result.as_bytes().len(), malicious_packet.len());
+    }
+
+    #[test]
+    fn test_packet_bytes_to_cstring_preserves_normal_packets() {
+        let normal_packet = b"OPTIONS sip:1.2.3.4 SIP/2.0\r\n".to_vec();
+
+        let result = packet_bytes_to_cstring(&normal_packet);
+
+        assert_eq!(result.as_bytes(), normal_packet.as_slice());
     }
 }
