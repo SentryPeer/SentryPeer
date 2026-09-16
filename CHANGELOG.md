@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changes
 - Update crates using `cargo update` for latest versions and to fix compile issues with `bindgen`
+- Update our clippy lints and address them. Mainly to remove `unwrap()` and 
+  `expect()` to avoid panics in production and other idiomatic changes - [#422](https://github.com/SentryPeer/SentryPeer/issues/422)
 
 ### Fixes 
 - Panic on startup when the default config directory can't be created 

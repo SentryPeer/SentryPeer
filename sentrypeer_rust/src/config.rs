@@ -54,7 +54,7 @@ pub(crate) fn config_from_env(config: Config) -> Result<Config, Box<dyn std::err
             .cert
             .into_os_string()
             .into_string()
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{:?}", e)))
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{e:?}")))
     })?;
 
     let key = std::env::var("SENTRYPEER_KEY").or_else(|_| {
@@ -62,7 +62,7 @@ pub(crate) fn config_from_env(config: Config) -> Result<Config, Box<dyn std::err
             .key
             .into_os_string()
             .into_string()
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{:?}", e)))
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{e:?}")))
     })?;
     let tls_listen_address = std::env::var("SENTRYPEER_TLS_LISTEN_ADDRESS")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))
@@ -104,9 +104,7 @@ pub(crate) fn config_from_cli(
     Ok(config)
 }
 
-pub fn load_all_configs(
-    sentrypeer_config: SentryPeerConfig,
-) -> Result<Config, Box<dyn std::error::Error>> {
+pub fn load_all_configs(sentrypeer_config: SentryPeerConfig) -> Config {
     let debug_mode = unsafe { (*sentrypeer_config.p).debug_mode };
     let verbose_mode = unsafe { (*sentrypeer_config.p).verbose_mode };
     let mut config = Config::default();
@@ -152,7 +150,7 @@ pub fn load_all_configs(
         }
     }
 
-    Ok(config)
+    config
 }
 
 pub(crate) fn load_certs(path: &Path) -> io::Result<Vec<CertificateDer<'static>>> {
@@ -208,7 +206,7 @@ pub fn create_tls_cert_and_key() -> Result<(), Box<dyn std::error::Error>> {
 
     if input == "y" || input == "yes" {
         return match create_certs() {
-            Ok(_) => {
+            Ok(()) => {
                 println!("cert.pem and key.pem created successfully");
                 Ok(())
             }
@@ -230,7 +228,8 @@ pub fn create_tls_cert_and_key() -> Result<(), Box<dyn std::error::Error>> {
 // Create a new TLS cert and key usng rcgen
 pub fn create_certs() -> io::Result<()> {
     let CertifiedKey { cert, signing_key } =
-        generate_simple_self_signed(vec!["localhost".to_string()]).expect("Failed to create cert");
+        generate_simple_self_signed(vec!["localhost".to_string()])
+            .map_err(|err| io::Error::other(format!("Failed to create cert: {err}")))?;
 
     std::fs::write("cert.pem", cert.pem())?;
     std::fs::write("key.pem", signing_key.serialize_pem())?;
@@ -254,7 +253,10 @@ mod tests {
             key: PathBuf::from("key.pem"),
             tls_listen_address: "0.0.0.0:5061".into(),
         };
-        config = config_from_env(config).unwrap();
+        config = match config_from_env(config) {
+            Ok(value) => value,
+            Err(err) => panic!("Failed to apply env config: {err}"),
+        };
         assert_eq!(config.cert, PathBuf::from("cert.pem"));
         assert_eq!(config.key, PathBuf::from("key.pem"));
         assert_eq!(config.tls_listen_address, "0.0.0.0:5061");
@@ -265,7 +267,10 @@ mod tests {
     #[serial]
     fn test_load_certs() {
         let path = Path::new("tests/certs/cert.pem");
-        let certs = load_certs(path).expect("Failed to load certs");
+        let certs = match load_certs(path) {
+            Ok(certs) => certs,
+            Err(err) => panic!("Failed to load certs: {err}"),
+        };
         assert_eq!(certs.len(), 1);
     }
 
@@ -275,7 +280,10 @@ mod tests {
             key: "key.pem".into(),
             tls_listen_address: "0.0.0.0:5061".into(),
         };
-        confy::store("sentrypeer", None, cfg).unwrap();
+        match confy::store("sentrypeer", None, cfg) {
+            Ok(()) => (),
+            Err(err) => panic!("Failed to set up config file: {err}"),
+        }
     }
 
     #[test]
@@ -293,7 +301,10 @@ mod tests {
         setup_config_file();
 
         let config_file = PathBuf::from("./tests/custom_config.toml");
-        let cfg: Config = load_file(true, false, config_file).unwrap();
+        let cfg: Config = match load_file(true, false, config_file) {
+            Ok(cfg) => cfg,
+            Err(err) => panic!("Failed to load config file: {err}"),
+        };
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
         assert_eq!(cfg.key, PathBuf::from("key.pem"));
         assert_eq!(cfg.tls_listen_address, "0.0.0.0:5061");
@@ -313,7 +324,10 @@ mod tests {
         setup_config_file();
 
         let config_file = PathBuf::from("./tests/custom_config.toml");
-        let cfg: Config = load_file(true, false, config_file).unwrap();
+        let cfg: Config = match load_file(true, false, config_file) {
+            Ok(cfg) => cfg,
+            Err(err) => panic!("Failed to load config file: {err}"),
+        };
         assert_eq!(cfg.cert, PathBuf::from("cert.pem"));
         assert_eq!(cfg.key, PathBuf::from("key.pem"));
         assert_eq!(cfg.tls_listen_address, "0.0.0.0:5061");
@@ -322,7 +336,10 @@ mod tests {
             key: "key2.pem".into(),
             tls_listen_address: "0.0.0.0:5062".into(),
         };
-        confy::store("sentrypeer", None, cfg).unwrap();
+        match confy::store("sentrypeer", None, cfg) {
+            Ok(()) => (),
+            Err(err) => panic!("Failed to update config file: {err}"),
+        }
 
         // Reset to original
         setup_config_file();
@@ -336,7 +353,10 @@ mod tests {
         let sentrypeer_config = SentryPeerConfig {
             p: Box::into_raw(Box::new(unsafe { *sentrypeer_c_config })),
         };
-        let config_file_path = get_config_file_path(sentrypeer_config).unwrap();
+        let config_file_path = match get_config_file_path(sentrypeer_config) {
+            Ok(path) => path,
+            Err(err) => panic!("Failed to determine config file path: {err}"),
+        };
 
         eprintln!("test_get_config_file_path: config file is {config_file_path:?}");
         assert_ne!(config_file_path, PathBuf::from("./sentrypeer.toml"));
@@ -356,11 +376,15 @@ mod tests {
             env::temp_dir().join(format!("sentrypeer-config-readonly-{}", std::process::id()));
 
         let _ = fs::remove_dir_all(&temp_dir);
-        fs::create_dir_all(&temp_dir).unwrap();
+        fs::create_dir_all(&temp_dir)
+            .unwrap_or_else(|err| panic!("Failed to create temp dir: {err}"));
 
-        let mut permissions = fs::metadata(&temp_dir).unwrap().permissions();
+        let mut permissions = fs::metadata(&temp_dir)
+            .unwrap_or_else(|err| panic!("Failed to stat temp dir: {err}"))
+            .permissions();
         permissions.set_mode(0o555);
-        fs::set_permissions(&temp_dir, permissions).unwrap();
+        fs::set_permissions(&temp_dir, permissions)
+            .unwrap_or_else(|err| panic!("Failed to mark temp dir read-only: {err}"));
 
         let old_xdg = env::var_os("XDG_CONFIG_HOME");
         let old_home = env::var_os("HOME");
@@ -376,7 +400,7 @@ mod tests {
             p: Box::into_raw(Box::new(unsafe { *sentrypeer_c_config })),
         };
 
-        let config = load_all_configs(sentrypeer_config).unwrap();
+        let config = load_all_configs(sentrypeer_config);
         assert_eq!(config, Config::default());
 
         unsafe { sentrypeer_config_destroy(&mut sentrypeer_c_config) };
@@ -396,9 +420,12 @@ mod tests {
             }
         }
 
-        let mut writable_permissions = fs::metadata(&temp_dir).unwrap().permissions();
+        let mut writable_permissions = fs::metadata(&temp_dir)
+            .unwrap_or_else(|err| panic!("Failed to stat temp dir for cleanup: {err}"))
+            .permissions();
         writable_permissions.set_mode(0o755);
-        fs::set_permissions(&temp_dir, writable_permissions).unwrap();
+        fs::set_permissions(&temp_dir, writable_permissions)
+            .unwrap_or_else(|err| panic!("Failed to restore temp dir permissions: {err}"));
         let _ = fs::remove_dir_all(&temp_dir);
     }
 }

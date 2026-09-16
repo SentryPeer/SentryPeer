@@ -33,7 +33,10 @@ fn tls_probe() {
     cmd.args(["-k", "../tests/unit_tests/127.0.0.1-key.pem"]);
     cmd.args(["-z", "127.0.0.1:5061"]);
 
-    let mut sentrypeer = cmd.spawn().expect("Failed to start sentrypeer");
+    let mut sentrypeer = match cmd.spawn() {
+        Ok(child) => child,
+        Err(err) => panic!("Failed to start sentrypeer: {err}"),
+    };
 
     // Give sentrypeer time to start
     std::thread::sleep(std::time::Duration::from_secs(1));
