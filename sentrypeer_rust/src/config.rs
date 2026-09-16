@@ -40,7 +40,7 @@ impl Default for Config {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Config {
     pub cert: PathBuf,
     pub key: PathBuf,
@@ -109,15 +109,48 @@ pub fn load_all_configs(
 ) -> Result<Config, Box<dyn std::error::Error>> {
     let debug_mode = unsafe { (*sentrypeer_config.p).debug_mode };
     let verbose_mode = unsafe { (*sentrypeer_config.p).verbose_mode };
-    let config_file = get_config_file_path(sentrypeer_config)?;
+    let mut config = Config::default();
 
-    // Our Configuration file is loaded first, with defaults
-    let mut config =
-        load_file(debug_mode, verbose_mode, config_file).expect("Failed to load config file");
+    let config_file = match get_config_file_path(sentrypeer_config) {
+        Ok(path) => Some(path),
+        Err(err) => {
+            eprintln!(
+                "Warning: failed to determine config file path: {err}; using default configuration."
+            );
+            None
+        }
+    };
+
+    // Our Configuration file is loaded first, with defaults.
+    if let Some(config_path) = config_file {
+        match load_file(debug_mode, verbose_mode, config_path.clone()) {
+            Ok(file_config) => config = file_config,
+            Err(err) => {
+                eprintln!(
+                    "Warning: failed to load config file at {config_path:?}: {err}; using default configuration."
+                );
+            }
+        }
+    }
+
     // Then our env
-    config = config_from_env(config)?;
+    match config_from_env(config.clone()) {
+        Ok(env_config) => config = env_config,
+        Err(err) => {
+            eprintln!(
+                "Warning: failed to apply environment overrides: {err}; using previously loaded configuration."
+            );
+        }
+    }
     // Then our CLI args
-    config = config_from_cli(config, sentrypeer_config.p)?;
+    match config_from_cli(config.clone(), sentrypeer_config.p) {
+        Ok(cli_config) => config = cli_config,
+        Err(err) => {
+            eprintln!(
+                "Warning: failed to apply CLI overrides: {err}; using previously loaded configuration."
+            );
+        }
+    }
 
     Ok(config)
 }
@@ -309,5 +342,63 @@ mod tests {
         assert_ne!(config_file_path, PathBuf::from("./sentrypeer.toml"));
 
         unsafe { sentrypeer_config_destroy(&mut sentrypeer_c_config) };
+    }
+
+    #[test]
+    #[cfg(unix)]
+    #[serial]
+    fn test_load_all_configs_falls_back_to_default_for_read_only_config_dir() {
+        use std::env;
+        use std::fs;
+        use std::os::unix::fs::PermissionsExt;
+
+        let temp_dir =
+            env::temp_dir().join(format!("sentrypeer-config-readonly-{}", std::process::id()));
+
+        let _ = fs::remove_dir_all(&temp_dir);
+        fs::create_dir_all(&temp_dir).unwrap();
+
+        let mut permissions = fs::metadata(&temp_dir).unwrap().permissions();
+        permissions.set_mode(0o555);
+        fs::set_permissions(&temp_dir, permissions).unwrap();
+
+        let old_xdg = env::var_os("XDG_CONFIG_HOME");
+        let old_home = env::var_os("HOME");
+        let old_config_file = env::var_os("SENTRYPEER_CONFIG_FILE");
+
+        unsafe {
+            env::set_var("XDG_CONFIG_HOME", &temp_dir);
+            env::remove_var("HOME");
+            env::remove_var("SENTRYPEER_CONFIG_FILE");
+        }
+        let mut sentrypeer_c_config = unsafe { sentrypeer_config_new() };
+        let sentrypeer_config = SentryPeerConfig {
+            p: Box::into_raw(Box::new(unsafe { *sentrypeer_c_config })),
+        };
+
+        let config = load_all_configs(sentrypeer_config).unwrap();
+        assert_eq!(config, Config::default());
+
+        unsafe { sentrypeer_config_destroy(&mut sentrypeer_c_config) };
+
+        unsafe {
+            match old_xdg {
+                Some(value) => env::set_var("XDG_CONFIG_HOME", value),
+                None => env::remove_var("XDG_CONFIG_HOME"),
+            }
+            match old_home {
+                Some(value) => env::set_var("HOME", value),
+                None => env::remove_var("HOME"),
+            }
+            match old_config_file {
+                Some(value) => env::set_var("SENTRYPEER_CONFIG_FILE", value),
+                None => env::remove_var("SENTRYPEER_CONFIG_FILE"),
+            }
+        }
+
+        let mut writable_permissions = fs::metadata(&temp_dir).unwrap().permissions();
+        writable_permissions.set_mode(0o755);
+        fs::set_permissions(&temp_dir, writable_permissions).unwrap();
+        let _ = fs::remove_dir_all(&temp_dir);
     }
 }
