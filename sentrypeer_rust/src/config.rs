@@ -40,7 +40,7 @@ impl Default for Config {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Config {
     pub cert: PathBuf,
     pub key: PathBuf,
@@ -134,7 +134,7 @@ pub fn load_all_configs(
     }
 
     // Then our env
-    match config_from_env(config) {
+    match config_from_env(config.clone()) {
         Ok(env_config) => config = env_config,
         Err(err) => {
             eprintln!(
@@ -143,7 +143,7 @@ pub fn load_all_configs(
         }
     }
     // Then our CLI args
-    match config_from_cli(config, sentrypeer_config.p) {
+    match config_from_cli(config.clone(), sentrypeer_config.p) {
         Ok(cli_config) => config = cli_config,
         Err(err) => {
             eprintln!(
@@ -353,7 +353,7 @@ mod tests {
         use std::os::unix::fs::PermissionsExt;
 
         let temp_dir =
-            std::env::temp_dir().join(format!("sentrypeer-config-readonly-{}", std::process::id()));
+            env::temp_dir().join(format!("sentrypeer-config-readonly-{}", std::process::id()));
 
         let _ = fs::remove_dir_all(&temp_dir);
         fs::create_dir_all(&temp_dir).unwrap();
@@ -366,10 +366,11 @@ mod tests {
         let old_home = env::var_os("HOME");
         let old_config_file = env::var_os("SENTRYPEER_CONFIG_FILE");
 
-        env::set_var("XDG_CONFIG_HOME", &temp_dir);
-        env::remove_var("HOME");
-        env::remove_var("SENTRYPEER_CONFIG_FILE");
-
+        unsafe {
+            env::set_var("XDG_CONFIG_HOME", &temp_dir);
+            env::remove_var("HOME");
+            env::remove_var("SENTRYPEER_CONFIG_FILE");
+        }
         let mut sentrypeer_c_config = unsafe { sentrypeer_config_new() };
         let sentrypeer_config = SentryPeerConfig {
             p: Box::into_raw(Box::new(unsafe { *sentrypeer_c_config })),
@@ -380,17 +381,19 @@ mod tests {
 
         unsafe { sentrypeer_config_destroy(&mut sentrypeer_c_config) };
 
-        match old_xdg {
-            Some(value) => env::set_var("XDG_CONFIG_HOME", value),
-            None => env::remove_var("XDG_CONFIG_HOME"),
-        }
-        match old_home {
-            Some(value) => env::set_var("HOME", value),
-            None => env::remove_var("HOME"),
-        }
-        match old_config_file {
-            Some(value) => env::set_var("SENTRYPEER_CONFIG_FILE", value),
-            None => env::remove_var("SENTRYPEER_CONFIG_FILE"),
+        unsafe {
+            match old_xdg {
+                Some(value) => env::set_var("XDG_CONFIG_HOME", value),
+                None => env::remove_var("XDG_CONFIG_HOME"),
+            }
+            match old_home {
+                Some(value) => env::set_var("HOME", value),
+                None => env::remove_var("HOME"),
+            }
+            match old_config_file {
+                Some(value) => env::set_var("SENTRYPEER_CONFIG_FILE", value),
+                None => env::remove_var("SENTRYPEER_CONFIG_FILE"),
+            }
         }
 
         let mut writable_permissions = fs::metadata(&temp_dir).unwrap().permissions();

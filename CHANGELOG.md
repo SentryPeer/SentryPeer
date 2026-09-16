@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changes
+- Update crates using `cargo update` for latest versions and to fix compile issues with `bindgen`
+
 ### Fixes 
 - Panic on startup when the default config directory can't be created 
   (e.g. read-only container filesystem). Closes [#420](https://github.com/SentryPeer/SentryPeer/issues/420)
