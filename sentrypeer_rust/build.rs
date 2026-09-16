@@ -10,6 +10,10 @@
                               __/ |
                              |___/
 */
+// Allow unwrap and expect in this build script, as we want to fail the
+// build if something goes wrong
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::expect_used)]
 use std::env;
 use std::path::PathBuf;
 
@@ -24,6 +28,8 @@ fn main() {
     #[cfg(target_os = "macos")]
     {
         println!("cargo:rustc-link-search=/opt/homebrew/lib");
+        println!("cargo:rustc-link-lib=framework=CoreFoundation");
+        println!("cargo:rustc-link-lib=framework=Security");
     }
 
     println!("cargo:rustc-link-lib=sentrypeer");

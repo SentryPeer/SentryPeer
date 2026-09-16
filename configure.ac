@@ -17,6 +17,7 @@ AC_PREREQ([2.69])
 AC_INIT([sentrypeer],[4.0.6],[ghenry@sentrypeer.org],[],[https://github.com/SentryPeer/SentryPeer])
 # Some weird issue with AX_PTHREAD macro that needs this to be called first:
 AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/sentrypeer.h])
@@ -94,6 +95,16 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([setenv clock_gettime getcwd inet_ntoa localtime_r memset select socket strdup strerror strncasecmp strndup atexit bzero])
+
+case "$host_os" in
+  darwin*)
+    SENTRYPEER_PLATFORM_LDFLAGS="-framework CoreFoundation -framework Security"
+    ;;
+  *)
+    SENTRYPEER_PLATFORM_LDFLAGS=""
+    ;;
+esac
+AC_SUBST([SENTRYPEER_PLATFORM_LDFLAGS])
 
 # https://github.com/stedolan/jq/blob/master/configure.ac#L129
 # Find pthread, if we have it. We do this first because we may set -pthread on CFLAGS

@@ -250,7 +250,7 @@ AM_CFLAGS =-Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors \
 
 # Adding this for now:
 # https://github.com/Homebrew/discussions/discussions/2587
-AM_LDFLAGS=-Wl,-rpath,/home/linuxbrew/.linuxbrew/lib
+AM_LDFLAGS=-Wl,-rpath,/home/linuxbrew/.linuxbrew/lib $(SENTRYPEER_PLATFORM_LDFLAGS)
 ACLOCAL_AMFLAGS=-I m4
 
 if HAVE_CMOCKA

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes 
 - Panic on startup when the default config directory can't be created 
   (e.g. read-only container filesystem). Closes [#420](https://github.com/SentryPeer/SentryPeer/issues/420)
+- macOS frameworks are not linked to correctly [#423](https://github.com/SentryPeer/SentryPeer/issues/423)
 
 ## [4.0.5] - 2026-07-27
 
