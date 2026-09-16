@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changes
+- Update crates using `cargo update` for latest versions and to fix compile issues with `bindgen`
+
+### Fixes 
+- Panic on startup when the default config directory can't be created 
+  (e.g. read-only container filesystem). Closes [#420](https://github.com/SentryPeer/SentryPeer/issues/420)
+
 ## [4.0.5] - 2026-07-27
 
 ### Fixes
@@ -28,7 +35,7 @@ Thanks for reporting @szenzero
 - Only check major version output in our cli integration test
 - Run `autoscan` to update missing checks from `configure.ac` 
 - Don't use `rust-lld` due to https://github.com/rust-lang/rust/issues/147329
-- Add clippy lint checks to Cargo.toml to catch and `unwrap()` or `expect()` usage
+- Add clippy lint checks to Cargo.toml to catch any `unwrap()` or `expect()` usage
 - Update Rust crates to the latest versions for security fixes
 
 ## [4.0.4] - 2025-03-17

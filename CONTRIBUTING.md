@@ -22,9 +22,24 @@ A patch commit message SHOULD consist of a single short (less than 50 character)
 
 A "Correct Patch" is one that satisfies the above requirements.
 
+### AI-assisted work
+
+Using AI for contributions is acceptable, given the following:
+
+- YOU review the output before sending a non-Draft PR. Do NOT request review
+  until YOU have checked the AI-generated PR and verify the following:
+- REMOVE verbosity and blathering from documentation, comments, PR description,
+  commit message, etc. All resources, including names, should be CONCISE and
+  CLEAR. They should contain USEFUL information and nothing more.
+- REMOVE and DEDUPLICATE redundant code, tests, explanations, etc. Explicitness
+  and clarity are GOOD, but verbosity, over-explanation, and redundancy is BAD.
 
 ## Coding Style
 
 This project uses the Linux kernel coding style:
 
 See https://www.kernel.org/doc/html/latest/process/coding-style.html
+
+Rust code in this project uses `clippy` and `rustfmt`. Please run `cargo clippy` and `cargo fmt` on your code before submitting a patch.
+
+Our CI jobs will also run these on your PR in case you forget.  

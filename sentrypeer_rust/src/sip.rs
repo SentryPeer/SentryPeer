@@ -25,7 +25,9 @@ use tokio::net::UdpSocket;
 use tokio::sync::oneshot;
 use tokio_rustls::{TlsAcceptor, rustls};
 
-use crate::config::{SentryPeerConfig, create_certs, load_all_configs, load_certs, load_key};
+use crate::config::{
+    Config, SentryPeerConfig, create_certs, load_all_configs, load_certs, load_key,
+};
 use crate::tcp::handle_tcp_connection;
 use crate::tls::handle_tls_connection;
 use crate::udp::handle_udp_connection;
@@ -142,7 +144,15 @@ pub(crate) extern "C" fn run_sip_server(sentrypeer_c_config: *mut sentrypeer_con
 
     let _std_thread_handle = thread_builder.spawn(move || {
         handle.block_on(async move {
-            let config = load_all_configs(sentrypeer_config).expect("Failed to load all configs");
+            let config = match load_all_configs(sentrypeer_config) {
+                Ok(config) => config,
+                Err(err) => {
+                    eprintln!(
+                        "Warning: failed to load all configs: {err}; using default configuration."
+                    );
+                    Config::default()
+                }
+            };
 
             // TCP
             let tcp_listener = TcpListener::bind("0.0.0.0:5060")
