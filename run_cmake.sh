@@ -12,6 +12,8 @@
 #                             |___/
 #
 
+set -e
+
 rm -rf build/
 cmake -S . -B build -DUNIT_TESTING=ON
 cmake --build build 

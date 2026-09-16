@@ -13,9 +13,22 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
 
+// Handle finding autotools and CMake builds of sentrypeer binary
+fn get_cmd() -> Command {
+    if let Ok(bin) = std::env::var("SENTRYPEER_BIN") {
+        Command::new(bin)
+    } else if std::path::Path::new("../sentrypeer").exists() {
+        Command::new("../sentrypeer")
+    } else if std::path::Path::new("../build/sentrypeer").exists() {
+        Command::new("../build/sentrypeer")
+    } else {
+        Command::new("sentrypeer")
+    }
+}
+
 #[test]
 fn help_shown_on_unknown_args() {
-    let mut cmd = Command::new("../sentrypeer");
+    let mut cmd = get_cmd();
     cmd.arg("--does-not-exist");
 
     cmd.assert()
@@ -25,7 +38,7 @@ fn help_shown_on_unknown_args() {
 
 #[test]
 fn check_about() {
-    let mut cmd = Command::new("../sentrypeer");
+    let mut cmd = get_cmd();
     cmd.arg("-h");
 
     cmd.assert()
@@ -35,7 +48,7 @@ fn check_about() {
 
 #[test]
 fn check_version() {
-    let mut cmd = Command::new("../sentrypeer");
+    let mut cmd = get_cmd();
     cmd.arg("-V");
 
     cmd.assert()

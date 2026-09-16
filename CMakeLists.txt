@@ -28,7 +28,7 @@ option(DISABLE_RUST "Disable Rust parts" OFF)
 option(RUST_DEBUG_RELEASE "Rust debug or release" OFF)
 
 if (DISABLE_OPENDHT)
-    add_definitions(-DHAVE_OPENDHT=0)
+    add_definitions(-DHAVE_OPENDHT_C=0)
     message(STATUS "OpenDHT support disabled")
 endif ()
 
@@ -42,7 +42,7 @@ if (RUST_DEBUG_RELEASE)
     message(STATUS "Rust debug release enabled")
 endif ()
 
-set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
+set(SENTRYPEER_LIB_SRCS
         ${CMAKE_SOURCE_DIR}/src/signal_handler.c
         ${CMAKE_SOURCE_DIR}/src/conf.c
         ${CMAKE_SOURCE_DIR}/src/http_common.c
@@ -67,7 +67,7 @@ set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
 # Build a SentryPeer library for use in our Rust code FIRST as,
 # our Rust code depends on it in our executable
 add_library(${CMAKE_PROJECT_NAME}_lib SHARED
-        ${SRC_FILES}
+        ${SENTRYPEER_LIB_SRCS}
 )
 
 # Make the library have the same name as the project
@@ -75,7 +75,8 @@ add_library(${CMAKE_PROJECT_NAME}_lib SHARED
 set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 
 add_executable(${CMAKE_PROJECT_NAME}
-        ${SRC_FILES}
+        ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
+        ${SENTRYPEER_LIB_SRCS}
 )
 
 # See https://github.com/bast/cmake-example/blob/master/CMakeLists.txt
@@ -83,6 +84,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 include(${CMAKE_SOURCE_DIR}/cmake/git_revision.cmake)
 
 find_package(PkgConfig REQUIRED)
+
 
 pkg_search_module(OSIP2 REQUIRED libosip2)
 pkg_search_module(SQLITE3 REQUIRED sqlite3)
@@ -93,15 +95,35 @@ pkg_search_module(CURL REQUIRED libcurl)
 pkg_search_module(PCRE2 REQUIRED libpcre2-8)
 
 if (NOT DISABLE_OPENDHT)
-    pkg_search_module(OPENDHT opendht)
+    pkg_search_module(OPENDHT opendht-c)
     message(STATUS "OpenDHT support not disabled")
 endif ()
 
 if (OPENDHT_FOUND)
     add_definitions(-DHAVE_OPENDHT_C=1)
     message(STATUS "OPENDHT_C_VERSION: ${OPENDHT_VERSION}")
-    add_definitions(-DOPENDHT_C_VERSION="${OPENDHT_VERISON}")
+    add_definitions(-DOPENDHT_C_VERSION="${OPENDHT_VERSION}")
 endif ()
+
+set(SENTRYPEER_LIB_DIRS "")
+set(SENTRYPEER_SYS_LIB_DIRS "")
+foreach(dir IN LISTS OSIP2_LIBRARY_DIRS OSIP2_LIBDIR SQLITE3_LIBRARY_DIRS SQLITE3_LIBDIR UUID_LIBRARY_DIRS UUID_LIBDIR MICROHTTPD_LIBRARY_DIRS MICROHTTPD_LIBDIR JANSSON_LIBRARY_DIRS JANSSON_LIBDIR CURL_LIBRARY_DIRS CURL_LIBDIR PCRE2_LIBRARY_DIRS PCRE2_LIBDIR OPENDHT_LIBRARY_DIRS OPENDHT_LIBDIR)
+    if(dir)
+        if(dir MATCHES "^/usr/lib" OR dir MATCHES "^/lib")
+            list(APPEND SENTRYPEER_SYS_LIB_DIRS "${dir}")
+        else()
+            list(APPEND SENTRYPEER_LIB_DIRS "${dir}")
+        endif()
+    endif()
+endforeach()
+if(SENTRYPEER_SYS_LIB_DIRS)
+    list(REMOVE_DUPLICATES SENTRYPEER_SYS_LIB_DIRS)
+    list(APPEND SENTRYPEER_LIB_DIRS ${SENTRYPEER_SYS_LIB_DIRS})
+endif()
+if(SENTRYPEER_LIB_DIRS)
+    list(REMOVE_DUPLICATES SENTRYPEER_LIB_DIRS)
+    link_directories(${SENTRYPEER_LIB_DIRS})
+endif()
 
 include_directories(${OSIP2_INCLUDE_DIRS})
 include_directories(${SQLITE3_INCLUDE_DIRS})
@@ -111,6 +133,16 @@ include_directories(${JANSSON_INCLUDE_DIRS})
 include_directories(${CURL_INCLUDE_DIRS})
 include_directories(${PCRE2_INCLUDE_DIRS})
 include_directories(${OPENDHT_INCLUDE_DIRS})
+
+set(SENTRYPEER_COMMON_LIBS
+        ${OSIP2_LIBRARIES}
+        ${SQLITE3_LIBRARIES}
+        ${UUID_LIBRARIES}
+        ${MICROHTTPD_LIBRARIES}
+        ${JANSSON_LIBRARIES}
+        ${CURL_LIBRARIES}
+        ${PCRE2_LIBRARIES}
+)
 
 # project version
 set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
@@ -136,13 +168,8 @@ if (NOT DISABLE_RUST)
     add_definitions(-DHAVE_RUST=1)
 endif ()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} -losipparser2)
-target_link_libraries(${CMAKE_PROJECT_NAME} -lsqlite3)
-target_link_libraries(${CMAKE_PROJECT_NAME} -luuid)
-target_link_libraries(${CMAKE_PROJECT_NAME} -lmicrohttpd)
-target_link_libraries(${CMAKE_PROJECT_NAME} -ljansson)
-target_link_libraries(${CMAKE_PROJECT_NAME} -lcurl)
-target_link_libraries(${CMAKE_PROJECT_NAME} -lpcre2-8)
+target_link_libraries(${CMAKE_PROJECT_NAME} ${SENTRYPEER_COMMON_LIBS})
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib ${SENTRYPEER_COMMON_LIBS})
 
 # Used in config.h.in - can't reset OPENDHT_FOUND here, so use a new variable
 if (NOT OPENDHT_FOUND)
@@ -150,7 +177,8 @@ if (NOT OPENDHT_FOUND)
 endif ()
 
 if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
-    target_link_libraries(${CMAKE_PROJECT_NAME} -lopendht-c)
+    target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENDHT_LIBRARIES})
+    target_link_libraries(${CMAKE_PROJECT_NAME}_lib ${OPENDHT_LIBRARIES})
     message(STATUS "Linking with OpenDHT")
     set(HAVE_OPENDHT_C 1)
 endif ()

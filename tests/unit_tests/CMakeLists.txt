@@ -1,11 +1,6 @@
 if (UNIT_TESTING)
     set(TEST_RUNNER_NAME runner)
 
-    if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
-        # Find opendht_c
-        find_library(OPENDHT_C opendht-c)
-    endif ()
-
     # configure header file
     configure_file(
             ${CMAKE_SOURCE_DIR}/cmake/config.h.in
@@ -50,21 +45,35 @@ if (UNIT_TESTING)
     target_include_directories(${TEST_RUNNER_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/src)
     target_include_directories(${TEST_RUNNER_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/tests/unit_tests)
 
-    target_link_libraries(${TEST_RUNNER_NAME} -losipparser2)
-    target_link_libraries(${TEST_RUNNER_NAME} -lsqlite3)
-    target_link_libraries(${TEST_RUNNER_NAME} -luuid)
-    target_link_libraries(${TEST_RUNNER_NAME} -lmicrohttpd)
-    target_link_libraries(${TEST_RUNNER_NAME} -ljansson)
-    target_link_libraries(${TEST_RUNNER_NAME} -lcurl)
-    target_link_libraries(${TEST_RUNNER_NAME} -lpcre2-8)
+    if (SENTRYPEER_LIB_DIRS)
+        target_link_directories(${TEST_RUNNER_NAME} PRIVATE ${SENTRYPEER_LIB_DIRS})
+        list(JOIN SENTRYPEER_LIB_DIRS ":" SENTRYPEER_LIB_DIRS_STR)
+        set(TEST_LD_LIBRARY_PATH "${CMAKE_BINARY_DIR}:${SENTRYPEER_LIB_DIRS_STR}")
+        set(TEST_LIBRARY_PATH "${SENTRYPEER_LIB_DIRS_STR}")
+    else ()
+        set(TEST_LD_LIBRARY_PATH "${CMAKE_BINARY_DIR}")
+        set(TEST_LIBRARY_PATH "")
+    endif ()
+
+    if (DEFINED ENV{LD_LIBRARY_PATH})
+        string(APPEND TEST_LD_LIBRARY_PATH ":$ENV{LD_LIBRARY_PATH}")
+    endif ()
+
+    if (DEFINED ENV{LIBRARY_PATH})
+        string(APPEND TEST_LIBRARY_PATH ":$ENV{LIBRARY_PATH}")
+    endif ()
+
+    target_link_libraries(${TEST_RUNNER_NAME} ${SENTRYPEER_COMMON_LIBS})
 
 
     if (OPENDHT_FOUND AND NOT DISABLE_OPENDHT)
-        target_link_libraries(${TEST_RUNNER_NAME} -lopendht-c)
+        target_link_libraries(${TEST_RUNNER_NAME} ${OPENDHT_LIBRARIES})
     endif ()
 
-    target_link_libraries(${TEST_RUNNER_NAME} sentrypeer_rust)
-    target_link_libraries(${TEST_RUNNER_NAME} -lcmocka)
+    if (NOT DISABLE_RUST)
+        target_link_libraries(${TEST_RUNNER_NAME} sentrypeer_rust)
+    endif ()
+    target_link_libraries(${TEST_RUNNER_NAME} cmocka::cmocka)
 
     enable_testing()
     add_test(NAME ${TEST_RUNNER_NAME} COMMAND ${TEST_RUNNER_NAME})
@@ -72,7 +81,11 @@ if (UNIT_TESTING)
             NAME sentrypeer_rust
             COMMAND cargo test --manifest-path ${CMAKE_SOURCE_DIR}/sentrypeer_rust/Cargo.toml -- --nocapture
     )
-    set_tests_properties(sentrypeer_rust PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}")
+    set_tests_properties(
+            sentrypeer_rust
+            PROPERTIES
+            ENVIRONMENT "LD_LIBRARY_PATH=${TEST_LD_LIBRARY_PATH};LIBRARY_PATH=${TEST_LIBRARY_PATH};SENTRYPEER_BIN=${CMAKE_BINARY_DIR}/sentrypeer;PATH=${CMAKE_BINARY_DIR}:$ENV{PATH}"
+    )
 
 endif ()
 

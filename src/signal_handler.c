@@ -18,6 +18,8 @@
 
 #include "signal_handler.h"
 
+volatile sig_atomic_t cleanup_flag = 0;
+
 /* Signal handler (used to intercept CTRL+C and SIGTERM) */
 static void signal_handler(int signo)
 {

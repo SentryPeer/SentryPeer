@@ -34,8 +34,6 @@
 #include "sentrypeer_rust.h"
 #endif
 
-volatile sig_atomic_t cleanup_flag = 0;
-
 int main(int argc, char **argv)
 {
 	sentrypeer_config *config = sentrypeer_config_new();
