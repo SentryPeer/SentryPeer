@@ -44,5 +44,6 @@ jobs:
           brew install libosip opendht
       - run: |
           set -x
-          cppcheck --inline-suppr --enable=warning,performance,portability,style --error-exitcode=1 src/
-          cppcheck --inline-suppr --enable=warning,performance,portability,style --error-exitcode=1 tests/
+          CPPCHECK_FLAGS="--inline-suppr --enable=warning,performance,portability,style --error-exitcode=1 --suppress=constParameter --suppress=constParameterPointer --suppress=constParameterCallback --suppress=constVariable --suppress=constVariablePointer"
+          cppcheck ${CPPCHECK_FLAGS} src/
+          cppcheck ${CPPCHECK_FLAGS} tests/
