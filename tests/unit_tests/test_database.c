@@ -222,7 +222,7 @@ void test_open_select_close_sqlite_db(void **state)
 		"Opened database successfully at line number %d in file %s\n",
 		__LINE__ - 1, __FILE__);
 
-	char select_bad_actor_by_uuid[] =
+	const char select_bad_actor_by_uuid[] =
 		"SELECT source_ip FROM honey WHERE event_uuid = ?";
 	assert_int_equal(sqlite3_prepare_v2(db, select_bad_actor_by_uuid, -1,
 					    &select_bad_actor_stmt, NULL),
@@ -255,9 +255,9 @@ void test_db_insert_bad_actor(void **state)
 	sentrypeer_config *config = *state;
 	assert_non_null(config);
 
-	char test_source_ip[] = "127.0.0.1";
-	char test_transport_type[] = "UDP";
-	char test_collected_method[] = "passive";
+	const char test_source_ip[] = "127.0.0.1";
+	const char test_transport_type[] = "UDP";
+	const char test_collected_method[] = "passive";
 	bad_actor *bad_actor_event =
 		bad_actor_new(0, util_duplicate_string(test_source_ip), 0, 0, 0,
 			      util_duplicate_string(test_transport_type), 0,

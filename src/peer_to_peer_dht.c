@@ -60,6 +60,9 @@ static bool dht_value_callback(const dht_value *value, bool expired,
 	// TODO: Move to a validator function
 	if (data.size > 0) {
 		char *received_value_str = malloc(data.size + 1);
+		if (!received_value_str) {
+			return true;
+		}
 		memcpy(received_value_str, data.data, data.size);
 		received_value_str[data.size] = '\0';
 

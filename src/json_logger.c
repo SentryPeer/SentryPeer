@@ -37,8 +37,11 @@ struct memory_struct {
 	size_t size;
 };
 
-static size_t ignore_data(void *buffer, size_t size, size_t nmemb, void *userp)
+static size_t ignore_data(const void *buffer, size_t size, size_t nmemb,
+			  void *userp)
 {
+	(void)buffer;
+	(void)userp;
 	return size * nmemb;
 }
 
@@ -186,6 +189,9 @@ static int set_oauth2_bearer_token_header(const sentrypeer_config *config,
 					  AUTH0_MAX_BEARER_TOKEN_LEN + 1;
 
 	char *oauth2_bearer_header = malloc(oauth2_bearer_header_len);
+	if (!oauth2_bearer_header) {
+		return EXIT_FAILURE;
+	}
 
 	if (snprintf(oauth2_bearer_header, oauth2_bearer_header_len,
 		     "Authorization: Bearer %s",

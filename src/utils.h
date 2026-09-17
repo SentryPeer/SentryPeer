@@ -26,10 +26,10 @@
 /**
  * Get the current time suitable for event logging
  *
- * @param event_timestamp The timestamp to fill.
+ * @param timestamp_str The timestamp to fill.
  * @return The current time in format YYYY-MM-DD HH:MM:SS.XXXXXXXXX
  */
-char *event_timestamp(char *event_timestamp);
+char *event_timestamp(char *timestamp_str);
 
 /**
  * Duplicate a string (must be freed by caller)

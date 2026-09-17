@@ -30,7 +30,7 @@ void test_utils(void **state)
 	(void)state; /* unused */
 
 	// String utils
-	char string_to_duplicate[] = "I'm a string that will be copied!";
+	const char string_to_duplicate[] = "I'm a string that will be copied!";
 	assert_non_null(string_to_duplicate);
 
 	// util_duplicate_string
@@ -96,8 +96,8 @@ void test_utils(void **state)
 	json_decref(json);
 
 	// UUID utils
-	char uuid_valid[] = "00000000-0000-0000-0000-000000000000";
-	char uuid_invalid[] = "0000000000-054564654654000-0000-000000000000123";
+	const char uuid_valid[] = "00000000-0000-0000-0000-000000000000";
+	const char uuid_invalid[] = "0000000000-054564654654000-0000-000000000000123";
 	assert_true(is_valid_uuid(uuid_valid));
 	assert_false(is_valid_uuid(uuid_invalid));
 

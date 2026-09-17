@@ -36,19 +36,19 @@ void test_conf(void **state)
 	// Check uuid_parse always works as we rely on this when validating
 	// bad_actors received on the DHT.
 	uuid_t node_id;
-	char too_short_uuid[] = "baa3db34-1670-441b-baff-32445081509";
+	const char too_short_uuid[] = "baa3db34-1670-441b-baff-32445081509";
 	assert_int_equal(uuid_parse(config->node_id, node_id), EXIT_SUCCESS);
 	assert_int_equal(uuid_parse(too_short_uuid, node_id), -1);
 
 	// Test that we reject this db file location
-	char cli_db_file_location_wrong[] =
+	const char cli_db_file_location_wrong[] =
 		"tests/unit_tests/test_sentrypeer.db";
 	assert_int_equal(set_db_file_location(config,
 					      cli_db_file_location_wrong),
 			 EXIT_FAILURE);
 
 	// Test that we accept a valid db file location
-	char cli_db_file_location[] = "/tests/unit_tests/test_sentrypeer.db";
+	const char cli_db_file_location[] = "/tests/unit_tests/test_sentrypeer.db";
 	assert_int_equal(set_db_file_location(config, cli_db_file_location),
 			 EXIT_SUCCESS);
 
@@ -64,14 +64,14 @@ void test_conf(void **state)
 
 	// TODO: Move these into their own test file or JSON group?
 	// Test that we reject this json log file location
-	char cli_json_log_file_location_wrong[] =
+	const char cli_json_log_file_location_wrong[] =
 		"tests/unit_tests/test_sentrypeer_json.log";
 	assert_int_equal(set_json_log_file_location(
 				 config, cli_json_log_file_location_wrong),
 			 EXIT_FAILURE);
 
 	// Test that we accept a valid json log file location
-	char cli_json_log_file_location[] =
+	const char cli_json_log_file_location[] =
 		"/tests/unit_tests/test_sentrypeer_json.log";
 	assert_int_equal(set_json_log_file_location(config,
 						    cli_json_log_file_location),
@@ -143,7 +143,7 @@ void test_conf(void **state)
 			    SENTRYPEER_BOOTSTRAP_NODE);
 
 	// Set our own node
-	char bootstrap_node[] = "bootstrap.example.com";
+	const char bootstrap_node[] = "bootstrap.example.com";
 	assert_int_equal(setenv("SENTRYPEER_BOOTSTRAP_NODE", bootstrap_node, 1),
 			 EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
@@ -156,7 +156,7 @@ void test_conf(void **state)
 	assert_string_equal(config->webhook_url, SENTRYPEER_WEBHOOK_URL);
 
 	// Set our own WebHook URL
-	char webhook_url[] = "https://webhook.example.com/events";
+	const char webhook_url[] = "https://webhook.example.com/events";
 	assert_int_equal(setenv("SENTRYPEER_WEBHOOK_URL", webhook_url, 1),
 			 EXIT_SUCCESS);
 	assert_int_equal(process_env_vars(config), EXIT_SUCCESS);
@@ -171,7 +171,7 @@ void test_conf(void **state)
 			    SENTRYPEER_OAUTH2_CLIENT_SECRET);
 
 	// Set OAuth2 client ID
-	char oauth2_client_id[] = "my-client-id";
+	const char oauth2_client_id[] = "my-client-id";
 	assert_int_equal(setenv("SENTRYPEER_OAUTH2_CLIENT_ID", oauth2_client_id,
 				1),
 			 EXIT_SUCCESS);
@@ -180,7 +180,7 @@ void test_conf(void **state)
 	assert_true(config->oauth2_mode);
 
 	// Set OAuth2 client secret
-	char oauth2_client_secret[] = "my-client-secret";
+	const char oauth2_client_secret[] = "my-client-secret";
 	assert_int_equal(setenv("SENTRYPEER_OAUTH2_CLIENT_SECRET",
 				oauth2_client_secret, 1),
 			 EXIT_SUCCESS);

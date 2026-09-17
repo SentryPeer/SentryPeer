@@ -22,7 +22,6 @@
 int ip_addresses_route(struct MHD_Connection *connection,
 		       sentrypeer_config const *config)
 {
-	const char *reply = NULL;
 	bad_actor **bad_actors = 0;
 	int64_t row_count = 0;
 
@@ -73,7 +72,7 @@ int ip_addresses_route(struct MHD_Connection *connection,
 		json_t *json_final_obj =
 			json_pack("{s:i,s:o}", "ip_addresses_total", row_count,
 				  "ip_addresses", json_arr);
-		reply = json_dumps(json_final_obj, JSON_INDENT(2));
+		const char *reply = json_dumps(json_final_obj, JSON_INDENT(2));
 
 		// Free the json objects
 		json_decref(json_final_obj);

@@ -66,7 +66,7 @@ void test_bad_actor(void **state)
 {
 	(void)state; /* unused */
 
-	char test_invalid_sip_message_to_parse[] =
+	const char test_invalid_sip_message_to_parse[] =
 		"OPTIONS sip:100@23.148.145.71 SIP/2.0\n"
 		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\n"
 		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\n"
@@ -79,7 +79,7 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\n"
 		"Content-Length: 0";
 
-	char test_valid_sip_message_to_parse[] =
+	const char test_valid_sip_message_to_parse[] =
 		"OPTIONS sip:100@23.148.145.71 SIP/2.0\r\n"
 		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\r\n"
 		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\r\n"
@@ -92,7 +92,7 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
-	char test_valid_sip_message_to_parse_no_called_number[] =
+	const char test_valid_sip_message_to_parse_no_called_number[] =
 		"OPTIONS sip:100@23.148.145.71 SIP/2.0\r\n"
 		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\r\n"
 		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\r\n"
@@ -105,7 +105,7 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
-	char test_valid_sip_message_to_parse_no_user_agent[] =
+	const char test_valid_sip_message_to_parse_no_user_agent[] =
 		"OPTIONS sip:100@23.148.145.71 SIP/2.0\r\n"
 		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\r\n"
 		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\r\n"
@@ -117,7 +117,7 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
-	char test_valid_sip_message_to_parse_blank_user_agent[] =
+	const char test_valid_sip_message_to_parse_blank_user_agent[] =
 		"OPTIONS sip:100@23.148.145.71 SIP/2.0\r\n"
 		"Via: SIP/2.0/UDP 23.148.145.71:5084;branch=z9hG4bK-3054909403;rport\r\n"
 		"From: \"sipvicious\" <sip:100@1.1.1.1>;tag=6434396633623535313363340133343333313138393833\r\n"

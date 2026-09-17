@@ -26,7 +26,7 @@
 #include <curl/curl.h>
 #include <config.h>
 
-static size_t save_json_results(void *json, size_t size, size_t nmemb,
+static size_t save_json_results(const void *json, size_t size, size_t nmemb,
 				void *userp)
 {
 	size_t realsize = size * nmemb;

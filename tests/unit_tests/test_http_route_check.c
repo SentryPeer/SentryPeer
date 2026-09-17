@@ -27,15 +27,15 @@ void test_http_route_check(void **state)
 	sentrypeer_config *config = sentrypeer_config_new();
 	config->verbose_mode = true;
 
-	char requested_url[] = "/test/route/check";
+	const char requested_url[] = "/test/route/check";
 
-	char route0[] = "/";
-	char route1[] = "/ip-addresses/8.8.8.8";
-	char route2[] = "/ip-addresses";
-	char route3[] = "/health-check/";
-	char route4[] = "/health-check";
-	char route5[] = "/numbers";
-	char route6[] = "/numbers/123456789";
+	const char route0[] = "/";
+	const char route1[] = "/ip-addresses/8.8.8.8";
+	const char route2[] = "/ip-addresses";
+	const char route3[] = "/health-check/";
+	const char route4[] = "/health-check";
+	const char route5[] = "/numbers";
+	const char route6[] = "/numbers/123456789";
 
 	// Expect no matches.
 	assert_int_not_equal(route_check(route0, requested_url, config), 0);
@@ -47,7 +47,7 @@ void test_http_route_check(void **state)
 	assert_int_not_equal(route_check(route6, requested_url, config), 0);
 
 	// Test a route that is smaller than all, but more than "/". Expect no matches.
-	char requested_url_middle_size[] = "/test/rt";
+	const char requested_url_middle_size[] = "/test/rt";
 
 	assert_int_not_equal(
 		route_check(route0, requested_url_middle_size, config), 0);
@@ -65,7 +65,7 @@ void test_http_route_check(void **state)
 		route_check(route6, requested_url_middle_size, config), 0);
 
 	// Test a route that is smaller than all, but has a partial match, apart from end of url. Expect no matches.
-	char requested_url_middle_size_partial[] = "/ip-/";
+	const char requested_url_middle_size_partial[] = "/ip-/";
 
 	assert_int_not_equal(
 		route_check(route0, requested_url_middle_size_partial, config),
@@ -90,7 +90,7 @@ void test_http_route_check(void **state)
 		0);
 
 	// Test a route that is smaller than all, but has a partial match. No end of url. Expect no matches.
-	char requested_url_middle_size_partial_no_end[] = "/ip-";
+	const char requested_url_middle_size_partial_no_end[] = "/ip-";
 
 	assert_int_not_equal(
 		route_check(route0, requested_url_middle_size_partial_no_end,
@@ -122,11 +122,11 @@ void test_http_route_check(void **state)
 		0);
 
 	// Test a match.
-	char requested_url_match[] = "/ip-addresses";
+	const char requested_url_match[] = "/ip-addresses";
 	assert_int_equal(route_check(route2, requested_url_match, config), 0);
 
 	// Test a bigger url that than we have a route for. Expect no matches.
-	char requested_url_bigger[] =
+	const char requested_url_bigger[] =
 		"/ip-this-is-longer-url-than-we-have-a-route-for-but-has-ip-prefix/";
 	assert_int_not_equal(route_check(route2, requested_url_bigger, config),
 			     0);
