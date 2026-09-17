@@ -21,9 +21,9 @@ fn main() {
     // Deal with the SentryPeer C library
     //
     // Tell cargo to tell rustc to link the sentrypeer
-    // shared library and how to find it
-    println!("cargo:rustc-link-search=../build"); // CMake
+    // static library and how to find it
     println!("cargo:rustc-link-search=../.libs"); // Autotools
+    println!("cargo:rustc-link-search=../build"); // CMake
 
     #[cfg(target_os = "macos")]
     {
@@ -32,7 +32,7 @@ fn main() {
         println!("cargo:rustc-link-lib=framework=Security");
     }
 
-    println!("cargo:rustc-link-lib=sentrypeer");
+    println!("cargo:rustc-link-lib=static=sentrypeer");
 
     // Our other hard SentryPeer dependencies
     println!("cargo:rustc-link-lib=jansson");

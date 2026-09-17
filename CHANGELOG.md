@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `expect()` to avoid panics in production and other idiomatic changes - [#422](https://github.com/SentryPeer/SentryPeer/issues/422)
 - Make CMakeLists.txt more robust [#424](https://github.com/SentryPeer/SentryPeer/issues/424)
 - Clean up cppcheck [#427](https://github.com/SentryPeer/SentryPeer/issues/427)
+- Handle CMake and Autotools better in build.rs [#429](https://github.com/SentryPeer/SentryPeer/issues/429)
 
 ### Fixes 
 - Panic on startup when the default config directory can't be created 

@@ -64,15 +64,18 @@ set(SENTRYPEER_LIB_SRCS
         ${CMAKE_SOURCE_DIR}/src/json_logger.c
 )
 
-# Build a SentryPeer library for use in our Rust code FIRST as,
+# Build a static SentryPeer library for use in our Rust code FIRST as,
 # our Rust code depends on it in our executable
-add_library(${CMAKE_PROJECT_NAME}_lib SHARED
+add_library(${CMAKE_PROJECT_NAME}_lib STATIC
         ${SENTRYPEER_LIB_SRCS}
 )
 
 # Make the library have the same name as the project
 # https://discourse.cmake.org/t/how-to-use-the-same-name-for-a-target-and-a-library/5044/2
-set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
+set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES
+        OUTPUT_NAME ${CMAKE_PROJECT_NAME}
+        POSITION_INDEPENDENT_CODE ON
+)
 
 add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/src/sentrypeer.c
