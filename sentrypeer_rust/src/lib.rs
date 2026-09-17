@@ -258,7 +258,7 @@ mod tests {
             assert_eq!(
                 callback_from_c(return_exit_status, true),
                 libc::EXIT_SUCCESS
-            )
+            );
         };
     }
 

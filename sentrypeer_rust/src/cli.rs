@@ -222,7 +222,7 @@ unsafe fn parse_args(
             if !tls_cert_file.exists() {
                 eprintln!("TLS cert file does not exist: {tls_cert_file:?}");
                 match create_tls_cert_and_key() {
-                    Ok(_) => {}
+                    Ok(()) => {}
                     Err(err) => {
                         eprintln!("Error creating TLS cert and key: {err}");
                         Err("Error creating TLS cert and key")?;

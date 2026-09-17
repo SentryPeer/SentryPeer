@@ -199,7 +199,7 @@ pub(crate) unsafe extern "C" fn json_log_bad_actor_rs(
     let json_str = format!("{json_str}\n");
 
     match buf.write_all(json_str.as_bytes()) {
-        Ok(_) => (),
+        Ok(()) => (),
         Err(e) => {
             eprintln!("Error writing to JSON log file: {e}");
             return libc::EXIT_FAILURE;
@@ -294,7 +294,7 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
 
             unsafe {
                 (*sentrypeer_c_config).oauth2_access_token =
-                    util_duplicate_string(access_token_c_str.as_ptr())
+                    util_duplicate_string(access_token_c_str.as_ptr());
             };
 
             if debug_mode || verbose_mode {
