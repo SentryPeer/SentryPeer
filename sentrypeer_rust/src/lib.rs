@@ -67,11 +67,14 @@ impl BadActor {
         collected_method: *const c_char,
         created_by_node_id: *const c_char,
     ) -> Self {
+        let event_timestamp = CString::new(Utc::now().format("%Y-%m-%d %H:%M:%S").to_string())
+            .map_or(std::ptr::null_mut(), CString::into_raw);
+        let event_uuid = CString::new(Uuid::new_v4().to_string())
+            .map_or(std::ptr::null_mut(), CString::into_raw);
+
         BadActor {
-            event_timestamp: CString::new(Utc::now().format("%Y-%m-%d %H:%M:%S").to_string())
-                .unwrap()
-                .into_raw(),
-            event_uuid: CString::new(Uuid::new_v4().to_string()).unwrap().into_raw(),
+            event_timestamp,
+            event_uuid,
             sip_message,
             source_ip,
             destination_ip,
@@ -206,8 +209,7 @@ pub extern "C" fn return_exit_status(success: bool) -> i32 {
 /// from the C FFI side.
 #[unsafe(no_mangle)]
 pub extern "C" fn return_string() -> *mut c_char {
-    let string = CString::new("Greetings from Rust").unwrap();
-    string.into_raw()
+    CString::new("Greetings from Rust").map_or(std::ptr::null_mut(), CString::into_raw)
 }
 
 /// # Safety
@@ -271,19 +273,17 @@ mod tests {
     }
 
     #[test]
-    fn test_return_bad_actor_new() {
-        let sip_message = CString::new("blah").unwrap().into_raw();
-        let source_ip = CString::new("127.0.0.1").unwrap().into_raw();
-        let destination_ip = CString::new("127.0.0.1").unwrap().into_raw();
-        let called_number = CString::new("1234").unwrap().into_raw();
-        let method = CString::new("INVITE").unwrap().into_raw();
-        let transport_type = CString::new("UDP").unwrap().into_raw();
-        let user_agent = CString::new("SIPp").unwrap().into_raw();
-        let collected_method = CString::new("INVITE").unwrap().into_raw();
+    fn test_return_bad_actor_new() -> Result<(), Box<dyn std::error::Error>> {
+        let sip_message = CString::new("blah")?.into_raw();
+        let source_ip = CString::new("127.0.0.1")?.into_raw();
+        let destination_ip = CString::new("127.0.0.1")?.into_raw();
+        let called_number = CString::new("1234")?.into_raw();
+        let method = CString::new("INVITE")?.into_raw();
+        let transport_type = CString::new("UDP")?.into_raw();
+        let user_agent = CString::new("SIPp")?.into_raw();
+        let collected_method = CString::new("INVITE")?.into_raw();
         // Fake UUID
-        let created_by_node_id = CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")
-            .unwrap()
-            .into_raw();
+        let created_by_node_id = CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?.into_raw();
 
         let bad_actor = return_bad_actor_new(
             sip_message,
@@ -301,50 +301,50 @@ mod tests {
             let bad_actor = Box::from_raw(bad_actor);
 
             assert_eq!(
-                CStr::from_ptr(bad_actor.event_timestamp).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.event_timestamp).to_str()?,
                 Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.event_uuid).to_str().unwrap().len(),
+                CStr::from_ptr(bad_actor.event_uuid).to_str()?.len(),
                 36
             ); // We can't check the exact UUID, but we can check the length
             assert_eq!(
-                CStr::from_ptr(bad_actor.sip_message).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.sip_message).to_str()?,
                 "blah"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.source_ip).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.source_ip).to_str()?,
                 "127.0.0.1"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.destination_ip).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.destination_ip).to_str()?,
                 "127.0.0.1"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.called_number).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.called_number).to_str()?,
                 "1234"
             );
-            assert_eq!(CStr::from_ptr(bad_actor.method).to_str().unwrap(), "INVITE");
+            assert_eq!(CStr::from_ptr(bad_actor.method).to_str()?, "INVITE");
             assert_eq!(
-                CStr::from_ptr(bad_actor.transport_type).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.transport_type).to_str()?,
                 "UDP"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.user_agent).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.user_agent).to_str()?,
                 "SIPp"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.collected_method).to_str().unwrap(),
+                CStr::from_ptr(bad_actor.collected_method).to_str()?,
                 "INVITE"
             );
             assert_eq!(
                 CStr::from_ptr(bad_actor.created_by_node_id)
-                    .to_str()
-                    .unwrap(),
+                    .to_str()?,
                 "460f30e4-ce1d-4d53-9004-dd40a1c4abc9"
             );
 
             bad_actor_free(Box::into_raw(bad_actor));
         }
+        Ok(())
     }
 }
