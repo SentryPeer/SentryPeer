@@ -99,4 +99,26 @@ bool is_valid_uuid(const char *uuid_to_check);
  */
 int max_int(int x, int y);
 
+/**
+ * Sanitise a string for safe logging by removing/replacing newlines and control characters with '_'.
+ *
+ * @param dest The destination buffer to write to.
+ * @param src The source string to sanitise.
+ * @param dest_len The maximum length of the destination buffer.
+ * @return A pointer to the destination string, or NULL on error.
+ */
+char *util_sanitise_for_log(char *dest, const char *src, size_t dest_len);
+
+/**
+ * Sanitise a buffer of given length for safe logging by replacing control characters (except \r, \n, \t) with '.'.
+ *
+ * @param dest The destination buffer to write to.
+ * @param src The source buffer to sanitise.
+ * @param src_len The number of bytes from the source buffer to process.
+ * @param dest_len The maximum length of the destination buffer.
+ * @return A pointer to the destination string, or NULL on error.
+ */
+char *util_sanitise_buf_for_log(char *dest, const char *src, size_t src_len,
+				size_t dest_len);
+
 #endif //SENTRYPEER_UTILS_H

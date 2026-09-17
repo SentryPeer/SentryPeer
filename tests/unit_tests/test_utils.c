@@ -103,4 +103,20 @@ void test_utils(void **state)
 
 	// max_int
 	assert_int_equal(max_int(1, 2), 2);
+
+	// Log sanitisation utils
+	char sanitise_buf[100] = { 0 };
+	const char malicious_log_input[] = "line1\r\nline2\x1b[2J\tinjection";
+	assert_non_null(util_sanitise_for_log(sanitise_buf,
+					      malicious_log_input,
+					      sizeof(sanitise_buf)));
+	assert_string_equal(sanitise_buf, "line1__line2_[2J_injection");
+
+	char sanitise_buf_packet[100] = { 0 };
+	assert_non_null(util_sanitise_buf_for_log(sanitise_buf_packet,
+						  malicious_log_input,
+						  strlen(malicious_log_input),
+						  sizeof(sanitise_buf_packet)));
+	assert_string_equal(sanitise_buf_packet,
+			    "line1\r\nline2.[2J\tinjection");
 }

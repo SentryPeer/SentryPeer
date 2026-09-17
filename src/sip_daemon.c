@@ -35,6 +35,7 @@
 #include <errno.h>
 
 #include "conf.h"
+#include "utils.h"
 #include "sip_daemon.h"
 #include "sip_message_event.h"
 #include "sip_parser.h"
@@ -480,12 +481,19 @@ int sip_daemon_init(sentrypeer_config *config)
 					    config->verbose_mode) {
 						time_t timestamp;
 						time(&timestamp);
+						char sanitised_packet
+							[PACKET_BUFFER_SIZE] = { 0 };
+						util_sanitise_buf_for_log(
+							sanitised_packet,
+							read_packet_buf,
+							bytes_received,
+							sizeof(sanitised_packet));
 						fprintf(stderr,
 							"epochtime: %ld\nReceived (%d bytes): %.*s\n",
 							timestamp,
 							bytes_received,
 							bytes_received,
-							read_packet_buf);
+							sanitised_packet);
 
 						fprintf(stderr,
 							"Received TCP packet from %s\n",
@@ -653,12 +661,19 @@ int sip_daemon_init(sentrypeer_config *config)
 					    config->verbose_mode) {
 						time_t timestamp;
 						time(&timestamp);
+						char sanitised_packet
+							[PACKET_BUFFER_SIZE] = { 0 };
+						util_sanitise_buf_for_log(
+							sanitised_packet,
+							read_packet_buf,
+							bytes_received,
+							sizeof(sanitised_packet));
 						fprintf(stderr,
 							"epochtime: %ld\nReceived (%d bytes): %.*s\n",
 							timestamp,
 							bytes_received,
 							bytes_received,
-							read_packet_buf);
+							sanitised_packet);
 					}
 
 					char udp_client_ip_address_buffer[100];

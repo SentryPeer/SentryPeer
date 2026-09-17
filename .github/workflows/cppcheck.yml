@@ -23,7 +23,7 @@ jobs:
       - name: Test brew call
         run: brew search hello
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       # The only thing really needed is cppcheck, but I'm installing everything anyway
       - run: |
           sudo apt-get update

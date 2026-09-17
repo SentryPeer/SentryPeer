@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <jansson.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 char *event_timestamp(char *timestamp_str)
 {
@@ -158,4 +159,56 @@ int max_int(const int x, const int y)
 	} else {
 		return y;
 	}
+}
+
+char *util_sanitise_for_log(char *dest, const char *src, size_t dest_len)
+{
+	assert(src);
+	assert(dest);
+	assert(dest_len > 0);
+
+	if (src == NULL || dest == NULL || dest_len == 0) {
+		return NULL;
+	}
+
+	size_t i = 0;
+	while (src[i] != '\0' && i < dest_len - 1) {
+		unsigned char c = (unsigned char)src[i];
+		if (c == '\r' || c == '\n' || iscntrl(c) || !isprint(c)) {
+			dest[i] = '_';
+		} else {
+			dest[i] = (char)c;
+		}
+		i++;
+	}
+	dest[i] = '\0';
+
+	return dest;
+}
+
+char *util_sanitise_buf_for_log(char *dest, const char *src, size_t src_len,
+				size_t dest_len)
+{
+	assert(src);
+	assert(dest);
+	assert(dest_len > 0);
+
+	if (src == NULL || dest == NULL || dest_len == 0) {
+		return NULL;
+	}
+
+	size_t limit = src_len < dest_len - 1 ? src_len : dest_len - 1;
+	size_t i = 0;
+	for (i = 0; i < limit; i++) {
+		unsigned char c = (unsigned char)src[i];
+		if (c != '\r' && c != '\n' && c != '\t' &&
+		    (iscntrl(c) || !isprint(c))) {
+			dest[i] = '.';
+		} else {
+			dest[i] = (char)c;
+		}
+	}
+	dest[i] = '\0';
+
+	return dest;
 }

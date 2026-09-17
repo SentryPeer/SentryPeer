@@ -412,13 +412,18 @@ int set_db_file_location(sentrypeer_config *config,
 	if (cli_db_file_location == NULL) {
 		// try to get from the environment
 		if (getenv("SENTRYPEER_DB_FILE")) {
+			char sanitised_db_file[SENTRYPEER_PATH_MAX] = { 0 };
+			util_sanitise_for_log(
+				sanitised_db_file,
+				getenv("SENTRYPEER_DB_FILE"),
+				SENTRYPEER_PATH_MAX);
 			util_copy_string(config->db_file,
-					 getenv("SENTRYPEER_DB_FILE"),
+					 sanitised_db_file,
 					 SENTRYPEER_PATH_MAX);
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"SentryPeer db file location set via SENTRYPEER_DB_FILE env var to: %s\n",
-					config->db_file);
+					sanitised_db_file);
 			}
 		} else {
 			// Set to current working directory absolute path with our own db file name
@@ -445,18 +450,25 @@ int set_db_file_location(sentrypeer_config *config,
 	}
 
 	if (cli_db_file_location[0] == '/') {
-		util_copy_string(config->db_file, cli_db_file_location,
+		char sanitised_db_file[SENTRYPEER_PATH_MAX] = { 0 };
+		util_sanitise_for_log(sanitised_db_file, cli_db_file_location,
+				      SENTRYPEER_PATH_MAX);
+		util_copy_string(config->db_file, sanitised_db_file,
 				 SENTRYPEER_PATH_MAX);
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr,
 				"SentryPeer db file location set via cli -f to: %s\n",
-				config->db_file);
+				sanitised_db_file);
 		}
 		return EXIT_SUCCESS;
 	} else {
+		char sanitised_cli_loc[SENTRYPEER_PATH_MAX] = { 0 };
+		util_sanitise_for_log(sanitised_cli_loc,
+				      cli_db_file_location,
+				      SENTRYPEER_PATH_MAX);
 		fprintf(stderr,
 			"Error: SentryPeer db file location must be an absolute path: %s\n",
-			cli_db_file_location);
+			sanitised_cli_loc);
 		return EXIT_FAILURE;
 	}
 }
@@ -468,13 +480,18 @@ int set_json_log_file_location(sentrypeer_config *config,
 	if (cli_json_log_file_location == NULL) {
 		// try to get from the environment
 		if (getenv("SENTRYPEER_JSON_LOG_FILE")) {
+			char sanitised_json_log_file[SENTRYPEER_PATH_MAX] = { 0 };
+			util_sanitise_for_log(
+				sanitised_json_log_file,
+				getenv("SENTRYPEER_JSON_LOG_FILE"),
+				SENTRYPEER_PATH_MAX);
 			util_copy_string(config->json_log_file,
-					 getenv("SENTRYPEER_JSON_LOG_FILE"),
+					 sanitised_json_log_file,
 					 SENTRYPEER_PATH_MAX);
 			if (config->debug_mode || config->verbose_mode) {
 				fprintf(stderr,
 					"SentryPeer json log file location set via SENTRYPEER_JSON_LOG_FILE env var to: %s\n",
-					config->json_log_file);
+					sanitised_json_log_file);
 			}
 		} else {
 			// Set to current working directory absolute path with our own json log file name
@@ -504,19 +521,27 @@ int set_json_log_file_location(sentrypeer_config *config,
 	}
 
 	if (cli_json_log_file_location[0] == '/') {
+		char sanitised_json_log_file[SENTRYPEER_PATH_MAX] = { 0 };
+		util_sanitise_for_log(sanitised_json_log_file,
+				      cli_json_log_file_location,
+				      SENTRYPEER_PATH_MAX);
 		util_copy_string(config->json_log_file,
-				 cli_json_log_file_location,
+				 sanitised_json_log_file,
 				 SENTRYPEER_PATH_MAX);
 		if (config->debug_mode || config->verbose_mode) {
 			fprintf(stderr,
 				"SentryPeer json log file location set via cli -f to: %s\n",
-				config->json_log_file);
+				sanitised_json_log_file);
 		}
 		return EXIT_SUCCESS;
 	} else {
+		char sanitised_cli_loc[SENTRYPEER_PATH_MAX] = { 0 };
+		util_sanitise_for_log(sanitised_cli_loc,
+				      cli_json_log_file_location,
+				      SENTRYPEER_PATH_MAX);
 		fprintf(stderr,
 			"Error: SentryPeer json log file location must be an absolute path: %s\n",
-			cli_json_log_file_location);
+			sanitised_cli_loc);
 		return EXIT_FAILURE;
 	}
 }
