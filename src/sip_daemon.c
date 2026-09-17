@@ -522,7 +522,7 @@ int sip_daemon_init(sentrypeer_config *config)
 					assert(dest_ip_address_buffer);
 					socklen_t tcp_client_len = sizeof(i);
 
-					char transport_type[] = "TCP";
+					const char transport_type[] = "TCP";
 					sip_message_event *sip_event = sip_message_event_new(
 
 						util_duplicate_string(
@@ -693,7 +693,7 @@ int sip_daemon_init(sentrypeer_config *config)
 							"bytes_received size is: %d: \n\n",
 							bytes_received);
 					}
-					char transport_type[] = "UDP";
+					const char transport_type[] = "UDP";
 
 					sip_message_event *sip_event = sip_message_event_new(
 						util_duplicate_string(

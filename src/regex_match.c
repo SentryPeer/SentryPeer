@@ -34,7 +34,7 @@ int regex_match(const char *string, const char *regex, char **matched_string,
 	int rc;
 
 	PCRE2_SIZE erroroffset;
-	PCRE2_SIZE *ovector;
+	const PCRE2_SIZE *ovector;
 	PCRE2_SIZE subject_length;
 
 	pcre2_match_data *match_data;

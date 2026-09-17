@@ -86,8 +86,9 @@ int process_cli(sentrypeer_config *config, int argc, char **argv);
 
 int process_env_vars(sentrypeer_config *config);
 
-int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location);
+int set_db_file_location(sentrypeer_config *config,
+			 const char *cli_db_file_location);
 int set_json_log_file_location(sentrypeer_config *config,
-			       char *cli_json_log_file_location);
+			       const char *cli_json_log_file_location);
 
 #endif // SENTRYPEER_CONFIG_H

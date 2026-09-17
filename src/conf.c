@@ -406,7 +406,8 @@ int process_env_vars(sentrypeer_config *config)
 	return EXIT_SUCCESS;
 }
 
-int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
+int set_db_file_location(sentrypeer_config *config,
+			 const char *cli_db_file_location)
 {
 	if (cli_db_file_location == NULL) {
 		// try to get from the environment
@@ -462,7 +463,7 @@ int set_db_file_location(sentrypeer_config *config, char *cli_db_file_location)
 
 // TODO: When we use this for the 3rd time, re-work the lot as it's the same as set_db_file_location
 int set_json_log_file_location(sentrypeer_config *config,
-			       char *cli_json_log_file_location)
+			       const char *cli_json_log_file_location)
 {
 	if (cli_json_log_file_location == NULL) {
 		// try to get from the environment
