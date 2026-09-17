@@ -29,32 +29,85 @@ use crate::config::{SentryPeerConfig, create_certs, load_all_configs, load_certs
 use crate::tcp::handle_tcp_connection;
 use crate::tls::handle_tls_connection;
 use crate::udp::handle_udp_connection;
+use uuid::Uuid;
 
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
-// SIP packet const with \r\n - \n is added in the formatting
-pub const SIP_PACKET: &[u8] = b"SIP/2.0 200 OK\r
-Via: SIP/2.0/UDP 127.0.0.1:5061\r
-Call-ID: 1179563087@127.0.0.1\r
-From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r
-To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r
-CSeq: 1 OPTIONS\r
-Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r
-Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r
-Supported: 100rel, timer, replaces, norefersub\r
-Accept-Encoding: text/plain\r
-Accept-Language: en\r
-Server: FPBX-16.0.33(18.13.0)\r
-Content-Length:  0\r\n";
+/// Pulls a single header's value out of a raw SIP request. Case-insensitive
+/// on the header name, per RFC 3261. Works line-by-line on a lossily
+/// decoded copy of the request so it can never panic on non-UTF-8 or
+/// embedded-NUL bytes (a peer can and does send both).
+fn extract_header_value(request: &str, header_name: &str) -> Option<String> {
+    let header_name_lower = header_name.to_lowercase();
+    for line in request.split("\r\n") {
+        let (name, value) = line.split_once(':')?;
+        if name.trim().to_lowercase() == header_name_lower {
+            return Some(value.trim().to_string());
+        }
+    }
+    None
+}
+
+/// Builds a SIP 200 OK reply that correlates to the given request's
+/// Via/From/To/Call-ID/CSeq, per RFC 3261 SS8.2.6, instead of always
+/// replying with the same static packet regardless of what was sent to us.
+/// Bad Actors doing simple scanning don't care, but anything that checks
+/// whether our response actually correlates to its own request (real SIP
+/// clients doing loop detection, and some OSINT/recon scanners) would
+/// notice Via/From/To/Call-ID/CSeq never changed.
+///
+/// Falls back to the previous static values for any header the request
+/// didn't include, so a malformed or truncated request still gets a
+/// plausible reply instead of an empty one.
+pub fn build_sip_reply(request: &[u8]) -> Vec<u8> {
+    let request_str = String::from_utf8_lossy(request);
+
+    let via = extract_header_value(&request_str, "Via")
+        .unwrap_or_else(|| "SIP/2.0/UDP 127.0.0.1:56940".to_string());
+    let from = extract_header_value(&request_str, "From")
+        .unwrap_or_else(|| "<sip:sipsak@127.0.0.1>;tag=464eb44f".to_string());
+    let mut to = extract_header_value(&request_str, "To")
+        .unwrap_or_else(|| "<sip:asterisk@127.0.0.1>".to_string());
+    let call_id = extract_header_value(&request_str, "Call-ID")
+        .unwrap_or_else(|| "1179563087@127.0.0.1".to_string());
+    let cseq = extract_header_value(&request_str, "CSeq")
+        .unwrap_or_else(|| "1 OPTIONS".to_string());
+
+    // A final response needs a To-tag (RFC 3261 SS8.2.6.2). The request
+    // won't carry one on an initial transaction, so mint one if the
+    // request's To header didn't already have one (an in-dialog probe
+    // would already have one, and we leave that as-is).
+    if !to.to_lowercase().contains(";tag=") {
+        let tag = Uuid::new_v4().to_string();
+        to.push_str(&format!(";tag={}", &tag[..8]));
+    }
+
+    format!(
+        "SIP/2.0 200 OK\r\n\
+         Via: {via}\r\n\
+         Call-ID: {call_id}\r\n\
+         From: {from}\r\n\
+         To: {to}\r\n\
+         CSeq: {cseq}\r\n\
+         Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n\
+         Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n\
+         Supported: 100rel, timer, replaces, norefersub\r\n\
+         Accept-Encoding: text/plain\r\n\
+         Accept-Language: en\r\n\
+         Server: FPBX-17.0.32(22.6.0)\r\n\
+         Content-Length:  0\r\n"
+    )
+    .into_bytes()
+}
 
 // Allow any type that implements AsyncWriteExt so we can use tokio::net::TcpStream for TCP
 // and tokio_rustls::TlsStream<tokio::net::TcpStream> for TLS, e.g. WriteHalf<TlsStream<TcpStream>
-pub async fn gen_sip_reply<T>(mut writer: WriteHalf<T>)
+pub async fn gen_sip_reply<T>(mut writer: WriteHalf<T>, request: &[u8])
 where
     T: AsyncWriteExt,
 {
-    writer.write_all(SIP_PACKET).await.unwrap();
+    writer.write_all(&build_sip_reply(request)).await.unwrap();
 }
 
 /// # Safety
@@ -437,5 +490,78 @@ mod tests {
 
             sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }
+    }
+
+    #[test]
+    fn test_build_sip_reply_correlates_request_headers() {
+        let request = b"OPTIONS sip:1000@127.0.0.1 SIP/2.0\r\n\
+            Via: SIP/2.0/UDP 0.0.0.0:55123;branch=z9hG4bK-verify-test\r\n\
+            From: <sip:probe@0.0.0.0>;tag=verifytest1\r\n\
+            To: <sip:1000@127.0.0.1>\r\n\
+            Call-ID: verify-test-call-id-12345\r\n\
+            CSeq: 42 OPTIONS\r\n\
+            Content-Length: 0\r\n\r\n";
+
+        let reply = String::from_utf8(build_sip_reply(request)).unwrap();
+
+        assert!(reply.starts_with("SIP/2.0 200 OK\r\n"));
+        assert!(reply.contains(
+            "Via: SIP/2.0/UDP 0.0.0.0:55123;branch=z9hG4bK-verify-test\r\n"
+        ));
+        assert!(reply.contains("From: <sip:probe@0.0.0.0>;tag=verifytest1\r\n"));
+        assert!(reply.contains("Call-ID: verify-test-call-id-12345\r\n"));
+        assert!(reply.contains("CSeq: 42 OPTIONS\r\n"));
+        // The request's To header had no tag, so the reply must mint one
+        // (RFC 3261 SS8.2.6.2) rather than echo the request verbatim.
+        assert!(reply.contains("To: <sip:1000@127.0.0.1>;tag="));
+        // The stale FreePBX 16/Asterisk 18 fingerprint must be gone.
+        assert!(!reply.contains("FPBX-16.0.33(18.13.0)"));
+        assert!(reply.contains("Server: FPBX-17.0.32(22.6.0)\r\n"));
+    }
+
+    #[test]
+    fn test_build_sip_reply_preserves_existing_to_tag() {
+        // As if this were an in-dialog probe - the To header already has a
+        // tag, so the reply must preserve it exactly, not mint a second one.
+        let request = b"OPTIONS sip:1000@127.0.0.1 SIP/2.0\r\n\
+            Via: SIP/2.0/UDP 0.0.0.0:1;branch=z9hG4bK-x\r\n\
+            From: <sip:probe@0.0.0.0>;tag=abc\r\n\
+            To: <sip:1000@127.0.0.1>;tag=already-present\r\n\
+            Call-ID: has-a-to-tag-already\r\n\
+            CSeq: 1 OPTIONS\r\n\
+            Content-Length: 0\r\n\r\n";
+
+        let reply = String::from_utf8(build_sip_reply(request)).unwrap();
+
+        assert!(reply.contains("To: <sip:1000@127.0.0.1>;tag=already-present\r\n"));
+        assert!(!reply.contains("tag=already-present;tag="));
+    }
+
+    #[test]
+    fn test_build_sip_reply_survives_embedded_nul_byte() {
+        // The same packet shape that used to panic the C string conversion
+        // path (see test_packet_bytes_to_cstring_never_panics_on_embedded_nul)
+        // - this must not panic here either.
+        let request = b"OPTIONS sip:1000@127.0.0.1 SIP/2.0\r\n\
+            Via: SIP/2.0/UDP 0.0.0.0:1;branch=z9hG4bK-nul\r\n\
+            From: <sip:probe@0.0.0.0>;tag=abc\r\n\
+            To: <sip:1000@127.0.0.1>\r\n\
+            Call-ID: has-embedded-nul\r\n\
+            CSeq: 1 OPTIONS\r\n\
+            Content-Length: 4\r\n\r\nA\x00BC";
+
+        let reply = String::from_utf8(build_sip_reply(request)).unwrap();
+
+        assert!(reply.contains("Call-ID: has-embedded-nul\r\n"));
+    }
+
+    #[test]
+    fn test_build_sip_reply_falls_back_on_malformed_request() {
+        let request = b"not a real SIP request at all";
+
+        let reply = String::from_utf8(build_sip_reply(request)).unwrap();
+
+        assert!(reply.starts_with("SIP/2.0 200 OK\r\n"));
+        assert!(reply.contains("Call-ID: 1179563087@127.0.0.1\r\n"));
     }
 }

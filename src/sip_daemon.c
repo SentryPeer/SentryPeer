@@ -33,12 +33,14 @@
 #include <syslog.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "conf.h"
 #include "utils.h"
 #include "sip_daemon.h"
 #include "sip_message_event.h"
 #include "sip_parser.h"
+#include "utils.h"
 
 #if HAVE_OPENDHT_C != 0
 #include "peer_to_peer_dht.h"
@@ -186,30 +188,132 @@ int sip_log_event(sentrypeer_config *config, const sip_message_event *sip_event)
 	return EXIT_SUCCESS;
 }
 
+// A previous version of this function replied with the same hardcoded
+// packet regardless of what was sent to us - Bad Actors doing simple
+// scanning didn't care, but anything that checks whether a response
+// actually correlates to its own request (real SIP clients doing loop
+// detection, and some OSINT/recon scanners) would notice Via/From/To/
+// Call-ID/CSeq never changed. Real SIP servers are required by RFC 3261
+// SS8.2.6 to copy these fields from the request into the response, so we
+// do the same here instead.
+//
+// sip_event->packet is not guaranteed to be NUL-terminated (bad actors can
+// and do send SIP packets containing embedded NUL bytes - see the
+// sip.rs embedded-NUL fix in this same repo for the Rust side of that
+// lesson), so this works on a bounded copy and never calls a function
+// that assumes NUL-terminated input beyond that copy's own NUL terminator.
+static bool sip_extract_header_value(char const *packet, size_t packet_len,
+				     char const *header_name, char *out,
+				     size_t out_len)
+{
+	assert(packet);
+	assert(header_name);
+	assert(out);
+	assert(out_len > 0);
+
+	char *buf = calloc(packet_len + 1, 1);
+	if (buf == NULL) {
+		return false;
+	}
+	memcpy(buf, packet, packet_len);
+
+	bool found = false;
+	size_t name_len = strlen(header_name);
+	char *line = buf;
+
+	while (line != NULL && *line != '\0') {
+		char *line_end = strstr(line, "\r\n");
+		size_t line_len =
+			line_end ? (size_t)(line_end - line) : strlen(line);
+
+		if (line_len > name_len &&
+		    strncasecmp(line, header_name, name_len) == 0 &&
+		    line[name_len] == ':') {
+			char *value = line + name_len + 1;
+			size_t value_len = line_len - name_len - 1;
+			while (value_len > 0 && *value == ' ') {
+				value++;
+				value_len--;
+			}
+			if (value_len >= out_len) {
+				value_len = out_len - 1;
+			}
+			memcpy(out, value, value_len);
+			out[value_len] = '\0';
+			found = true;
+			break;
+		}
+
+		if (line_end == NULL) {
+			break;
+		}
+		line = line_end + 2;
+	}
+
+	free(buf);
+	return found;
+}
+
 int sip_send_reply(sentrypeer_config const *config,
 		   sip_message_event const *sip_event)
 {
-	// TODO Create reply headers with libosip2. Bad
-	// Actors don't seem to care we're always replying
-	// with 200 OK/non-compliant SIP :-)
-	char SIP_200_OK[] =
+	char via[256] = "SIP/2.0/UDP 127.0.0.1:56940";
+	char from[256] = "<sip:sipsak@127.0.0.1>;tag=464eb44f";
+	char to[256] = "<sip:asterisk@127.0.0.1>";
+	char call_id[256] = "1179563087@127.0.0.1";
+	char cseq[64] = "1 OPTIONS";
+	char to_tag[UTILS_UUID_STRING_LEN] = { 0 };
+	char reply[2048];
+
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "Via", via, sizeof(via));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "From", from, sizeof(from));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "To", to, sizeof(to));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "Call-ID", call_id, sizeof(call_id));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "CSeq", cseq, sizeof(cseq));
+
+	// A final response needs a To-tag (RFC 3261 SS8.2.6.2). The request
+	// won't carry one on an initial transaction, so mint one if the
+	// request's To header didn't already have one (an in-dialog probe
+	// would already have one, and we leave that as-is).
+	if (strcasestr(to, ";tag=") == NULL) {
+		char uuid_string[UTILS_UUID_STRING_LEN];
+		util_uuid_generate_string(uuid_string);
+		snprintf(to_tag, sizeof(to_tag), "%.8s", uuid_string);
+	}
+
+	int reply_len = snprintf(
+		reply, sizeof(reply),
 		"SIP/2.0 200 OK\r\n"
-		"Via: SIP/2.0/UDP 127.0.0.1:56940\r\n"
-		"Call-ID: 1179563087@127.0.0.1\r\n"
-		"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n"
-		"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r\n"
-		"CSeq: 1 OPTIONS\r\n"
+		"Via: %s\r\n"
+		"Call-ID: %s\r\n"
+		"From: %s\r\n"
+		"To: %s%s%s\r\n"
+		"CSeq: %s\r\n"
 		"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n"
 		"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n"
 		"Supported: 100rel, timer, replaces, norefersub\r\n"
 		"Accept-Encoding: text/plain\r\n"
 		"Accept-Language: en\r\n"
-		"Server: FPBX-16.0.33(18.13.0)\r\n"
-		"Content-Length:  0\r\n";
+		"Server: FPBX-17.0.32(22.6.0)\r\n"
+		"Content-Length:  0\r\n",
+		via, call_id, from, to, to_tag[0] != '\0' ? ";tag=" : "",
+		to_tag, cseq);
 
-	long bytes_sent =
-		sendto(sip_event->socket, SIP_200_OK, sizeof(SIP_200_OK), 0,
-		       sip_event->client_ip_addr, sip_event->client_addr_len);
+	if (reply_len < 0 || (size_t)reply_len >= sizeof(reply)) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "SIP reply too large for buffer.\n");
+		}
+		return EXIT_FAILURE;
+	}
+
+	long bytes_sent = sendto(sip_event->socket, reply, (size_t)reply_len,
+				 0, sip_event->client_ip_addr,
+				 sip_event->client_addr_len);
 	if (bytes_sent < 1) {
 		if (config->debug_mode || config->verbose_mode) {
 			perror("sendto() failed.");

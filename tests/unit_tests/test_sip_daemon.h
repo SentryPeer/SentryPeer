@@ -15,5 +15,8 @@
 #define SENTRYPEER_TEST_SIP_DAEMON_H 1
 
 void test_sip_daemon(void **state);
+void test_sip_send_reply_correlates_request_headers(void **state);
+void test_sip_send_reply_adds_to_tag_when_missing(void **state);
+void test_sip_send_reply_survives_embedded_nul_byte(void **state);
 
 #endif //SENTRYPEER_TEST_SIP_DAEMON_H
