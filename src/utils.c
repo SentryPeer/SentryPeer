@@ -172,7 +172,7 @@ char *util_sanitise_for_log(char *dest, const char *src, size_t dest_len)
 	}
 
 	size_t i = 0;
-	while (src[i] != '\0' && i < dest_len - 1) {
+	while (i < dest_len - 1 && src[i] != '\0') {
 		unsigned char c = (unsigned char)src[i];
 		if (c == '\r' || c == '\n' || iscntrl(c) || !isprint(c)) {
 			dest[i] = '_';
