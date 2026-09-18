@@ -54,3 +54,190 @@ pub async fn handle_tcp_connection(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{sentrypeer_config_destroy, sentrypeer_config_new};
+    use serial_test::serial;
+    use tokio::io::AsyncWriteExt;
+    use tokio::net::TcpListener;
+
+    const TEST_SIP_REQUEST: &[u8] = b"OPTIONS sip:100@127.0.0.1:5060 SIP/2.0\r
+Via: SIP/2.0/TCP 127.0.0.1:5060;branch=z9hG4bK-1234\r
+From: <sip:test@127.0.0.1>;tag=1234\r
+To: <sip:100@127.0.0.1>\r
+Call-ID: test-tcp-call-id-1234@127.0.0.1\r
+CSeq: 1 OPTIONS\r
+Contact: <sip:test@127.0.0.1:5060>\r
+User-Agent: test-tcp-agent\r
+Content-Length: 0\r\n\r\n";
+
+    #[tokio::test]
+    #[serial]
+    async fn test_handle_tcp_connection_responsive() {
+        let sentrypeer_c_config = unsafe { sentrypeer_config_new() };
+        assert!(!sentrypeer_c_config.is_null());
+        unsafe {
+            (*sentrypeer_c_config).debug_mode = true;
+            (*sentrypeer_c_config).verbose_mode = true;
+            (*sentrypeer_c_config).sip_responsive_mode = true;
+        }
+        let sentrypeer_config = SentryPeerConfig {
+            p: sentrypeer_c_config,
+        };
+
+        let listener = match TcpListener::bind("127.0.0.1:0").await {
+            Ok(listener) => listener,
+            Err(err) => panic!("Failed to bind TCP listener: {err}"),
+        };
+        let listen_addr = match listener.local_addr() {
+            Ok(addr) => addr,
+            Err(err) => panic!("Failed to get local address: {err}"),
+        };
+
+        let client_task = tokio::spawn(async move {
+            let mut stream = match TcpStream::connect(listen_addr).await {
+                Ok(stream) => stream,
+                Err(err) => panic!("Client failed to connect: {err}"),
+            };
+
+            if let Err(err) = stream.write_all(TEST_SIP_REQUEST).await {
+                panic!("Client failed to write SIP request: {err}");
+            }
+
+            let mut response_buf = [0; 1024];
+            let n = match stream.read(&mut response_buf).await {
+                Ok(n) => n,
+                Err(err) => panic!("Client failed to read response: {err}"),
+            };
+            assert!(n > 0);
+            let response = String::from_utf8_lossy(&response_buf[..n]);
+            assert!(response.contains("SIP/2.0 200 OK"));
+        });
+
+        let (server_stream, peer_addr) = match listener.accept().await {
+            Ok(res) => res,
+            Err(err) => panic!("Failed to accept TCP stream: {err}"),
+        };
+
+        let res =
+            handle_tcp_connection(server_stream, sentrypeer_config, peer_addr, listen_addr).await;
+        assert!(res.is_ok());
+
+        if let Err(err) = client_task.await {
+            panic!("Client task failed: {err}");
+        }
+
+        unsafe {
+            let mut conf_ptr = sentrypeer_c_config;
+            sentrypeer_config_destroy(&mut conf_ptr);
+        }
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn test_handle_tcp_connection_non_responsive() {
+        let sentrypeer_c_config = unsafe { sentrypeer_config_new() };
+        assert!(!sentrypeer_c_config.is_null());
+        unsafe {
+            (*sentrypeer_c_config).debug_mode = true;
+            (*sentrypeer_c_config).verbose_mode = false;
+            (*sentrypeer_c_config).sip_responsive_mode = false;
+        }
+        let sentrypeer_config = SentryPeerConfig {
+            p: sentrypeer_c_config,
+        };
+
+        let listener = match TcpListener::bind("127.0.0.1:0").await {
+            Ok(listener) => listener,
+            Err(err) => panic!("Failed to bind TCP listener: {err}"),
+        };
+        let listen_addr = match listener.local_addr() {
+            Ok(addr) => addr,
+            Err(err) => panic!("Failed to get local address: {err}"),
+        };
+
+        let client_task = tokio::spawn(async move {
+            let mut stream = match TcpStream::connect(listen_addr).await {
+                Ok(stream) => stream,
+                Err(err) => panic!("Client failed to connect: {err}"),
+            };
+
+            if let Err(err) = stream.write_all(TEST_SIP_REQUEST).await {
+                panic!("Client failed to write SIP request: {err}");
+            }
+        });
+
+        let (server_stream, peer_addr) = match listener.accept().await {
+            Ok(res) => res,
+            Err(err) => panic!("Failed to accept TCP stream: {err}"),
+        };
+
+        let res =
+            handle_tcp_connection(server_stream, sentrypeer_config, peer_addr, listen_addr).await;
+        assert!(res.is_ok());
+
+        if let Err(err) = client_task.await {
+            panic!("Client task failed: {err}");
+        }
+
+        unsafe {
+            let mut conf_ptr = sentrypeer_c_config;
+            sentrypeer_config_destroy(&mut conf_ptr);
+        }
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn test_handle_tcp_connection_invalid_packet() {
+        let sentrypeer_c_config = unsafe { sentrypeer_config_new() };
+        assert!(!sentrypeer_c_config.is_null());
+        unsafe {
+            (*sentrypeer_c_config).debug_mode = true;
+            (*sentrypeer_c_config).verbose_mode = true;
+            (*sentrypeer_c_config).sip_responsive_mode = false;
+        }
+        let sentrypeer_config = SentryPeerConfig {
+            p: sentrypeer_c_config,
+        };
+
+        let listener = match TcpListener::bind("127.0.0.1:0").await {
+            Ok(listener) => listener,
+            Err(err) => panic!("Failed to bind TCP listener: {err}"),
+        };
+        let listen_addr = match listener.local_addr() {
+            Ok(addr) => addr,
+            Err(err) => panic!("Failed to get local address: {err}"),
+        };
+
+        let client_task = tokio::spawn(async move {
+            let mut stream = match TcpStream::connect(listen_addr).await {
+                Ok(stream) => stream,
+                Err(err) => panic!("Client failed to connect: {err}"),
+            };
+
+            if let Err(err) = stream.write_all(b"NOT A VALID SIP PACKET\r\n").await {
+                panic!("Client failed to write data: {err}");
+            }
+        });
+
+        let (server_stream, peer_addr) = match listener.accept().await {
+            Ok(res) => res,
+            Err(err) => panic!("Failed to accept TCP stream: {err}"),
+        };
+
+        let res =
+            handle_tcp_connection(server_stream, sentrypeer_config, peer_addr, listen_addr).await;
+        assert!(res.is_ok());
+
+        if let Err(err) = client_task.await {
+            panic!("Client task failed: {err}");
+        }
+
+        unsafe {
+            let mut conf_ptr = sentrypeer_c_config;
+            sentrypeer_config_destroy(&mut conf_ptr);
+        }
+    }
+}
