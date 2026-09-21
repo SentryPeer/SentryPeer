@@ -395,6 +395,12 @@ pub(crate) unsafe extern "C" fn shutdown_sip(sentrypeer_c_config: *const sentryp
     }
 }
 
+/// A `CString` can't hold an interior NUL, so swap NULs for `.` instead of
+/// dropping the packet.
+fn packet_to_cstring(buf: &[u8]) -> Option<CString> {
+    CString::new(String::from_utf8_lossy(buf).replace('\0', ".")).ok()
+}
+
 pub fn log_sip_packet(
     sentrypeer_c_config: SentryPeerConfig,
     buf: Vec<u8>,
@@ -408,9 +414,7 @@ pub fn log_sip_packet(
 
     // To free on our side
     // https://doc.rust-lang.org/std/ffi/struct.CString.html#method.into_raw
-    let Ok(packet_c_str) =
-        CString::new(String::from_utf8_lossy(&buf[..bytes_read]).to_string())
-    else {
+    let Some(packet_c_str) = packet_to_cstring(&buf[..bytes_read]) else {
         return libc::EXIT_FAILURE;
     };
     let packet_ptr = packet_c_str.into_raw();
@@ -566,5 +570,23 @@ mod tests {
 
             sentrypeer_config_destroy(&mut sentrypeer_c_config);
         }
+    }
+
+    #[test]
+    fn test_packet_to_cstring_replaces_embedded_nul() {
+        let packet = b"INVITE sip:test\x00SIP/2.0\r\n\x00";
+        assert_eq!(
+            packet_to_cstring(packet).as_deref(),
+            Some(c"INVITE sip:test.SIP/2.0\r\n.")
+        );
+    }
+
+    #[test]
+    fn test_packet_to_cstring_keeps_normal_packet() {
+        let packet = b"OPTIONS sip:1.2.3.4 SIP/2.0\r\n";
+        assert_eq!(
+            packet_to_cstring(packet).as_deref(),
+            Some(c"OPTIONS sip:1.2.3.4 SIP/2.0\r\n")
+        );
     }
 }
