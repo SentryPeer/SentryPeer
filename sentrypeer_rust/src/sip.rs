@@ -29,32 +29,93 @@ use crate::config::{SentryPeerConfig, create_certs, load_all_configs, load_certs
 use crate::tcp::handle_tcp_connection;
 use crate::tls::handle_tls_connection;
 use crate::udp::handle_udp_connection;
+use uuid::Uuid;
 
 // Our C FFI functions
 use crate::{sentrypeer_config, sip_log_event, sip_message_event_destroy, sip_message_event_new};
 
-// SIP packet const with \r\n - \n is added in the formatting
-pub const SIP_PACKET: &[u8] = b"SIP/2.0 200 OK\r
-Via: SIP/2.0/UDP 127.0.0.1:5061\r
-Call-ID: 1179563087@127.0.0.1\r
-From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r
-To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r
-CSeq: 1 OPTIONS\r
-Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r
-Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r
-Supported: 100rel, timer, replaces, norefersub\r
-Accept-Encoding: text/plain\r
-Accept-Language: en\r
-Server: FPBX-16.0.33(18.13.0)\r
-Content-Length:  0\r\n";
+const WSP: [char; 2] = [' ', '\t'];
+
+/// Value of the first `header_name` header, or `None` if it is absent or empty.
+/// The headers end at the first blank line, so the body is never searched.
+fn extract_header_value(request: &str, header_name: &str) -> Option<String> {
+    // Leading CRLFs are allowed (RFC 3261 §7.5)
+    for line in request.split("\r\n").skip_while(|l| l.is_empty()) {
+        if line.is_empty() {
+            break;
+        }
+        let Some((name, value)) = line.split_once(':') else {
+            continue;
+        };
+        if name.trim_end_matches(WSP).eq_ignore_ascii_case(header_name) {
+            // A stray CR, LF or NUL ends the value
+            let value = value
+                .split(['\r', '\n', '\0'])
+                .next()
+                .unwrap_or_default()
+                .trim_matches(WSP);
+            return (!value.is_empty()).then(|| value.to_string());
+        }
+    }
+    None
+}
+
+/// True if `to` has a `tag` parameter. Whitespace is allowed around `;` and `=`.
+fn to_has_tag(to: &str) -> bool {
+    to.split(';').skip(1).any(|param| {
+        let param = param.trim_start_matches(WSP);
+        param
+            .get(..3)
+            .is_some_and(|t| t.eq_ignore_ascii_case("tag"))
+            && param[3..].trim_start_matches(WSP).starts_with('=')
+    })
+}
+
+/// Builds a 200 OK that echoes the request's Via/From/To/Call-ID/CSeq
+/// (RFC 3261 §8.2.6). Headers missing from the request get static defaults.
+pub fn build_sip_reply(request: &[u8]) -> Vec<u8> {
+    let request = String::from_utf8_lossy(request);
+    let header = |name: &str, default: &str| {
+        extract_header_value(&request, name).unwrap_or_else(|| default.to_string())
+    };
+
+    let via = header("Via", "SIP/2.0/UDP 127.0.0.1:56940");
+    let from = header("From", "<sip:sipsak@127.0.0.1>;tag=464eb44f");
+    let mut to = header("To", "<sip:asterisk@127.0.0.1>");
+    let call_id = header("Call-ID", "1179563087@127.0.0.1");
+    let cseq = header("CSeq", "1 OPTIONS");
+
+    // A final response needs a To tag (RFC 3261 §8.2.6.2)
+    if !to_has_tag(&to) {
+        let tag = Uuid::new_v4().to_string();
+        to.push_str(&format!(";tag={}", &tag[..8]));
+    }
+
+    format!(
+        "SIP/2.0 200 OK\r\n\
+         Via: {via}\r\n\
+         Call-ID: {call_id}\r\n\
+         From: {from}\r\n\
+         To: {to}\r\n\
+         CSeq: {cseq}\r\n\
+         Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n\
+         Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n\
+         Supported: 100rel, timer, replaces, norefersub\r\n\
+         Accept-Encoding: text/plain\r\n\
+         Accept-Language: en\r\n\
+         Server: FPBX-17.0.32(22.6.0)\r\n\
+         Content-Length:  0\r\n"
+    )
+    .into_bytes()
+}
 
 // Allow any type that implements AsyncWriteExt so we can use tokio::net::TcpStream for TCP
 // and tokio_rustls::TlsStream<tokio::net::TcpStream> for TLS, e.g. WriteHalf<TlsStream<TcpStream>
-pub async fn gen_sip_reply<T>(mut writer: WriteHalf<T>)
+pub async fn gen_sip_reply<T>(mut writer: WriteHalf<T>, request: &[u8])
 where
     T: AsyncWriteExt,
 {
-    if let Err(err) = writer.write_all(SIP_PACKET).await {
+    if let Err(err) = writer.write_all(&build_sip_reply(request)).await {
         eprintln!("Failed to write SIP reply: {err}");
     }
 }
@@ -542,6 +603,102 @@ unsafe fn clean_up_sip_message(
 mod tests {
     use super::*;
     use crate::{sentrypeer_config_destroy, sentrypeer_config_new};
+
+    const DEFAULT_CALL_ID: &str = "Call-ID: 1179563087@127.0.0.1\r\n";
+
+    fn reply_for(request: &[u8]) -> String {
+        String::from_utf8_lossy(&build_sip_reply(request)).into_owned()
+    }
+
+    /// Reply to an OPTIONS request that has `headers` after the request line
+    fn reply_with(headers: &str) -> String {
+        reply_for(format!("OPTIONS sip:x SIP/2.0\r\n{headers}\r\n").as_bytes())
+    }
+
+    #[test]
+    fn test_reply_correlates_headers() {
+        let reply = reply_with(
+            "Via: SIP/2.0/UDP 0.0.0.0:55123;branch=z9hG4bK-x\r\n\
+             From: <sip:probe@0.0.0.0>;tag=abc\r\n\
+             To: <sip:1000@127.0.0.1>\r\n\
+             Call-ID: call-id-1\r\n\
+             CSeq: 42 OPTIONS\r\n",
+        );
+
+        assert!(reply.starts_with("SIP/2.0 200 OK\r\n"));
+        for line in [
+            "Via: SIP/2.0/UDP 0.0.0.0:55123;branch=z9hG4bK-x",
+            "From: <sip:probe@0.0.0.0>;tag=abc",
+            "Call-ID: call-id-1",
+            "CSeq: 42 OPTIONS",
+            "Server: FPBX-17.0.32(22.6.0)",
+        ] {
+            assert!(reply.contains(&format!("{line}\r\n")), "{line}");
+        }
+        assert!(reply.contains("To: <sip:1000@127.0.0.1>;tag="));
+    }
+
+    #[test]
+    fn test_reply_keeps_existing_to_tag() {
+        for to in [
+            "<sip:1000@127.0.0.1>;tag=abc",
+            "<sip:1000@127.0.0.1>; tag=abc",
+        ] {
+            let reply = reply_with(&format!("To: {to}\r\n"));
+
+            assert!(reply.contains(&format!("To: {to}\r\n")), "{to}");
+        }
+    }
+
+    #[test]
+    fn test_reply_defaults_on_malformed_request() {
+        let reply = reply_for(b"not a real SIP request at all");
+
+        assert!(reply.starts_with("SIP/2.0 200 OK\r\n"));
+        assert!(reply.contains(DEFAULT_CALL_ID));
+    }
+
+    #[test]
+    fn test_reply_header_parsing() {
+        // Whitespace around the colon, and a stray LF or NUL ending a value
+        let echoed = [
+            ("Via : v1\r\n", "Via: v1\r\n"),
+            ("Call-ID:\tb\r\n", "Call-ID: b\r\n"),
+            ("Call-ID: d\nX: 1\r\n", "Call-ID: d\r\n"),
+            ("Call-ID: e\0f\r\n", "Call-ID: e\r\n"),
+        ];
+        for (headers, line) in echoed {
+            assert!(reply_with(headers).contains(line), "{headers:?}");
+        }
+
+        // A header in the body, and empty or blank values, fall back
+        for headers in [
+            "Via: v\r\n\r\nCall-ID: x\r\n",
+            "Call-ID:\r\n",
+            "Call-ID: \t \r\n",
+        ] {
+            assert!(reply_with(headers).contains(DEFAULT_CALL_ID), "{headers:?}");
+        }
+
+        // Leading CRLF, and a request line without a colon
+        let reply = reply_for(b"\r\nOPTIONS sip:x SIP/2.0\r\nCall-ID: a\r\n\r\n");
+        assert!(reply.contains("Call-ID: a\r\n"));
+        let reply = reply_for(b"OPTIONS * SIP/2.0\r\nCall-ID: c\r\n\r\n");
+        assert!(reply.contains("Call-ID: c\r\n"));
+    }
+
+    #[test]
+    fn test_reply_invalid_utf8_in_to() {
+        let head = &b"OPTIONS sip:x SIP/2.0\r\nCall-ID: c\r\nTo: <sip:x>;"[..];
+        // Multi-byte characters that straddle byte 3 and byte 4 of the parameter
+        for tail in [
+            &b"\xff\xff\r\n\r\n"[..],
+            &b"\xc3\xa9\xe2\x82\xac\r\n\r\n"[..],
+            &b"\xc3\xa9a\xe2\x82\xac\r\n\r\n"[..],
+        ] {
+            assert!(reply_for(&[head, tail].concat()).contains("Call-ID: c\r\n"));
+        }
+    }
 
     #[test]
     fn test_listen() {
