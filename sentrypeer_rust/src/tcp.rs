@@ -50,7 +50,7 @@ pub async fn handle_tcp_connection(
     }
 
     if sip_responsive_mode {
-        gen_sip_reply(writer).await;
+        gen_sip_reply(writer, &buf[..bytes_read]).await;
     }
     Ok(())
 }
