@@ -26,14 +26,39 @@ kill_timeout = "5s"
 [env]
   PRIMARY_REGION = "den"
 
+# 1. SIP UDP on Port 5060
 [[services]]
-  protocol = "udp"
-  internal_port = 5060
-  processes = ["app"]
+protocol = "udp"
+internal_port = 5060
+processes = ["app"]
 
-  [[services.ports]]
-    port = 5060
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 25
-    soft_limit = 20
+[[services.ports]]
+port = 5060
+
+# 2. SIP TCP on Port 5060
+[[services]]
+protocol = "tcp"
+internal_port = 5060
+processes = ["app"]
+
+[[services.ports]]
+port = 5060
+
+[services.concurrency]
+type = "connections"
+hard_limit = 25
+soft_limit = 20
+
+# 3. SIP TLS (TCP) on Port 5061
+[[services]]
+protocol = "tcp"
+internal_port = 5061
+processes = ["app"]
+
+[[services.ports]]
+port = 5061
+
+[services.concurrency]
+type = "connections"
+hard_limit = 25
+soft_limit = 20
