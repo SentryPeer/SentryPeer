@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make CMakeLists.txt more robust [#424](https://github.com/SentryPeer/SentryPeer/issues/424)
 - Clean up cppcheck [#427](https://github.com/SentryPeer/SentryPeer/issues/427)
 - Handle CMake and Autotools better in build.rs [#429](https://github.com/SentryPeer/SentryPeer/issues/429)
+- SIP replies echo the request's Via/From/To/Call-ID/CSeq, and `Server` is now `FPBX-17.0.32(22.6.0)` [#421](https://github.com/SentryPeer/SentryPeer/pull/421)
 
 ### Fixes 
 - Panic on startup when the default config directory can't be created 

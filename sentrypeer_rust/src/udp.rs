@@ -11,7 +11,7 @@
                              |___/
 */
 use crate::config::SentryPeerConfig;
-use crate::sip::{SIP_PACKET, log_sip_packet};
+use crate::sip::{build_sip_reply, log_sip_packet};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::UdpSocket;
@@ -52,7 +52,8 @@ pub async fn handle_udp_connection(
     }
 
     if sip_responsive_mode {
-        udp_socket.send_to(SIP_PACKET, peer_addr).await?;
+        let reply = build_sip_reply(&buf[..bytes_read]);
+        udp_socket.send_to(&reply, peer_addr).await?;
     }
 
     Ok(())

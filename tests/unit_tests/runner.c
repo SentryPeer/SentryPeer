@@ -78,6 +78,11 @@ int main(void)
 		cmocka_unit_test(test_route_regex_check),
 		cmocka_unit_test(test_sip_message_event),
 		cmocka_unit_test(test_sip_daemon),
+		cmocka_unit_test(
+			test_sip_send_reply_correlates_request_headers),
+		cmocka_unit_test(test_sip_send_reply_preserves_existing_to_tag),
+		cmocka_unit_test(test_sip_send_reply_header_edge_cases),
+		cmocka_unit_test(test_sip_send_reply_ignores_bytes_after_nul),
 		cmocka_unit_test_setup_teardown(test_json_logger,
 						test_setup_sqlite_db,
 						test_teardown_sqlite_db),

@@ -33,6 +33,7 @@
 #include <syslog.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "conf.h"
 #include "utils.h"
@@ -186,29 +187,147 @@ int sip_log_event(sentrypeer_config *config, const sip_message_event *sip_event)
 	return EXIT_SUCCESS;
 }
 
+// Copies the value of the first `header_name` header in `packet` into `out`.
+// The daemon's copy of the packet can be shorter than `packet_len`, so stop
+// at its first NUL.
+static bool sip_extract_header_value(char const *packet, size_t packet_len,
+				     char const *header_name, char *out,
+				     size_t out_len)
+{
+	assert(packet);
+	assert(header_name);
+	assert(out);
+	assert(out_len > 0);
+
+	size_t copy_len = strnlen(packet, packet_len);
+	char *buf = calloc(copy_len + 1, 1);
+	if (buf == NULL) {
+		return false;
+	}
+	memcpy(buf, packet, copy_len);
+
+	bool found = false;
+	size_t name_len = strlen(header_name);
+	char *line = buf;
+
+	// Ignore leading CRLFs (RFC 3261 §7.5)
+	while (strncmp(line, "\r\n", 2) == 0) {
+		line += 2;
+	}
+
+	// The headers end at the first empty line
+	while (*line != '\0' && strncmp(line, "\r\n", 2) != 0) {
+		char *line_end = strstr(line, "\r\n");
+
+		if (strncasecmp(line, header_name, name_len) == 0) {
+			char *p = line + name_len;
+			p += strspn(p, " \t");
+			if (*p == ':') {
+				p++;
+				p += strspn(p, " \t");
+				// A stray CR or LF ends the value
+				size_t value_len = strcspn(p, "\r\n");
+				while (value_len > 0 &&
+				       (p[value_len - 1] == ' ' ||
+					p[value_len - 1] == '\t')) {
+					value_len--;
+				}
+				// Empty means missing, so the default is used
+				if (value_len == 0) {
+					break;
+				}
+				if (value_len >= out_len) {
+					value_len = out_len - 1;
+				}
+				memcpy(out, p, value_len);
+				out[value_len] = '\0';
+				found = true;
+				break;
+			}
+		}
+
+		if (line_end == NULL) {
+			break;
+		}
+		line = line_end + 2;
+	}
+
+	free(buf);
+	return found;
+}
+
+// True if `to` has a tag parameter: ";" SWS "tag" SWS "=" (RFC 3261 §25.1)
+static bool sip_to_has_tag(char const *to)
+{
+	for (char const *p = strchr(to, ';'); p != NULL;
+	     p = strchr(p + 1, ';')) {
+		char const *q = p + 1 + strspn(p + 1, " \t");
+		if (strncasecmp(q, "tag", 3) == 0) {
+			q += 3;
+			if (q[strspn(q, " \t")] == '=') {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 int sip_send_reply(sentrypeer_config const *config,
 		   sip_message_event const *sip_event)
 {
-	// TODO Create reply headers with libosip2. Bad
-	// Actors don't seem to care we're always replying
-	// with 200 OK/non-compliant SIP :-)
-	char SIP_200_OK[] =
+	char via[256] = "SIP/2.0/UDP 127.0.0.1:56940";
+	char from[256] = "<sip:sipsak@127.0.0.1>;tag=464eb44f";
+	char to[256] = "<sip:asterisk@127.0.0.1>";
+	char call_id[256] = "1179563087@127.0.0.1";
+	char cseq[64] = "1 OPTIONS";
+	char to_tag[UTILS_UUID_STRING_LEN] = { 0 };
+	char reply[2048];
+
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "Via", via, sizeof(via));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "From", from, sizeof(from));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len, "To",
+				 to, sizeof(to));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "Call-ID", call_id, sizeof(call_id));
+	sip_extract_header_value(sip_event->packet, sip_event->packet_len,
+				 "CSeq", cseq, sizeof(cseq));
+
+	// A final response needs a To-tag (RFC 3261 §8.2.6.2)
+	if (!sip_to_has_tag(to)) {
+		char uuid_string[UTILS_UUID_STRING_LEN];
+		util_uuid_generate_string(uuid_string);
+		snprintf(to_tag, sizeof(to_tag), "%.8s", uuid_string);
+	}
+
+	int reply_len = snprintf(
+		reply, sizeof(reply),
 		"SIP/2.0 200 OK\r\n"
-		"Via: SIP/2.0/UDP 127.0.0.1:56940\r\n"
-		"Call-ID: 1179563087@127.0.0.1\r\n"
-		"From: <sip:sipsak@127.0.0.1>;tag=464eb44f\r\n"
-		"To: <sip:asterisk@127.0.0.1>;tag=z9hG4bK.1c882828\r\n"
-		"CSeq: 1 OPTIONS\r\n"
+		"Via: %s\r\n"
+		"Call-ID: %s\r\n"
+		"From: %s\r\n"
+		"To: %s%s%s\r\n"
+		"CSeq: %s\r\n"
 		"Accept: application/sdp, application/dialog-info+xml, application/simple-message-summary, application/xpidf+xml, application/cpim-pidf+xml, application/pidf+xml, application/pidf+xml, application/dialog-info+xml, application/simple-message-summary, message/sipfrag;version=2.0\r\n"
 		"Allow: OPTIONS, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, REGISTER, REFER, MESSAGE\r\n"
 		"Supported: 100rel, timer, replaces, norefersub\r\n"
 		"Accept-Encoding: text/plain\r\n"
 		"Accept-Language: en\r\n"
-		"Server: FPBX-16.0.33(18.13.0)\r\n"
-		"Content-Length:  0\r\n";
+		"Server: FPBX-17.0.32(22.6.0)\r\n"
+		"Content-Length:  0\r\n",
+		via, call_id, from, to, to_tag[0] != '\0' ? ";tag=" : "",
+		to_tag, cseq);
+
+	if (reply_len < 0 || (size_t)reply_len >= sizeof(reply)) {
+		if (config->debug_mode || config->verbose_mode) {
+			fprintf(stderr, "SIP reply too large for buffer.\n");
+		}
+		return EXIT_FAILURE;
+	}
 
 	long bytes_sent =
-		sendto(sip_event->socket, SIP_200_OK, sizeof(SIP_200_OK), 0,
+		sendto(sip_event->socket, reply, (size_t)reply_len, 0,
 		       sip_event->client_ip_addr, sip_event->client_addr_len);
 	if (bytes_sent < 1) {
 		if (config->debug_mode || config->verbose_mode) {
