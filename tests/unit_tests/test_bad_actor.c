@@ -130,6 +130,11 @@ void test_bad_actor(void **state)
 		"Max-forwards: 70\r\n"
 		"Content-Length: 0\r\n";
 
+	// A SIP response has a status line, not a request line, so libosip2
+	// leaves sip_method NULL.
+	const char test_valid_sip_response_to_parse[] =
+		"SIP/2.0 200 OK\r\n\r\n";
+
 	sentrypeer_config *config = sentrypeer_config_new();
 	assert_non_null(config);
 	config->debug_mode = true;
@@ -203,6 +208,16 @@ void test_bad_actor(void **state)
 			    BAD_ACTOR_NOT_FOUND);
 	bad_actor_destroy(&bad_actor_event4_1);
 	assert_null(bad_actor_event4_1);
+
+	bad_actor *bad_actor_event4_2 = test_bad_actor_event_new();
+	assert_int_equal(
+		sip_message_parser(test_valid_sip_response_to_parse,
+				   sizeof(test_valid_sip_response_to_parse) - 1,
+				   bad_actor_event4_2, config),
+		EXIT_SUCCESS);
+	assert_string_equal(bad_actor_event4_2->method, BAD_ACTOR_NOT_FOUND);
+	bad_actor_destroy(&bad_actor_event4_2);
+	assert_null(bad_actor_event4_2);
 
 	bad_actor *bad_actor_event5 = test_bad_actor_event_new();
 	char *bad_actor_json = bad_actor_to_json(config, bad_actor_event5);

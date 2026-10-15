@@ -10,16 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update crates using `cargo update` for latest versions and to fix compile issues with `bindgen`
 - Update our clippy lints and address them. Mainly to remove `unwrap()` and 
   `expect()` to avoid panics in production and other idiomatic changes - [#422](https://github.com/SentryPeer/SentryPeer/issues/422)
-- Make CMakeLists.txt more robust [#424](https://github.com/SentryPeer/SentryPeer/issues/424)
-- Clean up cppcheck [#427](https://github.com/SentryPeer/SentryPeer/issues/427)
-- Handle CMake and Autotools better in build.rs [#429](https://github.com/SentryPeer/SentryPeer/issues/429)
+- Make CMakeLists.txt more robust - [#424](https://github.com/SentryPeer/SentryPeer/issues/424)
+- Clean up cppcheck - [#427](https://github.com/SentryPeer/SentryPeer/issues/427)
+- Handle CMake and Autotools better in build.rs - [#429](https://github.com/SentryPeer/SentryPeer/issues/429)
 
 ### Fixes 
 - Panic on startup when the default config directory can't be created 
-  (e.g. read-only container filesystem). Closes [#420](https://github.com/SentryPeer/SentryPeer/issues/420)
-- macOS frameworks are not linked to correctly [#423](https://github.com/SentryPeer/SentryPeer/issues/423)
-- Logging injection potential - SonarCloud [#428](https://github.com/SentryPeer/SentryPeer/issues/428)
-- Fix panic on SIP packets containing an embedded NUL byte [#419](https://github.com/SentryPeer/SentryPeer/pull/419)
+  (e.g. read-only container filesystem) - [#420](https://github.com/SentryPeer/SentryPeer/issues/420)
+- macOS frameworks are not linked to correctly - [#423](https://github.com/SentryPeer/SentryPeer/issues/423)
+- Logging injection potential - SonarCloud - [#428](https://github.com/SentryPeer/SentryPeer/issues/428)
+- Fix panic on SIP packets containing an embedded NUL byte - [#419](https://github.com/SentryPeer/SentryPeer/pull/419)
+- Fix abort on a SIP response packet, which has no method, so `sip_method` is
+  NULL and `util_duplicate_string()` asserts - [#446](https://github.com/SentryPeer/SentryPeer/pull/446)
 
 ## [4.0.5] - 2026-07-27
 
