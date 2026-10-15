@@ -66,8 +66,14 @@ int sip_message_parser(const char *incoming_sip_message, size_t packet_size,
 
 	// SIP Method
 	bad_actor_event->method = 0; // Clear the previous SIP method
-	bad_actor_event->method =
-		util_duplicate_string(parsed_sip_message->sip_method);
+	// A SIP response has no method, so sip_method is NULL.
+	if (parsed_sip_message->sip_method != NULL) {
+		bad_actor_event->method =
+			util_duplicate_string(parsed_sip_message->sip_method);
+	} else {
+		bad_actor_event->method =
+			util_duplicate_string(BAD_ACTOR_NOT_FOUND);
+	}
 
 	// Phone Number called
 	bad_actor_event->called_number = 0; // Clear the previous called number

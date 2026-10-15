@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - macOS frameworks are not linked to correctly [#423](https://github.com/SentryPeer/SentryPeer/issues/423)
 - Logging injection potential - SonarCloud [#428](https://github.com/SentryPeer/SentryPeer/issues/428)
 - Fix panic on SIP packets containing an embedded NUL byte [#419](https://github.com/SentryPeer/SentryPeer/pull/419)
+- Fix abort on a SIP response packet, which has no method, so `sip_method` is
+  NULL and `util_duplicate_string()` asserts
 
 ## [4.0.5] - 2026-07-27
 
