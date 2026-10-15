@@ -9,6 +9,7 @@
 [![Build and Test](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/main.yml)
 [![CodeQL](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/codeql-analysis.yml)
 [![Clang Static Analysis](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml/badge.svg)](https://github.com/SentryPeer/SentryPeer/actions/workflows/clang-analyzer.yml)
+[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/23969.svg)](https://scan.coverity.com/projects/sentrypeer-sentrypeer)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5374/badge)](https://bestpractices.coreinfrastructure.org/projects/5374)
 [![gitleaks](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml/badge.svg?branch=main)](https://github.com/SentryPeer/SentryPeer/actions/workflows/gitleaks.yml)
 
