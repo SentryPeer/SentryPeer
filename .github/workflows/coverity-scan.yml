@@ -43,8 +43,18 @@ jobs:
           mkdir coverity-tools
           tar xzf cov-analysis-linux64.tar.gz --strip 1 -C coverity-tools
           rm cov-analysis-linux64.tar.gz
+          echo "$GITHUB_WORKSPACE/coverity-tools/bin" >> "$GITHUB_PATH"
         env:
           TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+
+      - name: Validate Coverity version
+        run: |
+          version=$(cov-build --version)
+          echo "$version"
+          if [[ ! "$version" =~ version[[:space:]](2024\.12\.1|2024\.6\.1)([[:space:]]|$) ]]; then
+            echo "::error::Unsupported cov-build version. Expected 2024.12.1 or 2024.6.1."
+            exit 1
+          fi
 
       - name: Run bootstrap.sh
         run: ./bootstrap.sh
@@ -54,7 +64,6 @@ jobs:
 
       - name: Build
         run: |
-          export PATH=`pwd`/coverity-tools/bin:$PATH
           ( cov-build --dir cov-int make -j 3 )
           cat cov-int/build-log.txt
 
