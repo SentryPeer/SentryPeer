@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v5.0.0] - 2026-10-15
+
 ### Changes
 - Update crates using `cargo update` for latest versions and to fix compile issues with `bindgen`
 - Update our clippy lints and address them. Mainly to remove `unwrap()` and 
@@ -47,7 +49,7 @@ Thanks for reporting @szenzero
 - Don't use `rust-lld` due to https://github.com/rust-lang/rust/issues/147329
 - Add clippy lint checks to Cargo.toml to catch any `unwrap()` or `expect()` usage
 - Update Rust crates to the latest versions for security fixes
-
+ 
 ## [4.0.4] - 2025-03-17
 
 ### Fixes
