@@ -63,7 +63,7 @@ jobs:
           tar -czvf sentrypeer.tar.gz cov-int
           curl \
             --form token=$TOKEN \
-            --form email=ghenry@suretecsystems.com \
+            --form email=ghenry@antnetworks.com \
             --form file=@sentrypeer.tar.gz \
             --form version=main \
             --form description="`git rev-parse HEAD`" \
