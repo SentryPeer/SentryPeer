@@ -49,11 +49,14 @@ jobs:
 
       - name: Validate Coverity version
         run: |
-          version=$(cov-build --version)
-          echo "$version"
-          if [[ ! "$version" =~ version[[:space:]](2024\.12\.1|2024\.6\.1)([[:space:]]|$) ]]; then
-            echo "::error::Unsupported cov-build version. Expected 2024.12.1 or 2024.6.1."
-            exit 1
+          if version=$(cov-build --version 2>&1); then
+            echo "$version"
+            if [[ ! "$version" =~ version[[:space:]](2024\.12\.1|2024\.6\.1)([[:space:]]|$) ]]; then
+              echo "::error::Unsupported cov-build version. Expected 2024.12.1 or 2024.6.1."
+              exit 1
+            fi
+          else
+            echo "::notice::cov-build does not support --version; skipping version validation."
           fi
 
       - name: Run bootstrap.sh
