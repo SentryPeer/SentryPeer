@@ -25,6 +25,10 @@ Group=sentrypeer
 StandardOutput=journal
 StandardError=journal
 Restart=on-failure
+# systemd's default RestartSec=100ms restarts fast enough that five crashes
+# land inside the default 10s StartLimitIntervalSec and the unit gives up.
+# Spacing restarts out keeps a crashing honeypot alive.
+RestartSec=5s
 PrivateTmp=yes
 
 [Install]
