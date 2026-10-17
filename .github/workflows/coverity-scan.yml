@@ -70,20 +70,6 @@ jobs:
           ( cov-build --dir cov-int sh -c 'make -j 3 && make -j 3 check TESTS=' )
           cat cov-int/build-log.txt
 
-      - name: Restrict Coverity scan to src and tests only
-        run: |
-          # Remove every captured translation unit not under src/ or tests/ (e.g. sentrypeer_rust)
-          if filter_output=$(cov-manage-emit --dir cov-int --tu-pattern \
-            "!(file('^$GITHUB_WORKSPACE/src/') || file('^$GITHUB_WORKSPACE/tests/'))" delete 2>&1); then
-            echo "$filter_output"
-          elif [[ "$filter_output" == *"No matching translation units."* ]]; then
-            echo "$filter_output"
-          else
-            echo "$filter_output" >&2
-            exit 1
-          fi
-          cov-manage-emit --dir cov-int list
-
       - name: Submit the result to Coverity Scan
         run: |
           tar -czvf sentrypeer.tar.gz cov-int
