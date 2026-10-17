@@ -74,7 +74,7 @@ jobs:
         run: |
           # Remove every captured translation unit not under src/ or tests/ (e.g. sentrypeer_rust)
           cov-manage-emit --dir cov-int --tu-pattern \
-            "not (file('^$GITHUB_WORKSPACE/src/') or file('^$GITHUB_WORKSPACE/tests/'))" delete
+            "!(file('^$GITHUB_WORKSPACE/src/') || file('^$GITHUB_WORKSPACE/tests/'))" delete
           cov-manage-emit --dir cov-int list-tus
 
       - name: Submit the result to Coverity Scan
