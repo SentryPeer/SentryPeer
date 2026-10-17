@@ -82,7 +82,7 @@ jobs:
             echo "$filter_output" >&2
             exit 1
           fi
-          cov-manage-emit --dir cov-int list-tus
+          cov-manage-emit --dir cov-int list
 
       - name: Submit the result to Coverity Scan
         run: |
