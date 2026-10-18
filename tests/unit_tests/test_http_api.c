@@ -40,7 +40,13 @@ static long curl_get_url(const char *url)
 		return CURLE_FAILED_INIT;
 	}
 
-	curl_easy_setopt(curl, CURLOPT_URL, url);
+	res = curl_easy_setopt(curl, CURLOPT_URL, url);
+	if (res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_setopt() failed: %s\n",
+			curl_easy_strerror(res));
+		curl_easy_cleanup(curl);
+		return EXIT_FAILURE;
+	}
 	res = curl_easy_perform(curl);
 	if (res != CURLE_OK) {
 		fprintf(stderr, "curl_easy_perform() failed: %s\n",
