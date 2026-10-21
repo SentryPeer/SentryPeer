@@ -156,7 +156,25 @@ EXTRA_DIST=AUTHORS README.md CHANGELOG.md \
            COPYRIGHT COPYING LICENSE.GPL-2.0-only \
            LICENSE.GPL-3.0-only CMakeLists.txt \
            cmake/git_revision.cmake cmake/config.h.in \
-           .env
+           .env \
+            tests/fuzz/corpus/http_input/ip.txt \
+            tests/fuzz/corpus/http_input/ip6.txt \
+            tests/fuzz/corpus/http_input/number.txt \
+            tests/fuzz/corpus/http_input/number2.txt \
+            tests/fuzz/corpus/json_bad_actor/bad_actor.json \
+            tests/fuzz/corpus/sip_parser/invite.sip \
+            tests/fuzz/corpus/sip_parser/invite_sdp.sip \
+            tests/fuzz/corpus/sip_parser/message_multipart.sip \
+            tests/fuzz/corpus/sip_parser/options.sip \
+            tests/fuzz/corpus/sip_parser/register_auth.sip \
+            tests/fuzz/corpus/sip_parser/response_minimal.sip \
+            tests/fuzz/corpus/sip_parser/response_ok.sip \
+            tests/fuzz/corpus/sip_parser/response_proxy_auth.sip \
+            tests/fuzz/corpus/sip_parser/response_unauthorized.sip \
+            tests/fuzz/fuzz_http_input.c \
+            tests/fuzz/fuzz_json_bad_actor.c \
+            tests/fuzz/fuzz_sip_parser.c \
+            tests/fuzz/sip.dict
 
 if !DISABLE_RUST
 if HAVE_RUST
