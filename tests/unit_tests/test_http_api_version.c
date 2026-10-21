@@ -48,6 +48,7 @@ int test_http_api_health_check_version(void)
 	CURL *curl_handle;
 	memory_struct chunk;
 	memory_struct *chunk_ptr = &chunk;
+	CURLcode curl_result;
 
 	chunk.memory =
 		malloc(1); /* Will be grown as needed by the realloc above */
@@ -61,35 +62,34 @@ int test_http_api_health_check_version(void)
 	assert_non_null(curl_handle);
 
 	/* Specify URL to get */
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_URL,
-					  "http://localhost:8082/health-check"),
-			 CURLE_OK);
+	curl_result = curl_easy_setopt(curl_handle, CURLOPT_URL,
+				       "http://localhost:8082/health-check");
+	assert_int_equal(curl_result, CURLE_OK);
 
 	/* Send all data to this function  */
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION,
-					  save_json_results),
-			 CURLE_OK);
+	curl_result = curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION,
+				       save_json_results);
+	assert_int_equal(curl_result, CURLE_OK);
 
 	/* We pass our 'chunk' struct to the callback function */
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA,
-					  chunk_ptr),
-			 CURLE_OK);
+	curl_result =
+		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, chunk_ptr);
+	assert_int_equal(curl_result, CURLE_OK);
 
 	struct curl_slist *headers = 0;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER,
-					  headers),
-			 CURLE_OK);
+	curl_result = curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers);
+	assert_int_equal(curl_result, CURLE_OK);
 
 	/* Some servers do not like requests that are made without a user-agent
      	   field, so we provide one */
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_USERAGENT,
-					  "SentryPeer/1.0"),
-			 CURLE_OK);
+	curl_result =
+		curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "SentryPeer/1.0");
+	assert_int_equal(curl_result, CURLE_OK);
 
 	/* Save version output for troubleshooting in test-suite.log if failures */
-	assert_int_equal(curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L),
-			 CURLE_OK);
+	curl_result = curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
+	assert_int_equal(curl_result, CURLE_OK);
 
 	/* Get it! */
 	assert_int_equal(curl_easy_perform(curl_handle), CURLE_OK);
