@@ -32,9 +32,7 @@ fn c_char_ptr_to_str<'a>(ptr: *const c_char) -> &'a str {
 
 fn json_val_to_cstring(val: &serde_json::Value, key: &str) -> CString {
     let s = val.get(key).and_then(|v| v.as_str()).unwrap_or("not_found");
-    CString::new(s).unwrap_or_else(|_| {
-        CString::new("not_found").unwrap_or_default()
-    })
+    CString::new(s).unwrap_or_else(|_| CString::new("not_found").unwrap_or_default())
 }
 
 #[unsafe(no_mangle)]
@@ -376,15 +374,11 @@ pub(crate) unsafe extern "C" fn json_http_post_bad_actor_rs(
                     eprintln!("Failed to POST bad actor.");
                     libc::EXIT_FAILURE
                 } else {
-                    eprintln!(
-                        "WebHook POSTing failed: HTTP response code: {res_status:?}"
-                    );
+                    eprintln!("WebHook POSTing failed: HTTP response code: {res_status:?}");
                     libc::EXIT_FAILURE
                 }
             } else {
-                eprintln!(
-                    "WebHook POSTing failed: HTTP response code: {res_status:?}"
-                );
+                eprintln!("WebHook POSTing failed: HTTP response code: {res_status:?}");
                 libc::EXIT_FAILURE
             };
         }
@@ -429,8 +423,7 @@ mod tests {
                 util_duplicate_string(CString::new("SIPp")?.as_ptr()),
                 util_duplicate_string(CString::new("responsive")?.as_ptr()),
                 util_duplicate_string(
-                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?
-                        .as_ptr(),
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?.as_ptr(),
                 ),
             );
 
@@ -468,13 +461,10 @@ mod tests {
                 "sip_message": "INVITE"
             }"#;
 
-            let bad_actor_event = json_to_bad_actor_rs(
-                sentrypeer_c_config,
-                CString::new(json_str)?.into_raw(),
-            );
+            let bad_actor_event =
+                json_to_bad_actor_rs(sentrypeer_c_config, CString::new(json_str)?.into_raw());
             assert_str_eq!(
-                CStr::from_ptr((*bad_actor_event).collected_method)
-                    .to_str()?,
+                CStr::from_ptr((*bad_actor_event).collected_method).to_str()?,
                 String::from("responsive")
             );
 
@@ -498,8 +488,7 @@ mod tests {
                 util_duplicate_string(CString::new("SIPp")?.as_ptr()),
                 util_duplicate_string(CString::new("responsive")?.as_ptr()),
                 util_duplicate_string(
-                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?
-                        .as_ptr(),
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?.as_ptr(),
                 ),
             );
 
@@ -552,8 +541,7 @@ mod tests {
                 util_duplicate_string(CString::new("SIPp")?.as_ptr()),
                 util_duplicate_string(CString::new("responsive")?.as_ptr()),
                 util_duplicate_string(
-                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?
-                        .as_ptr(),
+                    CString::new("460f30e4-ce1d-4d53-9004-dd40a1c4abc9")?.as_ptr(),
                 ),
             );
 

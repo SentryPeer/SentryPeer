@@ -304,42 +304,23 @@ mod tests {
                 CStr::from_ptr(bad_actor.event_timestamp).to_str()?,
                 Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
             );
-            assert_eq!(
-                CStr::from_ptr(bad_actor.event_uuid).to_str()?.len(),
-                36
-            ); // We can't check the exact UUID, but we can check the length
-            assert_eq!(
-                CStr::from_ptr(bad_actor.sip_message).to_str()?,
-                "blah"
-            );
-            assert_eq!(
-                CStr::from_ptr(bad_actor.source_ip).to_str()?,
-                "127.0.0.1"
-            );
+            assert_eq!(CStr::from_ptr(bad_actor.event_uuid).to_str()?.len(), 36); // We can't check the exact UUID, but we can check the length
+            assert_eq!(CStr::from_ptr(bad_actor.sip_message).to_str()?, "blah");
+            assert_eq!(CStr::from_ptr(bad_actor.source_ip).to_str()?, "127.0.0.1");
             assert_eq!(
                 CStr::from_ptr(bad_actor.destination_ip).to_str()?,
                 "127.0.0.1"
             );
-            assert_eq!(
-                CStr::from_ptr(bad_actor.called_number).to_str()?,
-                "1234"
-            );
+            assert_eq!(CStr::from_ptr(bad_actor.called_number).to_str()?, "1234");
             assert_eq!(CStr::from_ptr(bad_actor.method).to_str()?, "INVITE");
-            assert_eq!(
-                CStr::from_ptr(bad_actor.transport_type).to_str()?,
-                "UDP"
-            );
-            assert_eq!(
-                CStr::from_ptr(bad_actor.user_agent).to_str()?,
-                "SIPp"
-            );
+            assert_eq!(CStr::from_ptr(bad_actor.transport_type).to_str()?, "UDP");
+            assert_eq!(CStr::from_ptr(bad_actor.user_agent).to_str()?, "SIPp");
             assert_eq!(
                 CStr::from_ptr(bad_actor.collected_method).to_str()?,
                 "INVITE"
             );
             assert_eq!(
-                CStr::from_ptr(bad_actor.created_by_node_id)
-                    .to_str()?,
+                CStr::from_ptr(bad_actor.created_by_node_id).to_str()?,
                 "460f30e4-ce1d-4d53-9004-dd40a1c4abc9"
             );
 

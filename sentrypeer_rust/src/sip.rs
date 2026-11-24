@@ -420,19 +420,40 @@ pub fn log_sip_packet(
     let packet_ptr = packet_c_str.into_raw();
 
     let Ok(transport_type_c_str) = CString::new(transport_type) else {
-        unsafe { clean_up_sip_message(packet_ptr, std::ptr::null_mut(), std::ptr::null_mut(), std::ptr::null_mut()) };
+        unsafe {
+            clean_up_sip_message(
+                packet_ptr,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            );
+        };
         return libc::EXIT_FAILURE;
     };
     let transport_type_ptr = transport_type_c_str.into_raw();
 
     let Ok(client_ip_addr_c_str) = CString::new(peer_addr.to_string()) else {
-        unsafe { clean_up_sip_message(packet_ptr, transport_type_ptr, std::ptr::null_mut(), std::ptr::null_mut()) };
+        unsafe {
+            clean_up_sip_message(
+                packet_ptr,
+                transport_type_ptr,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            );
+        };
         return libc::EXIT_FAILURE;
     };
     let client_ip_addr_ptr = client_ip_addr_c_str.into_raw();
 
     let Ok(dest_ip_addr_c_str) = CString::new(listen_addr.to_string()) else {
-        unsafe { clean_up_sip_message(packet_ptr, transport_type_ptr, client_ip_addr_ptr, std::ptr::null_mut()) };
+        unsafe {
+            clean_up_sip_message(
+                packet_ptr,
+                transport_type_ptr,
+                client_ip_addr_ptr,
+                std::ptr::null_mut(),
+            );
+        };
         return libc::EXIT_FAILURE;
     };
     let dest_ip_addr_ptr = dest_ip_addr_c_str.into_raw();
